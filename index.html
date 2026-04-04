@@ -117,6 +117,35 @@
 
     .h-meta b { color: #dbeafe; }
 
+    .header-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .top-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 10px #34d399;
+    }
+
     .lastUpdate {
       font-size: 11px;
       opacity: 0.76;
@@ -419,7 +448,6 @@
       font-weight: 600;
     }
 
-    /* KPIs mais compactos */
     .kpis {
       display: grid;
       grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -489,19 +517,19 @@
 
     .kpi .val {
       margin-top: 3px;
-      font-size: 25px;
+      font-size: 27px;
       font-weight: 900;
-      line-height: 1.1;
+      line-height: 1.12;
       letter-spacing: -0.04em;
       word-break: break-word;
     }
 
     .kpi .sub {
-      margin-top: 5px;
-      font-size: 10px;
+      margin-top: 6px;
+      font-size: 11px;
       color: var(--muted);
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
     .kpi-principal {
@@ -526,33 +554,24 @@
     .kpi-faturados-qtd .kpiIcon { background: rgba(37,99,235,.12); color: var(--secondary); }
     .kpi-fat .kpiIcon { background: rgba(11,94,66,.12); color: var(--primary); }
 
-    /* NOVO CSS DOS MÓDULOS - mais compactos e responsivos */
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px;
-      margin: 0 0 18px;
+      grid-template-columns: 1.35fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
-    @media (max-width: 1400px) {
-      .summary-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 980px) {
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 1180px) {
+      .summary-grid { grid-template-columns: 1fr; }
     }
 
     .summary-card {
       background: white;
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 22px;
       box-shadow: var(--shadow);
-      padding: 12px 14px;
-      min-height: 118px;
+      padding: 18px 18px 16px;
+      min-height: 160px;
       transition: all .22s ease;
     }
 
@@ -562,9 +581,9 @@
     }
 
     .summary-card-primary {
-      background: linear-gradient(135deg, #083c2d 0%, #0b5e42 52%, #0f7a58 100%);
+      background: linear-gradient(135deg, #083c2d 0%, #0b5e42 50%, #0f7a58 100%);
       color: white;
-      border-color: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.08);
       position: relative;
       overflow: hidden;
     }
@@ -573,68 +592,55 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 85% 20%, rgba(255,255,255,.10), transparent 28%);
+      background: radial-gradient(circle at 80% 20%, rgba(255,255,255,.12), transparent 28%);
       pointer-events: none;
     }
 
-    .summary-card-status {
-      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-    }
-
     .summary-title {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: .10em;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
     .summary-card-primary .summary-title {
-      color: rgba(255,255,255,.74);
+      color: rgba(255,255,255,.75);
     }
 
     .summary-main {
-      font-size: 15px;
+      font-size: 24px;
       font-weight: 900;
-      line-height: 1.25;
-      letter-spacing: -0.03em;
-      margin-bottom: 6px;
-      max-width: 100%;
-    }
-
-    .summary-main-sm {
-      font-size: 14px;
-      letter-spacing: -0.02em;
+      line-height: 1.18;
+      letter-spacing: -0.04em;
+      margin-bottom: 10px;
+      max-width: 92%;
     }
 
     .summary-desc {
-      font-size: 11px;
-      line-height: 1.45;
+      font-size: 13px;
+      line-height: 1.65;
       color: rgba(255,255,255,.86);
-    }
-
-    .summary-desc-sm {
-      color: var(--muted);
-      font-weight: 700;
+      max-width: 96%;
     }
 
     .chip-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 8px;
+      gap: 8px;
+      margin-bottom: 12px;
     }
 
     .filter-chip {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 9px;
+      gap: 8px;
+      padding: 8px 12px;
       border-radius: 999px;
       background: var(--card-muted);
       border: 1px solid var(--border);
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 800;
       color: var(--text);
     }
@@ -648,16 +654,16 @@
       background: #fff8eb;
       border: 1px solid #fde7c1;
       color: #8a5a08;
-      padding: 8px 10px;
-      border-radius: 12px;
-      font-size: 10.5px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      font-size: 12px;
       font-weight: 700;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .insight-list {
       display: grid;
-      gap: 7px;
+      gap: 10px;
       list-style: none;
       padding: 0;
       margin: 0;
@@ -665,16 +671,16 @@
 
     .insight-list li {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       align-items: flex-start;
       background: var(--card-muted);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 8px 10px;
-      font-size: 10.5px;
+      border-radius: 16px;
+      padding: 11px 12px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--text);
-      line-height: 1.35;
+      line-height: 1.45;
     }
 
     .insight-list i {
@@ -1041,13 +1047,13 @@
       color: white;
     }
 
-    /* TABELA VISÃO GERAL COM CABEÇALHO CONGELADO */
-    .estabelecimento-table-wrapper {
+    .estabelecimento-table-wrapper,
+    .table-container-fisico,
+    .table-wrapper,
+    .fin-table-wrap {
       overflow: auto;
       border-radius: 16px;
       border: 1px solid var(--border);
-      max-height: 550px;
-      position: relative;
       background: white;
     }
 
@@ -1059,6 +1065,9 @@
     }
 
     .estabelecimento-table th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
       background: linear-gradient(135deg, var(--primary-dark), var(--primary));
       color: white;
       padding: 12px 8px;
@@ -1067,18 +1076,13 @@
       font-size: 11px;
       text-transform: uppercase;
       white-space: nowrap;
-      position: sticky;
-      top: 0;
-      z-index: 30;
     }
 
     .estabelecimento-table th:first-child {
       text-align: left;
-      position: sticky;
       left: 0;
-      top: 0;
-      z-index: 35;
-      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      z-index: 11;
+      position: sticky;
     }
 
     .estabelecimento-table td {
@@ -1108,26 +1112,20 @@
       border-top: 2px solid var(--border);
     }
 
-    /* TABELA FÍSICO X FINANCEIRO COM CABEÇALHO CONGELADO */
-    .table-container-fisico {
-      overflow: auto;
-      max-height: 500px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      position: relative;
-      background: white;
-    }
-
-    .data-table-fisico {
+    .data-table-fisico,
+    .data-table-simple,
+    .fin-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 12px;
     }
 
-    .data-table-fisico th {
+    .data-table-fisico th,
+    .data-table-simple th,
+    .fin-table th {
       position: sticky;
       top: 0;
-      z-index: 30;
+      z-index: 10;
       background: linear-gradient(135deg, var(--primary-dark), var(--primary));
       color: white;
       padding: 13px 12px;
@@ -1136,10 +1134,6 @@
       font-size: 11px;
       text-transform: uppercase;
       white-space: nowrap;
-    }
-
-    .data-table-fisico thead th {
-      box-shadow: 0 1px 0 rgba(255,255,255,.08), 0 2px 0 rgba(0,0,0,.03);
     }
 
     .data-table-fisico td,
@@ -1313,6 +1307,11 @@
       &nbsp;•&nbsp; Desenvolvido por <b>Ana P. A. Silva — Matric. 201704</b>
     </div>
 
+    <div class="header-badges">
+      <div class="top-badge"><span class="dot"></span> Dados carregados das bases publicadas</div>
+      <div class="top-badge"><i class="fa-solid fa-filter-circle-xmark"></i> Financeiro respeita filtro de período</div>
+    </div>
+
     <div class="lastUpdate" id="lastUpdate">Carregando dados...</div>
   </div>
 
@@ -1326,48 +1325,6 @@
 <div class="toastBox" id="toastBox"></div>
 
 <main class="wrap">
-  <!-- MÓDULOS COMPACTOS (logo abaixo do cabeçalho) -->
-  <div class="summary-grid">
-    <div class="summary-card summary-card-status">
-      <div class="summary-title">Status da Base</div>
-      <div class="summary-main summary-main-sm">Dados carregados das bases publicadas</div>
-      <div class="summary-desc summary-desc-sm">
-        Integração com fila de espera, agendamentos Vivver, agendados e consolidado financeiro.
-      </div>
-    </div>
-
-    <div class="summary-card summary-card-status">
-      <div class="summary-title">Regra de Leitura</div>
-      <div class="summary-main summary-main-sm">Financeiro respeita o filtro de período</div>
-      <div class="summary-desc summary-desc-sm">
-        A base financeira é consolidada e não possui o mesmo detalhamento analítico de especialidade/subgrupo.
-      </div>
-    </div>
-
-    <div class="summary-card summary-card-primary">
-      <div class="summary-title">Resumo Executivo</div>
-      <div class="summary-main" id="summaryHeadline">Carregando leitura executiva...</div>
-      <div class="summary-desc" id="summaryDescription">Aguarde a consolidação das bases.</div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-title">Escopo Aplicado</div>
-      <div class="chip-list" id="activeFilterChips">
-        <span class="filter-chip">Carregando filtros...</span>
-      </div>
-      <div class="scope-note" id="scopeNote">
-        Financeiro respeita apenas o filtro de período, pois a base consolidada não traz o mesmo nível de detalhamento por especialidade/subgrupo.
-      </div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-title">Principais Insights</div>
-      <ul class="insight-list" id="insightList">
-        <li><i class="fa-solid fa-chart-line"></i> Consolidando indicadores...</li>
-      </ul>
-    </div>
-  </div>
-
   <div class="card filters">
     <div class="filtersTop">
       <div class="filtersTitle">
@@ -1487,6 +1444,31 @@
         <div class="val" id="kFinanceiro">R$ 0</div>
         <div class="sub" id="subFinanceiro">Carregando...</div>
       </div>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card summary-card-primary">
+      <div class="summary-title">Resumo executivo</div>
+      <div class="summary-main" id="summaryHeadline">Carregando leitura executiva...</div>
+      <div class="summary-desc" id="summaryDescription">Aguarde a consolidação das bases.</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-title">Escopo aplicado</div>
+      <div class="chip-list" id="activeFilterChips">
+        <span class="filter-chip">Carregando filtros...</span>
+      </div>
+      <div class="scope-note" id="scopeNote">
+        Financeiro respeita apenas o filtro de período, pois a base consolidada não traz o mesmo nível de detalhamento por especialidade/subgrupo.
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-title">Principais insights</div>
+      <ul class="insight-list" id="insightList">
+        <li><i class="fa-solid fa-chart-line"></i> Consolidando indicadores...</li>
+      </ul>
     </div>
   </div>
 
@@ -1627,12 +1609,12 @@
               <th>Hospital São José</th>
               <th>Hospital Santa Rita</th>
               <th>Total</th>
-             </tr>
+            </tr>
           </thead>
           <tbody id="tableAgendadasPorEspecEstabBody">
-             <tr><td colspan="8">Carregando...</td></tr>
+            <tr><td colspan="8">Carregando...</td></tr>
           </tbody>
-         </table>
+        </table>
       </div>
     </div>
   </section>
@@ -1701,18 +1683,18 @@
       <div class="table-container-fisico">
         <table class="data-table-fisico" id="tabelaFisicoFinanceiro">
           <thead>
-             <tr>
+            <tr>
               <th onclick="sortTableFisico(0)" style="cursor:pointer;">Estabelecimento <i class="fa-solid fa-arrow-up-wide-short"></i></th>
               <th onclick="sortTableFisico(1)" style="cursor:pointer;">Mês <i class="fa-solid fa-arrow-up-wide-short"></i></th>
               <th class="text-right" onclick="sortTableFisico(2)" style="cursor:pointer;">Agendados <i class="fa-solid fa-arrow-up-wide-short"></i></th>
               <th class="text-right" onclick="sortTableFisico(3)" style="cursor:pointer;">Total Faturado <i class="fa-solid fa-arrow-up-wide-short"></i></th>
               <th class="text-right" onclick="sortTableFisico(4)" style="cursor:pointer;">Total Financeiro <i class="fa-solid fa-arrow-up-wide-short"></i></th>
-             </tr>
+            </tr>
           </thead>
           <tbody id="tBodyFisico">
-             <tr><td colspan="5">Carregando...</td></tr>
+            <tr><td colspan="5">Carregando...</td></tr>
           </tbody>
-         </table>
+        </table>
       </div>
       <div class="muted" id="tInfoFisico" style="margin-top: 12px; text-align: right;">—</div>
     </div>
@@ -1762,10 +1744,10 @@
         <div class="table-wrapper">
           <table class="data-table-simple" id="tableOfertas">
             <thead>
-               <tr><th>Especialidade</th><th class="text-right">Total</th></tr>
+              <tr><th>Especialidade</th><th class="text-right">Total</th></tr>
             </thead>
-            <tbody id="tableOfertasBody"> <tr><td colspan="2">Carregando...</td></tr> </tbody>
-           </table>
+            <tbody id="tableOfertasBody"><tr><td colspan="2">Carregando...</td></tr></tbody>
+          </table>
         </div>
       </div>
 
@@ -1774,10 +1756,10 @@
         <div class="table-wrapper">
           <table class="data-table-simple" id="tableRecepcionadosVivver">
             <thead>
-               <tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Referente à Oferta</th></tr>
+              <tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Referente à Oferta</th></tr>
             </thead>
-            <tbody id="tableRecepcionadosVivverBody"> <tr><td colspan="3">Carregando...</td></tr> </tbody>
-           </table>
+            <tbody id="tableRecepcionadosVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
         </div>
       </div>
 
@@ -1786,10 +1768,10 @@
         <div class="table-wrapper">
           <table class="data-table-simple" id="tableFaltososVivver">
             <thead>
-               <tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Referente à Oferta</th></tr>
+              <tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Referente à Oferta</th></tr>
             </thead>
-            <tbody id="tableFaltososVivverBody"> <tr><td colspan="3">Carregando...</td></tr> </tbody>
-           </table>
+            <tbody id="tableFaltososVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1803,10 +1785,10 @@
         <div class="table-wrapper" style="max-height: 400px;">
           <table class="data-table-simple" id="tableFilaEspecialidade">
             <thead>
-               <tr><th>Especialidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr>
+              <tr><th>Especialidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr>
             </thead>
-            <tbody id="tableFilaEspecialidadeBody"> <tr><td colspan="3">Carregando...</td></tr> </tbody>
-           </table>
+            <tbody id="tableFilaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
         </div>
       </div>
 
@@ -1815,10 +1797,10 @@
         <div class="table-wrapper" style="max-height: 400px;">
           <table class="data-table-simple" id="tableFilaProcedimento">
             <thead>
-               <tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr>
+              <tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr>
             </thead>
-            <tbody id="tableFilaProcedimentoBody"> <tr><td colspan="3">Carregando...</td></tr> </tbody>
-           </table>
+            <tbody id="tableFilaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1829,10 +1811,10 @@
         <div class="table-wrapper" style="max-height: 400px;">
           <table class="data-table-simple" id="tableFilaComplexidade">
             <thead>
-               <tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr>
+              <tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr>
             </thead>
-            <tbody id="tableFilaComplexidadeBody"> <tr><td colspan="3">Carregando...</td></tr> </tbody>
-           </table>
+            <tbody id="tableFilaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
         </div>
       </div>
 
@@ -1841,10 +1823,10 @@
         <div class="table-wrapper" style="max-height: 400px;">
           <table class="data-table-simple" id="tableFilaSubgrupo">
             <thead>
-               <tr><th>Subgrupo</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr>
+              <tr><th>Subgrupo</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr>
             </thead>
-            <tbody id="tableFilaSubgrupoBody"> <tr><td colspan="3">Carregando...</td></tr> </tbody>
-           </table>
+            <tbody id="tableFilaSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -2915,14 +2897,14 @@
         scales: {
           x: {
             beginAtZero: true,
-            grid: { display: false, drawBorder: false },
+            grid: { color: "rgba(148,163,184,0.10)" },
             ticks: {
               font: { weight: "bold", size: 10 },
               callback: value => isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR")
             }
           },
           y: {
-            grid: { display: false, drawBorder: false },
+            grid: { display: false },
             ticks: { font: { weight: "bold", size: 10 } }
           }
         }
@@ -3040,13 +3022,13 @@
         },
         scales: {
           x: {
-            grid: { display: false, drawBorder: false },
+            grid: { display: false },
             ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false }
           },
           y: {
             beginAtZero: true,
             grace: "10%",
-            grid: { display: false, drawBorder: false },
+            grid: { color: "rgba(148,163,184,0.12)" },
             ticks: {
               font: { weight: "bold" },
               callback: value => yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR")
@@ -3067,7 +3049,7 @@
     return periods.length ? periods : allPeriodos;
   }
 
-  function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
+    function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
     const canvas = el("cEvolucao");
     if (!canvas) return;
 
@@ -3176,7 +3158,7 @@
         },
         scales: {
           x: {
-            grid: { display: false, drawBorder: false },
+            grid: { display: false },
             ticks: {
               font: { weight: "bold" },
               maxRotation: 0,
@@ -3187,7 +3169,7 @@
             beginAtZero: true,
             position: "left",
             grace: "10%",
-            grid: { display: false, drawBorder: false },
+            grid: { color: "rgba(148,163,184,0.12)" },
             ticks: {
               font: { weight: "bold" },
               callback: value => value.toLocaleString("pt-BR")
@@ -3202,7 +3184,7 @@
             beginAtZero: true,
             position: "right",
             grace: "10%",
-            grid: { display: false, drawBorder: false },
+            grid: { drawOnChartArea: false },
             ticks: {
               font: { weight: "bold" },
               callback: value => value.toLocaleString("pt-BR")
@@ -3412,13 +3394,13 @@
           },
           scales: {
             x: {
-              grid: { display: false, drawBorder: false },
+              grid: { display: false },
               ticks: { font: { weight: "bold" } }
             },
             y: {
               beginAtZero: true,
               grace: "10%",
-              grid: { display: false, drawBorder: false },
+              grid: { color: "rgba(148,163,184,0.10)" },
               ticks: { font: { weight: "bold" } }
             }
           }
@@ -3815,13 +3797,13 @@
           },
           scales: {
             x: {
-              grid: { display: false, drawBorder: false },
+              grid: { display: false },
               ticks: { font: { weight: "bold" } }
             },
             y: {
               beginAtZero: true,
               grace: "10%",
-              grid: { display: false, drawBorder: false },
+              grid: { color: "rgba(148,163,184,0.12)" },
               ticks: { font: { weight: "bold" } }
             }
           }
@@ -3917,3 +3899,5 @@
 </script>
 </body>
 </html>
+
+
