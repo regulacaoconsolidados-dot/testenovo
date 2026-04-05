@@ -3,7 +3,7 @@ Chart.register(ChartDataLabels);
 
 const el = id => document.getElementById(id);
 
-// URLs atualizadas para as abas corretas
+// URLs das planilhas (formato correto de exportação)
 const URL_FILA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSqltus8b2SYt7WPDLHHPJwM8BTqOTCgoyaLwvyhOEbaRLHQbocDMTqYoMjE-muww/pub?gid=1716569787&single=true&output=csv";
 const URL_AGENDAMENTOS_VIVVER = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSqltus8b2SYt7WPDLHHPJwM8BTqOTCgoyaLwvyhOEbaRLHQbocDMTqYoMjE-muww/pub?gid=1546152833&single=true&output=csv";
 const URL_FATURADO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSqltus8b2SYt7WPDLHHPJwM8BTqOTCgoyaLwvyhOEbaRLHQbocDMTqYoMjE-muww/pub?gid=252919053&single=true&output=csv";
@@ -12,19 +12,9 @@ const URL_AGENDADOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSqltus8b
 
 const MONTHS_ORDER = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 const MONTH_HEADER_MAP = {
-  "JANEIRO": "jan",
-  "FEVEREIRO": "fev",
-  "MARCO": "mar",
-  "MARÇO": "mar",
-  "ABRIL": "abr",
-  "MAIO": "mai",
-  "JUNHO": "jun",
-  "JULHO": "jul",
-  "AGOSTO": "ago",
-  "SETEMBRO": "set",
-  "OUTUBRO": "out",
-  "NOVEMBRO": "nov",
-  "DEZEMBRO": "dez"
+  "JANEIRO": "jan", "FEVEREIRO": "fev", "MARCO": "mar", "MARÇO": "mar",
+  "ABRIL": "abr", "MAIO": "mai", "JUNHO": "jun", "JULHO": "jul",
+  "AGOSTO": "ago", "SETEMBRO": "set", "OUTUBRO": "out", "NOVEMBRO": "nov", "DEZEMBRO": "dez"
 };
 
 const GRUPOS_SIGTAP = {
@@ -34,13 +24,12 @@ const GRUPOS_SIGTAP = {
 
 let dadosFila = [];
 let dadosAgendamentosVivver = [];
-let dadosFaturado = [];      // Nova base FATURADO (quantidade)
-let dadosFinanceiro = [];    // Nova base FINANCEIRO (R$)
+let dadosFaturado = [];
+let dadosFinanceiro = [];
 let dadosAgendados = [];
 
 let gruposSet = new Set();
 let especialidadesSet = new Set();
-
 let especialidadeToGrupos = new Map();
 let especialidadeToSubgrupos = new Map();
 
@@ -56,7 +45,6 @@ let currentTableDataFisico = [];
 let currentSortColumnFisico = 0;
 let currentSortDirectionFisico = "asc";
 let currentTableMonthFilterFisico = "";
-
 let currentChartFilter = null;
 
 function toast(msg, type = "info") {
@@ -64,52 +52,18 @@ function toast(msg, type = "info") {
   if (!box) return;
   const d = document.createElement("div");
   d.className = `toast ${type}`;
-  let icon = "circle-info";
-  if (type === "success") icon = "circle-check";
-  if (type === "error") icon = "triangle-exclamation";
+  let icon = type === "success" ? "circle-check" : type === "error" ? "triangle-exclamation" : "circle-info";
   d.innerHTML = `<i class="fa-solid fa-${icon}"></i> ${msg}`;
   box.appendChild(d);
   setTimeout(() => d.remove(), 4000);
 }
 
-function normalizeText(v) {
-  return String(v ?? "").trim();
-}
-
-function normalizeKey(v) {
-  return normalizeText(v)
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, " ")
-    .toUpperCase()
-    .trim();
-}
-
-function escapeHtml(t) {
-  return String(t ?? "").replace(/[&<>"]/g, m => {
-    if (m === "&") return "&amp;";
-    if (m === "<") return "&lt;";
-    if (m === ">") return "&gt;";
-    if (m === '"') return "&quot;";
-    return m;
-  });
-}
-
-function truncateLabel(t, max = 30) {
-  const s = String(t ?? "");
-  return s.length > max ? s.slice(0, max - 3) + "..." : s;
-}
-
-function formatMoney(v) {
-  return (v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-function formatMoneyCompact(v) {
-  const n = Number(v || 0);
-  if (n >= 1000000) return "R$ " + (n / 1000000).toFixed(1) + "M";
-  if (n >= 1000) return "R$ " + (n / 1000).toFixed(1) + " mil";
-  return formatMoney(n);
-}
+function normalizeText(v) { return String(v ?? "").trim(); }
+function normalizeKey(v) { return normalizeText(v).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toUpperCase().trim(); }
+function escapeHtml(t) { return String(t ?? "").replace(/[&<>"]/g, m => m === "&" ? "&amp;" : m === "<" ? "&lt;" : m === ">" ? "&gt;" : "&quot;"); }
+function truncateLabel(t, max = 30) { const s = String(t ?? ""); return s.length > max ? s.slice(0, max - 3) + "..." : s; }
+function formatMoney(v) { return (v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
+function formatMoneyCompact(v) { const n = Number(v || 0); if (n >= 1000000) return "R$ " + (n / 1000000).toFixed(1) + "M"; if (n >= 1000) return "R$ " + (n / 1000).toFixed(1) + " mil"; return formatMoney(n); }
 
 function parseNumberBR(value) {
   if (value == null) return 0;
@@ -120,25 +74,16 @@ function parseNumberBR(value) {
   const hasComma = s.includes(",");
   const hasDot = s.includes(".");
   if (hasComma && hasDot) {
-    if (s.lastIndexOf(",") > s.lastIndexOf(".")) {
-      s = s.replace(/\./g, "").replace(",", ".");
-    } else {
-      s = s.replace(/,/g, "");
-    }
-  } else if (hasComma) {
-    s = s.replace(/\./g, "").replace(",", ".");
-  } else {
-    s = s.replace(/,/g, "");
-  }
+    if (s.lastIndexOf(",") > s.lastIndexOf(".")) s = s.replace(/\./g, "").replace(",", ".");
+    else s = s.replace(/,/g, "");
+  } else if (hasComma) s = s.replace(/\./g, "").replace(",", ".");
+  else s = s.replace(/,/g, "");
   s = s.replace(/[^\d.-]/g, "");
   const n = parseFloat(s);
   return Number.isFinite(n) ? n : 0;
 }
 
-function monthNameToShort(name) {
-  const key = normalizeKey(name);
-  return MONTH_HEADER_MAP[key] || "";
-}
+function monthNameToShort(name) { return MONTH_HEADER_MAP[normalizeKey(name)] || ""; }
 
 function normalizePeriodo(label) {
   let s = normalizeText(label).toLowerCase();
@@ -173,10 +118,7 @@ function periodoSortValue(label) {
   return ano * 100 + mesIndex;
 }
 
-function sortPeriodos(list) {
-  return [...new Set((list || []).map(normalizePeriodo).filter(Boolean))]
-    .sort((a, b) => periodoSortValue(a) - periodoSortValue(b));
-}
+function sortPeriodos(list) { return [...new Set((list || []).map(normalizePeriodo).filter(Boolean))].sort((a, b) => periodoSortValue(a) - periodoSortValue(b)); }
 
 function getField(row, aliases = []) {
   const keys = Object.keys(row || {});
@@ -208,13 +150,7 @@ async function loadCSVSmart(url, expectedHeaders = []) {
   if (headerIndex === -1) throw new Error("Cabeçalho CSV não localizado.");
   const headers = (rawRows[headerIndex] || []).map(h => normalizeText(h));
   const dataRows = rawRows.slice(headerIndex + 1);
-  return dataRows
-    .map(row => {
-      const obj = {};
-      headers.forEach((header, idx) => { if (header) obj[header] = row?.[idx] ?? ""; });
-      return obj;
-    })
-    .filter(obj => Object.values(obj).some(v => normalizeText(v) !== ""));
+  return dataRows.map(row => { const obj = {}; headers.forEach((header, idx) => { if (header) obj[header] = row?.[idx] ?? ""; }); return obj; }).filter(obj => Object.values(obj).some(v => normalizeText(v) !== ""));
 }
 
 function extractGrupoCodigo(grupoTexto) {
