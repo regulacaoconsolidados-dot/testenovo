@@ -35,10 +35,9 @@ html { scroll-behavior: smooth; }
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(circle at top left, rgba(37,99,235,0.06), transparent 18%),
-    radial-gradient(circle at top right, rgba(11,94,66,0.07), transparent 22%),
-    linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+  background: radial-gradient(circle at top left, rgba(37,99,235,0.06), transparent 18%),
+              radial-gradient(circle at top right, rgba(11,94,66,0.07), transparent 22%),
+              linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -715,30 +714,6 @@ select:focus,
   text-align: center;
 }
 
-.gauge-zones-row {
-  display: flex;
-  gap: 12px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.gauge-zone-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--muted);
-}
-
-.zone-circle {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
 .gauge-badge {
   display: inline-flex;
   align-items: center;
@@ -1093,30 +1068,6 @@ select:focus,
   padding: 8px 12px;
   border-radius: 12px;
   font-size: 12px;
-}
-
-.table-chip-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f9fbfd;
-  padding: 4px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-}
-
-.table-chip-control input,
-.table-chip-control select {
-  border: none;
-  background: transparent;
-  box-shadow: none !important;
-  padding: 8px 4px;
-  min-height: auto;
-}
-
-.table-chip-control input:focus,
-.table-chip-control select:focus {
-  outline: none;
 }
 
 .progress-bar-container {
