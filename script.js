@@ -11,22 +11,8 @@ const URL_FATURADO = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/e
 const URL_FINANCEIRO = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=269446681`;
 const URL_AGENDADOS = "https://docs.google.com/spreadsheets/d/1ax8ZpVRSZnDkTm_T1GY37ybSgrlP_8Rk/export?format=csv&gid=429397138";
 
-const MONTHS_ORDER = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
-const MONTH_HEADER_MAP = {
-  "JANEIRO": "jan",
-  "FEVEREIRO": "fev",
-  "MARCO": "mar",
-  "MARÇO": "mar",
-  "ABRIL": "abr",
-  "MAIO": "mai",
-  "JUNHO": "jun",
-  "JULHO": "jul",
-  "AGOSTO": "ago",
-  "SETEMBRO": "set",
-  "OUTUBRO": "out",
-  "NOVEMBRO": "nov",
-  "DEZEMBRO": "dez"
-};
+const MONTHS_ORDER = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+const MONTHS_FULL = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 
 const GRUPOS_SIGTAP = {
   "03": "03 - Procedimentos clínicos",
@@ -146,11 +132,6 @@ function parseNumberBR(value) {
   return Number.isFinite(n) ? n : 0;
 }
 
-function monthNameToShort(name) {
-  const key = normalizeKey(name);
-  return MONTH_HEADER_MAP[key] || "";
-}
-
 function normalizePeriodo(label) {
   let s = normalizeText(label).toLowerCase();
   if (!s) return "";
@@ -162,27 +143,12 @@ function normalizePeriodo(label) {
     .replace(/\./g, "")
     .replace(/-/g, "/");
 
-  const ptMap = {
-    janeiro: "jan",
-    fevereiro: "fev",
-    marco: "mar",
-    abril: "abr",
-    maio: "mai",
-    junho: "jun",
-    julho: "jul",
-    agosto: "ago",
-    setembro: "set",
-    outubro: "out",
-    novembro: "nov",
-    dezembro: "dez"
-  };
-
-  for (const [full, short] of Object.entries(ptMap)) {
-    if (s.startsWith(full)) {
-      const rest = s.slice(full.length);
+  for (let i = 0; i < MONTHS_FULL.length; i++) {
+    if (s.startsWith(MONTHS_FULL[i])) {
+      const rest = s.slice(MONTHS_FULL[i].length);
       const yearMatch = rest.match(/\/?(\d{2,4})$/);
       const yy = yearMatch ? String(yearMatch[1]).slice(-2) : currentYearShort;
-      return `${short}/${yy}`;
+      return `${MONTHS_ORDER[i]}/${yy}`;
     }
   }
 
@@ -304,11 +270,11 @@ async function loadAllData() {
     console.log("Iniciando carregamento dos dados...");
     
     const [filaRaw, agVivverRaw, faturadoRaw, financeiroRaw, agendadosRaw] = await Promise.all([
-      loadCSVSmart(URL_FILA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "TOTAL", "Data Corte/ Fila de Espera"]),
+      loadCSVSmart(URL_FILA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "TOTAL", "Data Corte"]),
       loadCSVSmart(URL_AGENDAMENTOS_VIVVER, ["CÓDIGO DO PROCEDIMENTO", "PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE", "COMPLEXIDADE", "MÊS", "FAL", "REC", "OFERTA"]),
-      loadCSVSmart(URL_FATURADO, ["Procedimento Descrição", "GRUPO", "SUB GRUPO", "ESTABELECIMENTO", "Especialidade Descrição", "Código Especialidade", "CÓDIGO DO PROCEDIMENTO", "Total geral"]),
-      loadCSVSmart(URL_FINANCEIRO, ["PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE", "CÓDIGO ESPECIALIDADE", "CÓDIGO PROCEDIMENTO", "Total geral"]),
-      loadCSVSmart(URL_AGENDADOS, ["ESTABELECIMENTO", "ESPECIALIDADE", "Janeiro", "Fevereiro", "Março"])
+      loadCSVSmart(URL_FATURADO, ["Procedimento Descrição", "GRUPO", "SUB GRUPO", "ESTABELECIMENTO", "Especialidade Descrição"]),
+      loadCSVSmart(URL_FINANCEIRO, ["PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE"]),
+      loadCSVSmart(URL_AGENDADOS, ["ESTABELECIMENTO", "ESPECIALIDADE"])
     ]);
 
     console.log("Dados carregados:", { 
@@ -318,31 +284,6 @@ async function loadAllData() {
       financeiro: financeiroRaw.length, 
       agendados: agendadosRaw.length 
     });
-
-    // Coletar períodos para determinar ano atual
-    const candidatePeriods = agVivverRaw.map(r => getField(r, ["MÊS"]))
-      .concat(faturadoRaw.flatMap(r => {
-        const months = [];
-        for (let i = 0; i < 12; i++) {
-          const monthVal = getField(r, [MONTHS_ORDER[i]]);
-          if (monthVal && parseNumberBR(monthVal) > 0) {
-            months.push(`${MONTHS_ORDER[i]}/${currentYearShort}`);
-          }
-        }
-        return months;
-      }))
-      .concat(financeiroRaw.flatMap(r => {
-        const months = [];
-        for (let i = 0; i < 12; i++) {
-          const monthVal = getField(r, [MONTHS_ORDER[i]]);
-          if (monthVal && parseNumberBR(monthVal) > 0) {
-            months.push(`${MONTHS_ORDER[i]}/${currentYearShort}`);
-          }
-        }
-        return months;
-      }));
-
-    currentYearShort = getDominantYearShort(candidatePeriods);
 
     gruposSet = new Set();
     especialidadesSet = new Set();
@@ -361,7 +302,7 @@ async function loadAllData() {
       const subgrupoRaw = normalizeText(getField(r, ["Subgrupo", "SUBGRUPO"]));
       const grupoCodigo = extractGrupoCodigo(grupoRaw);
       const subgrupoCodigo = extractSubgrupoCodigo(subgrupoRaw);
-      const dataCorteRaw = normalizeText(getField(r, ["Data Corte/ Fila de Espera", "DATA CORTE/ FILA DE ESPERA"]));
+      const dataCorteRaw = normalizeText(getField(r, ["Data Corte/ Fila de Espera", "DATA CORTE/ FILA DE ESPERA", "Data Corte"]));
       const dataCorteNorm = normalizePeriodo(dataCorteRaw);
 
       if (especialidade) especialidadesSet.add(especialidade);
@@ -439,16 +380,18 @@ async function loadAllData() {
       };
     }).filter(d => d.especialidade || d.descricao);
 
-    // Processar FATURADO (com meses de jan/25 a dez/25)
+    // Processar FATURADO - os meses estão como colunas
     dadosFaturado = [];
-    faturadoRaw.forEach(r => {
-      const especialidade = normalizeText(getField(r, ["Especialidade Descrição", "ESPECIALIDADE"]));
-      const estabelecimento = normalizeText(getField(r, ["ESTABELECIMENTO", "Estabelecimento"]));
-      const grupoRaw = normalizeText(getField(r, ["GRUPO"]));
-      const subgrupoRaw = normalizeText(getField(r, ["SUB GRUPO", "SUBGRUPO"]));
+    const monthColumns = [...MONTHS_ORDER];
+    
+    faturadoRaw.forEach(row => {
+      const especialidade = normalizeText(getField(row, ["Especialidade Descrição", "ESPECIALIDADE"]));
+      const estabelecimento = normalizeText(getField(row, ["ESTABELECIMENTO", "Estabelecimento"]));
+      const grupoRaw = normalizeText(getField(row, ["GRUPO"]));
+      const subgrupoRaw = normalizeText(getField(row, ["SUB GRUPO", "SUBGRUPO"]));
       const grupoCodigo = extractGrupoCodigo(grupoRaw);
-      const descricao = normalizeText(getField(r, ["Procedimento Descrição", "PROCEDIMENTO DESCRIÇÃO"]));
-      const codigo = normalizeText(getField(r, ["CÓDIGO DO PROCEDIMENTO", "Código do Procedimento"]));
+      const descricao = normalizeText(getField(row, ["Procedimento Descrição", "PROCEDIMENTO DESCRIÇÃO"]));
+      const codigo = normalizeText(getField(row, ["CÓDIGO DO PROCEDIMENTO", "Código do Procedimento"]));
 
       if (especialidade) especialidadesSet.add(especialidade);
       if (grupoCodigo) gruposSet.add(grupoCodigo);
@@ -456,12 +399,13 @@ async function loadAllData() {
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
 
-      // Processar cada mês
-      for (let i = 0; i < MONTHS_ORDER.length; i++) {
-        const monthKey = `${MONTHS_ORDER[i]}/${currentYearShort}`;
-        const monthValue = parseNumberBR(getField(r, [MONTHS_ORDER[i]]));
+      // Processar cada mês/coluna
+      for (let i = 0; i < monthColumns.length; i++) {
+        const monthKey = monthColumns[i];
+        const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/25`, `${monthKey}/25`, monthKey.toUpperCase()]));
         
         if (monthValue > 0) {
+          const mesFormatado = `${monthColumns[i]}/${currentYearShort}`;
           dadosFaturado.push({
             codigo,
             descricao,
@@ -471,23 +415,24 @@ async function loadAllData() {
             grupoCodigo,
             subgrupo: subgrupoRaw,
             subgrupoCodigo: extractSubgrupoCodigo(subgrupoRaw),
-            mes: monthKey,
+            mes: mesFormatado,
             quantidade: monthValue
           });
         }
       }
     });
 
-    // Processar FINANCEIRO (com meses de jan/25 a dez/25)
+    // Processar FINANCEIRO - os meses estão como colunas
     dadosFinanceiro = [];
-    financeiroRaw.forEach(r => {
-      const especialidade = normalizeText(getField(r, ["ESPECIALIDADE", "Especialidade"]));
-      const estabelecimento = normalizeText(getField(r, ["ESTABELECIMENTO", "Estabelecimento"]));
-      const grupoRaw = normalizeText(getField(r, ["GRUPO"]));
-      const subgrupoRaw = normalizeText(getField(r, ["SUBGRUPO"]));
+    
+    financeiroRaw.forEach(row => {
+      const especialidade = normalizeText(getField(row, ["ESPECIALIDADE", "Especialidade"]));
+      const estabelecimento = normalizeText(getField(row, ["ESTABELECIMENTO", "Estabelecimento"]));
+      const grupoRaw = normalizeText(getField(row, ["GRUPO"]));
+      const subgrupoRaw = normalizeText(getField(row, ["SUBGRUPO"]));
       const grupoCodigo = extractGrupoCodigo(grupoRaw);
-      const descricao = normalizeText(getField(r, ["PROCEDIMENTO DESCRIÇÃO"]));
-      const codigo = normalizeText(getField(r, ["CÓDIGO PROCEDIMENTO", "CÓDIGO DO PROCEDIMENTO"]));
+      const descricao = normalizeText(getField(row, ["PROCEDIMENTO DESCRIÇÃO"]));
+      const codigo = normalizeText(getField(row, ["CÓDIGO PROCEDIMENTO", "CÓDIGO DO PROCEDIMENTO"]));
 
       if (especialidade) especialidadesSet.add(especialidade);
       if (grupoCodigo) gruposSet.add(grupoCodigo);
@@ -495,12 +440,13 @@ async function loadAllData() {
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
 
-      // Processar cada mês
-      for (let i = 0; i < MONTHS_ORDER.length; i++) {
-        const monthKey = `${MONTHS_ORDER[i]}/${currentYearShort}`;
-        const monthValue = parseNumberBR(getField(r, [MONTHS_ORDER[i]]));
+      // Processar cada mês/coluna
+      for (let i = 0; i < monthColumns.length; i++) {
+        const monthKey = monthColumns[i];
+        const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/25`, monthKey.toUpperCase()]));
         
         if (monthValue > 0) {
+          const mesFormatado = `${monthColumns[i]}/${currentYearShort}`;
           dadosFinanceiro.push({
             codigo,
             descricao,
@@ -510,7 +456,7 @@ async function loadAllData() {
             grupoCodigo,
             subgrupo: subgrupoRaw,
             subgrupoCodigo: extractSubgrupoCodigo(subgrupoRaw),
-            mes: monthKey,
+            mes: mesFormatado,
             valor: monthValue
           });
         }
@@ -519,16 +465,33 @@ async function loadAllData() {
 
     // Processar AGENDADOS
     dadosAgendados = [];
-    agendadosRaw.forEach(r => {
-      const estabelecimento = normalizeText(getField(r, ["ESTABELECIMENTO", "Estabelecimento"]));
-      const especialidade = normalizeText(getField(r, ["ESPECIALIDADE", "Especialidade"]));
+    agendadosRaw.forEach(row => {
+      const estabelecimento = normalizeText(getField(row, ["ESTABELECIMENTO", "Estabelecimento"]));
+      const especialidade = normalizeText(getField(row, ["ESPECIALIDADE", "Especialidade"]));
       if (!estabelecimento && !especialidade) return;
       if (especialidade) especialidadesSet.add(especialidade);
 
-      Object.keys(r).forEach(col => {
-        const shortMonth = monthNameToShort(col);
+      // Mapear meses em português para o formato curto
+      const monthMap = {
+        "janeiro": "jan", "fevereiro": "fev", "março": "mar", "abril": "abr",
+        "maio": "mai", "junho": "jun", "julho": "jul", "agosto": "ago",
+        "setembro": "set", "outubro": "out", "novembro": "nov", "dezembro": "dez"
+      };
+
+      Object.keys(row).forEach(col => {
+        const colLower = col.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let shortMonth = null;
+        
+        for (const [full, short] of Object.entries(monthMap)) {
+          if (colLower === full || colLower === short) {
+            shortMonth = short;
+            break;
+          }
+        }
+        
         if (!shortMonth) return;
-        const value = parseNumberBR(r[col]);
+        
+        const value = parseNumberBR(row[col]);
         if (value <= 0) return;
 
         dadosAgendados.push({
@@ -540,25 +503,44 @@ async function loadAllData() {
       });
     });
 
-    // Atualizar subgruposSet com dados de faturado e financeiro
-    dadosFaturado.forEach(d => {
-      if (d.subgrupo) subgruposSet.add(d.subgrupo);
-    });
-    dadosFinanceiro.forEach(d => {
-      if (d.subgrupo) subgruposSet.add(d.subgrupo);
-    });
-
-    allPeriodos = sortPeriodos([
+    // Coletar todos os períodos para determinar ano atual
+    const allPeriodsCollected = [
       ...dadosFila.map(d => d.dataCorte),
       ...dadosAgendamentosVivver.map(d => d.mes),
       ...dadosFaturado.map(d => d.mes),
       ...dadosFinanceiro.map(d => d.mes),
       ...dadosAgendados.map(d => d.mes)
-    ]);
+    ].filter(Boolean);
+    
+    // Atualizar ano baseado nos períodos encontrados
+    const detectedYear = getDominantYearShort(allPeriodsCollected);
+    if (detectedYear) currentYearShort = detectedYear;
+
+    // Reformatar meses com o ano correto
+    const reformatMonth = (mes) => {
+      if (!mes) return mes;
+      const match = mes.match(/^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)(?:\/(\d{2}))?$/i);
+      if (match) {
+        return `${match[1].toLowerCase()}/${currentYearShort}`;
+      }
+      return mes;
+    };
+
+    dadosFaturado = dadosFaturado.map(d => ({ ...d, mes: reformatMonth(d.mes) }));
+    dadosFinanceiro = dadosFinanceiro.map(d => ({ ...d, mes: reformatMonth(d.mes) }));
+    dadosAgendados = dadosAgendados.map(d => ({ ...d, mes: reformatMonth(d.mes) }));
+    dadosAgendamentosVivver = dadosAgendamentosVivver.map(d => ({ ...d, mes: reformatMonth(d.mes) }));
+    dadosFila = dadosFila.map(d => ({ ...d, dataCorte: reformatMonth(d.dataCorte) }));
+
+    allPeriodos = sortPeriodos(allPeriodsCollected.map(reformatMonth));
 
     console.log("Períodos encontrados:", allPeriodos);
     console.log("Especialidades:", [...especialidadesSet].length);
     console.log("Subgrupos:", [...subgruposSet].length);
+    console.log("Faturado registros:", dadosFaturado.length);
+    console.log("Financeiro registros:", dadosFinanceiro.length);
+    console.log("Primeiro faturado:", dadosFaturado[0]);
+    console.log("Primeiro financeiro:", dadosFinanceiro[0]);
 
     populateFilters();
     updateLastUpdate();
@@ -620,7 +602,6 @@ function getVisibleSubgrupos() {
   const grupo = el("grupoSelect")?.value || "";
   let subgrupos = new Set();
 
-  // Coletar subgrupos de todas as fontes de dados
   [...dadosFila, ...dadosAgendamentosVivver, ...dadosFaturado, ...dadosFinanceiro].forEach(d => {
     if (!d.subgrupo) return;
     if (grupo && d.grupoCodigo !== grupo) return;
@@ -1625,6 +1606,15 @@ function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValu
       label: "Faturados",
       data: faturadosValues,
       backgroundColor: "#059669",
+      borderRadius: 8
+    });
+  }
+
+  if (datasets.length === 0) {
+    datasets.push({
+      label: "Agendados",
+      data: agendadosValues,
+      backgroundColor: "#b6923e",
       borderRadius: 8
     });
   }
