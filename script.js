@@ -130,38 +130,42 @@ function getField(row, aliases = []) {
   return "";
 }
 
-function detectHeaderIndex(rows, expectedHeaders = []) {
-  if (!rows?.length) return -1;
-  for (let i = 0; i < rows.length; i++) {
-    const row = (rows[i] || []).map(v => normalizeKey(v));
-    const score = expectedHeaders.filter(h => row.some(col => col === normalizeKey(h))).length;
-    if (score >= Math.max(2, Math.ceil(expectedHeaders.length * 0.5))) return i;
-  }
-  return -1;
-}
-
+// ============================================================
+// FUNÇÃO CORRIGIDA - Cabeçalho na LINHA 2 (índice 1)
+// Dados começam na LINHA 3 (índice 2)
+// ============================================================
 async function loadCSVSmart(url, expectedHeaders = []) {
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Falha HTTP ${response.status}`);
+  
   const text = await response.text();
   const parsed = Papa.parse(text, { skipEmptyLines: false });
   const rawRows = parsed.data || [];
-  const headerIndex = detectHeaderIndex(rawRows, expectedHeaders);
-  if (headerIndex === -1) throw new Error("Cabeçalho CSV não localizado.");
-  const headers = (rawRows[headerIndex] || []).map(h => normalizeText(h));
-  const dataRows = rawRows.slice(headerIndex + 1);
-  return dataRows.map(row => { const obj = {}; headers.forEach((header, idx) => { if (header) obj[header] = row?.[idx] ?? ""; }); return obj; }).filter(obj => Object.values(obj).some(v => normalizeText(v) !== ""));
+  
+  // Verifica se há pelo menos 2 linhas (linha 1 ignorada, linha 2 é cabeçalho)
+  if (rawRows.length < 2) throw new Error("Planilha vazia ou formato inválido.");
+  
+  // LINHA 2 (índice 1) é o cabeçalho
+  const headers = (rawRows[1] || []).map(h => normalizeText(h));
+  
+  // Dados começam na LINHA 3 (índice 2)
+  const dataRows = rawRows.slice(2);
+  
+  console.log(`Cabeçalhos encontrados na linha 2:`, headers);
+  
+  return dataRows
+    .map(row => {
+      const obj = {};
+      headers.forEach((header, idx) => {
+        if (header) obj[header] = row?.[idx] ?? "";
+      });
+      return obj;
+    })
+    .filter(obj => Object.values(obj).some(v => normalizeText(v) !== ""));
 }
 
-function extractGrupoCodigo(grupoTexto) {
-  const match = String(grupoTexto || "").match(/^(\d{2})/);
-  return match ? match[1] : "";
-}
-
-function extractSubgrupoCodigo(subgrupoTexto) {
-  const match = String(subgrupoTexto || "").match(/^(\d{4})/);
-  return match ? match[1] : "";
-}
+function extractGrupoCodigo(grupoTexto) { const match = String(grupoTexto || "").match(/^(\d{2})/); return match ? match[1] : ""; }
+function extractSubgrupoCodigo(subgrupoTexto) { const match = String(subgrupoTexto || "").match(/^(\d{4})/); return match ? match[1] : ""; }
 
 function addMapSet(map, key, value) {
   if (!key || !value) return;
@@ -195,15 +199,27 @@ async function loadAllData() {
   if (loadingEl) loadingEl.classList.add("on");
   try {
     console.log("Iniciando carregamento dos dados...");
+    console.log("URL_FILA:", URL_FILA);
+    console.log("URL_AGENDAMENTOS_VIVVER:", URL_AGENDAMENTOS_VIVVER);
+    console.log("URL_FATURADO:", URL_FATURADO);
+    console.log("URL_FINANCEIRO:", URL_FINANCEIRO);
+    console.log("URL_AGENDADOS:", URL_AGENDADOS);
+    
     const [filaRaw, agVivverRaw, faturadoRaw, financeiroRaw, agendadosRaw] = await Promise.all([
       loadCSVSmart(URL_FILA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "TOTAL", "Data Corte/ Fila de Espera"]),
       loadCSVSmart(URL_AGENDAMENTOS_VIVVER, ["CÓDIGO DO PROCEDIMENTO", "PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE", "COMPLEXIDADE", "MÊS", "FAL", "REC", "OFERTA"]),
-      loadCSVSmart(URL_FATURADO, ["Procedimento Descrição", "GRUPO", "SUB GRUPO", "ESTABELECIMENTO", "Especialidade Descrição", "Código Especialidade", "CÓDIGO DO PROCEDIMENTO", "jan/25", "fev/25", "mar/25", "abr/25", "mai/25", "jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "Total geral"]),
-      loadCSVSmart(URL_FINANCEIRO, ["PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE", "CÓDIGO ESPECIALIDADE", "CÓDIGO PROCEDIMENTO", "jan/25", "fev/25", "mar/25", "abr/25", "mai/25", "jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "Total geral"]),
+      loadCSVSmart(URL_FATURADO, ["Procedimento Descrição", "GRUPO", "SUB GRUPO", "ESTABELECIMENTO", "Especialidade Descrição", "Código Especialidade", "CÓDIGO DO PROCEDIMENTO"]),
+      loadCSVSmart(URL_FINANCEIRO, ["PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE", "CÓDIGO ESPECIALIDADE", "CÓDIGO PROCEDIMENTO"]),
       loadCSVSmart(URL_AGENDADOS, ["ESTABELECIMENTO", "ESPECIALIDADE", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"])
     ]);
 
-    console.log("Dados carregados:", { fila: filaRaw.length, vivver: agVivverRaw.length, faturado: faturadoRaw.length, financeiro: financeiroRaw.length, agendados: agendadosRaw.length });
+    console.log("Dados carregados:", { 
+      fila: filaRaw.length, 
+      vivver: agVivverRaw.length, 
+      faturado: faturadoRaw.length, 
+      financeiro: financeiroRaw.length, 
+      agendados: agendadosRaw.length 
+    });
 
     const candidatePeriods = agVivverRaw.map(r => getField(r, ["MÊS"]));
     currentYearShort = getDominantYearShort(candidatePeriods);
@@ -216,6 +232,7 @@ async function loadAllData() {
     let latestDateValue = "";
     let latestDateSortValue = -1;
 
+    // Processamento da FILA DE ESPERA
     dadosFila = filaRaw.map(r => {
       const especialidade = normalizeText(getField(r, ["Especialidade", "ESPECIALIDADE"]));
       const grupoRaw = normalizeText(getField(r, ["Grupo", "GRUPO"]));
@@ -250,6 +267,7 @@ async function loadAllData() {
     const dataCorteElement = el("dataCorteInfo");
     if (dataCorteElement) dataCorteElement.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorte}`;
 
+    // Processamento dos AGENDAMENTOS VIVVER
     dadosAgendamentosVivver = agVivverRaw.map(r => {
       const especialidade = normalizeText(getField(r, ["ESPECIALIDADE", "Especialidade"]));
       const estabelecimento = normalizeText(getField(r, ["ESTABELECIMENTO", "PRESTADOR", "Estabelecimento"]));
@@ -290,12 +308,12 @@ async function loadAllData() {
       const grupoRaw = normalizeText(getField(row, ["GRUPO"]));
       const subgrupoRaw = normalizeText(getField(row, ["SUB GRUPO"]));
       const grupoCodigo = extractGrupoCodigo(grupoRaw);
-      const codigoProcedimento = normalizeText(getField(row, ["CÓDIGO DO PROCEDIMENTO"]));
-      const descricaoProcedimento = normalizeText(getField(row, ["Procedimento Descrição"]));
       if (especialidade) especialidadesSet.add(especialidade);
       if (grupoCodigo) gruposSet.add(grupoCodigo);
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
+      
+      // Percorre os meses
       for (let i = 0; i < MONTHS_ORDER.length; i++) {
         const mesAno = `${MONTHS_ORDER[i]}/${currentYearShort}`;
         const valor = parseNumberBR(row[`${MONTHS_ORDER[i]}/${currentYearShort}`]);
@@ -306,8 +324,6 @@ async function loadAllData() {
             grupo: grupoRaw || (GRUPOS_SIGTAP[grupoCodigo] || ""),
             grupoCodigo,
             subgrupo: subgrupoRaw,
-            codigoProcedimento,
-            descricaoProcedimento,
             mes: mesAno,
             faturadoQtd: valor
           });
@@ -323,12 +339,12 @@ async function loadAllData() {
       const grupoRaw = normalizeText(getField(row, ["GRUPO"]));
       const subgrupoRaw = normalizeText(getField(row, ["SUBGRUPO"]));
       const grupoCodigo = extractGrupoCodigo(grupoRaw);
-      const codigoProcedimento = normalizeText(getField(row, ["CÓDIGO PROCEDIMENTO"]));
-      const descricaoProcedimento = normalizeText(getField(row, ["PROCEDIMENTO DESCRIÇÃO"]));
       if (especialidade) especialidadesSet.add(especialidade);
       if (grupoCodigo) gruposSet.add(grupoCodigo);
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
+      
+      // Percorre os meses
       for (let i = 0; i < MONTHS_ORDER.length; i++) {
         const mesAno = `${MONTHS_ORDER[i]}/${currentYearShort}`;
         const valor = parseNumberBR(row[`${MONTHS_ORDER[i]}/${currentYearShort}`]);
@@ -339,8 +355,6 @@ async function loadAllData() {
             grupo: grupoRaw || (GRUPOS_SIGTAP[grupoCodigo] || ""),
             grupoCodigo,
             subgrupo: subgrupoRaw,
-            codigoProcedimento,
-            descricaoProcedimento,
             mes: mesAno,
             financeiroValor: valor
           });
@@ -348,6 +362,7 @@ async function loadAllData() {
       }
     });
 
+    // Processamento da aba AGENDADOS
     dadosAgendados = [];
     agendadosRaw.forEach(r => {
       const estabelecimento = normalizeText(getField(r, ["ESTABELECIMENTO", "Estabelecimento"]));
@@ -359,7 +374,12 @@ async function loadAllData() {
         if (!shortMonth) return;
         const value = parseNumberBR(r[col]);
         if (value <= 0) return;
-        dadosAgendados.push({ estabelecimento, especialidade, mes: `${shortMonth}/${currentYearShort}`, agendados: value });
+        dadosAgendados.push({ 
+          estabelecimento, 
+          especialidade, 
+          mes: `${shortMonth}/${currentYearShort}`, 
+          agendados: value 
+        });
       });
     });
 
@@ -372,6 +392,9 @@ async function loadAllData() {
     ]);
 
     console.log("Períodos encontrados:", allPeriodos);
+    console.log("Especialidades encontradas:", [...especialidadesSet].slice(0, 10));
+    console.log("Grupos encontrados:", [...gruposSet]);
+    
     populateFilters();
     updateLastUpdate();
     applyFilters();
@@ -393,12 +416,16 @@ function updateLastUpdate() {
 function populateFilters() {
   const grupoSelect = el("grupoSelect");
   if (grupoSelect) grupoSelect.innerHTML = '<option value="">Todos os grupos</option>' + [...gruposSet].sort().map(cod => `<option value="${escapeHtml(cod)}">${escapeHtml(GRUPOS_SIGTAP[cod] || cod)}</option>`).join("");
+  
   const periodoSelect = el("periodoSelect");
   if (periodoSelect) periodoSelect.innerHTML = '<option value="">Todos os meses</option>' + allPeriodos.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+  
   const tableMonthFilterFisico = el("tableMonthFilterFisico");
   if (tableMonthFilterFisico) tableMonthFilterFisico.innerHTML = '<option value="">Todos os meses</option>' + allPeriodos.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+  
   const tabelaMonthFilterEspec = el("tabelaMonthFilterEspec");
   if (tabelaMonthFilterEspec) tabelaMonthFilterEspec.innerHTML = '<option value="">Todos os meses</option>' + allPeriodos.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+  
   buildSubgrupoList();
   buildEspecialidadeList();
 }
@@ -448,17 +475,23 @@ function buildEspecialidadeList() {
 
 function updateMsLabelSub() { const label = el("msLabelSub"); if (label) label.textContent = selectedSubgrupos.size ? `${selectedSubgrupos.size} selecionado(s)` : "Todos"; }
 function updateMsLabelEsp() { const label = el("msLabelEsp"); if (label) label.textContent = selectedEspecialidades.size ? `${selectedEspecialidades.size} selecionado(s)` : "Todos"; }
+
 function closeAllDropdowns() { ["Sub", "Esp"].forEach(suf => { const dd = el(`msDropdown${suf}`); const tr = el(`msTrigger${suf}`); if (dd) dd.classList.remove("open"); if (tr) tr.classList.remove("open"); }); }
+
 function toggleMsDropdownSub(e) { e.stopPropagation(); const dd = el("msDropdownSub"); const tr = el("msTriggerSub"); if (!dd || !tr) return; const willOpen = !dd.classList.contains("open"); closeAllDropdowns(); if (willOpen) { dd.classList.add("open"); tr.classList.add("open"); } }
 function toggleMsDropdownEsp(e) { e.stopPropagation(); const dd = el("msDropdownEsp"); const tr = el("msTriggerEsp"); if (!dd || !tr) return; const willOpen = !dd.classList.contains("open"); closeAllDropdowns(); if (willOpen) { dd.classList.add("open"); tr.classList.add("open"); } }
+
 function selectAllSub(e) { e.preventDefault(); selectedSubgrupos = new Set(getVisibleSubgrupos()); buildSubgrupoList(); applyFilters(); }
 function clearSubSelection(e) { e.preventDefault(); selectedSubgrupos.clear(); buildSubgrupoList(); applyFilters(); }
 function selectAllEsp(e) { e.preventDefault(); selectedEspecialidades = new Set(getVisibleEspecialidades()); buildEspecialidadeList(); applyFilters(); }
 function clearEspSelection(e) { e.preventDefault(); selectedEspecialidades.clear(); buildEspecialidadeList(); applyFilters(); }
+
 function filterMsListSub() { const q = (el("msSearchSub")?.value || "").toLowerCase(); const list = el("msListSub"); if (!list) return; list.querySelectorAll(".ms-item").forEach(item => { const text = item.querySelector("span")?.textContent?.toLowerCase() || ""; item.style.display = text.includes(q) ? "" : "none"; }); }
 function filterMsListEsp() { const q = (el("msSearchEsp")?.value || "").toLowerCase(); const list = el("msListEsp"); if (!list) return; list.querySelectorAll(".ms-item").forEach(item => { const text = item.querySelector("span")?.textContent?.toLowerCase() || ""; item.style.display = text.includes(q) ? "" : "none"; }); }
+
 function especialidadeMatchesGrupo(especialidade, grupoCodigo) { if (!grupoCodigo) return true; const set = especialidadeToGrupos.get(especialidade); return set ? set.has(grupoCodigo) : false; }
 function especialidadeMatchesSubgrupos(especialidade, selectedSubs) { if (!selectedSubs.size) return true; const set = especialidadeToSubgrupos.get(especialidade); if (!set) return false; for (const s of selectedSubs) if (set.has(s)) return true; return false; }
+
 function matchBaseWithDimensions(item, hasGroupFields = true) {
   const grupo = el("grupoSelect")?.value || "";
   const periodo = el("periodoSelect")?.value || "";
@@ -474,7 +507,6 @@ function matchBaseWithDimensions(item, hasGroupFields = true) {
   }
   return especialidadeMatch && periodoMatch && grupoMatch && subgrupoMatch;
 }
-function matchFinanceiro(item) { const periodo = el("periodoSelect")?.value || ""; return !periodo || item.mes === periodo; }
 
 function createGaugeChart(canvasId, percent, color) {
   const canvas = el(canvasId);
@@ -491,6 +523,7 @@ function createGaugeChart(canvasId, percent, color) {
 
 function applyFilters() {
   console.log("Aplicando filtros...");
+  
   const filteredFila = dadosFila.filter(d => matchBaseWithDimensions(d, true));
   const filteredAgVivver = dadosAgendamentosVivver.filter(d => matchBaseWithDimensions(d, true));
   const filteredAgendados = dadosAgendados.filter(d => matchBaseWithDimensions(d, false));
@@ -527,6 +560,7 @@ function applyFilters() {
   if (taxaFaturamento >= 80) { fatColor = "#059669"; fatBadgeBg = "rgba(5,150,105,.20)"; fatBadgeColor = "#065f46"; fatBadgeText = "✓ Ótimo"; }
   else if (taxaFaturamento >= 50) { fatColor = "#d97706"; fatBadgeBg = "rgba(217,119,6,.18)"; fatBadgeColor = "#92400e"; fatBadgeText = "⚠ Regular"; }
   else { fatColor = "#dc2626"; fatBadgeBg = "rgba(220,38,38,.16)"; fatBadgeColor = "#991b1b"; fatBadgeText = "✗ Crítico"; }
+  
   const gaugeFatPct = el("gaugeFatPct"); if (gaugeFatPct) { gaugeFatPct.textContent = taxaFaturamento.toFixed(1) + "%"; gaugeFatPct.style.color = fatColor; }
   const fatBadge = el("gaugeFatBadge"); if (fatBadge) { fatBadge.textContent = fatBadgeText; fatBadge.style.background = fatBadgeBg; fatBadge.style.color = fatBadgeColor; fatBadge.style.border = `1px solid ${fatColor}55`; }
   const gFatAg = el("gFatAg"); if (gFatAg) gFatAg.textContent = totalAgendados.toLocaleString("pt-BR");
@@ -539,6 +573,7 @@ function applyFilters() {
   else if (taxaAbsenteismo <= 20) { absColor = "#3b82f6"; absBadgeBg = "rgba(59,130,246,.18)"; absBadgeColor = "#1d4ed8"; absBadgeText = "✓ Bom"; }
   else if (taxaAbsenteismo <= 35) { absColor = "#d97706"; absBadgeBg = "rgba(217,119,6,.18)"; absBadgeColor = "#92400e"; absBadgeText = "⚠ Atenção"; }
   else { absColor = "#dc2626"; absBadgeBg = "rgba(220,38,38,.16)"; absBadgeColor = "#991b1b"; absBadgeText = "✗ Crítico"; }
+  
   const gaugeAbsPct = el("gaugeAbsPct"); if (gaugeAbsPct) { gaugeAbsPct.textContent = taxaAbsenteismo.toFixed(1) + "%"; gaugeAbsPct.style.color = absColor; }
   const absBadge = el("gaugeAbsBadge"); if (absBadge) { absBadge.textContent = absBadgeText; absBadge.style.background = absBadgeBg; absBadge.style.color = absBadgeColor; absBadge.style.border = `1px solid ${absColor}55`; }
   const gAbsAg = el("gAbsAg"); if (gAbsAg) gAbsAg.textContent = agVivverTotal.toLocaleString("pt-BR");
@@ -748,17 +783,50 @@ function renderTableBodyFisico() {
   let rows = [...currentTableDataFisico];
   if (month) rows = rows.filter(r => r.mes === month);
   if (q) rows = rows.filter(r => `${r.estabelecimento} ${r.mes}`.toLowerCase().includes(q));
-  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5">Nenhum dado disponível</td></tr>'; const tInfoFisico = el("tInfoFisico"); if (tInfoFisico) tInfoFisico.innerText = "0 registros"; return; }
-  tbody.innerHTML = rows.map(r => `<tr><td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(truncateLabel(r.estabelecimento, 60))}</td><td>${escapeHtml(r.mes || "-")}</td><td class="text-right">${r.agendados.toLocaleString("pt-BR")}</td><td class="text-right">${r.faturadosQtd.toLocaleString("pt-BR")}</td><td class="text-right">${formatMoney(r.financeiroValor)}</td></tr>`).join("");
-  const tInfoFisico = el("tInfoFisico"); if (tInfoFisico) tInfoFisico.innerText = `${rows.length.toLocaleString("pt-BR")} registros`;
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5">Nenhum dado disponível
+  if (!rows.length) { 
+    tbody.innerHTML = '<tr><td colspan="5">Nenhum dado disponível</td></tr>'; 
+    const tInfoFisico = el("tInfoFisico"); 
+    if (tInfoFisico) tInfoFisico.innerText = "0 registros"; 
+    return; 
+  }
+  
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(truncateLabel(r.estabelecimento, 60))}</td>
+      <td>${escapeHtml(r.mes || "-")}</td>
+      <td class="text-right">${r.agendados.toLocaleString("pt-BR")}</td>
+      <td class="text-right">${r.faturadosQtd.toLocaleString("pt-BR")}</td>
+      <td class="text-right">${formatMoney(r.financeiroValor)}</td>
+    </tr>
+  `).join("");
+  
+  const tInfoFisico = el("tInfoFisico"); 
+  if (tInfoFisico) tInfoFisico.innerText = `${rows.length.toLocaleString("pt-BR")} registros`;
 }
 
 function sortTableFisico(colIndex) {
   const columns = ["estabelecimento", "mes", "agendados", "faturadosQtd", "financeiroValor"];
-  if (currentSortColumnFisico === colIndex) currentSortDirectionFisico = currentSortDirectionFisico === "asc" ? "desc" : "asc";
-  else { currentSortColumnFisico = colIndex; currentSortDirectionFisico = "asc"; }
+  if (currentSortColumnFisico === colIndex) {
+    currentSortDirectionFisico = currentSortDirectionFisico === "asc" ? "desc" : "asc";
+  } else {
+    currentSortColumnFisico = colIndex;
+    currentSortDirectionFisico = "asc";
+  }
   const col = columns[colIndex];
-  currentTableDataFisico.sort((a, b) => { let va = a[col], vb = b[col]; if (col === "mes") { va = periodoSortValue(va); vb = periodoSortValue(vb); } else if (typeof va === "string") { va = va.toLowerCase(); vb = vb.toLowerCase(); } if (va < vb) return currentSortDirectionFisico === "asc" ? -1 : 1; if (va > vb) return currentSortDirectionFisico === "asc" ? 1 : -1; return 0; });
+  currentTableDataFisico.sort((a, b) => { 
+    let va = a[col], vb = b[col]; 
+    if (col === "mes") { 
+      va = periodoSortValue(va); 
+      vb = periodoSortValue(vb); 
+    } else if (typeof va === "string") { 
+      va = va.toLowerCase(); 
+      vb = vb.toLowerCase(); 
+    } 
+    if (va < vb) return currentSortDirectionFisico === "asc" ? -1 : 1; 
+    if (va > vb) return currentSortDirectionFisico === "asc" ? 1 : -1; 
+    return 0; 
+  });
   renderTableBodyFisico();
 }
 
@@ -769,12 +837,14 @@ function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFatu
   const faltososEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.faltosos);
   const faturadosQtdEstab = aggregateBy(filteredFaturado, d => d.estabelecimento, d => d.faturadoQtd);
   const financeiroEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento, d => d.financeiroValor);
+  
   const topAgendados = [...agendadosEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topOfertas = [...ofertasEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topRecep = [...recepcionadosEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFalt = [...faltososEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFatQtd = [...faturadosQtdEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFinanceiro = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
+  
   makeHorizontalBarChart("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas");
   makeHorizontalBarChart("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas");
   makeHorizontalBarChart("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados");
@@ -798,12 +868,15 @@ function renderFila(filteredFila) {
   const filaComplexidade = aggregateBy(filteredFila, d => d.complexidade, d => d.fila);
   const filaSubgrupo = aggregateBy(filteredFila, d => d.subgrupo, d => d.fila);
   const filaMes = aggregateBy(filteredFila, d => d.dataCorte, d => d.fila);
+  
   renderPercentageTotalTable("tableFilaEspecialidadeBody", filaEspecialidade, "#2563eb");
   renderPercentageTotalTable("tableFilaProcedimentoBody", filaProcedimento, "#059669");
   renderPercentageTotalTable("tableFilaComplexidadeBody", filaComplexidade, "#8b5cf6");
   renderPercentageTotalTable("tableFilaSubgrupoBody", filaSubgrupo, "#d97706");
+  
   const complexArr = [...filaComplexidade.entries()].sort((a, b) => b[1] - a[1]);
   makeDoughnutChartWithPercentages("cFilaComplexidadeRosca", complexArr.map(([k]) => truncateLabel(k || "Sem Dados", 28)), complexArr.map(([,v]) => v), ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626", "#3b82f6", "#059669"]);
+  
   const periods = [...filaMes.keys()].sort((a, b) => periodoSortValue(a) - periodoSortValue(b));
   const values = periods.map(p => filaMes.get(p) || 0);
   const trendLabels = [...periods];
@@ -813,20 +886,51 @@ function renderFila(filteredFila) {
   if (last3.length >= 2) growth = (last3[last3.length - 1] - last3[0]) / (last3.length - 1);
   const lastValue = values[values.length - 1] || 0;
   const projectionData = Array(periods.length).fill(null);
-  for (let i = 1; i <= 3; i++) { trendLabels.push(`Proj. ${i}`); projectionData.push(Math.max(0, Math.round(lastValue + growth * i))); }
+  for (let i = 1; i <= 3; i++) { 
+    trendLabels.push(`Proj. ${i}`); 
+    projectionData.push(Math.max(0, Math.round(lastValue + growth * i))); 
+  }
+  
   destroyChart("cTendenciaFila");
   const cTendenciaFila = el("cTendenciaFila");
   if (cTendenciaFila) {
     charts.cTendenciaFila = new Chart(cTendenciaFila.getContext("2d"), {
-      type: "line", data: { labels: trendLabels, datasets: [{ label: "Fila Real", data: [...trendDataReal, ...Array(3).fill(null)], borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.10)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8 }, { label: "Projeção", data: projectionData, borderColor: "#d97706", borderDash: [6, 4], borderWidth: 3, backgroundColor: "rgba(217,119,6,0.05)", fill: false, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#d97706", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8 }] },
-      options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 24, right: 20, bottom: 10, left: 10 } }, plugins: { legend: { position: "top", labels: { font: { weight: "bold" } } }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } }, datalabels: { display: true, color: ctx => ctx.dataset.borderColor || "#1F2937", font: { weight: "bold", size: 10 }, formatter: value => value ? value.toLocaleString("pt-BR") : "", align: "top", anchor: "end", offset: 6, clamp: true } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: "bold" } } }, y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.12)" }, ticks: { font: { weight: "bold" } } } } }
+      type: "line", 
+      data: { 
+        labels: trendLabels, 
+        datasets: [
+          { label: "Fila Real", data: [...trendDataReal, ...Array(3).fill(null)], borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.10)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8 },
+          { label: "Projeção", data: projectionData, borderColor: "#d97706", borderDash: [6, 4], borderWidth: 3, backgroundColor: "rgba(217,119,6,0.05)", fill: false, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#d97706", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8 }
+        ] 
+      },
+      options: { 
+        responsive: true, maintainAspectRatio: false, layout: { padding: { top: 24, right: 20, bottom: 10, left: 10 } }, 
+        plugins: { 
+          legend: { position: "top", labels: { font: { weight: "bold" } } }, 
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } }, 
+          datalabels: { display: true, color: ctx => ctx.dataset.borderColor || "#1F2937", font: { weight: "bold", size: 10 }, formatter: value => value ? value.toLocaleString("pt-BR") : "", align: "top", anchor: "end", offset: 6, clamp: true } 
+        }, 
+        scales: { 
+          x: { grid: { display: false }, ticks: { font: { weight: "bold" } } }, 
+          y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.12)" }, ticks: { font: { weight: "bold" } } } 
+        } 
+      }
     });
   }
 }
 
 function exportExcel() {
-  if (!currentTableDataFisico.length) { toast("Sem dados para exportar", "info"); return; }
-  const data = currentTableDataFisico.map(r => ({ Estabelecimento: r.estabelecimento, Mes: r.mes, Agendados: r.agendados, Total_Faturado: r.faturadosQtd, Total_Financeiro: r.financeiroValor }));
+  if (!currentTableDataFisico.length) { 
+    toast("Sem dados para exportar", "info"); 
+    return; 
+  }
+  const data = currentTableDataFisico.map(r => ({ 
+    Estabelecimento: r.estabelecimento, 
+    Mes: r.mes, 
+    Agendados: r.agendados, 
+    Total_Faturado: r.faturadosQtd, 
+    Total_Financeiro: r.financeiroValor 
+  }));
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.json_to_sheet(data);
   ws["!cols"] = [{ wch: 45 }, { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 22 }];
@@ -844,15 +948,24 @@ function switchTab(id, btn) {
   setTimeout(() => { Object.values(charts).forEach(chart => chart?.resize?.()); }, 120);
 }
 
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM carregado, inicializando painel...");
   loadAllData();
-  const btnRefresh = el("btnRefresh"); if (btnRefresh) btnRefresh.addEventListener("click", loadAllData);
-  const btnExcel = el("btnExcel"); if (btnExcel) btnExcel.addEventListener("click", exportExcel);
+  
+  const btnRefresh = el("btnRefresh"); 
+  if (btnRefresh) btnRefresh.addEventListener("click", loadAllData);
+  
+  const btnExcel = el("btnExcel"); 
+  if (btnExcel) btnExcel.addEventListener("click", exportExcel);
+  
   const btnClear = el("btnClear");
   if (btnClear) {
     btnClear.addEventListener("click", () => {
-      selectedSubgrupos.clear(); selectedEspecialidades.clear();
+      selectedSubgrupos.clear(); 
+      selectedEspecialidades.clear();
       const grupoSelect = el("grupoSelect"); if (grupoSelect) grupoSelect.value = "";
       const periodoSelect = el("periodoSelect"); if (periodoSelect) periodoSelect.value = "";
       const tableMonthFilterFisico = el("tableMonthFilterFisico"); if (tableMonthFilterFisico) tableMonthFilterFisico.value = "";
@@ -862,15 +975,30 @@ document.addEventListener("DOMContentLoaded", () => {
       const tSearchFisico = el("tSearchFisico"); if (tSearchFisico) tSearchFisico.value = "";
       const tabelaSearchEspec = el("tabelaSearchEspec"); if (tabelaSearchEspec) tabelaSearchEspec.value = "";
       currentTableMonthFilterFisico = "";
-      buildSubgrupoList(); buildEspecialidadeList(); applyFilters();
+      buildSubgrupoList(); 
+      buildEspecialidadeList(); 
+      applyFilters();
       toast("Filtros limpos", "info");
     });
   }
-  const grupoSelect = el("grupoSelect"); if (grupoSelect) grupoSelect.addEventListener("change", () => { buildSubgrupoList(); applyFilters(); });
-  const periodoSelect = el("periodoSelect"); if (periodoSelect) periodoSelect.addEventListener("change", applyFilters);
-  const tableMonthFilterFisico = el("tableMonthFilterFisico"); if (tableMonthFilterFisico) tableMonthFilterFisico.addEventListener("change", e => { currentTableMonthFilterFisico = e.target.value || ""; renderTableBodyFisico(); });
-  const tSearchFisico = el("tSearchFisico"); if (tSearchFisico) tSearchFisico.addEventListener("input", renderTableBodyFisico);
+  
+  const grupoSelect = el("grupoSelect"); 
+  if (grupoSelect) grupoSelect.addEventListener("change", () => { buildSubgrupoList(); applyFilters(); });
+  
+  const periodoSelect = el("periodoSelect"); 
+  if (periodoSelect) periodoSelect.addEventListener("change", applyFilters);
+  
+  const tableMonthFilterFisico = el("tableMonthFilterFisico"); 
+  if (tableMonthFilterFisico) tableMonthFilterFisico.addEventListener("change", e => { currentTableMonthFilterFisico = e.target.value || ""; renderTableBodyFisico(); });
+  
+  const tSearchFisico = el("tSearchFisico"); 
+  if (tSearchFisico) tSearchFisico.addEventListener("input", renderTableBodyFisico);
+  
   document.addEventListener("click", () => closeAllDropdowns());
-  const msDropdownSub = el("msDropdownSub"); if (msDropdownSub) msDropdownSub.addEventListener("click", e => e.stopPropagation());
-  const msDropdownEsp = el("msDropdownEsp"); if (msDropdownEsp) msDropdownEsp.addEventListener("click", e => e.stopPropagation());
+  
+  const msDropdownSub = el("msDropdownSub"); 
+  if (msDropdownSub) msDropdownSub.addEventListener("click", e => e.stopPropagation());
+  
+  const msDropdownEsp = el("msDropdownEsp"); 
+  if (msDropdownEsp) msDropdownEsp.addEventListener("click", e => e.stopPropagation());
 });
