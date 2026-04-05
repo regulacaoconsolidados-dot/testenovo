@@ -859,11 +859,85 @@ select:focus,
   }
 }
 
+/* CORREÇÃO: Tabelas do Agendamentos Vivver - tamanho proporcional */
+.three-tables .chartCard {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.three-tables .table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 400px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: white;
+  width: 100%;
+}
+
+.three-tables .data-table-simple {
+  width: 100%;
+  min-width: 280px;
+  border-collapse: collapse;
+  font-size: 12px;
+  table-layout: auto;
+}
+
+.three-tables .data-table-simple th,
+.three-tables .data-table-simple td {
+  padding: 10px 8px;
+  white-space: normal;
+  word-break: break-word;
+  vertical-align: middle;
+}
+
+.three-tables .data-table-simple th:first-child,
+.three-tables .data-table-simple td:first-child {
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 1;
+}
+
+.three-tables .data-table-simple th:first-child {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  z-index: 2;
+}
+
+.three-tables .data-table-simple td:nth-child(2) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.three-tables .data-table-simple td:nth-child(3) {
+  min-width: 100px;
+}
+
 .legend-with-avg {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
   align-items: center;
+}
+
+/* Estilo para as legendas clicáveis do gráfico */
+.legend-with-avg .legend-item {
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.legend-with-avg .legend-item:hover {
+  background: rgba(0,0,0,0.05);
+  transform: translateY(-1px);
+}
+
+.legend-with-avg .legend-item.active-filter {
+  background: rgba(11,94,66,0.12);
+  box-shadow: 0 0 0 2px var(--primary);
 }
 
 .legend-item {
