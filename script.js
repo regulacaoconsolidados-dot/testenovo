@@ -54,6 +54,9 @@ let currentSortColumnFisico = 0;
 let currentSortDirectionFisico = "asc";
 let currentTableMonthFilterFisico = "";
 
+// Variáveis para controle do filtro do gráfico Agendados vs Faturados
+let currentChartFilter = null; // null = ambos, "agendados", "faturados"
+
 function toast(msg, type = "info") {
   const box = el("toastBox");
   if (!box) return;
@@ -1478,6 +1481,136 @@ function renderAgendadasPorEspecialidadeEstabTable(filteredAgendados) {
     </tr>`;
 }
 
+// Função para renderizar o gráfico Agendados vs Faturados com suporte a filtro
+function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues) {
+  const canvas = el("cAgendadosVsFaturadosMes");
+  if (!canvas) return;
+
+  destroyChart("cAgendadosVsFaturadosMes");
+
+  // Determinar quais datasets mostrar baseado no filtro atual
+  const datasets = [];
+  
+  if (currentChartFilter !== "faturados") {
+    datasets.push({
+      label: "Agendados",
+      data: agendadosValues,
+      backgroundColor: "#b6923e",
+      borderRadius: 8
+    });
+  }
+  
+  if (currentChartFilter !== "agendados") {
+    datasets.push({
+      label: "Faturados",
+      data: faturadosValues,
+      backgroundColor: "#059669",
+      borderRadius: 8
+    });
+  }
+
+  charts.cAgendadosVsFaturadosMes = new Chart(canvas.getContext("2d"), {
+    type: "bar",
+    data: {
+      labels: periods,
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 12, right: 20, bottom: 10, left: 10 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}`
+          }
+        },
+        datalabels: {
+          color: "#fff",
+          font: { weight: "bold", size: 11 },
+          formatter: value => value ? value.toLocaleString("pt-BR") : "",
+          anchor: "center",
+          align: "center"
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { weight: "bold" } }
+        },
+        y: {
+          beginAtZero: true,
+          grace: "10%",
+          grid: { color: "rgba(148,163,184,0.10)" },
+          ticks: { font: { weight: "bold" } }
+        }
+      }
+    }
+  });
+}
+
+// Função para configurar os cliques nas legendas do gráfico
+function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
+  const legendContainer = el("legendAgendadosFaturados");
+  if (!legendContainer) return;
+
+  // Encontrar os itens da legenda
+  const legendItems = legendContainer.querySelectorAll(".legend-item");
+  if (legendItems.length !== 2) return;
+
+  const agendadosItem = legendItems[0];
+  const faturadosItem = legendItems[1];
+
+  // Remover event listeners antigos (clonando para limpar)
+  const newAgendadosItem = agendadosItem.cloneNode(true);
+  const newFaturadosItem = faturadosItem.cloneNode(true);
+  agendadosItem.parentNode.replaceChild(newAgendadosItem, agendadosItem);
+  faturadosItem.parentNode.replaceChild(newFaturadosItem, faturadosItem);
+
+  // Adicionar estilos de cursor e eventos
+  newAgendadosItem.style.cursor = "pointer";
+  newFaturadosItem.style.cursor = "pointer";
+
+  // Função para atualizar destaque visual
+  function updateLegendActiveStyle() {
+    newAgendadosItem.classList.remove("active-filter");
+    newFaturadosItem.classList.remove("active-filter");
+    
+    if (currentChartFilter === "agendados") {
+      newAgendadosItem.classList.add("active-filter");
+    } else if (currentChartFilter === "faturados") {
+      newFaturadosItem.classList.add("active-filter");
+    }
+  }
+
+  // Evento para Agendados
+  newAgendadosItem.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (currentChartFilter === "agendados") {
+      currentChartFilter = null;
+    } else {
+      currentChartFilter = "agendados";
+    }
+    renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues);
+    updateLegendActiveStyle();
+  });
+
+  // Evento para Faturados
+  newFaturadosItem.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (currentChartFilter === "faturados") {
+      currentChartFilter = null;
+    } else {
+      currentChartFilter = "faturados";
+    }
+    renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues);
+    updateLegendActiveStyle();
+  });
+
+  updateLegendActiveStyle();
+}
+
 function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro) {
   const periods = getPeriodsFromFilteredData(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro);
 
@@ -1512,64 +1645,13 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
         <span style="font-weight:900;color:var(--primary-dark)">(Média: ${Math.round(faturadosMedia).toLocaleString("pt-BR")})</span>
       </div>
     `;
+    
+    // Configurar os cliques nas legendas
+    setupChartLegendClick(periods, agendadosValues, faturadosValues);
   }
 
-  destroyChart("cAgendadosVsFaturadosMes");
-  const cAgendadosVsFaturadosMes = el("cAgendadosVsFaturadosMes");
-  if (cAgendadosVsFaturadosMes) {
-    charts.cAgendadosVsFaturadosMes = new Chart(cAgendadosVsFaturadosMes.getContext("2d"), {
-      type: "bar",
-      data: {
-        labels: periods,
-        datasets: [
-          {
-            label: "Agendados",
-            data: agendadosValues,
-            backgroundColor: "#b6923e",
-            borderRadius: 8
-          },
-          {
-            label: "Faturados",
-            data: faturadosValues,
-            backgroundColor: "#059669",
-            borderRadius: 8
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: { top: 12, right: 20, bottom: 10, left: 10 } },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}`
-            }
-          },
-          datalabels: {
-            color: "#fff",
-            font: { weight: "bold", size: 11 },
-            formatter: value => value ? value.toLocaleString("pt-BR") : "",
-            anchor: "center",
-            align: "center"
-          }
-        },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: { font: { weight: "bold" } }
-          },
-          y: {
-            beginAtZero: true,
-            grace: "10%",
-            grid: { color: "rgba(148,163,184,0.10)" },
-            ticks: { font: { weight: "bold" } }
-          }
-        }
-      }
-    });
-  }
+  // Renderizar o gráfico com o filtro atual
+  renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues);
 
   makeLineChart(
     "cReceitaFinanceiraMes",
