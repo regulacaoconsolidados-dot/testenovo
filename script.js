@@ -376,6 +376,12 @@ async function loadAllData() {
 
     latestDataCorteRetroativa = latestRetroativaDateValue || "Não disponível";
 
+    // Atualizar o elemento da data de corte retroativa se existir
+    const dataCorteRetroativaElement = el("kFilaRetroativaDataCorte");
+    if (dataCorteRetroativaElement) {
+      dataCorteRetroativaElement.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
+    }
+
     // Processa Agendamentos Vivver
     dadosAgendamentosVivver = agVivverRaw.map(r => {
       const especialidade = normalizeText(getField(r, ["ESPECIALIDADE", "Especialidade"]));
@@ -450,11 +456,13 @@ async function loadAllData() {
     ]);
 
     console.log("Períodos encontrados:", allPeriodos);
+    console.log("Dados da Fila Retroativa carregados:", dadosFilaRetroativa.length);
+    console.log("Datas da Fila Retroativa:", dadosFilaRetroativa.map(d => d.dataCorte));
 
     populateFilters();
     updateLastUpdate();
     applyFilters();
-    renderFilaRetroativa(); // Renderiza a nova aba
+    renderFilaRetroativa();
     toast("Dados carregados com sucesso!", "success");
   } catch (e) {
     console.error("Erro detalhado:", e);
@@ -770,8 +778,12 @@ function applyFilters() {
   const filteredAgVivver = dadosAgendamentosVivver.filter(d => matchBaseWithDimensions(d, true));
   const filteredAgendados = dadosAgendados.filter(d => matchBaseWithDimensions(d, false));
   const filteredFinanceiro = dadosFinanceiro.filter(d => matchFinanceiro(d));
+  
+  // Filtrar também os dados retroativos
+  const filteredFilaRetroativa = dadosFilaRetroativa.filter(d => matchBaseWithDimensions(d, true));
 
   const totalFila = filteredFila.reduce((s, d) => s + d.fila, 0);
+  const totalFilaRetroativa = filteredFilaRetroativa.reduce((s, d) => s + d.fila, 0);
   const totalRecepcionados = filteredAgVivver.reduce((s, d) => s + d.recepcionados, 0);
   const totalFaltosos = filteredAgVivver.reduce((s, d) => s + d.faltosos, 0);
   const totalAgendados = filteredAgendados.reduce((s, d) => s + d.agendados, 0);
@@ -900,7 +912,8 @@ function applyFilters() {
   
   createGaugeChart("cGaugeAbs", taxaAbsenteismo, absColor);
 
-  renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro);
+  // Passar os dados retroativos filtrados para a visão geral
+  renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro, filteredFilaRetroativa);
   renderFinanceiro(filteredFinanceiro);
   renderFisicoFinanceiro(filteredAgendados, filteredFinanceiro);
   renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFinanceiro);
@@ -1189,6 +1202,18 @@ function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepciona
   const canvas = el("cEvolucao");
   if (!canvas) return;
   destroyChart("cEvolucao");
+  
+  console.log("===== GRÁFICO DE EVOLUÇÃO =====");
+  console.log("Períodos:", periods);
+  console.log("Dados de Fila (com retroativos):", filaPorMes);
+  
+  const filaData = periods.map(p => filaPorMes.get(p) || 0);
+  const ofertaData = periods.map(p => ofertaPorMes.get(p) || 0);
+  const recepData = periods.map(p => recepcionadosPorMes.get(p) || 0);
+  const faltaData = periods.map(p => faltososPorMes.get(p) || 0);
+  
+  console.log("Valores da Fila no gráfico:", filaData);
+  
   charts.cEvolucao = new Chart(canvas.getContext("2d"), {
     data: {
       labels: periods,
@@ -1196,7 +1221,7 @@ function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepciona
         {
           type: "bar",
           label: "Ofertas",
-          data: periods.map(p => ofertaPorMes.get(p) || 0),
+          data: ofertaData,
           backgroundColor: "rgba(37,99,235,0.22)",
           borderColor: "#2563eb",
           borderWidth: 1.5,
@@ -1206,8 +1231,8 @@ function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepciona
         },
         {
           type: "line",
-          label: "Fila de Espera",
-          data: periods.map(p => filaPorMes.get(p) || 0),
+          label: "Fila de Espera (Atual + Retroativa)",
+          data: filaData,
           borderColor: "#dc2626",
           backgroundColor: "rgba(220,38,38,0.10)",
           borderWidth: 3,
@@ -1224,7 +1249,7 @@ function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepciona
         {
           type: "line",
           label: "Recepcionados",
-          data: periods.map(p => recepcionadosPorMes.get(p) || 0),
+          data: recepData,
           borderColor: "#059669",
           backgroundColor: "rgba(5,150,105,0.10)",
           borderWidth: 3,
@@ -1241,7 +1266,7 @@ function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepciona
         {
           type: "line",
           label: "Faltosos",
-          data: periods.map(p => faltososPorMes.get(p) || 0),
+          data: faltaData,
           borderColor: "#d97706",
           backgroundColor: "rgba(217,119,6,0.10)",
           borderWidth: 3,
@@ -1541,18 +1566,29 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
   updateLegendActiveStyle();
 }
 
-function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro) {
-  // Combinar fila atual com fila retroativa para o gráfico de evolução
-  const filteredFilaRetroativa = dadosFilaRetroativa.filter(d => matchBaseWithDimensions(d, true));
+// FUNÇÃO CORRIGIDA - Agora inclui os dados retroativos
+function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro, filteredFilaRetroativa = []) {
+  // COMBINAR os dados da fila atual com os dados retroativos
   const todasFila = [...filteredFila, ...filteredFilaRetroativa];
   
+  console.log("===== RENDER VISAO GERAL =====");
+  console.log("Fila atual (filtrada):", filteredFila.length);
+  console.log("Fila retroativa (filtrada):", filteredFilaRetroativa.length);
+  console.log("Total combinado:", todasFila.length);
+  console.log("Dados retroativos por data:", filteredFilaRetroativa.map(d => ({ data: d.dataCorte, valor: d.fila })));
+  
+  // Obter todos os períodos a partir dos dados COMBINADOS
   const periods = getPeriodsFromFilteredData(todasFila, filteredAgVivver, filteredAgendados, filteredFinanceiro);
-
+  
+  // Agregar a fila usando os dados COMBINADOS
   const filaPorMes = aggregateBy(todasFila, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
-
+  
+  console.log("Fila por mês (combinada):", filaPorMes);
+  
+  // Renderizar gráfico com os dados COMBINADOS
   renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
 
   const agendadosPorMes = aggregateBy(filteredAgendados, d => d.mes, d => d.agendados);
@@ -1780,6 +1816,13 @@ function renderTableBodyFisico() {
       <td>${escapeHtml(r.mes || "-")}</td>
       <td class="text-right">${r.agendados.toLocaleString("pt-BR")}</td>
       <td class="text-right">${r.faturadosQtd.toLocaleString("pt-BR")}</td>
+      <td class="text-right">${formatMoney(r.financeiroValor)}
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(truncateLabel(r.estabelecimento, 60))}</td>
+      <td>${escapeHtml(r.mes || "-")}</td>
+      <td class="text-right">${r.agendados.toLocaleString("pt-BR")}</td>
+      <td class="text-right">${r.faturadosQtd.toLocaleString("pt-BR")}</td>
       <td class="text-right">${formatMoney(r.financeiroValor)}</td>
     </tr>
   `).join("");
@@ -1853,12 +1896,7 @@ function renderFila(filteredFila) {
   renderPercentageTotalTable("tableFilaComplexidadeBody", filaComplexidade, "#8b5cf6");
   renderPercentageTotalTable("tableFilaSubgrupoBody", filaSubgrupo, "#d97706");
   const complexArr = [...filaComplexidade.entries()].sort((a, b) => b[1] - a[1]);
-  makeDoughnutChartWithPercentages(
-    "cFilaComplexidadeRosca",
-    complexArr.map(([k]) => truncateLabel(k || "Sem Dados", 28)),
-    complexArr.map(([,v]) => v),
-    ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626", "#3b82f6", "#059669"]
-  );
+  makeDoughnutChartWithPercentages("cFilaComplexidadeRosca", complexArr.map(([k]) => truncateLabel(k || "Sem Dados", 28)), complexArr.map(([,v]) => v), ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626", "#3b82f6", "#059669"]);
   const periods = [...filaMes.keys()].sort((a, b) => periodoSortValue(a) - periodoSortValue(b));
   const values = periods.map(p => filaMes.get(p) || 0);
   const trendLabels = [...periods];
@@ -1955,54 +1993,36 @@ function renderFila(filteredFila) {
   }
 }
 
-// NOVA FUNÇÃO: Renderiza a aba Fila Retroativa 2025
 function renderFilaRetroativa() {
-  const grupo = el("grupoSelect")?.value || "";
-  const periodo = el("periodoSelect")?.value || "";
-  const especialidadeMatch = (item) => !selectedEspecialidades.size || selectedEspecialidades.has(item.especialidade);
-  const periodoMatch = (item) => !periodo || item.dataCorte === periodo;
-  const grupoMatch = (item) => !grupo || item.grupoCodigo === grupo;
-  const subgrupoMatch = (item) => !selectedSubgrupos.size || selectedSubgrupos.has(item.subgrupo);
+  const totalFilaRetroativa = dadosFilaRetroativa.reduce((s, d) => s + d.fila, 0);
+  const kFilaRetroativaTotal = el("kFilaRetroativaTotal");
+  const kFilaRetroativaMedia = el("kFilaRetroativaMedia");
+  const kFilaRetroativaDataCorte = el("kFilaRetroativaDataCorte");
   
-  const filtered = dadosFilaRetroativa.filter(item => 
-    especialidadeMatch(item) && periodoMatch(item) && grupoMatch(item) && subgrupoMatch(item)
-  );
-
-  const totalFila = filtered.reduce((s, d) => s + d.fila, 0);
-  const mediaPorProcedimento = filtered.length > 0 ? totalFila / filtered.length : 0;
-
-  const kTotal = el("kFilaRetroativaTotal");
-  const kDataCorte = el("kFilaRetroativaDataCorte");
-  const kMedia = el("kFilaRetroativaMedia");
+  if (kFilaRetroativaTotal) kFilaRetroativaTotal.innerText = totalFilaRetroativa.toLocaleString("pt-BR");
+  if (kFilaRetroativaMedia) {
+    const media = dadosFilaRetroativa.length > 0 ? totalFilaRetroativa / dadosFilaRetroativa.length : 0;
+    kFilaRetroativaMedia.innerText = media.toFixed(1);
+  }
+  if (kFilaRetroativaDataCorte) {
+    kFilaRetroativaDataCorte.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
+  }
   
-  if (kTotal) kTotal.innerText = totalFila.toLocaleString("pt-BR");
-  if (kDataCorte) kDataCorte.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
-  if (kMedia) kMedia.innerText = mediaPorProcedimento.toFixed(1);
-
-  // Gráfico de Complexidade
-  const complexMap = aggregateBy(filtered, d => d.complexidade || "Não informado", d => d.fila);
-  const complexArr = [...complexMap.entries()].sort((a, b) => b[1] - a[1]);
-  const complexLabels = complexArr.map(([k]) => truncateLabel(k, 25));
-  const complexValues = complexArr.map(([,v]) => v);
-  makeDoughnutChartWithPercentages("cFilaRetroativaComplexidade", complexLabels, complexValues, ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626"]);
-
-  // Gráfico de Subgrupo
-  const subgrupoMap = aggregateBy(filtered, d => d.subgrupo || "Não informado", d => d.fila);
-  const subgrupoArr = [...subgrupoMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const subgrupoLabels = subgrupoArr.map(([k]) => truncateLabel(k, 25));
-  const subgrupoValues = subgrupoArr.map(([,v]) => v);
-  makeDoughnutChartWithPercentages("cFilaRetroativaSubgrupo", subgrupoLabels, subgrupoValues, ["#3b82f6", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#f97316"]);
-
-  // Tabela: Top Especialidades
-  const especialidadeMap = aggregateBy(filtered, d => d.especialidade || "Não informado", d => d.fila);
-  renderPercentageTotalTable("tableRetroativaEspecialidadeBody", especialidadeMap, "#8b5cf6");
-
-  // Tabela: Top Procedimentos
-  const procedimentoMap = aggregateBy(filtered, d => d.descricao || "Não informado", d => d.fila);
-  renderPercentageTotalTable("tableRetroativaProcedimentoBody", procedimentoMap, "#8b5cf6");
-
-  // Tabela Detalhada
-  renderTabelaRetroativaDetalhada(filtered);
+  const filaRetroativaEspecialidade = aggregateBy(dadosFilaRetroativa, d => d.especialidade, d => d.fila);
+  const filaRetroativaProcedimento = aggregateBy(dadosFilaRetroativa, d => d.descricao, d => d.fila);
+  const filaRetroativaComplexidade = aggregateBy(dadosFilaRetroativa, d => d.complexidade, d => d.fila);
+  const filaRetroativaSubgrupo = aggregateBy(dadosFilaRetroativa, d => d.subgrupo, d => d.fila);
+  
+  renderPercentageTotalTable("tableRetroativaEspecialidadeBody", filaRetroativaEspecialidade, "#8b5cf6");
+  renderPercentageTotalTable("tableRetroativaProcedimentoBody", filaRetroativaProcedimento, "#a855f7");
+  
+  const complexArr = [...filaRetroativaComplexidade.entries()].sort((a, b) => b[1] - a[1]);
+  makeDoughnutChartWithPercentages("cFilaRetroativaComplexidade", complexArr.map(([k]) => truncateLabel(k || "Sem Dados", 28)), complexArr.map(([,v]) => v), ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626", "#3b82f6", "#059669"]);
+  
+  const subgrupoArr = [...filaRetroativaSubgrupo.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+  makeDoughnutChartWithPercentages("cFilaRetroativaSubgrupo", subgrupoArr.map(([k]) => truncateLabel(k || "Sem Dados", 30)), subgrupoArr.map(([,v]) => v), ["#8b5cf6", "#c084fc", "#a855f7", "#9333ea", "#7e22ce", "#6b21a5", "#581c87", "#4c1d95", "#3b0764", "#2e1065"]);
+  
+  renderTabelaRetroativaDetalhada(dadosFilaRetroativa);
 }
 
 function renderTabelaRetroativaDetalhada(data) {
@@ -2029,7 +2049,7 @@ function renderTabelaRetroativaDetalhada(data) {
       <td>${escapeHtml(d.grupo || "-")}</td>
       <td>${escapeHtml(d.subgrupo || "-")}</td>
       <td>${escapeHtml(d.complexidade || "-")}</td>
-      <td class="text-right">${d.fila.toLocaleString("pt-BR")}</td>
+      <td class="text-right font-700">${d.fila.toLocaleString("pt-BR")}</td>
       <td>${escapeHtml(d.dataCorte || "-")}</td>
     </tr>
   `).join("");
@@ -2106,6 +2126,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const tabelaRetroativaSearch = el("tabelaRetroativaSearch");
       if (tabelaRetroativaSearch) tabelaRetroativaSearch.value = "";
       currentTableMonthFilterFisico = "";
+      currentChartFilter = null;
       buildSubgrupoList();
       buildEspecialidadeList();
       applyFilters();
