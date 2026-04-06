@@ -725,6 +725,32 @@ select:focus,
   margin-top: 10px;
 }
 
+.gauge-zones-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.gauge-zone-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.zone-circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
 .chartCard,
 .estatistica-card {
   background: white;
@@ -1132,65 +1158,4 @@ select:focus,
   .chartWrap-hero { height: 360px; }
   .topic-pill { margin-left: 0; }
   .topic-header { padding: 18px 16px; }
-}
-/* Estilos para as legendas dos gráficos Gauge */
-.gauge-legend {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-}
-
-.gauge-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.gauge-legend-color {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  display: inline-block;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
-}
-
-.gauge-legend-label {
-  color: var(--text-primary);
-}
-
-.gauge-legend-value {
-  color: var(--primary-color);
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.gauge-legend-sublabel {
-  font-size: 11px;
-  color: var(--text-secondary);
-  text-align: center;
-  margin-top: 4px;
-  padding-top: 4px;
-  border-top: 1px solid rgba(148, 163, 184, 0.2);
-}
-
-/* Ajuste para os containers dos gráficos gauge */
-.gauge-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.gauge-container canvas {
-  max-height: 180px;
-  width: 100%;
 }
