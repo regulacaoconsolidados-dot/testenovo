@@ -1542,19 +1542,29 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
 }
 
 function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro) {
-  const periods = getPeriodsFromFilteredData(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro);
-  const filaPorMes = aggregateBy(filteredFila, d => d.dataCorte, d => d.fila);
+  // Combinar fila atual com fila retroativa para o gráfico de evolução
+  const filteredFilaRetroativa = dadosFilaRetroativa.filter(d => matchBaseWithDimensions(d, true));
+  const todasFila = [...filteredFila, ...filteredFilaRetroativa];
+  
+  const periods = getPeriodsFromFilteredData(todasFila, filteredAgVivver, filteredAgendados, filteredFinanceiro);
+
+  const filaPorMes = aggregateBy(todasFila, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
+
   renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
+
   const agendadosPorMes = aggregateBy(filteredAgendados, d => d.mes, d => d.agendados);
   const faturadosQtdPorMes = aggregateBy(filteredFinanceiro, d => d.mes, d => d.faturadoQtd);
   const financeiroPorMes = aggregateBy(filteredFinanceiro, d => d.mes, d => d.financeiroValor);
+
   const agendadosValues = periods.map(p => agendadosPorMes.get(p) || 0);
   const faturadosValues = periods.map(p => faturadosQtdPorMes.get(p) || 0);
+
   const agendadosMedia = agendadosValues.reduce((a, b) => a + b, 0) / (agendadosValues.filter(v => v > 0).length || 1);
   const faturadosMedia = faturadosValues.reduce((a, b) => a + b, 0) / (faturadosValues.filter(v => v > 0).length || 1);
+
   const legendContainer = el("legendAgendadosFaturados");
   if (legendContainer) {
     legendContainer.innerHTML = `
@@ -1571,7 +1581,9 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
     `;
     setupChartLegendClick(periods, agendadosValues, faturadosValues);
   }
+
   renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues);
+
   makeLineChart(
     "cReceitaFinanceiraMes",
     periods,
@@ -1592,8 +1604,10 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
     true,
     true
   );
+
   const financeiroEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento, d => d.financeiroValor);
   const topFinanceiroEstab = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
+
   makeHorizontalBarChart(
     "cFatEstabelecimento",
     topFinanceiroEstab.map(([k]) => truncateLabel(k, 28)),
@@ -1602,22 +1616,28 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
     "Financeiro",
     true
   );
+
   const totalOferta = filteredAgVivver.reduce((s, d) => s + d.oferta, 0);
   const totalRecepcionados = filteredAgVivver.reduce((s, d) => s + d.recepcionados, 0);
   const totalFaltosos = filteredAgVivver.reduce((s, d) => s + d.faltosos, 0);
+
   makeDoughnutChartWithPercentages(
     "cFunil",
     ["Ofertas", "Recepcionados", "Faltosos"],
     [totalOferta, totalRecepcionados, totalFaltosos],
     ["#2563eb", "#059669", "#d97706"]
   );
+
   renderAgendadasPorEspecialidadeEstabTable(filteredAgendados);
+
   const searchInput = el("tabelaSearchEspec");
   const monthSelect = el("tabelaMonthFilterEspec");
+
   if (searchInput && !searchInput.dataset.bound) {
     searchInput.dataset.bound = "1";
     searchInput.addEventListener("input", () => renderAgendadasPorEspecialidadeEstabTable(filteredAgendados));
   }
+
   if (monthSelect && !monthSelect.dataset.bound) {
     monthSelect.dataset.bound = "1";
     monthSelect.addEventListener("change", () => renderAgendadasPorEspecialidadeEstabTable(filteredAgendados));
