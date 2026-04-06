@@ -725,30 +725,37 @@ select:focus,
   margin-top: 10px;
 }
 
+/* CORREÇÃO DAS LEGENDAS DOS GAUGES */
 .gauge-zones-row {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(148,163,184,.35);
 }
 
 .gauge-zone-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 10px;
+  gap: 8px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--muted);
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .zone-circle {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  min-height: 10px;
   border-radius: 50%;
   display: inline-block;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.05);
 }
 
 .chartCard,
@@ -1158,4 +1165,74 @@ select:focus,
   .chartWrap-hero { height: 360px; }
   .topic-pill { margin-left: 0; }
   .topic-header { padding: 18px 16px; }
+
+  .gauge-zones-row {
+    gap: 10px;
+    justify-content: flex-start;
+  }
+
+  .gauge-zone-item {
+    font-size: 10px;
+  }
+}
+
+/* Blocos auxiliares já existentes/compatíveis */
+.gauge-legend {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.gauge-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.gauge-legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.gauge-legend-label {
+  color: var(--text);
+}
+
+.gauge-legend-value {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.gauge-legend-sublabel {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.gauge-container canvas {
+  max-height: 180px;
+  width: 100%;
 }
