@@ -20,21 +20,8 @@ const GRUPOS_SIGTAP = {
   "04": "04 - Procedimentos cirúrgicos"
 };
 
-// Zonas dos gauges ajustadas para casar corretamente com as legendas
-const FAT_GAUGE_ZONES = [
-  { value: 20, color: "rgba(5,150,105,.45)" },   // 80–100 ótimo
-  { value: 30, color: "rgba(217,119,6,.45)" },   // 50–79 regular
-  { value: 50, color: "rgba(220,38,38,.45)" }    // 0–49 crítico
-];
-
-const ABS_GAUGE_ZONES = [
-  { value: 10, color: "rgba(5,150,105,.45)" },   // 0–10 excelente
-  { value: 10, color: "rgba(59,130,246,.45)" },  // 11–20 bom
-  { value: 15, color: "rgba(217,119,6,.45)" },   // 21–35 atenção
-  { value: 65, color: "rgba(220,38,38,.45)" }    // >35 crítico
-];
-
 let dadosFila = [];
+let dadosFilaRetroativa = [];
 let dadosAgendamentosVivver = [];
 let dadosFaturado = [];
 let dadosFinanceiro = [];
@@ -50,6 +37,7 @@ let especialidadeToSubgrupos = new Map();
 let allPeriodos = [];
 let currentYearShort = null;
 let latestDataCorte = "";
+let latestDataCorteRetroativa = "";
 
 let selectedSubgrupos = new Set();
 let selectedEspecialidades = new Set();
@@ -60,7 +48,6 @@ let currentSortColumnFisico = 0;
 let currentSortDirectionFisico = "asc";
 let currentTableMonthFilterFisico = "";
 
-// Variáveis para controle do filtro do gráfico Agendados vs Faturados
 let currentChartFilter = null;
 
 function toast(msg, type = "info") {
@@ -155,24 +142,8 @@ function normalizePeriodo(label) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, "")
-    .replace(/\./g, "/")
+    .replace(/\./g, "")
     .replace(/-/g, "/");
-
-  s = s.split(" ")[0];
-
-  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
-  if (m) {
-    let month = parseInt(m[2], 10);
-    let year = String(m[3]).slice(-2);
-    if (month >= 1 && month <= 12) return `${MONTHS_ORDER[month - 1]}/${year}`;
-  }
-
-  m = s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
-  if (m) {
-    const month = parseInt(m[2], 10);
-    let year = String(m[1]).slice(-2);
-    if (month >= 1 && month <= 12) return `${MONTHS_ORDER[month - 1]}/${year}`;
-  }
 
   let extractedYear = null;
   const yearMatch = s.match(/\/(\d{2,4})$/);
@@ -181,9 +152,9 @@ function normalizePeriodo(label) {
     if (yearNum >= 100) {
       extractedYear = String(yearNum).slice(-2);
     } else {
-      extractedYear = String(yearNum).padStart(2, "0");
+      extractedYear = String(yearNum).padStart(2, '0');
     }
-    s = s.replace(/\/(\d{2,4})$/, "");
+    s = s.replace(/\/(\d{2,4})$/, '');
   }
 
   for (let i = 0; i < MONTHS_FULL.length; i++) {
@@ -208,10 +179,10 @@ function normalizePeriodo(label) {
 
   const numericMatch = s.match(/^(\d{1,2})\/(\d{2,4})$/);
   if (numericMatch) {
-    const mNum = parseInt(numericMatch[1], 10);
+    const m = parseInt(numericMatch[1], 10);
     let yy = String(numericMatch[2]).slice(-2);
-    if (mNum >= 1 && mNum <= 12) {
-      return `${MONTHS_ORDER[mNum - 1]}/${yy}`;
+    if (m >= 1 && m <= 12) {
+      return `${MONTHS_ORDER[m - 1]}/${yy}`;
     }
   }
 
@@ -240,48 +211,6 @@ function getField(row, aliases = []) {
     if (found) return row[found];
   }
   return "";
-}
-
-function getLastColumnKey(row) {
-  const keys = Object.keys(row || {}).filter(k => normalizeText(k) !== "");
-  return keys.length ? keys[keys.length - 1] : "";
-}
-
-function getLastColumnValue(row) {
-  const lastKey = getLastColumnKey(row);
-  return lastKey ? normalizeText(row[lastKey]) : "";
-}
-
-function getDataCorteSortValue(value) {
-  const raw = normalizeText(value);
-  if (!raw) return -1;
-
-  let s = raw
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\./g, "/")
-    .replace(/-/g, "/")
-    .trim()
-    .split(" ")[0];
-
-  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
-  if (m) {
-    let day = parseInt(m[1], 10);
-    let month = parseInt(m[2], 10);
-    let year = parseInt(m[3], 10);
-    if (year < 100) year += 2000;
-    return year * 10000 + month * 100 + day;
-  }
-
-  m = s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
-  if (m) {
-    const year = parseInt(m[1], 10);
-    const month = parseInt(m[2], 10);
-    const day = parseInt(m[3], 10);
-    return year * 10000 + month * 100 + day;
-  }
-
-  return periodoSortValue(raw);
 }
 
 function detectHeaderIndex(rows, expectedHeaders = []) {
@@ -346,11 +275,11 @@ function getDominantYearShort(periodos) {
       years[year] = (years[year] || 0) + 1;
     }
   });
-
+  
   if (Object.keys(years).length === 0) {
     return "25";
   }
-
+  
   const sorted = Object.entries(years).sort((a, b) => b[1] - a[1]);
   return sorted[0][0];
 }
@@ -371,54 +300,47 @@ async function loadAllData() {
 
   try {
     console.log("Iniciando carregamento dos dados...");
-
-    const [
-      filaAtualRaw,
-      filaRetroativaRaw,
-      agVivverRaw,
-      faturadoRaw,
-      financeiroRaw,
-      agendadosRaw
-    ] = await Promise.all([
-      loadCSVSmart(URL_FILA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "TOTAL"]),
-      loadCSVSmart(URL_FILA_RETROATIVA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "Complexidade- Sigtap", "TOTAL"]),
+    
+    const [filaRaw, filaRetroativaRaw, agVivverRaw, faturadoRaw, financeiroRaw, agendadosRaw] = await Promise.all([
+      loadCSVSmart(URL_FILA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "TOTAL", "Data Corte"]),
+      loadCSVSmart(URL_FILA_RETROATIVA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "Complexidade- Sigtap", "TOTAL", "Data Corte/ Fila de Espera"]),
       loadCSVSmart(URL_AGENDAMENTOS_VIVVER, ["CÓDIGO DO PROCEDIMENTO", "PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE", "COMPLEXIDADE", "MÊS", "FAL", "REC", "OFERTA"]),
       loadCSVSmart(URL_FATURADO, ["Procedimento Descrição", "GRUPO", "SUB GRUPO", "ESTABELECIMENTO", "Especialidade Descrição"]),
       loadCSVSmart(URL_FINANCEIRO, ["PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE"]),
       loadCSVSmart(URL_AGENDADOS, ["ESTABELECIMENTO", "ESPECIALIDADE"])
     ]);
 
-    const filaRaw = [...filaAtualRaw, ...filaRetroativaRaw];
-
-    console.log("Dados carregados:", {
-      filaAtual: filaAtualRaw.length,
+    console.log("Dados carregados:", { 
+      fila: filaRaw.length, 
       filaRetroativa: filaRetroativaRaw.length,
-      filaTotal: filaRaw.length,
-      vivver: agVivverRaw.length,
+      vivver: agVivverRaw.length, 
       faturado: faturadoRaw.length,
-      financeiro: financeiroRaw.length,
-      agendados: agendadosRaw.length
+      financeiro: financeiroRaw.length, 
+      agendados: agendadosRaw.length 
     });
 
     const allRawPeriods = [];
-
+    
     filaRaw.forEach(row => {
-      const dataCorte = getLastColumnValue(row);
+      const dataCorte = normalizeText(getField(row, ["Data Corte/ Fila de Espera", "DATA CORTE/ FILA DE ESPERA", "Data Corte"]));
       if (dataCorte) allRawPeriods.push(dataCorte);
     });
-
+    
+    filaRetroativaRaw.forEach(row => {
+      const dataCorte = normalizeText(getField(row, ["Data Corte/ Fila de Espera", "DATA CORTE/ FILA DE ESPERA", "Data Corte"]));
+      if (dataCorte) allRawPeriods.push(dataCorte);
+    });
+    
     agVivverRaw.forEach(row => {
       const mes = normalizeText(getField(row, ["MÊS"]));
       if (mes) allRawPeriods.push(mes);
     });
-
+    
     agendadosRaw.forEach(row => {
       Object.keys(row).forEach(col => {
         const colLower = col.toLowerCase();
-        const hasMonth =
-          MONTHS_FULL.some(month => colLower.includes(month)) ||
-          MONTHS_ORDER.some(month => colLower.includes(month));
-
+        const hasMonth = MONTHS_FULL.some(month => colLower.includes(month)) ||
+                        MONTHS_ORDER.some(month => colLower === month);
         if (hasMonth) {
           const yearMatch = col.match(/(\d{4})/);
           if (yearMatch) {
@@ -429,10 +351,15 @@ async function loadAllData() {
         }
       });
     });
-
+    
     const detectedYear = getDominantYearShort(allRawPeriods);
-    currentYearShort = detectedYear || "25";
-    console.log(`Ano detectado: 20${currentYearShort}`);
+    if (detectedYear) {
+      currentYearShort = detectedYear;
+      console.log(`Ano detectado: 20${currentYearShort}`);
+    } else {
+      currentYearShort = "25";
+      console.log("Usando ano padrão: 2025");
+    }
 
     gruposSet = new Set();
     especialidadesSet = new Set();
@@ -443,7 +370,6 @@ async function loadAllData() {
     let latestDateValue = "";
     let latestDateSortValue = -1;
 
-    // Processar FILA ATUAL + RETROATIVA
     dadosFila = filaRaw.map(r => {
       const especialidade = normalizeText(getField(r, ["Especialidade", "ESPECIALIDADE"]));
       const estabelecimento = normalizeText(getField(r, ["PRESTADOR", "ESTABELECIMENTO", "Estabelecimento"]));
@@ -451,22 +377,21 @@ async function loadAllData() {
       const subgrupoRaw = normalizeText(getField(r, ["Subgrupo", "SUBGRUPO"]));
       const grupoCodigo = extractGrupoCodigo(grupoRaw);
       const subgrupoCodigo = extractSubgrupoCodigo(subgrupoRaw);
-
-      // Usa sempre a última coluna como Data Corte
-      const dataCorteRaw = getLastColumnValue(r);
+      const dataCorteRaw = normalizeText(getField(r, ["Data Corte/ Fila de Espera", "DATA CORTE/ FILA DE ESPERA", "Data Corte"]));
       const dataCorteNorm = normalizePeriodo(dataCorteRaw);
 
       if (especialidade) especialidadesSet.add(especialidade);
       if (grupoCodigo) gruposSet.add(grupoCodigo);
       if (subgrupoRaw) subgruposSet.add(subgrupoRaw);
-
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
 
-      const rawSortVal = getDataCorteSortValue(dataCorteRaw);
-      if (rawSortVal > latestDateSortValue) {
-        latestDateSortValue = rawSortVal;
-        latestDateValue = dataCorteRaw || dataCorteNorm || "";
+      if (dataCorteNorm) {
+        const sortVal = periodoSortValue(dataCorteNorm);
+        if (sortVal > latestDateSortValue) {
+          latestDateSortValue = sortVal;
+          latestDateValue = dataCorteNorm;
+        }
       }
 
       return {
@@ -481,17 +406,68 @@ async function loadAllData() {
         estabelecimento,
         fila: parseNumberBR(getField(r, ["TOTAL", "Total"])),
         dataCorte: dataCorteNorm,
-        dataCorteRaw
+        origem: "principal"
       };
-    }).filter(d => d.especialidade || d.descricao || d.fila > 0);
+    }).filter(d => d.especialidade || d.descricao);
 
-    latestDataCorte = latestDateValue || "Não disponível";
-    const dataCorteElement = el("dataCorteInfo");
-    if (dataCorteElement) {
-      dataCorteElement.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${escapeHtml(latestDataCorte)}`;
+    let latestDateRetroativaValue = "";
+    let latestDateRetroativaSortValue = -1;
+
+    dadosFilaRetroativa = filaRetroativaRaw.map(r => {
+      const especialidade = normalizeText(getField(r, ["Especialidade", "ESPECIALIDADE"]));
+      const estabelecimento = normalizeText(getField(r, ["PRESTADOR", "ESTABELECIMENTO", "Estabelecimento"]));
+      const grupoRaw = normalizeText(getField(r, ["Grupo", "GRUPO"]));
+      const subgrupoRaw = normalizeText(getField(r, ["Subgrupo", "SUBGRUPO"]));
+      const grupoCodigo = extractGrupoCodigo(grupoRaw);
+      const subgrupoCodigo = extractSubgrupoCodigo(subgrupoRaw);
+      const dataCorteRaw = normalizeText(getField(r, ["Data Corte/ Fila de Espera", "DATA CORTE/ FILA DE ESPERA", "Data Corte"]));
+      const dataCorteNorm = normalizePeriodo(dataCorteRaw);
+
+      if (especialidade) especialidadesSet.add(especialidade);
+      if (grupoCodigo) gruposSet.add(grupoCodigo);
+      if (subgrupoRaw) subgruposSet.add(subgrupoRaw);
+      addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
+      addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
+
+      if (dataCorteNorm) {
+        const sortVal = periodoSortValue(dataCorteNorm);
+        if (sortVal > latestDateRetroativaSortValue) {
+          latestDateRetroativaSortValue = sortVal;
+          latestDateRetroativaValue = dataCorteNorm;
+        }
+      }
+
+      return {
+        codigo: normalizeText(getField(r, ["Código do Procedimento", "CÓDIGO DO PROCEDIMENTO"])),
+        especialidade,
+        descricao: normalizeText(getField(r, ["Descrição do Procedimento", "PROCEDIMENTO DESCRIÇÃO"])),
+        grupo: grupoRaw || (GRUPOS_SIGTAP[grupoCodigo] || ""),
+        grupoCodigo,
+        subgrupo: subgrupoRaw,
+        subgrupoCodigo,
+        complexidade: normalizeText(getField(r, ["Complexidade- Sigtap", "COMPLEXIDADE"])),
+        estabelecimento,
+        fila: parseNumberBR(getField(r, ["TOTAL", "Total"])),
+        dataCorte: dataCorteNorm,
+        origem: "retroativa"
+      };
+    }).filter(d => d.especialidade || d.descricao);
+
+    const allFilaData = [...dadosFila, ...dadosFilaRetroativa];
+    
+    const allDataCortes = allFilaData.map(d => d.dataCorte).filter(Boolean);
+    if (allDataCortes.length > 0) {
+      const sortedCortes = sortPeriodos(allDataCortes);
+      latestDataCorte = sortedCortes[sortedCortes.length - 1] || "Não disponível";
+    } else {
+      latestDataCorte = "Não disponível";
     }
 
-    // Processar AGENDAMENTOS VIVVER
+    const dataCorteElement = el("dataCorteInfo");
+    if (dataCorteElement) {
+      dataCorteElement.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorte}`;
+    }
+
     dadosAgendamentosVivver = agVivverRaw.map(r => {
       const especialidade = normalizeText(getField(r, ["ESPECIALIDADE", "Especialidade"]));
       const estabelecimento = normalizeText(getField(r, ["ESTABELECIMENTO", "PRESTADOR", "Estabelecimento"]));
@@ -500,7 +476,7 @@ async function loadAllData() {
       const grupoCodigo = extractGrupoCodigo(grupoRaw);
       const subgrupoCodigo = extractSubgrupoCodigo(subgrupoRaw);
       const mesRaw = normalizeText(getField(r, ["MÊS"]));
-
+      
       let mesNorm = normalizePeriodo(mesRaw);
       if (mesNorm && !mesNorm.includes("/")) {
         mesNorm = `${mesNorm}/${currentYearShort}`;
@@ -517,7 +493,6 @@ async function loadAllData() {
       if (especialidade) especialidadesSet.add(especialidade);
       if (grupoCodigo) gruposSet.add(grupoCodigo);
       if (subgrupoRaw) subgruposSet.add(subgrupoRaw);
-
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
 
@@ -538,10 +513,9 @@ async function loadAllData() {
       };
     }).filter(d => d.especialidade || d.descricao);
 
-    // Processar FATURADO
     dadosFaturado = [];
     const monthColumns = [...MONTHS_ORDER];
-
+    
     faturadoRaw.forEach(row => {
       const especialidade = normalizeText(getField(row, ["Especialidade Descrição", "ESPECIALIDADE"]));
       const estabelecimento = normalizeText(getField(row, ["ESTABELECIMENTO", "Estabelecimento"]));
@@ -554,14 +528,13 @@ async function loadAllData() {
       if (especialidade) especialidadesSet.add(especialidade);
       if (grupoCodigo) gruposSet.add(grupoCodigo);
       if (subgrupoRaw) subgruposSet.add(subgrupoRaw);
-
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
 
       for (let i = 0; i < monthColumns.length; i++) {
         const monthKey = monthColumns[i];
         const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/${currentYearShort}`, `${monthKey}/25`, monthKey.toUpperCase()]));
-
+        
         if (monthValue > 0) {
           const mesFormatado = `${monthColumns[i]}/${currentYearShort}`;
           dadosFaturado.push({
@@ -580,9 +553,8 @@ async function loadAllData() {
       }
     });
 
-    // Processar FINANCEIRO
     dadosFinanceiro = [];
-
+    
     financeiroRaw.forEach(row => {
       const especialidade = normalizeText(getField(row, ["ESPECIALIDADE", "Especialidade"]));
       const estabelecimento = normalizeText(getField(row, ["ESTABELECIMENTO", "Estabelecimento"]));
@@ -595,14 +567,13 @@ async function loadAllData() {
       if (especialidade) especialidadesSet.add(especialidade);
       if (grupoCodigo) gruposSet.add(grupoCodigo);
       if (subgrupoRaw) subgruposSet.add(subgrupoRaw);
-
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
 
       for (let i = 0; i < monthColumns.length; i++) {
         const monthKey = monthColumns[i];
         const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/${currentYearShort}`, monthKey.toUpperCase()]));
-
+        
         if (monthValue > 0) {
           const mesFormatado = `${monthColumns[i]}/${currentYearShort}`;
           dadosFinanceiro.push({
@@ -621,7 +592,6 @@ async function loadAllData() {
       }
     });
 
-    // Processar AGENDADOS
     dadosAgendados = [];
     agendadosRaw.forEach(row => {
       const estabelecimento = normalizeText(getField(row, ["ESTABELECIMENTO", "Estabelecimento"]));
@@ -639,22 +609,24 @@ async function loadAllData() {
         const colLower = col.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         let shortMonth = null;
         let extractedYear = null;
-
+        
         const yearMatch = col.match(/(\d{4})/);
-        if (yearMatch) extractedYear = yearMatch[1].slice(-2);
-
+        if (yearMatch) {
+          extractedYear = yearMatch[1].slice(-2);
+        }
+        
         for (const [full, short] of Object.entries(monthMap)) {
           if (colLower === full || colLower === short || colLower.includes(full) || colLower.includes(short)) {
             shortMonth = short;
             break;
           }
         }
-
+        
         if (!shortMonth) return;
-
+        
         const value = parseNumberBR(row[col]);
         if (value <= 0) return;
-
+        
         const yearToUse = extractedYear || currentYearShort;
         if (!yearToUse) return;
 
@@ -668,21 +640,19 @@ async function loadAllData() {
     });
 
     const allPeriodsCollected = [
-      ...dadosFila.map(d => d.dataCorte),
+      ...allFilaData.map(d => d.dataCorte),
       ...dadosAgendamentosVivver.map(d => d.mes),
       ...dadosFaturado.map(d => d.mes),
       ...dadosFinanceiro.map(d => d.mes),
       ...dadosAgendados.map(d => d.mes)
     ].filter(Boolean);
-
+    
     allPeriodos = sortPeriodos(allPeriodsCollected);
 
     console.log("Períodos encontrados:", allPeriodos);
     console.log("Especialidades:", [...especialidadesSet].length);
     console.log("Subgrupos:", [...subgruposSet].length);
-    console.log("Faturado registros:", dadosFaturado.length);
-    console.log("Financeiro registros:", dadosFinanceiro.length);
-    console.log("Agendados registros:", dadosAgendados.length);
+    console.log("Fila total registros:", allFilaData.length);
     console.log("Ano atual usado:", currentYearShort);
 
     populateFilters();
@@ -743,9 +713,10 @@ function populateFilters() {
 
 function getVisibleSubgrupos() {
   const grupo = el("grupoSelect")?.value || "";
+  const allFilaData = [...dadosFila, ...dadosFilaRetroativa];
   let subgrupos = new Set();
 
-  [...dadosFila, ...dadosAgendamentosVivver, ...dadosFaturado, ...dadosFinanceiro].forEach(d => {
+  [...allFilaData, ...dadosAgendamentosVivver, ...dadosFaturado, ...dadosFinanceiro].forEach(d => {
     if (!d.subgrupo) return;
     if (grupo && d.grupoCodigo !== grupo) return;
     subgrupos.add(d.subgrupo);
@@ -966,11 +937,11 @@ function matchFaturadoFinanceiro(item) {
   const periodoMatch = !periodo || item.mes === periodo;
   const grupoMatch = !grupo || item.grupoCodigo === grupo;
   const subgrupoMatch = !selectedSubgrupos.size || selectedSubgrupos.has(item.subgrupo);
-
+  
   return especialidadeMatch && periodoMatch && grupoMatch && subgrupoMatch;
 }
 
-function createGaugeChart(canvasId, percent, color, zoneConfig = []) {
+function createGaugeChart(canvasId, percent, color) {
   const canvas = el(canvasId);
   if (!canvas) return;
 
@@ -981,15 +952,14 @@ function createGaugeChart(canvasId, percent, color, zoneConfig = []) {
   }
 
   const pctVal = Math.min(Math.max(percent, 0), 100);
-  const zones = zoneConfig.length ? zoneConfig : FAT_GAUGE_ZONES;
 
   charts[canvasId] = new Chart(ctx, {
     type: "doughnut",
     data: {
       datasets: [
         {
-          data: zones.map(z => z.value),
-          backgroundColor: zones.map(z => z.color),
+          data: [50, 30, 20],
+          backgroundColor: ["rgba(220,38,38,.45)", "rgba(217,119,6,.45)", "rgba(5,150,105,.45)"],
           borderWidth: 0,
           hoverOffset: 0,
           weight: 1
@@ -1025,8 +995,9 @@ function createGaugeChart(canvasId, percent, color, zoneConfig = []) {
 
 function applyFilters() {
   console.log("Aplicando filtros...");
-
-  const filteredFila = dadosFila.filter(d => matchBaseWithDimensions(d, true));
+  
+  const allFilaData = [...dadosFila, ...dadosFilaRetroativa];
+  const filteredFila = allFilaData.filter(d => matchBaseWithDimensions(d, true));
   const filteredAgVivver = dadosAgendamentosVivver.filter(d => matchBaseWithDimensions(d, true));
   const filteredAgendados = dadosAgendados.filter(d => matchBaseWithDimensions(d, false));
   const filteredFaturado = dadosFaturado.filter(d => matchFaturadoFinanceiro(d));
@@ -1107,12 +1078,12 @@ function applyFilters() {
   const gFatAg = el("gFatAg");
   const gFatFat = el("gFatFat");
   const gFatDiff = el("gFatDiff");
-
+  
   if (gFatAg) gFatAg.textContent = totalAgendados.toLocaleString("pt-BR");
   if (gFatFat) gFatFat.textContent = totalFaturadosQtd.toLocaleString("pt-BR");
   if (gFatDiff) gFatDiff.textContent = Math.max(0, totalAgendados - totalFaturadosQtd).toLocaleString("pt-BR");
-
-  createGaugeChart("cGaugeFat", taxaFaturamento, fatColor, FAT_GAUGE_ZONES);
+  
+  createGaugeChart("cGaugeFat", taxaFaturamento, fatColor);
 
   let absColor, absBadgeBg, absBadgeColor, absBadgeText;
   if (taxaAbsenteismo <= 10) {
@@ -1154,12 +1125,12 @@ function applyFilters() {
   const gAbsAg = el("gAbsAg");
   const gAbsRec = el("gAbsRec");
   const gAbsAus = el("gAbsAus");
-
+  
   if (gAbsAg) gAbsAg.textContent = agVivverTotal.toLocaleString("pt-BR");
   if (gAbsRec) gAbsRec.textContent = recepcionadosGauge.toLocaleString("pt-BR");
   if (gAbsAus) gAbsAus.textContent = faltososGauge.toLocaleString("pt-BR");
-
-  createGaugeChart("cGaugeAbs", taxaAbsenteismo, absColor, ABS_GAUGE_ZONES);
+  
+  createGaugeChart("cGaugeAbs", taxaAbsenteismo, absColor);
 
   renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   renderFinanceiro(filteredFinanceiro);
@@ -1227,7 +1198,7 @@ function renderPercentageTotalTable(tbodyId, dataMap, color = "#0b5e42") {
   if (!tbody) return;
 
   const arr = [...dataMap.entries()].sort((a, b) => b[1] - a[1]);
-  const total = arr.reduce((s, [, v]) => s + v, 0);
+  const total = arr.reduce((s, [,v]) => s + v, 0);
   const maxValue = arr[0]?.[1] || 1;
 
   if (!arr.length) {
@@ -1712,7 +1683,6 @@ function renderAgendadasPorEspecialidadeEstabTable(filteredAgendados) {
         <td class="text-right">${r.valores["Centro Materno Infantil"].toLocaleString("pt-BR")}</td>
         <td class="text-right">${r.valores["Hospital Municipal de Contagem"].toLocaleString("pt-BR")}</td>
         <td class="text-right">${r.valores["Hospital São José"].toLocaleString("pt-BR")}</td>
-        <td class="text-right">${r.valores["Hospital Santa Rita"].toLocale
         <td class="text-right">${r.valores["Hospital Santa Rita"].toLocaleString("pt-BR")}</td>
         <td class="text-right font-800" style="background:#f0fdfa;">${r.total.toLocaleString("pt-BR")}</td>
       </tr>
@@ -1736,7 +1706,7 @@ function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValu
   destroyChart("cAgendadosVsFaturadosMes");
 
   const datasets = [];
-
+  
   if (currentChartFilter !== "faturados") {
     datasets.push({
       label: "Agendados",
@@ -1745,7 +1715,7 @@ function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValu
       borderRadius: 8
     });
   }
-
+  
   if (currentChartFilter !== "agendados") {
     datasets.push({
       label: "Faturados",
@@ -1768,7 +1738,7 @@ function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValu
     type: "bar",
     data: {
       labels: periods,
-      datasets
+      datasets: datasets
     },
     options: {
       responsive: true,
@@ -1798,10 +1768,7 @@ function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValu
           beginAtZero: true,
           grace: "10%",
           grid: { color: "rgba(148,163,184,0.10)" },
-          ticks: {
-            font: { weight: "bold" },
-            callback: value => value.toLocaleString("pt-BR")
-          }
+          ticks: { font: { weight: "bold" } }
         }
       }
     }
@@ -1829,7 +1796,7 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
   function updateLegendActiveStyle() {
     newAgendadosItem.classList.remove("active-filter");
     newFaturadosItem.classList.remove("active-filter");
-
+    
     if (currentChartFilter === "agendados") {
       newAgendadosItem.classList.add("active-filter");
     } else if (currentChartFilter === "faturados") {
@@ -1837,7 +1804,7 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
     }
   }
 
-  newAgendadosItem.addEventListener("click", e => {
+  newAgendadosItem.addEventListener("click", (e) => {
     e.stopPropagation();
     if (currentChartFilter === "agendados") {
       currentChartFilter = null;
@@ -1848,7 +1815,7 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
     updateLegendActiveStyle();
   });
 
-  newFaturadosItem.addEventListener("click", e => {
+  newFaturadosItem.addEventListener("click", (e) => {
     e.stopPropagation();
     if (currentChartFilter === "faturados") {
       currentChartFilter = null;
@@ -1896,7 +1863,7 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
         <span style="font-weight:900;color:var(--primary-dark)">(Média: ${Math.round(faturadosMedia).toLocaleString("pt-BR")})</span>
       </div>
     `;
-
+    
     setupChartLegendClick(periods, agendadosValues, faturadosValues);
   }
 
@@ -1929,7 +1896,7 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
   makeHorizontalBarChart(
     "cFatEstabelecimento",
     topFinanceiroEstab.map(([k]) => truncateLabel(k, 28)),
-    topFinanceiroEstab.map(([, v]) => v),
+    topFinanceiroEstab.map(([,v]) => v),
     "#059669",
     "Financeiro",
     true
@@ -1993,7 +1960,7 @@ function renderFinanceiro(filteredFinanceiro) {
   makeHorizontalBarChart(
     "cFatEstabelecimentoFinanceiro",
     topEstab.map(([k]) => truncateLabel(k, 28)),
-    topEstab.map(([, v]) => v),
+    topEstab.map(([,v]) => v),
     "#059669",
     "Financeiro por Estabelecimento",
     true
@@ -2174,12 +2141,12 @@ function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFatu
   const topFatQtd = [...faturadosQtdEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFinanceiro = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
 
-  makeHorizontalBarChart("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([, v]) => v), "#b6923e", "Agendadas");
-  makeHorizontalBarChart("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([, v]) => v), "#d97706", "Ofertas");
-  makeHorizontalBarChart("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([, v]) => v), "#059669", "Recepcionados");
-  makeHorizontalBarChart("cFaltososPorEstab", topFalt.map(([k]) => truncateLabel(k, 28)), topFalt.map(([, v]) => v), "#dc2626", "Faltosos");
-  makeHorizontalBarChart("cFaturadosPorEstab", topFatQtd.map(([k]) => truncateLabel(k, 28)), topFatQtd.map(([, v]) => v), "#2563eb", "Faturados");
-  makeHorizontalBarChart("cFinanceiroPorEstab", topFinanceiro.map(([k]) => truncateLabel(k, 28)), topFinanceiro.map(([, v]) => v), "#059669", "Financeiro", true);
+  makeHorizontalBarChart("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas");
+  makeHorizontalBarChart("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas");
+  makeHorizontalBarChart("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados");
+  makeHorizontalBarChart("cFaltososPorEstab", topFalt.map(([k]) => truncateLabel(k, 28)), topFalt.map(([,v]) => v), "#dc2626", "Faltosos");
+  makeHorizontalBarChart("cFaturadosPorEstab", topFatQtd.map(([k]) => truncateLabel(k, 28)), topFatQtd.map(([,v]) => v), "#2563eb", "Faturados");
+  makeHorizontalBarChart("cFinanceiroPorEstab", topFinanceiro.map(([k]) => truncateLabel(k, 28)), topFinanceiro.map(([,v]) => v), "#059669", "Financeiro", true);
 }
 
 function renderAgendamentosVivver(filteredAgVivver) {
@@ -2208,7 +2175,7 @@ function renderFila(filteredFila) {
   makeDoughnutChartWithPercentages(
     "cFilaComplexidadeRosca",
     complexArr.map(([k]) => truncateLabel(k || "Sem Dados", 28)),
-    complexArr.map(([, v]) => v),
+    complexArr.map(([,v]) => v),
     ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626", "#3b82f6", "#059669"]
   );
 
@@ -2305,10 +2272,7 @@ function renderFila(filteredFila) {
             beginAtZero: true,
             grace: "10%",
             grid: { color: "rgba(148,163,184,0.12)" },
-            ticks: {
-              font: { weight: "bold" },
-              callback: value => value.toLocaleString("pt-BR")
-            }
+            ticks: { font: { weight: "bold" } }
           }
         }
       }
@@ -2357,14 +2321,13 @@ function switchTab(id, btn) {
   }, 120);
 }
 
-// Inicialização quando o DOM estiver pronto
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM carregado, inicializando painel...");
   loadAllData();
 
   const btnRefresh = el("btnRefresh");
   if (btnRefresh) btnRefresh.addEventListener("click", loadAllData);
-
+  
   const btnExcel = el("btnExcel");
   if (btnExcel) btnExcel.addEventListener("click", exportExcel);
 
@@ -2376,25 +2339,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const grupoSelect = el("grupoSelect");
       if (grupoSelect) grupoSelect.value = "";
-
+      
       const periodoSelect = el("periodoSelect");
       if (periodoSelect) periodoSelect.value = "";
-
+      
       const tableMonthFilterFisico = el("tableMonthFilterFisico");
       if (tableMonthFilterFisico) tableMonthFilterFisico.value = "";
-
+      
       const tabelaMonthFilterEspec = el("tabelaMonthFilterEspec");
       if (tabelaMonthFilterEspec) tabelaMonthFilterEspec.value = "";
-
+      
       const msSearchSub = el("msSearchSub");
       if (msSearchSub) msSearchSub.value = "";
-
+      
       const msSearchEsp = el("msSearchEsp");
       if (msSearchEsp) msSearchEsp.value = "";
-
+      
       const tSearchFisico = el("tSearchFisico");
       if (tSearchFisico) tSearchFisico.value = "";
-
+      
       const tabelaSearchEspec = el("tabelaSearchEspec");
       if (tabelaSearchEspec) tabelaSearchEspec.value = "";
 
@@ -2430,11 +2393,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (tSearchFisico) tSearchFisico.addEventListener("input", renderTableBodyFisico);
 
   document.addEventListener("click", () => closeAllDropdowns());
-
+  
   const msDropdownSub = el("msDropdownSub");
   if (msDropdownSub) msDropdownSub.addEventListener("click", e => e.stopPropagation());
-
+  
   const msDropdownEsp = el("msDropdownEsp");
   if (msDropdownEsp) msDropdownEsp.addEventListener("click", e => e.stopPropagation());
 });
-
