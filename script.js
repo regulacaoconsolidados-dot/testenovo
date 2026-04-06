@@ -33,7 +33,7 @@ let especialidadeToGrupos = new Map();
 let especialidadeToSubgrupos = new Map();
 
 let allPeriodos = [];
-let currentYearShort = null;
+let currentYearShort = null; // Começa como null para detectar automaticamente
 let latestDataCorte = "";
 
 let selectedSubgrupos = new Set();
@@ -45,6 +45,7 @@ let currentSortColumnFisico = 0;
 let currentSortDirectionFisico = "asc";
 let currentTableMonthFilterFisico = "";
 
+// Variáveis para controle do filtro do gráfico Agendados vs Faturados
 let currentChartFilter = null;
 
 function toast(msg, type = "info") {
@@ -142,6 +143,7 @@ function normalizePeriodo(label) {
     .replace(/\./g, "")
     .replace(/-/g, "/");
 
+  // Tenta extrair o ano primeiro
   let extractedYear = null;
   const yearMatch = s.match(/\/(\d{2,4})$/);
   if (yearMatch) {
@@ -273,6 +275,7 @@ function getDominantYearShort(periodos) {
     }
   });
   
+  // Se não encontrou anos, usa o ano atual (2026)
   if (Object.keys(years).length === 0) {
     return "26";
   }
@@ -314,21 +317,26 @@ async function loadAllData() {
       agendados: agendadosRaw.length 
     });
 
+    // Primeiro, detectar o ano a partir dos dados brutos
     const allRawPeriods = [];
     
+    // Coletar períodos da FILA
     filaRaw.forEach(row => {
       const dataCorte = normalizeText(getField(row, ["Data Corte/ Fila de Espera", "DATA CORTE/ FILA DE ESPERA", "Data Corte"]));
       if (dataCorte) allRawPeriods.push(dataCorte);
     });
     
+    // Coletar períodos dos AGENDAMENTOS VIVVER
     agVivverRaw.forEach(row => {
       const mes = normalizeText(getField(row, ["MÊS"]));
       if (mes) allRawPeriods.push(mes);
     });
     
+    // Coletar períodos dos AGENDADOS
     agendadosRaw.forEach(row => {
       Object.keys(row).forEach(col => {
         const colLower = col.toLowerCase();
+        // Verificar se a coluna contém mês
         const hasMonth = MONTHS_FULL.some(month => colLower.includes(month)) ||
                         MONTHS_ORDER.some(month => colLower === month);
         if (hasMonth) {
@@ -342,12 +350,13 @@ async function loadAllData() {
       });
     });
     
+    // Detectar o ano dominante
     const detectedYear = getDominantYearShort(allRawPeriods);
     if (detectedYear) {
       currentYearShort = detectedYear;
       console.log(`Ano detectado: 20${currentYearShort}`);
     } else {
-      currentYearShort = "26";
+      currentYearShort = "26"; // Fallback para 2026
       console.log("Usando ano padrão: 2026");
     }
 
@@ -360,6 +369,7 @@ async function loadAllData() {
     let latestDateValue = "";
     let latestDateSortValue = -1;
 
+    // Processar FILA DE ESPERA
     dadosFila = filaRaw.map(r => {
       const especialidade = normalizeText(getField(r, ["Especialidade", "ESPECIALIDADE"]));
       const estabelecimento = normalizeText(getField(r, ["PRESTADOR", "ESTABELECIMENTO", "Estabelecimento"]));
@@ -405,6 +415,7 @@ async function loadAllData() {
       dataCorteElement.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorte}`;
     }
 
+    // Processar AGENDADOS RECEP E FALTOSOS (Vivver)
     dadosAgendamentosVivver = agVivverRaw.map(r => {
       const especialidade = normalizeText(getField(r, ["ESPECIALIDADE", "Especialidade"]));
       const estabelecimento = normalizeText(getField(r, ["ESTABELECIMENTO", "PRESTADOR", "Estabelecimento"]));
@@ -414,6 +425,7 @@ async function loadAllData() {
       const subgrupoCodigo = extractSubgrupoCodigo(subgrupoRaw);
       const mesRaw = normalizeText(getField(r, ["MÊS"]));
       
+      // Normalizar o mês com o ano detectado
       let mesNorm = normalizePeriodo(mesRaw);
       if (mesNorm && !mesNorm.includes("/")) {
         mesNorm = `${mesNorm}/${currentYearShort}`;
@@ -450,6 +462,7 @@ async function loadAllData() {
       };
     }).filter(d => d.especialidade || d.descricao);
 
+    // Processar FATURADO - os meses estão como colunas
     dadosFaturado = [];
     const monthColumns = [...MONTHS_ORDER];
     
@@ -468,6 +481,7 @@ async function loadAllData() {
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
 
+      // Processar cada mês/coluna
       for (let i = 0; i < monthColumns.length; i++) {
         const monthKey = monthColumns[i];
         const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/${currentYearShort}`, `${monthKey}/25`, monthKey.toUpperCase()]));
@@ -490,6 +504,7 @@ async function loadAllData() {
       }
     });
 
+    // Processar FINANCEIRO - os meses estão como colunas
     dadosFinanceiro = [];
     
     financeiroRaw.forEach(row => {
@@ -507,6 +522,7 @@ async function loadAllData() {
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
 
+      // Processar cada mês/coluna
       for (let i = 0; i < monthColumns.length; i++) {
         const monthKey = monthColumns[i];
         const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/${currentYearShort}`, monthKey.toUpperCase()]));
@@ -529,6 +545,7 @@ async function loadAllData() {
       }
     });
 
+    // Processar AGENDADOS
     dadosAgendados = [];
     agendadosRaw.forEach(row => {
       const estabelecimento = normalizeText(getField(row, ["ESTABELECIMENTO", "Estabelecimento"]));
@@ -536,6 +553,7 @@ async function loadAllData() {
       if (!estabelecimento && !especialidade) return;
       if (especialidade) especialidadesSet.add(especialidade);
 
+      // Mapear meses em português para o formato curto
       const monthMap = {
         "janeiro": "jan", "fevereiro": "fev", "março": "mar", "abril": "abr",
         "maio": "mai", "junho": "jun", "julho": "jul", "agosto": "ago",
@@ -547,6 +565,7 @@ async function loadAllData() {
         let shortMonth = null;
         let extractedYear = null;
         
+        // Tenta extrair ano do nome da coluna
         const yearMatch = col.match(/(\d{4})/);
         if (yearMatch) {
           extractedYear = yearMatch[1].slice(-2);
@@ -564,6 +583,7 @@ async function loadAllData() {
         const value = parseNumberBR(row[col]);
         if (value <= 0) return;
         
+        // Usa o ano extraído da coluna ou o ano detectado
         const yearToUse = extractedYear || currentYearShort;
         if (!yearToUse) return;
 
@@ -576,6 +596,7 @@ async function loadAllData() {
       });
     });
 
+    // Coletar todos os períodos para ordenação
     const allPeriodsCollected = [
       ...dadosFila.map(d => d.dataCorte),
       ...dadosAgendamentosVivver.map(d => d.mes),
@@ -879,7 +900,7 @@ function matchFaturadoFinanceiro(item) {
   return especialidadeMatch && periodoMatch && grupoMatch && subgrupoMatch;
 }
 
-function createGaugeChart(canvasId, percent, color, label) {
+function createGaugeChart(canvasId, percent, color) {
   const canvas = el(canvasId);
   if (!canvas) return;
 
@@ -894,58 +915,33 @@ function createGaugeChart(canvasId, percent, color, label) {
   charts[canvasId] = new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: [label, ""],
       datasets: [
         {
+          data: [50, 30, 20],
+          backgroundColor: ["rgba(220,38,38,.45)", "rgba(217,119,6,.45)", "rgba(5,150,105,.45)"],
+          borderWidth: 0,
+          hoverOffset: 0,
+          weight: 1
+        },
+        {
           data: [pctVal, 100 - pctVal],
-          backgroundColor: [color, "rgba(226,232,240,0.12)"],
+          backgroundColor: [color, "rgba(226,232,240,0.0)"],
           borderWidth: 0,
           borderRadius: 8,
           hoverOffset: 0,
-          circumference: 180,
-          rotation: -90,
-          cutout: "68%"
+          weight: 2
         }
       ]
     },
     options: {
+      rotation: -90,
+      circumference: 180,
+      cutout: "68%",
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: "bottom",
-          labels: {
-            font: { weight: "bold", size: 12, family: "'Poppins', sans-serif" },
-            usePointStyle: true,
-            pointStyle: "circle",
-            generateLabels: (chart) => {
-              const data = chart.data;
-              if (data.labels.length && data.labels[0]) {
-                return [{
-                  text: `${data.labels[0]}: ${pctVal.toFixed(1)}%`,
-                  fillStyle: color,
-                  strokeStyle: color,
-                  lineWidth: 2,
-                  hidden: false,
-                  index: 0,
-                  pointStyle: "circle"
-                }];
-              }
-              return [];
-            }
-          }
-        },
-        tooltip: { 
-          enabled: true,
-          callbacks: {
-            label: (ctx) => {
-              if (ctx.dataIndex === 0) {
-                return `${label}: ${ctx.raw.toFixed(1)}%`;
-              }
-              return null;
-            }
-          }
-        },
+        legend: { display: false },
+        tooltip: { enabled: false },
         datalabels: { display: false }
       },
       animation: {
@@ -1045,7 +1041,7 @@ function applyFilters() {
   if (gFatFat) gFatFat.textContent = totalFaturadosQtd.toLocaleString("pt-BR");
   if (gFatDiff) gFatDiff.textContent = Math.max(0, totalAgendados - totalFaturadosQtd).toLocaleString("pt-BR");
   
-  createGaugeChart("cGaugeFat", taxaFaturamento, fatColor, "Taxa de Faturamento");
+  createGaugeChart("cGaugeFat", taxaFaturamento, fatColor);
 
   let absColor, absBadgeBg, absBadgeColor, absBadgeText;
   if (taxaAbsenteismo <= 10) {
@@ -1092,7 +1088,7 @@ function applyFilters() {
   if (gAbsRec) gAbsRec.textContent = recepcionadosGauge.toLocaleString("pt-BR");
   if (gAbsAus) gAbsAus.textContent = faltososGauge.toLocaleString("pt-BR");
   
-  createGaugeChart("cGaugeAbs", taxaAbsenteismo, absColor, "Índice de Absenteísmo");
+  createGaugeChart("cGaugeAbs", taxaAbsenteismo, absColor);
 
   renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   renderFinanceiro(filteredFinanceiro);
@@ -2283,6 +2279,7 @@ function switchTab(id, btn) {
   }, 120);
 }
 
+// Inicialização quando o DOM estiver pronto
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM carregado, inicializando painel...");
   loadAllData();
