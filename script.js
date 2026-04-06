@@ -33,7 +33,7 @@ let especialidadeToGrupos = new Map();
 let especialidadeToSubgrupos = new Map();
 
 let allPeriodos = [];
-let currentYearShort = "25";
+let currentYearShort = null; // Começa como null para detectar automaticamente
 let latestDataCorte = "";
 
 let selectedSubgrupos = new Set();
@@ -143,23 +143,46 @@ function normalizePeriodo(label) {
     .replace(/\./g, "")
     .replace(/-/g, "/");
 
+  // Tenta extrair o ano primeiro
+  let extractedYear = null;
+  const yearMatch = s.match(/\/(\d{2,4})$/);
+  if (yearMatch) {
+    const yearNum = parseInt(yearMatch[1], 10);
+    if (yearNum >= 100) {
+      extractedYear = String(yearNum).slice(-2);
+    } else {
+      extractedYear = String(yearNum).padStart(2, '0');
+    }
+    s = s.replace(/\/(\d{2,4})$/, '');
+  }
+
   for (let i = 0; i < MONTHS_FULL.length; i++) {
     if (s.startsWith(MONTHS_FULL[i])) {
-      const rest = s.slice(MONTHS_FULL[i].length);
-      const yearMatch = rest.match(/\/?(\d{2,4})$/);
-      const yy = yearMatch ? String(yearMatch[1]).slice(-2) : currentYearShort;
+      const yy = extractedYear || currentYearShort || "26";
       return `${MONTHS_ORDER[i]}/${yy}`;
     }
   }
 
-  const shortMatch = s.match(/^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\/?(\d{2,4})$/i);
-  if (shortMatch) return `${shortMatch[1].toLowerCase()}/${String(shortMatch[2]).slice(-2)}`;
+  const shortMatch = s.match(/^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)$/i);
+  if (shortMatch) {
+    const yy = extractedYear || currentYearShort || "26";
+    return `${shortMatch[1].toLowerCase()}/${yy}`;
+  }
 
-  const numericMatch = s.match(/^(\d{1,2})\/?(\d{2,4})$/);
+  const fullMatch = s.match(/^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\/(\d{2,4})$/i);
+  if (fullMatch) {
+    let yy = String(fullMatch[2]).slice(-2);
+    if (yy.length === 1) yy = "0" + yy;
+    return `${fullMatch[1].toLowerCase()}/${yy}`;
+  }
+
+  const numericMatch = s.match(/^(\d{1,2})\/(\d{2,4})$/);
   if (numericMatch) {
     const m = parseInt(numericMatch[1], 10);
-    const yy = String(numericMatch[2]).slice(-2);
-    if (m >= 1 && m <= 12) return `${MONTHS_ORDER[m - 1]}/${yy}`;
+    let yy = String(numericMatch[2]).slice(-2);
+    if (m >= 1 && m <= 12) {
+      return `${MONTHS_ORDER[m - 1]}/${yy}`;
+    }
   }
 
   return "";
@@ -246,10 +269,19 @@ function getDominantYearShort(periodos) {
   (periodos || []).forEach(p => {
     const norm = normalizePeriodo(p);
     const match = norm.match(/\/(\d{2})$/);
-    if (match) years[match[1]] = (years[match[1]] || 0) + 1;
+    if (match) {
+      const year = match[1];
+      years[year] = (years[year] || 0) + 1;
+    }
   });
+  
+  // Se não encontrou anos, usa o ano atual (2026)
+  if (Object.keys(years).length === 0) {
+    return "26";
+  }
+  
   const sorted = Object.entries(years).sort((a, b) => b[1] - a[1]);
-  return sorted[0]?.[0] || "25";
+  return sorted[0][0];
 }
 
 function aggregateBy(items, keyFn, valFn) {
@@ -284,6 +316,49 @@ async function loadAllData() {
       financeiro: financeiroRaw.length, 
       agendados: agendadosRaw.length 
     });
+
+    // Primeiro, detectar o ano a partir dos dados brutos
+    const allRawPeriods = [];
+    
+    // Coletar períodos da FILA
+    filaRaw.forEach(row => {
+      const dataCorte = normalizeText(getField(row, ["Data Corte/ Fila de Espera", "DATA CORTE/ FILA DE ESPERA", "Data Corte"]));
+      if (dataCorte) allRawPeriods.push(dataCorte);
+    });
+    
+    // Coletar períodos dos AGENDAMENTOS VIVVER
+    agVivverRaw.forEach(row => {
+      const mes = normalizeText(getField(row, ["MÊS"]));
+      if (mes) allRawPeriods.push(mes);
+    });
+    
+    // Coletar períodos dos AGENDADOS
+    agendadosRaw.forEach(row => {
+      Object.keys(row).forEach(col => {
+        const colLower = col.toLowerCase();
+        // Verificar se a coluna contém mês
+        const hasMonth = MONTHS_FULL.some(month => colLower.includes(month)) ||
+                        MONTHS_ORDER.some(month => colLower === month);
+        if (hasMonth) {
+          const yearMatch = col.match(/(\d{4})/);
+          if (yearMatch) {
+            allRawPeriods.push(`${col}/${yearMatch[1]}`);
+          } else {
+            allRawPeriods.push(col);
+          }
+        }
+      });
+    });
+    
+    // Detectar o ano dominante
+    const detectedYear = getDominantYearShort(allRawPeriods);
+    if (detectedYear) {
+      currentYearShort = detectedYear;
+      console.log(`Ano detectado: 20${currentYearShort}`);
+    } else {
+      currentYearShort = "26"; // Fallback para 2026
+      console.log("Usando ano padrão: 2026");
+    }
 
     gruposSet = new Set();
     especialidadesSet = new Set();
@@ -348,6 +423,13 @@ async function loadAllData() {
       const subgrupoRaw = normalizeText(getField(r, ["SUBGRUPO"]));
       const grupoCodigo = extractGrupoCodigo(grupoRaw);
       const subgrupoCodigo = extractSubgrupoCodigo(subgrupoRaw);
+      const mesRaw = normalizeText(getField(r, ["MÊS"]));
+      
+      // Normalizar o mês com o ano detectado
+      let mesNorm = normalizePeriodo(mesRaw);
+      if (mesNorm && !mesNorm.includes("/")) {
+        mesNorm = `${mesNorm}/${currentYearShort}`;
+      }
 
       let recepcionados = parseNumberBR(getField(r, ["REC"]));
       let faltosos = parseNumberBR(getField(r, ["FAL"]));
@@ -373,7 +455,7 @@ async function loadAllData() {
         subgrupo: subgrupoRaw,
         subgrupoCodigo,
         complexidade: normalizeText(getField(r, ["COMPLEXIDADE"])),
-        mes: normalizePeriodo(getField(r, ["MÊS"])),
+        mes: mesNorm,
         faltosos,
         recepcionados,
         oferta
@@ -402,7 +484,7 @@ async function loadAllData() {
       // Processar cada mês/coluna
       for (let i = 0; i < monthColumns.length; i++) {
         const monthKey = monthColumns[i];
-        const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/25`, `${monthKey}/25`, monthKey.toUpperCase()]));
+        const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/${currentYearShort}`, `${monthKey}/25`, monthKey.toUpperCase()]));
         
         if (monthValue > 0) {
           const mesFormatado = `${monthColumns[i]}/${currentYearShort}`;
@@ -443,7 +525,7 @@ async function loadAllData() {
       // Processar cada mês/coluna
       for (let i = 0; i < monthColumns.length; i++) {
         const monthKey = monthColumns[i];
-        const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/25`, monthKey.toUpperCase()]));
+        const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/${currentYearShort}`, monthKey.toUpperCase()]));
         
         if (monthValue > 0) {
           const mesFormatado = `${monthColumns[i]}/${currentYearShort}`;
@@ -481,9 +563,16 @@ async function loadAllData() {
       Object.keys(row).forEach(col => {
         const colLower = col.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         let shortMonth = null;
+        let extractedYear = null;
+        
+        // Tenta extrair ano do nome da coluna
+        const yearMatch = col.match(/(\d{4})/);
+        if (yearMatch) {
+          extractedYear = yearMatch[1].slice(-2);
+        }
         
         for (const [full, short] of Object.entries(monthMap)) {
-          if (colLower === full || colLower === short) {
+          if (colLower === full || colLower === short || colLower.includes(full) || colLower.includes(short)) {
             shortMonth = short;
             break;
           }
@@ -493,17 +582,21 @@ async function loadAllData() {
         
         const value = parseNumberBR(row[col]);
         if (value <= 0) return;
+        
+        // Usa o ano extraído da coluna ou o ano detectado
+        const yearToUse = extractedYear || currentYearShort;
+        if (!yearToUse) return;
 
         dadosAgendados.push({
           estabelecimento: estabelecimento || "Não informado",
           especialidade,
-          mes: `${shortMonth}/${currentYearShort}`,
+          mes: `${shortMonth}/${yearToUse}`,
           agendados: value
         });
       });
     });
 
-    // Coletar todos os períodos para determinar ano atual
+    // Coletar todos os períodos para ordenação
     const allPeriodsCollected = [
       ...dadosFila.map(d => d.dataCorte),
       ...dadosAgendamentosVivver.map(d => d.mes),
@@ -512,35 +605,15 @@ async function loadAllData() {
       ...dadosAgendados.map(d => d.mes)
     ].filter(Boolean);
     
-    // Atualizar ano baseado nos períodos encontrados
-    const detectedYear = getDominantYearShort(allPeriodsCollected);
-    if (detectedYear) currentYearShort = detectedYear;
-
-    // Reformatar meses com o ano correto
-    const reformatMonth = (mes) => {
-      if (!mes) return mes;
-      const match = mes.match(/^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)(?:\/(\d{2}))?$/i);
-      if (match) {
-        return `${match[1].toLowerCase()}/${currentYearShort}`;
-      }
-      return mes;
-    };
-
-    dadosFaturado = dadosFaturado.map(d => ({ ...d, mes: reformatMonth(d.mes) }));
-    dadosFinanceiro = dadosFinanceiro.map(d => ({ ...d, mes: reformatMonth(d.mes) }));
-    dadosAgendados = dadosAgendados.map(d => ({ ...d, mes: reformatMonth(d.mes) }));
-    dadosAgendamentosVivver = dadosAgendamentosVivver.map(d => ({ ...d, mes: reformatMonth(d.mes) }));
-    dadosFila = dadosFila.map(d => ({ ...d, dataCorte: reformatMonth(d.dataCorte) }));
-
-    allPeriodos = sortPeriodos(allPeriodsCollected.map(reformatMonth));
+    allPeriodos = sortPeriodos(allPeriodsCollected);
 
     console.log("Períodos encontrados:", allPeriodos);
     console.log("Especialidades:", [...especialidadesSet].length);
     console.log("Subgrupos:", [...subgruposSet].length);
     console.log("Faturado registros:", dadosFaturado.length);
     console.log("Financeiro registros:", dadosFinanceiro.length);
-    console.log("Primeiro faturado:", dadosFaturado[0]);
-    console.log("Primeiro financeiro:", dadosFinanceiro[0]);
+    console.log("Agendados registros:", dadosAgendados.length);
+    console.log("Ano atual usado:", currentYearShort);
 
     populateFilters();
     updateLastUpdate();
