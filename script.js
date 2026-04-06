@@ -191,7 +191,14 @@ async function loadAllData() {
       loadCSVSmart(URL_FINANCEIRO, ["PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE"]),
       loadCSVSmart(URL_AGENDADOS, ["ESTABELECIMENTO", "ESPECIALIDADE"])
     ]);
-    console.log("Dados carregados:", { fila: filaRaw.length, filaRetroativa: filaRetroativaRaw.length, vivver: agVivverRaw.length, faturado: faturadoRaw.length, financeiro: financeiroRaw.length, agendados: agendadosRaw.length });
+    console.log("Dados carregados:", { 
+      fila: filaRaw.length, 
+      filaRetroativa: filaRetroativaRaw.length, 
+      vivver: agVivverRaw.length, 
+      faturado: faturadoRaw.length, 
+      financeiro: financeiroRaw.length, 
+      agendados: agendadosRaw.length 
+    });
 
     const allRawPeriods = [];
     filaRaw.forEach(row => { const dataCorte = normalizeText(getField(row, ["Data Corte/ Fila de Espera", "DATA CORTE/ FILA DE ESPERA", "Data Corte"])); if (dataCorte) allRawPeriods.push(dataCorte); });
@@ -338,6 +345,7 @@ async function loadAllData() {
       });
     });
 
+    // Coletar todos os períodos para os filtros
     const allPeriodsCollected = [...dadosFila.map(d => d.dataCorte), ...dadosFilaRetroativa.map(d => d.dataCorte), ...dadosAgendamentosVivver.map(d => d.mes), ...dadosFaturado.map(d => d.mes), ...dadosFinanceiro.map(d => d.mes), ...dadosAgendados.map(d => d.mes)].filter(Boolean);
     allPeriodos = sortPeriodos(allPeriodsCollected);
     console.log("Períodos encontrados:", allPeriodos);
@@ -439,6 +447,8 @@ function applyFilters() {
   const filteredAgendados = dadosAgendados.filter(d => matchBaseWithDimensions(d, false));
   const filteredFaturado = dadosFaturado.filter(d => matchFaturadoFinanceiro(d));
   const filteredFinanceiro = dadosFinanceiro.filter(d => matchFaturadoFinanceiro(d));
+
+  console.log("Dados filtrados - Fila:", filteredFila.length, "Agendamentos Vivver:", filteredAgVivver.length);
 
   const totalFila = filteredFila.reduce((s, d) => s + d.fila, 0);
   const totalRecepcionados = filteredAgVivver.reduce((s, d) => s + d.recepcionados, 0);
@@ -542,12 +552,57 @@ function makeLineChart(id, labels, datasets, yMoney = false, withDataLabels = tr
   charts[id] = new Chart(canvas.getContext("2d"), { type: "line", data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, layout: { padding: { top: 28, right: 24, bottom: 12, left: 12 } }, plugins: { legend: { position: "top", labels: { font: { weight: "bold", size: 12 }, usePointStyle: true, pointStyle: "circle", boxWidth: 10 } }, tooltip: { callbacks: { label: ctx => { const val = ctx.raw || 0; return yMoney ? `${ctx.dataset.label}: ${formatMoney(val)}` : `${ctx.dataset.label}: ${val.toLocaleString("pt-BR")}`; } } }, datalabels: { display: withDataLabels, color: ctx => ctx.dataset.borderColor || "#1F2937", font: { weight: "bold", size: 10 }, align: "top", anchor: "end", offset: 8, clamp: true, formatter: value => { if (!value) return ""; return yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); } } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } }, y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.12)" }, ticks: { font: { weight: "bold" }, callback: value => yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } } } } });
 }
 
-function getPeriodsFromFilteredData(...groups) { const arr = []; groups.flat().forEach(item => { if (item.mes) arr.push(item.mes); if (item.dataCorte) arr.push(item.dataCorte); }); const periods = sortPeriodos(arr); return periods.length ? periods : allPeriodos; }
+function getPeriodsFromFilteredData(...groups) { 
+  const arr = []; 
+  groups.flat().forEach(item => { 
+    if (item.mes) arr.push(item.mes); 
+    if (item.dataCorte) arr.push(item.dataCorte); 
+  }); 
+  const periods = sortPeriodos(arr); 
+  return periods.length ? periods : allPeriodos; 
+}
 
 function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
   const canvas = el("cEvolucao"); if (!canvas) return;
   destroyChart("cEvolucao");
-  charts.cEvolucao = new Chart(canvas.getContext("2d"), { data: { labels: periods, datasets: [{ type: "bar", label: "Ofertas", data: periods.map(p => ofertaPorMes.get(p) || 0), backgroundColor: "rgba(37,99,235,0.22)", borderColor: "#2563eb", borderWidth: 1.5, borderRadius: 10, yAxisID: "y", order: 4 }, { type: "line", label: "Fila de Espera", data: periods.map(p => filaPorMes.get(p) || 0), borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y1", order: 1 }, { type: "line", label: "Recepcionados", data: periods.map(p => recepcionadosPorMes.get(p) || 0), borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 2 }, { type: "line", label: "Faltosos", data: periods.map(p => faltososPorMes.get(p) || 0), borderColor: "#d97706", backgroundColor: "rgba(217,119,6,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#d97706", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 3 }] }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, layout: { padding: { top: 24, right: 16, bottom: 10, left: 10 } }, plugins: { legend: { position: "top", labels: { usePointStyle: true, pointStyle: "circle", font: { weight: "bold", size: 12 } } }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } }, datalabels: { color: ctx => ctx.dataset.borderColor || "#111827", font: { weight: "bold", size: 10 }, formatter: value => { if (!value) return ""; return value.toLocaleString("pt-BR"); }, align: ctx => ctx.dataset.type === "bar" ? "end" : "top", anchor: ctx => ctx.dataset.type === "bar" ? "end" : "end", offset: 6, clamp: true } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } }, y: { beginAtZero: true, position: "left", grace: "10%", grid: { display: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Oferta / Recepcionados / Faltosos", font: { weight: "bold" } } }, y1: { beginAtZero: true, position: "right", grace: "10%", grid: { display: false, drawOnChartArea: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Fila de Espera", font: { weight: "bold" } } } } } });
+  
+  // Verificar se há dados para exibir
+  console.log("Períodos para evolução:", periods);
+  console.log("Fila por mês:", filaPorMes);
+  console.log("Oferta por mês:", ofertaPorMes);
+  
+  const filaData = periods.map(p => filaPorMes.get(p) || 0);
+  const ofertaData = periods.map(p => ofertaPorMes.get(p) || 0);
+  const recepData = periods.map(p => recepcionadosPorMes.get(p) || 0);
+  const faltaData = periods.map(p => faltososPorMes.get(p) || 0);
+  
+  charts.cEvolucao = new Chart(canvas.getContext("2d"), { 
+    data: { 
+      labels: periods, 
+      datasets: [
+        { type: "bar", label: "Ofertas", data: ofertaData, backgroundColor: "rgba(37,99,235,0.22)", borderColor: "#2563eb", borderWidth: 1.5, borderRadius: 10, yAxisID: "y", order: 4 },
+        { type: "line", label: "Fila de Espera", data: filaData, borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y1", order: 1 },
+        { type: "line", label: "Recepcionados", data: recepData, borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 2 },
+        { type: "line", label: "Faltosos", data: faltaData, borderColor: "#d97706", backgroundColor: "rgba(217,119,6,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#d97706", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 3 }
+      ] 
+    }, 
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: false, 
+      interaction: { mode: "index", intersect: false }, 
+      layout: { padding: { top: 24, right: 16, bottom: 10, left: 10 } }, 
+      plugins: { 
+        legend: { position: "top", labels: { usePointStyle: true, pointStyle: "circle", font: { weight: "bold", size: 12 } } }, 
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } }, 
+        datalabels: { color: ctx => ctx.dataset.borderColor || "#111827", font: { weight: "bold", size: 10 }, formatter: value => { if (!value) return ""; return value.toLocaleString("pt-BR"); }, align: ctx => ctx.dataset.type === "bar" ? "end" : "top", anchor: ctx => ctx.dataset.type === "bar" ? "end" : "end", offset: 6, clamp: true } 
+      }, 
+      scales: { 
+        x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } }, 
+        y: { beginAtZero: true, position: "left", grace: "10%", grid: { display: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Oferta / Recepcionados / Faltosos", font: { weight: "bold" } } }, 
+        y1: { beginAtZero: true, position: "right", grace: "10%", grid: { display: false, drawOnChartArea: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Fila de Espera", font: { weight: "bold" } } } 
+      } 
+    } 
+  });
 }
 
 function renderAgendadasPorEspecialidadeEstabTable(filteredAgendados) {
@@ -594,12 +649,22 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
 }
 
 function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
-  const periods = getPeriodsFromFilteredData(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
+  // Obter todos os períodos disponíveis (meses e datas de corte)
+  const allPeriodsFromData = getPeriodsFromFilteredData(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
+  
+  // Se não houver períodos, usar um array vazio
+  const periods = allPeriodsFromData.length ? allPeriodsFromData : [];
+  
+  console.log("Períodos para visão geral:", periods);
+  
   const filaPorMes = aggregateBy(filteredFila, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
+  
+  // Renderizar o gráfico de evolução mesmo se não houver períodos (mostrará vazio)
   renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
+  
   const agendadosPorMes = aggregateBy(filteredAgendados, d => d.mes, d => d.agendados);
   const faturadosQtdPorMes = aggregateBy(filteredFaturado, d => d.mes, d => d.quantidade);
   const financeiroPorMes = aggregateBy(filteredFinanceiro, d => d.mes, d => d.valor);
