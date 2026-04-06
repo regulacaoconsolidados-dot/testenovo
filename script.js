@@ -379,7 +379,7 @@ function populateFilters() {
 
 function getVisibleSubgrupos() {
   const grupo = el("grupoSelect")?.value || "";
-  const allFilaData = [...dadosFila];
+  const allFilaData = [...dadosFila, ...dadosFilaRetroativa];
   let subgrupos = new Set();
   [...allFilaData, ...dadosAgendamentosVivver, ...dadosFaturado, ...dadosFinanceiro].forEach(d => { if (!d.subgrupo) return; if (grupo && d.grupoCodigo !== grupo) return; subgrupos.add(d.subgrupo); });
   return [...subgrupos].sort((a, b) => a.localeCompare(b, "pt-BR"));
@@ -649,20 +649,27 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
 }
 
 function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
+  // CORREÇÃO: Incorporar dados retroativos na evolução da fila
+  // Combinar dados da fila principal com os dados retroativos para ter uma visão completa
+  const combinedFilaData = [...filteredFila, ...dadosFilaRetroativa];
+  
   // Obter todos os períodos disponíveis (meses e datas de corte)
-  const allPeriodsFromData = getPeriodsFromFilteredData(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
+  const allPeriodsFromData = getPeriodsFromFilteredData(combinedFilaData, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   
   // Se não houver períodos, usar um array vazio
   const periods = allPeriodsFromData.length ? allPeriodsFromData : [];
   
-  console.log("Períodos para visão geral:", periods);
+  console.log("Períodos para visão geral (incluindo dados retroativos):", periods);
   
-  const filaPorMes = aggregateBy(filteredFila, d => d.dataCorte, d => d.fila);
+  // Agora usar os dados combinados para a fila
+  const filaPorMes = aggregateBy(combinedFilaData, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
   
-  // Renderizar o gráfico de evolução mesmo se não houver períodos (mostrará vazio)
+  console.log("Dados de fila por mês (combinados):", filaPorMes);
+  
+  // Renderizar o gráfico de evolução com os dados combinados
   renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
   
   const agendadosPorMes = aggregateBy(filteredAgendados, d => d.mes, d => d.agendados);
