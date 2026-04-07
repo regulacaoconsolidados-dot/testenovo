@@ -1543,8 +1543,10 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
 
 function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro) {
   // Combinar fila atual com fila retroativa para o gráfico de evolução
-  const filteredFilaRetroativa = dadosFilaRetroativa.filter(d => matchBaseWithDimensions(d, true));
+  const filteredFilaRetroativa = (dadosFilaRetroativa || []).filter(d => matchBaseWithDimensions(d, true));
   const todasFila = [...filteredFila, ...filteredFilaRetroativa];
+  
+  console.log("Dados para evolução - Fila atual:", filteredFila.length, "Fila retroativa:", filteredFilaRetroativa.length, "Total:", todasFila.length);
   
   const periods = getPeriodsFromFilteredData(todasFila, filteredAgVivver, filteredAgendados, filteredFinanceiro);
 
@@ -1552,6 +1554,9 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
+
+  console.log("Períodos encontrados:", periods);
+  console.log("Fila por mês (combinada):", filaPorMes);
 
   renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
 
