@@ -73,7 +73,7 @@
 
   <div class="kpis">
     <div class="kpi kpi-fila kpi-principal"><div class="kpiIcon"><i class="fa-solid fa-clock"></i></div><div><div class="label">Fila de Espera Atual</div><div class="val" id="kFila">0</div><div class="sub" id="dataCorteInfo">Carregando data de corte...</div></div></div>
-    <div class="kpi kpi-fila kpi-retroativa"><div class="kpiIcon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><div class="label">Fila de Espera Retroativa/2025</div><div class="val" id="kFilaRetroativaTotalHeader">0</div><div class="sub" id="dataCorteRetroativaInfoCard">Carregando data de corte...</div></div></div>
+    <div class="kpi kpi-fila-retroativa"><div class="kpiIcon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><div class="label">Fila de Espera Retroativa/2025</div><div class="val" id="kFilaRetroativaCard">0</div><div class="sub" id="dataCorteRetroativaInfoCard">Carregando data de corte...</div></div></div>
     <div class="kpi kpi-agendados-total"><div class="kpiIcon"><i class="fa-solid fa-calendar-check"></i></div><div><div class="label">Cirurgias Agendadas</div><div class="val" id="kAgendadosTotal">0</div><div class="sub" id="subAgendados">Carregando...</div></div></div>
     <div class="kpi kpi-real"><div class="kpiIcon"><i class="fa-solid fa-hospital-user"></i></div><div><div class="label">Cirurgias Recepcionadas</div><div class="val" id="kRecepcionados">0</div><div class="sub" id="subRecepcionados">Carregando...</div></div></div>
     <div class="kpi kpi-falt"><div class="kpiIcon"><i class="fa-solid fa-user-slash"></i></div><div><div class="label">Faltosos</div><div class="val" id="kFaltosos">0</div><div class="sub" id="subFaltosos">Carregando...</div></div></div>
@@ -119,7 +119,7 @@
   <!-- ABA 6: FILA DE ESPERA ATUAL -->
   <section id="tab-demanda_reprimida" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-hourglass-half"></i></div><div><h3>Fila de Espera Atual</h3><div class="topic-sub">Leitura da demanda reprimida por especialidade, procedimento, complexidade e subgrupo</div></div><div class="topic-pill"><i class="fa-solid fa-users"></i> Acompanhamento da demanda reprimida</div></div><div class="row2eq"><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--secondary);"></i> Top Especialidades com Maior Fila</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaEspecialidade"><thead><tr><th>Especialidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Fila por Procedimento</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaProcedimento"><thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div></div><div class="row2eq"><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Fila por Complexidade</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaComplexidade"><thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Fila por Subgrupo</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-pie"></i> Fila de Espera por Complexidade</h3><div class="chartSub">Distribuição por nível de complexidade</div></div><div class="chartWrap"><canvas id="cFilaComplexidadeRosca"></canvas></div></div></div></section>
 
-  <!-- ABA 7: FILA RETROATIVA 2025 - REFORMULADA -->
+  <!-- ABA 7: FILA RETROATIVA 2025 - REFORMULADA CONFORME MODELO -->
   <section id="tab-fila_retroativa" class="tabContent">
     <div class="topic-header">
       <div class="topic-header-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
@@ -133,20 +133,20 @@
       </div>
     </div>
 
-    <!-- KPI Row for Retroativa -->
-    <div class="kpi-row" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px;">
-      <div class="kpi kpi-retroativa" style="background: var(--kpi-retroativa); color: white;">
-        <div class="kpiIcon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+    <!-- Cards de KPIs para Fila Retroativa -->
+    <div class="kpi-row">
+      <div class="kpi kpi-principal" style="background: linear-gradient(135deg, #0f7a58 0%, #0b5e42 55%, #083c2d 100%);">
+        <div class="kpiIcon" style="background: rgba(255,255,255,0.2);"><i class="fa-solid fa-chart-line"></i></div>
         <div>
-          <div class="label">Total na Fila Retroativa</div>
-          <div class="val" id="kFilaRetroativaTotalValue">0</div>
+          <div class="label" style="color: rgba(255,255,255,0.9);">Total Fila Retroativa 2025</div>
+          <div class="val" id="kFilaRetroativa">0</div>
           <div class="sub" id="dataCorteRetroativaInfo">Carregando data de corte...</div>
         </div>
       </div>
       <div class="media-card">
-        <div class="media-label"><i class="fa-solid fa-chart-line"></i> Média por Procedimento</div>
-        <div class="media-value" id="kMediaRetroativa">0</div>
-        <div class="media-sub">Procedimentos cadastrados</div>
+        <div class="media-label"><i class="fa-solid fa-calculator"></i> Média por Procedimento</div>
+        <div class="media-value" id="mediaPorProcedimento">0</div>
+        <div class="media-sub">Procedimentos na fila retroativa</div>
       </div>
     </div>
 
@@ -154,26 +154,24 @@
     <div class="row2eq">
       <div class="chartCard">
         <div class="table-title">
-          <i class="fa-solid fa-chart-simple" style="color: var(--secondary);"></i> Top Especialidades - Fila Retroativa
-        </div>
-        <div class="table-wrapper" style="max-height: 400px;">
-          <table class="data-table-simple" id="tableFilaRetroativaEspecialidade">
-            <thead><tr><th>Especialidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
-            <tbody id="tableFilaRetroativaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr>
-          </tbody>
-        </table>
-        </div>
-      </div>
-      <div class="chartCard">
-        <div class="table-title">
-          <i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Top Procedimentos - Fila Retroativa
+          <i class="fa-solid fa-chart-simple" style="color: var(--secondary);"></i> Top Procedimentos - Fila Retroativa
         </div>
         <div class="table-wrapper" style="max-height: 400px;">
           <table class="data-table-simple" id="tableFilaRetroativaProcedimento">
             <thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
-            <tbody id="tableFilaRetroativaProcedimentoBody"><tr><td colspan="3">Carregando...络‹</tr>
-          </tbody>
-        </table>
+            <tbody id="tableFilaRetroativaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chartCard">
+        <div class="table-title">
+          <i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Fila Retroativa por Complexidade
+        </div>
+        <div class="table-wrapper" style="max-height: 400px;">
+          <table class="data-table-simple" id="tableFilaRetroativaComplexidade">
+            <thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
+            <tbody id="tableFilaRetroativaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -200,7 +198,7 @@
               <th>Data Corte</th>
             </tr>
           </thead>
-          <tbody id="tableFilaRetroativaCompletaBody"><tr><td colspan="8">Carregando...络‹</td></tbody>
+          <tbody id="tableFilaRetroativaCompletaBody"><tr><td colspan="8">Carregando...</td></tr></tbody>
         </table>
       </div>
     </div>
