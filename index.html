@@ -73,7 +73,7 @@
 
   <div class="kpis">
     <div class="kpi kpi-fila kpi-principal"><div class="kpiIcon"><i class="fa-solid fa-clock"></i></div><div><div class="label">Fila de Espera Atual</div><div class="val" id="kFila">0</div><div class="sub" id="dataCorteInfo">Carregando data de corte...</div></div></div>
-    <div class="kpi kpi-fila kpi-retroativa"><div class="kpiIcon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><div class="label">Fila de Espera Retroativa/2025</div><div class="val" id="kFilaRetroativaTotal">0</div><div class="sub" id="dataCorteRetroativaInfoCard">Carregando data de corte...</div></div></div>
+    <div class="kpi kpi-fila kpi-retroativa"><div class="kpiIcon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><div class="label">Fila de Espera Retroativa/2025</div><div class="val" id="kFilaRetroativaTotalHeader">0</div><div class="sub" id="dataCorteRetroativaInfoCard">Carregando data de corte...</div></div></div>
     <div class="kpi kpi-agendados-total"><div class="kpiIcon"><i class="fa-solid fa-calendar-check"></i></div><div><div class="label">Cirurgias Agendadas</div><div class="val" id="kAgendadosTotal">0</div><div class="sub" id="subAgendados">Carregando...</div></div></div>
     <div class="kpi kpi-real"><div class="kpiIcon"><i class="fa-solid fa-hospital-user"></i></div><div><div class="label">Cirurgias Recepcionadas</div><div class="val" id="kRecepcionados">0</div><div class="sub" id="subRecepcionados">Carregando...</div></div></div>
     <div class="kpi kpi-falt"><div class="kpiIcon"><i class="fa-solid fa-user-slash"></i></div><div><div class="label">Faltosos</div><div class="val" id="kFaltosos">0</div><div class="sub" id="subFaltosos">Carregando...</div></div></div>
@@ -139,17 +139,14 @@
         <div class="kpiIcon"><i class="fa-solid fa-clock-rotate-left"></i></div>
         <div>
           <div class="label">Total na Fila Retroativa</div>
-          <div class="val" id="kFilaRetroativaTotal">0</div>
+          <div class="val" id="kFilaRetroativaTotalValue">0</div>
           <div class="sub" id="dataCorteRetroativaInfo">Carregando data de corte...</div>
         </div>
       </div>
-      <div class="kpi" style="background: linear-gradient(135deg, #0f7a58 0%, #0b5e42 55%, #083c2d 100%); color: white;">
-        <div class="kpiIcon"><i class="fa-solid fa-chart-line"></i></div>
-        <div>
-          <div class="label">Média por Procedimento</div>
-          <div class="val" id="kMediaRetroativa">0</div>
-          <div class="sub">Procedimentos cadastrados</div>
-        </div>
+      <div class="media-card">
+        <div class="media-label"><i class="fa-solid fa-chart-line"></i> Média por Procedimento</div>
+        <div class="media-value" id="kMediaRetroativa">0</div>
+        <div class="media-sub">Procedimentos cadastrados</div>
       </div>
     </div>
 
@@ -162,8 +159,9 @@
         <div class="table-wrapper" style="max-height: 400px;">
           <table class="data-table-simple" id="tableFilaRetroativaEspecialidade">
             <thead><tr><th>Especialidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
-            <tbody id="tableFilaRetroativaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
-          </table>
+            <tbody id="tableFilaRetroativaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr>
+          </tbody>
+        </table>
         </div>
       </div>
       <div class="chartCard">
@@ -173,8 +171,9 @@
         <div class="table-wrapper" style="max-height: 400px;">
           <table class="data-table-simple" id="tableFilaRetroativaProcedimento">
             <thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
-            <tbody id="tableFilaRetroativaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
-          </table>
+            <tbody id="tableFilaRetroativaProcedimentoBody"><tr><td colspan="3">Carregando...络‹</tr>
+          </tbody>
+        </table>
         </div>
       </div>
     </div>
@@ -201,7 +200,7 @@
               <th>Data Corte</th>
             </tr>
           </thead>
-          <tbody id="tableFilaRetroativaCompletaBody"><tr><td colspan="8">Carregando...</td></tr></tbody>
+          <tbody id="tableFilaRetroativaCompletaBody"><tr><td colspan="8">Carregando...络‹</td></tbody>
         </table>
       </div>
     </div>
