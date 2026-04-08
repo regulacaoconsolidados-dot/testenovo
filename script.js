@@ -1998,14 +1998,18 @@ function renderFilaRetroativa() {
   const totalFila = filtered.reduce((s, d) => s + d.fila, 0);
   const mediaPorProcedimento = filtered.length > 0 ? totalFila / filtered.length : 0;
 
-  // Atualiza KPI retroativa total
-  const kTotal = el("kFilaRetroativaTotal");
-  const kMedia = el("kMediaRetroativa");
-  const dataCorteRetroativaInfo = el("dataCorteRetroativaInfo");
-  
-  if (kTotal) kTotal.innerText = totalFila.toLocaleString("pt-BR");
-  if (kMedia) kMedia.innerText = mediaPorProcedimento.toFixed(1);
-  if (dataCorteRetroativaInfo) dataCorteRetroativaInfo.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
+// Atualiza KPIs retroativa
+const kTotalHeader = el("kFilaRetroativaTotalHeader");
+const kTotalValue = el("kFilaRetroativaTotalValue");
+const kMedia = el("kMediaRetroativa");
+const dataCorteRetroativaInfo = el("dataCorteRetroativaInfo");
+const dataCorteRetroativaInfoCard = el("dataCorteRetroativaInfoCard");
+
+if (kTotalHeader) kTotalHeader.innerText = totalFila.toLocaleString("pt-BR");
+if (kTotalValue) kTotalValue.innerText = totalFila.toLocaleString("pt-BR");
+if (kMedia) kMedia.innerText = mediaPorProcedimento.toFixed(1);
+if (dataCorteRetroativaInfo) dataCorteRetroativaInfo.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
+if (dataCorteRetroativaInfoCard) dataCorteRetroativaInfoCard.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
 
   // Tabela: Top Especialidades
   const especialidadeMap = aggregateBy(filtered, d => d.especialidade || "Não informado", d => d.fila);
