@@ -272,7 +272,7 @@ async function loadAllData() {
       loadCSVSmart(URL_FILA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "TOTAL", "Data Corte/ Fila de Espera"]),
       loadCSVSmart(URL_AGENDAMENTOS_VIVVER, ["CÓDIGO DO PROCEDIMENTO", "PROCEDIMENTO DESCRIÇÃO", "ESTABELECIMENTO", "ESPECIALIDADE", "MÊS", "FAL", "REC", "OFERTA"]),
       loadCSVSmart(URL_FATURADO_FINANCEIRO, ["ESTABELECIMENTO", "MÊS", "REALIZADOS", "TOTAL FATURADO", "TOTAL FINANCEIRO"]),
-      loadCSVSmart(URL_AGENDADOS, ["ESTABELECIMENTO", "ESPECIALIDADE", "Janeiro", "Fevereiro", "Março"]),
+      loadCSVSmart(URL_AGENDADOS, ["ESTABELECIMENTO", "ESPECIALIDADE", "Grupo Sigtap", "Sub Grupo Sigtap", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]),
       loadCSVSmart(URL_FILA_RETROATIVA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "Complexidade- Sigtap", "TOTAL", "Data Corte/ Fila de Espera"])
     ]);
 
@@ -375,6 +375,12 @@ async function loadAllData() {
     }).filter(d => d.especialidade || d.descricao);
 
     latestDataCorteRetroativa = latestRetroativaDateValue || "Não disponível";
+    
+    // Atualiza KPI de data de corte retroativa
+    const dataCorteRetroativaCard = el("dataCorteRetroativaInfoCard");
+    if (dataCorteRetroativaCard) {
+      dataCorteRetroativaCard.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
+    }
 
     // Processa Agendamentos Vivver
     dadosAgendamentosVivver = agVivverRaw.map(r => {
@@ -420,13 +426,27 @@ async function loadAllData() {
       financeiroValor: parseNumberBR(getField(r, ["TOTAL FINANCEIRO", "Total Financeiro"]))
     })).filter(d => d.mes && (d.agendados > 0 || d.faturadoQtd > 0 || d.financeiroValor > 0));
 
-    // Processa Agendados
+    // Processa Agendados - Nova estrutura com Grupo e Subgrupo
     dadosAgendados = [];
     agendadosRaw.forEach(r => {
       const estabelecimento = normalizeText(getField(r, ["ESTABELECIMENTO", "Estabelecimento"]));
       const especialidade = normalizeText(getField(r, ["ESPECIALIDADE", "Especialidade"]));
+      const grupoSigtap = normalizeText(getField(r, ["Grupo Sigtap", "GRUPO SIGTAP"]));
+      const subGrupoSigtap = normalizeText(getField(r, ["Sub Grupo Sigtap", "SUB GRUPO SIGTAP"]));
+      
       if (!estabelecimento && !especialidade) return;
       if (especialidade) especialidadesSet.add(especialidade);
+      if (grupoSigtap) gruposSet.add(extractGrupoCodigo(grupoSigtap));
+      
+      // Adiciona relação especialidade-grupo/subgrupo
+      if (especialidade && grupoSigtap) {
+        addMapSet(especialidadeToGrupos, especialidade, extractGrupoCodigo(grupoSigtap));
+      }
+      if (especialidade && subGrupoSigtap) {
+        addMapSet(especialidadeToSubgrupos, especialidade, subGrupoSigtap);
+      }
+      
+      // Processa os meses
       Object.keys(r).forEach(col => {
         const shortMonth = monthNameToShort(col);
         if (!shortMonth) return;
@@ -435,6 +455,8 @@ async function loadAllData() {
         dadosAgendados.push({
           estabelecimento,
           especialidade,
+          grupoSigtap,
+          subGrupoSigtap,
           mes: `${shortMonth}/${currentYearShort}`,
           agendados: value
         });
@@ -454,7 +476,6 @@ async function loadAllData() {
     populateFilters();
     updateLastUpdate();
     applyFilters();
-    renderFilaRetroativa(); // Renderiza a nova aba
     toast("Dados carregados com sucesso!", "success");
   } catch (e) {
     console.error("Erro detalhado:", e);
@@ -511,10 +532,11 @@ function populateFilters() {
 function getVisibleSubgrupos() {
   const grupo = el("grupoSelect")?.value || "";
   let subgrupos = new Set();
-  [...dadosFila, ...dadosAgendamentosVivver, ...dadosFilaRetroativa].forEach(d => {
-    if (!d.subgrupo) return;
-    if (grupo && d.grupoCodigo !== grupo) return;
-    subgrupos.add(d.subgrupo);
+  [...dadosFila, ...dadosAgendamentosVivver, ...dadosFilaRetroativa, ...dadosAgendados].forEach(d => {
+    const subgrupo = d.subgrupo || d.subGrupoSigtap;
+    if (!subgrupo) return;
+    if (grupo && d.grupoCodigo !== grupo && d.grupoSigtap !== grupo) return;
+    subgrupos.add(subgrupo);
   });
   return [...subgrupos].sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
@@ -1960,7 +1982,7 @@ function renderFila(filteredFila) {
   }
 }
 
-// NOVA FUNÇÃO: Renderiza a aba Fila Retroativa 2025
+// Função para renderizar a aba Fila Retroativa 2025 (apenas tabelas, sem gráficos removidos)
 function renderFilaRetroativa() {
   const grupo = el("grupoSelect")?.value || "";
   const periodo = el("periodoSelect")?.value || "";
@@ -1976,44 +1998,31 @@ function renderFilaRetroativa() {
   const totalFila = filtered.reduce((s, d) => s + d.fila, 0);
   const mediaPorProcedimento = filtered.length > 0 ? totalFila / filtered.length : 0;
 
+  // Atualiza KPI retroativa total
   const kTotal = el("kFilaRetroativaTotal");
-  const kDataCorte = el("kFilaRetroativaDataCorte");
-  const kMedia = el("kFilaRetroativaMedia");
+  const kMedia = el("kMediaRetroativa");
+  const dataCorteRetroativaInfo = el("dataCorteRetroativaInfo");
   
   if (kTotal) kTotal.innerText = totalFila.toLocaleString("pt-BR");
-  if (kDataCorte) kDataCorte.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
   if (kMedia) kMedia.innerText = mediaPorProcedimento.toFixed(1);
-
-  // Gráfico de Complexidade
-  const complexMap = aggregateBy(filtered, d => d.complexidade || "Não informado", d => d.fila);
-  const complexArr = [...complexMap.entries()].sort((a, b) => b[1] - a[1]);
-  const complexLabels = complexArr.map(([k]) => truncateLabel(k, 25));
-  const complexValues = complexArr.map(([,v]) => v);
-  makeDoughnutChartWithPercentages("cFilaRetroativaComplexidade", complexLabels, complexValues, ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626"]);
-
-  // Gráfico de Subgrupo
-  const subgrupoMap = aggregateBy(filtered, d => d.subgrupo || "Não informado", d => d.fila);
-  const subgrupoArr = [...subgrupoMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const subgrupoLabels = subgrupoArr.map(([k]) => truncateLabel(k, 25));
-  const subgrupoValues = subgrupoArr.map(([,v]) => v);
-  makeDoughnutChartWithPercentages("cFilaRetroativaSubgrupo", subgrupoLabels, subgrupoValues, ["#3b82f6", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#f97316"]);
+  if (dataCorteRetroativaInfo) dataCorteRetroativaInfo.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
 
   // Tabela: Top Especialidades
   const especialidadeMap = aggregateBy(filtered, d => d.especialidade || "Não informado", d => d.fila);
-  renderPercentageTotalTable("tableRetroativaEspecialidadeBody", especialidadeMap, "#8b5cf6");
+  renderPercentageTotalTable("tableFilaRetroativaEspecialidadeBody", especialidadeMap, "#8b5cf6");
 
   // Tabela: Top Procedimentos
   const procedimentoMap = aggregateBy(filtered, d => d.descricao || "Não informado", d => d.fila);
-  renderPercentageTotalTable("tableRetroativaProcedimentoBody", procedimentoMap, "#8b5cf6");
+  renderPercentageTotalTable("tableFilaRetroativaProcedimentoBody", procedimentoMap, "#8b5cf6");
 
   // Tabela Detalhada
   renderTabelaRetroativaDetalhada(filtered);
 }
 
 function renderTabelaRetroativaDetalhada(data) {
-  const tbody = el("tableRetroativaDetalhadaBody");
+  const tbody = el("tableFilaRetroativaCompletaBody");
   if (!tbody) return;
-  const searchTerm = (el("tabelaRetroativaSearch")?.value || "").toLowerCase();
+  const searchTerm = (el("searchFilaRetroativa")?.value || "").toLowerCase();
   let filteredData = [...data];
   if (searchTerm) {
     filteredData = filteredData.filter(d => 
@@ -2108,8 +2117,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tSearchFisico) tSearchFisico.value = "";
       const tabelaSearchEspec = el("tabelaSearchEspec");
       if (tabelaSearchEspec) tabelaSearchEspec.value = "";
-      const tabelaRetroativaSearch = el("tabelaRetroativaSearch");
-      if (tabelaRetroativaSearch) tabelaRetroativaSearch.value = "";
+      const searchFilaRetroativa = el("searchFilaRetroativa");
+      if (searchFilaRetroativa) searchFilaRetroativa.value = "";
       currentTableMonthFilterFisico = "";
       buildSubgrupoList();
       buildEspecialidadeList();
@@ -2140,9 +2149,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const tSearchFisico = el("tSearchFisico");
   if (tSearchFisico) tSearchFisico.addEventListener("input", renderTableBodyFisico);
 
-  const tabelaRetroativaSearch = el("tabelaRetroativaSearch");
-  if (tabelaRetroativaSearch) {
-    tabelaRetroativaSearch.addEventListener("input", () => renderFilaRetroativa());
+  const searchFilaRetroativa = el("searchFilaRetroativa");
+  if (searchFilaRetroativa) {
+    searchFilaRetroativa.addEventListener("input", () => renderFilaRetroativa());
   }
 
   document.addEventListener("click", () => closeAllDropdowns());
