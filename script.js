@@ -766,10 +766,23 @@ function renderTableBodyFisico() {
   let rows = [...currentTableDataFisico];
   if (month) rows = rows.filter(r => r.mes === month);
   if (q) rows = rows.filter(r => `${r.estabelecimento} ${r.mes}`.toLowerCase().includes(q));
-  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5">Nenhum dado disponível
-      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5">Nenhum dado disponível</td></tr>'; const tInfoFisico = el("tInfoFisico"); if (tInfoFisico) tInfoFisico.innerText = "0 registros"; return; }
-  tbody.innerHTML = rows.map(r => `<tr><td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(truncateLabel(r.estabelecimento, 60))}</td><td>${escapeHtml(r.mes || "-")}</td><td class="text-right">${r.agendados.toLocaleString("pt-BR")}</td><td class="text-right">${r.faturadosQtd.toLocaleString("pt-BR")}</td><td class="text-right">${formatMoney(r.financeiroValor)}</td></tr>`).join("");
-  const tInfoFisico = el("tInfoFisico"); if (tInfoFisico) tInfoFisico.innerText = `${rows.length.toLocaleString("pt-BR")} registros`;
+  if (!rows.length) { 
+    tbody.innerHTML = '<tr><td colspan="5">Nenhum dado disponível</td></tr>'; 
+    const tInfoFisico = el("tInfoFisico"); 
+    if (tInfoFisico) tInfoFisico.innerText = "0 registros"; 
+    return; 
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(truncateLabel(r.estabelecimento, 60))}</td>
+      <td>${escapeHtml(r.mes || "-")}</td>
+      <td class="text-right">${r.agendados.toLocaleString("pt-BR")}</td>
+      <td class="text-right">${r.faturadosQtd.toLocaleString("pt-BR")}</td>
+      <td class="text-right">${formatMoney(r.financeiroValor)}</td>
+    </tr>
+  `).join("");
+  const tInfoFisico = el("tInfoFisico"); 
+  if (tInfoFisico) tInfoFisico.innerText = `${rows.length.toLocaleString("pt-BR")} registros`;
 }
 
 function sortTableFisico(colIndex) {
