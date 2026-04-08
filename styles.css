@@ -261,7 +261,7 @@ select:focus, .ms-trigger:focus, .table-controls input:focus, .table-controls se
 
 @media (max-width: 820px) { .wrap { padding: 18px 14px 30px; } .header { padding: 18px 16px; } .h-title { font-size: 22px; } .chartWrap, .chartWrap-hero { height: 360px; } .topic-pill { margin-left: 0; } .topic-header { padding: 18px 16px; } }
 
-/* Card Média por Procedimento - versão correta (verde com texto branco) */
+/* Card Média por Procedimento - CORES CORRIGIDAS (branco e negrito) */
 .media-card {
   background: linear-gradient(135deg, #0f7a58 0%, #0b5e42 55%, #083c2d 100%);
   border-radius: 12px;
@@ -278,14 +278,14 @@ select:focus, .ms-trigger:focus, .table-controls input:focus, .table-controls se
 
 .media-label {
   font-size: 14px;
-  color: rgba(255,255,255,0.9);
+  color: white;
   margin-bottom: 10px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .media-label i {
   margin-right: 8px;
-  color: rgba(255,255,255,0.9);
+  color: white;
 }
 
 .media-value {
@@ -297,5 +297,25 @@ select:focus, .ms-trigger:focus, .table-controls input:focus, .table-controls se
 
 .media-sub {
   font-size: 12px;
-  color: rgba(255,255,255,0.7);
+  color: white;
+  font-weight: 600;
+}
+
+/* Força adicional para garantir cores brancas no card de média */
+.media-card .media-value,
+.media-card .media-label,
+.media-card .media-sub {
+  color: #ffffff !important;
+}
+
+.media-card .media-label {
+  font-weight: 700 !important;
+}
+
+.media-card .media-sub {
+  font-weight: 600 !important;
+}
+
+.media-card .media-value {
+  font-weight: bold !important;
 }
