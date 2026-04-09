@@ -710,18 +710,22 @@ function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepciona
   });
 }
 
+// FUNÇÃO CORRIGIDA - A LINHA DA FILA AGORA INTERAGE COM OS FILTROS
 function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
-  // CORREÇÃO 1: Usar APENAS os dados filtrados para a fila
+  // CORREÇÃO: Usar APENAS os dados filtrados da fila (já vêm com os filtros aplicados)
   const filaPorMes = aggregateBy(filteredFila, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
   
+  // Períodos baseados nos dados filtrados
   const allPeriodsFromData = getPeriodsFromFilteredData(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   const periods = allPeriodsFromData.length ? allPeriodsFromData : [];
   
-  console.log("Períodos para visão geral (apenas dados filtrados):", periods);
+  console.log("Períodos para visão geral (dados filtrados):", periods);
+  console.log("Dados de fila por mês (com filtros aplicados):", filaPorMes);
   
+  // Renderizar o gráfico de evolução com os dados filtrados
   renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
   
   const agendadosPorMes = aggregateBy(filteredAgendados, d => d.mes, d => d.agendados);
@@ -732,7 +736,9 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
   const agendadosMedia = agendadosValues.reduce((a, b) => a + b, 0) / (agendadosValues.filter(v => v > 0).length || 1);
   const faturadosMedia = faturadosValues.reduce((a, b) => a + b, 0) / (faturadosValues.filter(v => v > 0).length || 1);
   const legendContainer = el("legendAgendadosFaturados");
-  if (legendContainer) { legendContainer.innerHTML = `<div class="legend-item"><div class="legend-color agendados"></div><span>Agendados</span><span style="font-weight:900;color:var(--primary-dark)">(Média: ${Math.round(agendadosMedia).toLocaleString("pt-BR")})</span></div><div class="legend-item"><div class="legend-color faturados"></div><span>Faturados</span><span style="font-weight:900;color:var(--primary-dark)">(Média: ${Math.round(faturadosMedia).toLocaleString("pt-BR")})</span></div>`; }
+  if (legendContainer) { 
+    legendContainer.innerHTML = `<div class="legend-item"><div class="legend-color agendados"></div><span>Agendados</span><span style="font-weight:900;color:var(--primary-dark)">(Média: ${Math.round(agendadosMedia).toLocaleString("pt-BR")})</span></div><div class="legend-item"><div class="legend-color faturados"></div><span>Faturados</span><span style="font-weight:900;color:var(--primary-dark)">(Média: ${Math.round(faturadosMedia).toLocaleString("pt-BR")})</span></div>`; 
+  }
   renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues);
   makeLineChart("cReceitaFinanceiraMes", periods, [{ label: "Receita Financeira", data: periods.map(p => financeiroPorMes.get(p) || 0), borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8 }], true, true);
   const financeiroEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento, d => d.valor);
@@ -743,13 +749,16 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
   const totalFaltosos = filteredAgVivver.reduce((s, d) => s + d.faltosos, 0);
   makeDoughnutChartWithPercentages("cFunil", ["Ofertas", "Recepcionados", "Faltosos"], [totalOferta, totalRecepcionados, totalFaltosos], ["#2563eb", "#059669", "#d97706"]);
   renderAgendadasPorEspecialidadeEstabTable(filteredAgendados);
+  const searchInput = el("tabelaSearchEspec"), monthSelect = el("tabelaMonthFilterEspec");
+  if (searchInput && !searchInput.dataset.bound) { searchInput.dataset.bound = "1"; searchInput.addEventListener("input", () => renderAgendadasPorEspecialidadeEstabTable(filteredAgendados)); }
+  if (monthSelect && !monthSelect.dataset.bound) { monthSelect.dataset.bound = "1"; monthSelect.addEventListener("change", () => renderAgendadasPorEspecialidadeEstabTable(filteredAgendados)); }
 }
 
 function renderAgendadasPorEspecialidadeEstabTable(filteredAgendados) {
   const tbody = el("tableAgendadasPorEspecEstabBody"); if (!tbody) return;
   const searchTerm = (el("tabelaSearchEspec")?.value || "").toLowerCase();
   const monthFilter = el("tabelaMonthFilterEspec")?.value || "";
-  if (!filteredAgendados.length) { tbody.innerHTML = '<tr><td colspan="8">Nenhum dado disponível</td></tr>'; return; }
+  if (!filteredAgendados.length) { tbody.innerHTML = '<td><td colspan="8">Nenhum dado disponível</td></tr>'; return; }
   const estabelecimentosFixos = ["Belo Horizonte", "Centro Materno Infantil", "Hospital Municipal de Contagem", "Hospital São José", "Hospital Santa Rita"];
   const normalizeEstabName = name => { const nameLower = String(name || "").toLowerCase(); if (nameLower.includes("belo horizonte") || nameLower.includes("bh")) return "Belo Horizonte"; if (nameLower.includes("centro materno") || nameLower.includes("materno infantil")) return "Centro Materno Infantil"; if (nameLower.includes("contagem")) return "Hospital Municipal de Contagem"; if (nameLower.includes("são josé") || nameLower.includes("sao jose")) return "Hospital São José"; if (nameLower.includes("santa rita")) return "Hospital Santa Rita"; return name; };
   const map = new Map();
@@ -818,258 +827,6 @@ function renderTableBodyFisico() {
     if (tInfoFisico) tInfoFisico.innerText = "0 registros"; 
     return; 
   }
-  tbody.innerHTML = rows.map(r => `<tr><td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(truncateLabel(r.estabelecimento, 60))}</td><td>${escapeHtml(r.mes || "-")}</td><td class="text-right">${r.agendados.toLocaleString("pt-BR")}</td><td class="text-right">${r.faturadosQtd.toLocaleString("pt-BR")}</td><td class="text-right">${formatMoney(r.financeiroValor)}</td></tr>`).join("");
-  const tInfoFisico = el("tInfoFisico"); 
-  if (tInfoFisico) tInfoFisico.innerText = `${rows.length.toLocaleString("pt-BR")} registros`;
-}
-
-function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
-  const agendadosEstab = aggregateBy(filteredAgendados, d => d.estabelecimento, d => d.agendados);
-  // CORREÇÃO 3: Ofertas por Estabelecimento deve ser REC + FAL
-  const ofertasEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados + d.faltosos);
-  const recepcionadosEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados);
-  const faltososEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.faltosos);
-  const faturadosQtdEstab = aggregateBy(filteredFaturado, d => d.estabelecimento, d => d.quantidade);
-  const financeiroEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento, d => d.valor);
-  const topAgendados = [...agendadosEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  const topOfertas = [...ofertasEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  const topRecep = [...recepcionadosEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  const topFalt = [...faltososEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  const topFatQtd = [...faturadosQtdEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  const topFinanceiro = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  
-  // CORREÇÃO 2: Aumentar tamanho da fonte nos gráficos
-  makeHorizontalBarChartLarge("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas", false, 13);
-  makeHorizontalBarChartLarge("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas (REC + FAL)", false, 13);
-  makeHorizontalBarChartLarge("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados", false, 13);
-  makeHorizontalBarChartLarge("cFaltososPorEstab", topFalt.map(([k]) => truncateLabel(k, 28)), topFalt.map(([,v]) => v), "#dc2626", "Faltosos", false, 13);
-  makeHorizontalBarChartLarge("cFaturadosPorEstab", topFatQtd.map(([k]) => truncateLabel(k, 28)), topFatQtd.map(([,v]) => v), "#2563eb", "Faturados", false, 13);
-  makeHorizontalBarChartLarge("cFinanceiroPorEstab", topFinanceiro.map(([k]) => truncateLabel(k, 28)), topFinanceiro.map(([,v]) => v), "#059669", "Financeiro", true, 13);
-}
-
-function renderAgendamentosVivver(filteredAgVivver) {
-  const ofertasEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.oferta);
-  const recepEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.recepcionados);
-  const faltEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.faltosos);
-  renderSimpleRankingTable("tableOfertasBody", ofertasEsp, false);
-  renderPercentReferenceTable("tableRecepcionadosVivverBody", recepEsp, ofertasEsp, "#059669");
-  renderPercentReferenceTable("tableFaltososVivverBody", faltEsp, ofertasEsp, "#dc2626");
-}
-
-function renderFila(filteredFila) {
-  const filaEspecialidade = aggregateBy(filteredFila, d => d.especialidade, d => d.fila);
-  const filaProcedimento = aggregateBy(filteredFila, d => d.descricao, d => d.fila);
-  const filaComplexidade = aggregateBy(filteredFila, d => d.complexidade, d => d.fila);
-  const filaSubgrupo = aggregateBy(filteredFila, d => d.subgrupo, d => d.fila);
-  renderPercentageTotalTable("tableFilaEspecialidadeBody", filaEspecialidade, "#2563eb");
-  renderPercentageTotalTable("tableFilaProcedimentoBody", filaProcedimento, "#059669");
-  renderPercentageTotalTable("tableFilaComplexidadeBody", filaComplexidade, "#8b5cf6");
-  renderPercentageTotalTable("tableFilaSubgrupoBody", filaSubgrupo, "#d97706");
-  const complexArr = [...filaComplexidade.entries()].sort((a, b) => b[1] - a[1]);
-  makeDoughnutChartWithPercentages("cFilaComplexidadeRosca", complexArr.map(([k]) => truncateLabel(k || "Sem Dados", 28)), complexArr.map(([,v]) => v), ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626", "#3b82f6", "#059669"]);
-}
-
-function renderFilaRetroativa() {
-  const totalFilaRetroativa = dadosFilaRetroativa.reduce((s, d) => s + d.fila, 0);
-  const kFilaRetroativa = el("kFilaRetroativa");
-  if (kFilaRetroativa) kFilaRetroativa.innerText = totalFilaRetroativa.toLocaleString("pt-BR");
-  
-  const procedimentosUnicos = new Set();
-  dadosFilaRetroativa.forEach(d => {
-    if (d.codigo && d.codigo.trim() !== "") {
-      procedimentosUnicos.add(d.codigo);
-    } else if (d.descricao && d.descricao.trim() !== "") {
-      procedimentosUnicos.add(d.descricao);
-    }
-  });
-  
-  const totalProcedimentos = procedimentosUnicos.size;
-  let mediaPorProcedimento = 0;
-  
-  if (totalProcedimentos > 0) {
-    mediaPorProcedimento = totalFilaRetroativa / totalProcedimentos;
-  } else if (dadosFilaRetroativa.length > 0) {
-    mediaPorProcedimento = totalFilaRetroativa / dadosFilaRetroativa.length;
-  }
-  
-  const mediaElement = el("mediaPorProcedimento");
-  if (mediaElement) {
-    mediaElement.innerText = mediaPorProcedimento.toFixed(2);
-  }
-  
-  const filaRetroativaProcedimento = aggregateBy(dadosFilaRetroativa, d => d.descricao, d => d.fila);
-  const filaRetroativaComplexidade = aggregateBy(dadosFilaRetroativa, d => d.complexidade, d => d.fila);
-  
-  renderPercentageTotalTable("tableFilaRetroativaProcedimentoBody", filaRetroativaProcedimento, "#a855f7");
-  renderPercentageTotalTable("tableFilaRetroativaComplexidadeBody", filaRetroativaComplexidade, "#8b5cf6");
-  
-  const tbodyCompleta = el("tableFilaRetroativaCompletaBody");
-  if (tbodyCompleta) {
-    const searchTerm = (el("searchFilaRetroativa")?.value || "").toLowerCase();
-    let sortedData = [...dadosFilaRetroativa].sort((a, b) => b.fila - a.fila);
-    
-    if (searchTerm) {
-      sortedData = sortedData.filter(d => 
-        (d.especialidade && d.especialidade.toLowerCase().includes(searchTerm)) ||
-        (d.descricao && d.descricao.toLowerCase().includes(searchTerm)) ||
-        (d.codigo && d.codigo.toLowerCase().includes(searchTerm))
-      );
-    }
-    
-    tbodyCompleta.innerHTML = sortedData.map(d => `
-      <tr><td>${escapeHtml(d.codigo || "-")}</td>
-        <td title="${escapeHtml(d.especialidade)}">${escapeHtml(truncateLabel(d.especialidade, 40))}</td>
-        <td title="${escapeHtml(d.descricao)}">${escapeHtml(truncateLabel(d.descricao, 50))}</td>
-        <td>${escapeHtml(d.grupo || "-")}</td>
-        <td>${escapeHtml(d.subgrupo || "-")}</td>
-        <td>${escapeHtml(d.complexidade || "-")}</td>
-        <td class="text-right font-700">${d.fila.toLocaleString("pt-BR")}</td>
-        <td>${escapeHtml(d.dataCorte || "-")}</td>
-      </tr>
-    `).join("");
-  }
-  
-  const searchInput = el("searchFilaRetroativa");
-  if (searchInput && !searchInput.dataset.bound) {
-    searchInput.dataset.bound = "1";
-    searchInput.addEventListener("input", () => renderFilaRetroativa());
-  }
-}
-
-function exportExcel() {
-  if (!currentTableDataFisico.length) { toast("Sem dados para exportar", "info"); return; }
-  const data = currentTableDataFisico.map(r => ({ Estabelecimento: r.estabelecimento, Mes: r.mes, Agendados: r.agendados, Total_Faturado: r.faturadosQtd, Total_Financeiro: r.financeiroValor }));
-  const wb = XLSX.utils.book_new(); const ws = XLSX.utils.json_to_sheet(data);
-  ws["!cols"] = [{ wch: 45 }, { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 22 }];
-  XLSX.utils.book_append_sheet(wb, ws, "Fisico_Financeiro");
-  XLSX.writeFile(wb, `painel_cirurgia_eletiva_${new Date().toISOString().slice(0, 10)}.xlsx`);
-  toast("Excel exportado com sucesso!", "success");
-}
-
-function switchTab(tabId, btn) {
-  document.querySelectorAll(".tabContent").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  const tabContent = el(`tab-${tabId}`);
-  if (tabContent) tabContent.classList.add("active");
-  if (btn) btn.classList.add("active");
-  setTimeout(() => { Object.values(charts).forEach(chart => chart?.resize?.()); }, 120);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM carregado, inicializando painel...");
-  loadAllData();
-  
-  const btnRefresh = el("btnRefresh"); if (btnRefresh) btnRefresh.addEventListener("click", loadAllData);
-  const btnExcel = el("btnExcel"); if (btnExcel) btnExcel.addEventListener("click", exportExcel);
-  const btnClear = el("btnClear");
-  if (btnClear) { 
-    btnClear.addEventListener("click", () => { 
-      selectedSubgrupos.clear(); 
-      selectedEspecialidades.clear(); 
-      const grupoSelect = el("grupoSelect"); if (grupoSelect) grupoSelect.value = ""; 
-      const periodoSelect = el("periodoSelect"); if (periodoSelect) periodoSelect.value = ""; 
-      const tableMonthFilterFisico = el("tableMonthFilterFisico"); if (tableMonthFilterFisico) tableMonthFilterFisico.value = ""; 
-      const tabelaMonthFilterEspec = el("tabelaMonthFilterEspec"); if (tabelaMonthFilterEspec) tabelaMonthFilterEspec.value = ""; 
-      const msSearchSub = el("msSearchSub"); if (msSearchSub) msSearchSub.value = ""; 
-      const msSearchEsp = el("msSearchEsp"); if (msSearchEsp) msSearchEsp.value = ""; 
-      const tSearchFisico = el("tSearchFisico"); if (tSearchFisico) tSearchFisico.value = ""; 
-      const tabelaSearchEspec = el("tabelaSearchEspec"); if (tabelaSearchEspec) tabelaSearchEspec.value = ""; 
-      const searchFilaRetroativa = el("searchFilaRetroativa"); if (searchFilaRetroativa) searchFilaRetroativa.value = ""; 
-      currentTableMonthFilterFisico = ""; 
-      currentChartFilter = null; 
-      buildSubgrupoList(); 
-      buildEspecialidadeList(); 
-      applyFilters(); 
-      renderFilaRetroativa(); 
-      toast("Filtros limpos", "info"); 
-    }); 
-  }
-  
-  const grupoSelect = el("grupoSelect"); if (grupoSelect) grupoSelect.addEventListener("change", () => { buildSubgrupoList(); applyFilters(); renderFilaRetroativa(); });
-  const periodoSelect = el("periodoSelect"); if (periodoSelect) periodoSelect.addEventListener("change", () => { applyFilters(); renderFilaRetroativa(); });
-  const tableMonthFilterFisico = el("tableMonthFilterFisico"); if (tableMonthFilterFisico) tableMonthFilterFisico.addEventListener("change", e => { currentTableMonthFilterFisico = e.target.value || ""; renderTableBodyFisico(); });
-  const tSearchFisico = el("tSearchFisico"); if (tSearchFisico) tSearchFisico.addEventListener("input", renderTableBodyFisico);
-  const tabelaSearchEspec = el("tabelaSearchEspec"); if (tabelaSearchEspec) tabelaSearchEspec.addEventListener("input", () => applyFilters());
-  const tabelaMonthFilterEspec = el("tabelaMonthFilterEspec"); if (tabelaMonthFilterEspec) tabelaMonthFilterEspec.addEventListener("change", () => applyFilters());
-  
-  // Configurar eventos dos tabs
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      const tabId = tab.getAttribute("data-tab");
-      if (tabId) switchTab(tabId, tab);
-    });
-  });
-  
-  // Configurar eventos dos multiselects
-  const msTriggerSub = el("msTriggerSub"); if (msTriggerSub) msTriggerSub.addEventListener("click", (e) => { e.stopPropagation(); const dd = el("msDropdownSub"); if (dd) dd.classList.toggle("open"); });
-  const msTriggerEsp = el("msTriggerEsp"); if (msTriggerEsp) msTriggerEsp.addEventListener("click", (e) => { e.stopPropagation(); const dd = el("msDropdownEsp"); if (dd) dd.classList.toggle("open"); });
-  
-  const msBtnAllSub = el("msBtnAllSub"); if (msBtnAllSub) msBtnAllSub.addEventListener("click", () => { selectedSubgrupos = new Set(getVisibleSubgrupos()); buildSubgrupoList(); applyFilters(); });
-  const msBtnClrSub = el("msBtnClrSub"); if (msBtnClrSub) msBtnClrSub.addEventListener("click", () => { selectedSubgrupos.clear(); buildSubgrupoList(); applyFilters(); });
-  const msBtnAllEsp = el("msBtnAllEsp"); if (msBtnAllEsp) msBtnAllEsp.addEventListener("click", () => { selectedEspecialidades = new Set(getVisibleEspecialidades()); buildEspecialidadeList(); applyFilters(); });
-  const msBtnClrEsp = el("msBtnClrEsp"); if (msBtnClrEsp) msBtnClrEsp.addEventListener("click", () => { selectedEspecialidades.clear(); buildEspecialidadeList(); applyFilters(); });
-  
-  const msSearchSubInput = el("msSearchSub"); if (msSearchSubInput) msSearchSubInput.addEventListener("input", () => { const q = msSearchSubInput.value.toLowerCase(); const list = el("msListSub"); if (list) { list.querySelectorAll(".ms-item").forEach(item => { const text = item.querySelector("span")?.textContent?.toLowerCase() || ""; item.style.display = text.includes(q) ? "" : "none"; }); } });
-  const msSearchEspInput = el("msSearchEsp"); if (msSearchEspInput) msSearchEspInput.addEventListener("input", () => { const q = msSearchEspInput.value.toLowerCase(); const list = el("msListEsp"); if (list) { list.querySelectorAll(".ms-item").forEach(item => { const text = item.querySelector("span")?.textContent?.toLowerCase() || ""; item.style.display = text.includes(q) ? "" : "none"; }); } });
-  
-  document.addEventListener("click", () => { 
-    const ddSub = el("msDropdownSub"); if (ddSub) ddSub.classList.remove("open");
-    const ddEsp = el("msDropdownEsp"); if (ddEsp) ddEsp.classList.remove("open");
-  });
-  
-  // Configurar ordenação da tabela físico x financeiro
-  document.querySelectorAll("#tabelaFisicoFinanceiro th[data-col]").forEach(th => {
-    th.addEventListener("click", () => {
-      const colIndex = parseInt(th.getAttribute("data-col"));
-      sortTableFisico(colIndex);
-    });
-  });
-});
-
-function sortTableFisico(colIndex) {
-  const columns = ["estabelecimento", "mes", "agendados", "faturadosQtd", "financeiroValor"];
-  if (currentSortColumnFisico === colIndex) currentSortDirectionFisico = currentSortDirectionFisico === "asc" ? "desc" : "asc";
-  else { currentSortColumnFisico = colIndex; currentSortDirectionFisico = "asc"; }
-  const col = columns[colIndex];
-  currentTableDataFisico.sort((a, b) => { let va = a[col], vb = b[col]; if (col === "mes") { va = periodoSortValue(va); vb = periodoSortValue(vb); } else if (typeof va === "string") { va = va.toLowerCase(); vb = vb.toLowerCase(); } if (va < vb) return currentSortDirectionFisico === "asc" ? -1 : 1; if (va > vb) return currentSortDirectionFisico === "asc" ? 1 : -1; return 0; });
-  renderTableBodyFisico();
-}
-// Continuação do arquivo script.js
-
-function renderFinTable(filteredFinanceiro) {
-  const wrap = el("finTableWrap"); if (!wrap) return;
-  if (!filteredFinanceiro.length) { wrap.innerHTML = "<div style='padding:20px;text-align:center'>Nenhum dado financeiro</div>"; return; }
-  const periods = getPeriodsFromFilteredData(filteredFinanceiro);
-  const map = new Map();
-  filteredFinanceiro.forEach(d => { const estab = d.estabelecimento || "Não informado"; if (!map.has(estab)) map.set(estab, {}); map.get(estab)[d.mes] = (map.get(estab)[d.mes] || 0) + d.valor; });
-  const rows = [...map.entries()].map(([estab, vals]) => ({ estabelecimento: estab, valores: vals, total: periods.reduce((s, p) => s + (vals[p] || 0), 0) })).sort((a, b) => b.total - a.total);
-  const totalsByMonth = {}; periods.forEach(p => totalsByMonth[p] = 0); rows.forEach(r => periods.forEach(p => totalsByMonth[p] += (r.valores[p] || 0))); const grandTotal = rows.reduce((s, r) => s + r.total, 0);
-  wrap.innerHTML = `<table class="fin-table"><thead><tr><th>Estabelecimento</th>${periods.map(p => `<th>${escapeHtml(p)}</th>`).join("")}<th>Total</th></tr></thead><tbody>${rows.map(r => `<tr><td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(r.estabelecimento)}</td>${periods.map(p => `<td>${(r.valores[p] || 0) > 0 ? formatMoney(r.valores[p]) : "<span class='nt-value'>NT</span>"}</td>`).join("")}<td><strong>${formatMoney(r.total)}</strong></td></tr>`).join("")}<tr class="total-row"><td><strong>TOTAL GERAL</strong></td>${periods.map(p => `<td><strong>${formatMoney(totalsByMonth[p])}</strong></td>`).join("")}<td><strong>${formatMoney(grandTotal)}</strong></td></tr></tbody></table>`;
-}
-
-function renderFisicoFinanceiro(filteredAgendados, filteredFaturado, filteredFinanceiro) {
-  const map = new Map();
-  const addRow = (estabelecimento, mes) => { const key = `${estabelecimento}||${mes}`; if (!map.has(key)) map.set(key, { estabelecimento, mes, agendados: 0, faturadosQtd: 0, financeiroValor: 0 }); return map.get(key); };
-  filteredAgendados.forEach(d => { const row = addRow(d.estabelecimento || "Não informado", d.mes); row.agendados += d.agendados; });
-  filteredFaturado.forEach(d => { const row = addRow(d.estabelecimento || "Não informado", d.mes); row.faturadosQtd += d.quantidade; });
-  filteredFinanceiro.forEach(d => { const row = addRow(d.estabelecimento || "Não informado", d.mes); row.financeiroValor += d.valor; });
-  currentTableDataFisico = [...map.values()].sort((a, b) => b.financeiroValor - a.financeiroValor);
-  renderTableBodyFisico();
-}
-
-function renderTableBodyFisico() {
-  const tbody = el("tBodyFisico"); if (!tbody) return;
-  const q = (el("tSearchFisico")?.value || "").toLowerCase();
-  const month = currentTableMonthFilterFisico;
-  let rows = [...currentTableDataFisico];
-  if (month) rows = rows.filter(r => r.mes === month);
-  if (q) rows = rows.filter(r => `${r.estabelecimento} ${r.mes}`.toLowerCase().includes(q));
-  if (!rows.length) { 
-    tbody.innerHTML = '<tr><td colspan="5">Nenhum dado disponível<tr>'; 
-    const tInfoFisico = el("tInfoFisico"); 
-    if (tInfoFisico) tInfoFisico.innerText = "0 registros"; 
-    return; 
-  }
   tbody.innerHTML = rows.map(r => `
     <tr>
       <td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(truncateLabel(r.estabelecimento, 60))}</td>
@@ -1077,8 +834,8 @@ function renderTableBodyFisico() {
       <td class="text-right">${r.agendados.toLocaleString("pt-BR")}</td>
       <td class="text-right">${r.faturadosQtd.toLocaleString("pt-BR")}</td>
       <td class="text-right">${formatMoney(r.financeiroValor)}</td>
-     `
-  ).join("");
+    </tr>
+  `).join("");
   const tInfoFisico = el("tInfoFisico"); 
   if (tInfoFisico) tInfoFisico.innerText = `${rows.length.toLocaleString("pt-BR")} registros`;
 }
@@ -1099,9 +856,10 @@ function sortTableFisico(colIndex) {
   renderTableBodyFisico();
 }
 
+// CORREÇÃO: Ofertas por Estabelecimento agora usa REC + FAL
 function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
   const agendadosEstab = aggregateBy(filteredAgendados, d => d.estabelecimento, d => d.agendados);
-  // CORREÇÃO: Ofertas por Estabelecimento deve ser REC + FAL
+  // CORREÇÃO: Ofertas = RECEPCIONADOS + FALTOSOS
   const ofertasEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados + d.faltosos);
   const recepcionadosEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados);
   const faltososEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.faltosos);
@@ -1114,7 +872,7 @@ function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFatu
   const topFatQtd = [...faturadosQtdEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFinanceiro = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   
-  // CORREÇÃO: Aumentar tamanho da fonte nos gráficos
+  // CORREÇÃO: Usar função com fontes maiores
   makeHorizontalBarChartLarge("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas", false, 13);
   makeHorizontalBarChartLarge("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas (REC + FAL)", false, 13);
   makeHorizontalBarChartLarge("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados", false, 13);
@@ -1202,8 +960,8 @@ function renderFilaRetroativa() {
         <td>${escapeHtml(d.complexidade || "-")}</td>
         <td class="text-right font-700">${d.fila.toLocaleString("pt-BR")}</td>
         <td>${escapeHtml(d.dataCorte || "-")}</td>
-       `
-    ).join("");
+      </tr>
+    `).join("");
   }
   
   const searchInput = el("searchFilaRetroativa");
