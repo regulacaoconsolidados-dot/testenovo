@@ -112,17 +112,80 @@
   <!-- ABA 4: DADOS POR ESTABELECIMENTO -->
   <section id="tab-consolidado_estabelecimento" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-building"></i></div><div><h3>Dados por Estabelecimento</h3><div class="topic-sub">Distribuição dos principais indicadores por unidade executora</div></div><div class="topic-pill"><i class="fa-solid fa-hospital"></i> Visão comparativa por estabelecimento</div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Agendadas por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cAgendadasPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Ofertas por Estabelecimento (REC + FAL)</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cOfertasPorEstab"></canvas></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Recepcionados por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cRecepcionadosPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Faltosos por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cFaltososPorEstab"></canvas></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Faturados por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cFaturadosPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Financeiro por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cFinanceiroPorEstab"></canvas></div></div></div></section>
 
-  <!-- ABA 5: AGENDAMENTOS VIVVER -->
+   <!-- ABA 5: AGENDAMENTOS VIVVER -->
   <section id="tab-agendamentos_especialidades" class="tabContent">
     <div class="topic-header">
       <div class="topic-header-icon"><i class="fa-solid fa-chart-simple"></i></div>
-      <div><h3>Agendamentos Vivver</h3><div class="topic-sub">Acompanhamento das ofertas, recepcionados e faltosos por especialidade</div></div>
+      <div>
+        <h3>Agendamentos Vivver</h3>
+        <div class="topic-sub">Acompanhamento das ofertas, recepcionados e faltosos por especialidade</div>
+      </div>
       <div class="topic-pill"><i class="fa-solid fa-stethoscope"></i> Monitoramento por especialidade</div>
     </div>
-    <div class="three-tables">
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Ofertas por Especialidade (REC + FAL)</div><div class="table-wrapper"><table class="data-table-simple" id="tableOfertas"><thead><tr><th>Especialidade</th><th class="text-right">Total</th></tr></thead><tbody id="tableOfertasBody"><tr><td colspan="2">Carregando...</td></tr></tbody></table></div></div>
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Recepcionados por Especialidade</div><div class="table-wrapper"><table class="data-table-simple" id="tableRecepcionadosVivver"><thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Referente à Oferta</th></tr></thead><tbody id="tableRecepcionadosVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--danger);"></i> Faltosos por Especialidade</div><div class="table-wrapper"><table class="data-table-simple" id="tableFaltososVivver"><thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Referente à Oferta</th></tr></thead><tbody id="tableFaltososVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+    
+    <!-- LINHA 1: Duas tabelas lado a lado (Ofertas e Recepcionados) -->
+    <div class="two-tables-row">
+      <!-- Tabela Ofertas por Especialidade -->
+      <div class="table-card">
+        <div class="table-title">
+          <div><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Ofertas por Especialidade (REC + FAL)</div>
+        </div>
+        <div class="table-wrapper-vivver">
+          <table class="data-table-vivver" id="tableOfertas">
+            <thead>
+              <tr>
+                <th>Especialidade</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody id="tableOfertasBody">
+              <tr><td colspan="2">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tabela Recepcionados por Especialidade -->
+      <div class="table-card">
+        <div class="table-title">
+          <div><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Recepcionados por Especialidade</div>
+        </div>
+        <div class="table-wrapper-vivver">
+          <table class="data-table-vivver" id="tableRecepcionadosVivver">
+            <thead>
+              <tr>
+                <th>Especialidade</th>
+                <th class="text-right">Total</th>
+                <th style="min-width: 140px;">% da Oferta</th>
+              </tr>
+            </thead>
+            <tbody id="tableRecepcionadosVivverBody">
+              <tr><td colspan="3">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- LINHA 2: Tabela Faltosos por Especialidade (ocupando toda largura) -->
+    <div class="chartCard">
+      <div class="table-title">
+        <div><i class="fa-solid fa-chart-simple" style="color: var(--danger);"></i> Faltosos por Especialidade</div>
+      </div>
+      <div class="table-wrapper" style="max-height: 400px;">
+        <table class="data-table-simple" id="tableFaltososVivver">
+          <thead>
+            <tr>
+              <th>Especialidade</th>
+              <th class="text-right">Total</th>
+              <th style="min-width: 140px;">% da Oferta</th>
+            </tr>
+          </thead>
+          <tbody id="tableFaltososVivverBody">
+            <tr><td colspan="3">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
 
