@@ -758,7 +758,7 @@ function renderAgendadasPorEspecialidadeEstabTable(filteredAgendados) {
   const tbody = el("tableAgendadasPorEspecEstabBody"); if (!tbody) return;
   const searchTerm = (el("tabelaSearchEspec")?.value || "").toLowerCase();
   const monthFilter = el("tabelaMonthFilterEspec")?.value || "";
-  if (!filteredAgendados.length) { tbody.innerHTML = '<td><td colspan="8">Nenhum dado disponível</td></tr>'; return; }
+  if (!filteredAgendados.length) { tbody.innerHTML = '<tr><td colspan="8">Nenhum dado disponível</td></tr>'; return; }
   const estabelecimentosFixos = ["Belo Horizonte", "Centro Materno Infantil", "Hospital Municipal de Contagem", "Hospital São José", "Hospital Santa Rita"];
   const normalizeEstabName = name => { const nameLower = String(name || "").toLowerCase(); if (nameLower.includes("belo horizonte") || nameLower.includes("bh")) return "Belo Horizonte"; if (nameLower.includes("centro materno") || nameLower.includes("materno infantil")) return "Centro Materno Infantil"; if (nameLower.includes("contagem")) return "Hospital Municipal de Contagem"; if (nameLower.includes("são josé") || nameLower.includes("sao jose")) return "Hospital São José"; if (nameLower.includes("santa rita")) return "Hospital Santa Rita"; return name; };
   const map = new Map();
