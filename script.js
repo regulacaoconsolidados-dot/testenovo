@@ -325,7 +325,6 @@ async function loadAllData() {
       }
     });
 
-    // --- Lógica atualizada para a aba "Agendados" com as novas colunas ---
     dadosAgendados = [];
     agendadosRaw.forEach(row => {
       const estabelecimento = normalizeText(getField(row, ["ESTABELECIMENTO", "Estabelecimento"]));
@@ -375,9 +374,7 @@ async function loadAllData() {
         });
       });
     });
-    // --- Fim da lógica atualizada ---
 
-    // Coletar todos os períodos para os filtros
     const allPeriodsCollected = [...dadosFila.map(d => d.dataCorte), ...dadosFilaRetroativa.map(d => d.dataCorte), ...dadosAgendamentosVivver.map(d => d.mes), ...dadosFaturado.map(d => d.mes), ...dadosFinanceiro.map(d => d.mes), ...dadosAgendados.map(d => d.mes)].filter(Boolean);
     allPeriodos = sortPeriodos(allPeriodsCollected);
     console.log("Períodos encontrados:", allPeriodos);
@@ -474,6 +471,7 @@ function createGaugeChart(canvasId, percent, color) {
 
 function applyFilters() {
   console.log("Aplicando filtros...");
+  
   const filteredFila = dadosFila.filter(d => matchBaseWithDimensions(d, true));
   const filteredAgVivver = dadosAgendamentosVivver.filter(d => matchBaseWithDimensions(d, true));
   const filteredAgendados = dadosAgendados.filter(d => matchBaseWithDimensions(d, true));
@@ -489,7 +487,6 @@ function applyFilters() {
   const totalFaturadosQtd = filteredFaturado.reduce((s, d) => s + d.quantidade, 0);
   const totalFinanceiro = filteredFinanceiro.reduce((s, d) => s + d.valor, 0);
   
-  // Card Fila Retroativa (total com filtros)
   const totalFilaRetroativa = dadosFilaRetroativa.reduce((s, d) => s + d.fila, 0);
   const kFilaRetroativaCard = el("kFilaRetroativaCard");
   if (kFilaRetroativaCard) kFilaRetroativaCard.innerText = totalFilaRetroativa.toLocaleString("pt-BR");
@@ -548,7 +545,7 @@ function renderSimpleRankingTable(tbodyId, dataMap, isMoney = false) {
   const tbody = el(tbodyId); if (!tbody) return;
   const arr = [...dataMap.entries()].sort((a, b) => b[1] - a[1]);
   if (!arr.length) { tbody.innerHTML = `<tr><td colspan="2">Nenhum dado disponível</td></tr>`; return; }
-  tbody.innerHTML = arr.map(([name, value]) => `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 55))}</td><td class="text-right font-700">${isMoney ? formatMoney(value) : value.toLocaleString("pt-BR")}</td></tr>`).join("");
+  tbody.innerHTML = arr.map(([name, value]) => `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 55))}</td><td class="text-right font-700">${isMoney ? formatMoney(value) : value.toLocaleString("pt-BR")}</td>`).join("");
 }
 
 function renderPercentReferenceTable(tbodyId, valueMap, referenceMap, color = "#0b5e42") {
@@ -556,7 +553,12 @@ function renderPercentReferenceTable(tbodyId, valueMap, referenceMap, color = "#
   const arr = [...valueMap.entries()].sort((a, b) => b[1] - a[1]);
   if (!arr.length) { tbody.innerHTML = `<tr><td colspan="3">Nenhum dado disponível</td></tr>`; return; }
   const maxValue = arr[0][1] || 1;
-  tbody.innerHTML = arr.map(([name, value]) => { const ref = referenceMap.get(name) || 0; const percent = ref > 0 ? ((value / ref) * 100) : 0; const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0; return `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 45))}</td><td class="text-right font-700">${value.toLocaleString("pt-BR")}</td><td><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">${percent > 0 ? `<span>${percent.toFixed(1)}%</span>` : ""}</div></div></td></tr>`; }).join("");
+  tbody.innerHTML = arr.map(([name, value]) => { 
+    const ref = referenceMap.get(name) || 0; 
+    const percent = ref > 0 ? ((value / ref) * 100) : 0; 
+    const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0; 
+    return `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 45))}</td><td class="text-right font-700">${value.toLocaleString("pt-BR")}</td><td><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">${percent > 0 ? `<span style="font-size: 11px; font-weight: 800;">${percent.toFixed(1)}%</span>` : ""}</div></div></td>`);
+  }).join("");
 }
 
 function renderPercentageTotalTable(tbodyId, dataMap, color = "#0b5e42") {
@@ -565,15 +567,19 @@ function renderPercentageTotalTable(tbodyId, dataMap, color = "#0b5e42") {
   const total = arr.reduce((s, [,v]) => s + v, 0);
   const maxValue = arr[0]?.[1] || 1;
   if (!arr.length) { tbody.innerHTML = `<tr><td colspan="3">Nenhum dado disponível</td></tr>`; return; }
-  tbody.innerHTML = arr.map(([name, value]) => { const percent = total > 0 ? (value / total) * 100 : 0; const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0; return `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 55))}</td><td class="text-right font-700">${value.toLocaleString("pt-BR")}</td><td><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">${percent > 0 ? `<span>${percent.toFixed(1)}%</span>` : ""}</div></div></td></tr>`; }).join("");
+  tbody.innerHTML = arr.map(([name, value]) => { 
+    const percent = total > 0 ? (value / total) * 100 : 0; 
+    const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0; 
+    return `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 55))}</td><td class="text-right font-700">${value.toLocaleString("pt-BR")}</td><td><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">${percent > 0 ? `<span style="font-size: 11px; font-weight: 800;">${percent.toFixed(1)}%</span>` : ""}</div></div></td>`);
+  }).join("");
 }
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
-function makeHorizontalBarChart(id, labels, values, color, datasetLabel, isMoney = false, dataLabelFontSize = 11) {
+function makeHorizontalBarChart(id, labels, values, color, datasetLabel, isMoney = false, dataLabelFontSize = 12) {
   const canvas = el(id); if (!canvas) return;
   destroyChart(id);
-  charts[id] = new Chart(canvas.getContext("2d"), { type: "bar", data: { labels, datasets: [{ label: datasetLabel, data: values, backgroundColor: color, borderRadius: 8, barPercentage: 0.72, categoryPercentage: 0.82 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", layout: { padding: { top: 8, right: 24, bottom: 8, left: 8 } }, plugins: { legend: { display: true, position: "top", labels: { font: { weight: "bold", size: 12 } } }, tooltip: { callbacks: { label: ctx => isMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } }, datalabels: { color: "#ffffff", font: { weight: "bold", size: dataLabelFontSize }, anchor: "center", align: "center", formatter: value => { if (!value) return ""; return isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); } } }, scales: { x: { beginAtZero: true, grid: { color: "rgba(148,163,184,0.10)" }, ticks: { font: { weight: "bold", size: 10 }, callback: value => isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } }, y: { grid: { display: false }, ticks: { font: { weight: "bold", size: 10 } } } } } });
+  charts[id] = new Chart(canvas.getContext("2d"), { type: "bar", data: { labels, datasets: [{ label: datasetLabel, data: values, backgroundColor: color, borderRadius: 8, barPercentage: 0.72, categoryPercentage: 0.82 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", layout: { padding: { top: 8, right: 24, bottom: 8, left: 8 } }, plugins: { legend: { display: true, position: "top", labels: { font: { weight: "bold", size: 13 } } }, tooltip: { callbacks: { label: ctx => isMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } }, datalabels: { color: "#ffffff", font: { weight: "bold", size: dataLabelFontSize }, anchor: "center", align: "center", formatter: value => { if (!value) return ""; return isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); } } }, scales: { x: { beginAtZero: true, grid: { color: "rgba(148,163,184,0.10)" }, ticks: { font: { weight: "bold", size: 11 }, callback: value => isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } }, y: { grid: { display: false }, ticks: { font: { weight: "bold", size: 11 } } } } } });
 }
 
 function makeDoughnutChartWithPercentages(id, labels, values, colors) {
@@ -653,7 +659,7 @@ function renderAgendadasPorEspecialidadeEstabTable(filteredAgendados) {
   const totalsByEstab = { "Belo Horizonte": 0, "Centro Materno Infantil": 0, "Hospital Municipal de Contagem": 0, "Hospital São José": 0, "Hospital Santa Rita": 0 };
   let grandTotal = 0;
   rows.forEach(row => { estabelecimentosFixos.forEach(estab => { totalsByEstab[estab] += row.valores[estab]; }); grandTotal += row.total; });
-  tbody.innerHTML = rows.map(r => `<tr><td title="${escapeHtml(r.especialidade)}">${escapeHtml(truncateLabel(r.especialidade, 35))}</td><td>${escapeHtml(r.mes)}</td><td class="text-right">${r.valores["Belo Horizonte"].toLocaleString("pt-BR")}</td><td class="text-right">${r.valores["Centro Materno Infantil"].toLocaleString("pt-BR")}</td><td class="text-right">${r.valores["Hospital Municipal de Contagem"].toLocaleString("pt-BR")}</td><td class="text-right">${r.valores["Hospital São José"].toLocaleString("pt-BR")}</td><td class="text-right">${r.valores["Hospital Santa Rita"].toLocaleString("pt-BR")}</td><td class="text-right font-800" style="background:#f0fdfa;">${r.total.toLocaleString("pt-BR")}</td></tr>`).join("") + `<tr class="total-row"><td colspan="2" class="font-800">TOTAL GERAL</td><td class="text-right font-800">${totalsByEstab["Belo Horizonte"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${totalsByEstab["Centro Materno Infantil"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${totalsByEstab["Hospital Municipal de Contagem"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${totalsByEstab["Hospital São José"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${totalsByEstab["Hospital Santa Rita"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${grandTotal.toLocaleString("pt-BR")}</td></tr>`;
+  tbody.innerHTML = rows.map(r => `<tr><td title="${escapeHtml(r.especialidade)}">${escapeHtml(truncateLabel(r.especialidade, 35))}</td><td>${escapeHtml(r.mes)}</td><td class="text-right">${r.valores["Belo Horizonte"].toLocaleString("pt-BR")}</td><td class="text-right">${r.valores["Centro Materno Infantil"].toLocaleString("pt-BR")}</td><td class="text-right">${r.valores["Hospital Municipal de Contagem"].toLocaleString("pt-BR")}</td><td class="text-right">${r.valores["Hospital São José"].toLocaleString("pt-BR")}</td><td class="text-right">${r.valores["Hospital Santa Rita"].toLocaleString("pt-BR")}</td><td class="text-right font-800" style="background:#f0fdfa;">${r.total.toLocaleString("pt-BR")}</td>`).join("") + `<tr class="total-row"><td colspan="2" class="font-800">TOTAL GERAL</td><td class="text-right font-800">${totalsByEstab["Belo Horizonte"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${totalsByEstab["Centro Materno Infantil"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${totalsByEstab["Hospital Municipal de Contagem"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${totalsByEstab["Hospital São José"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${totalsByEstab["Hospital Santa Rita"].toLocaleString("pt-BR")}</td><td class="text-right font-800">${grandTotal.toLocaleString("pt-BR")}</td>`);
 }
 
 function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues) {
@@ -681,27 +687,12 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
 }
 
 function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
-  // CORREÇÃO: Incorporar dados retroativos na evolução da fila
-  // Combinar dados da fila principal com os dados retroativos para ter uma visão completa
-  const combinedFilaData = [...filteredFila, ...dadosFilaRetroativa];
-  
-  // Obter todos os períodos disponíveis (meses e datas de corte)
-  const allPeriodsFromData = getPeriodsFromFilteredData(combinedFilaData, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
-  
-  // Se não houver períodos, usar um array vazio
-  const periods = allPeriodsFromData.length ? allPeriodsFromData : [];
-  
-  console.log("Períodos para visão geral (incluindo dados retroativos):", periods);
-  
-  // Agora usar os dados combinados para a fila
-  const filaPorMes = aggregateBy(combinedFilaData, d => d.dataCorte, d => d.fila);
+  const periods = getPeriodsFromFilteredData(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
+  const filaPorMes = aggregateBy(filteredFila, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
   
-  console.log("Dados de fila por mês (combinados):", filaPorMes);
-  
-  // Renderizar o gráfico de evolução com os dados combinados
   renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
   
   const agendadosPorMes = aggregateBy(filteredAgendados, d => d.mes, d => d.agendados);
@@ -796,7 +787,7 @@ function sortTableFisico(colIndex) {
 
 function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
   const agendadosEstab = aggregateBy(filteredAgendados, d => d.estabelecimento, d => d.agendados);
-  const ofertasEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.oferta);
+  const ofertasEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados + d.faltosos);
   const recepcionadosEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados);
   const faltososEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.faltosos);
   const faturadosQtdEstab = aggregateBy(filteredFaturado, d => d.estabelecimento, d => d.quantidade);
@@ -807,12 +798,13 @@ function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFatu
   const topFalt = [...faltososEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFatQtd = [...faturadosQtdEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFinanceiro = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  makeHorizontalBarChart("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas");
-  makeHorizontalBarChart("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas");
-  makeHorizontalBarChart("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados");
-  makeHorizontalBarChart("cFaltososPorEstab", topFalt.map(([k]) => truncateLabel(k, 28)), topFalt.map(([,v]) => v), "#dc2626", "Faltosos");
-  makeHorizontalBarChart("cFaturadosPorEstab", topFatQtd.map(([k]) => truncateLabel(k, 28)), topFatQtd.map(([,v]) => v), "#2563eb", "Faturados");
-  makeHorizontalBarChart("cFinanceiroPorEstab", topFinanceiro.map(([k]) => truncateLabel(k, 28)), topFinanceiro.map(([,v]) => v), "#059669", "Financeiro", true);
+  
+  makeHorizontalBarChart("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas", false, 13);
+  makeHorizontalBarChart("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas", false, 13);
+  makeHorizontalBarChart("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados", false, 13);
+  makeHorizontalBarChart("cFaltososPorEstab", topFalt.map(([k]) => truncateLabel(k, 28)), topFalt.map(([,v]) => v), "#dc2626", "Faltosos", false, 13);
+  makeHorizontalBarChart("cFaturadosPorEstab", topFatQtd.map(([k]) => truncateLabel(k, 28)), topFatQtd.map(([,v]) => v), "#2563eb", "Faturados", false, 13);
+  makeHorizontalBarChart("cFinanceiroPorEstab", topFinanceiro.map(([k]) => truncateLabel(k, 28)), topFinanceiro.map(([,v]) => v), "#059669", "Financeiro", true, 13);
 }
 
 function renderAgendamentosVivver(filteredAgVivver) {
@@ -843,7 +835,6 @@ function renderFilaRetroativa() {
   const kFilaRetroativa = el("kFilaRetroativa");
   if (kFilaRetroativa) kFilaRetroativa.innerText = totalFilaRetroativa.toLocaleString("pt-BR");
   
-  // Cálculo da média por procedimento
   const procedimentosUnicos = new Set();
   dadosFilaRetroativa.forEach(d => {
     if (d.codigo && d.codigo.trim() !== "") {
