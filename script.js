@@ -673,40 +673,150 @@ function getPeriodsFromFilteredData(...groups) {
 }
 
 function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
-  const canvas = el("cEvolucao"); if (!canvas) return;
+  const canvas = el("cEvolucao");
+  if (!canvas) return;
   destroyChart("cEvolucao");
-  
-  const filaData = periods.map(p => filaPorMes.get(p) || 0);
-  const ofertaData = periods.map(p => ofertaPorMes.get(p) || 0);
-  const recepData = periods.map(p => recepcionadosPorMes.get(p) || 0);
-  const faltaData = periods.map(p => faltososPorMes.get(p) || 0);
-  
-  charts.cEvolucao = new Chart(canvas.getContext("2d"), { 
-    data: { 
-      labels: periods, 
+  charts.cEvolucao = new Chart(canvas.getContext("2d"), {
+    data: {
+      labels: periods,
       datasets: [
-        { type: "bar", label: "Ofertas", data: ofertaData, backgroundColor: "rgba(37,99,235,0.22)", borderColor: "#2563eb", borderWidth: 1.5, borderRadius: 10, yAxisID: "y", order: 4 },
-        { type: "line", label: "Fila de Espera", data: filaData, borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y1", order: 1 },
-        { type: "line", label: "Recepcionados", data: recepData, borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 2 },
-        { type: "line", label: "Faltosos", data: faltaData, borderColor: "#d97706", backgroundColor: "rgba(217,119,6,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#d97706", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 3 }
-      ] 
-    }, 
-    options: { 
-      responsive: true, 
-      maintainAspectRatio: false, 
-      interaction: { mode: "index", intersect: false }, 
-      layout: { padding: { top: 24, right: 16, bottom: 10, left: 10 } }, 
-      plugins: { 
-        legend: { position: "top", labels: { usePointStyle: true, pointStyle: "circle", font: { weight: "bold", size: 12 } } }, 
-        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } }, 
-        datalabels: { color: ctx => ctx.dataset.borderColor || "#111827", font: { weight: "bold", size: 10 }, formatter: value => { if (!value) return ""; return value.toLocaleString("pt-BR"); }, align: ctx => ctx.dataset.type === "bar" ? "end" : "top", anchor: ctx => ctx.dataset.type === "bar" ? "end" : "end", offset: 6, clamp: true } 
-      }, 
-      scales: { 
-        x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } }, 
-        y: { beginAtZero: true, position: "left", grace: "10%", grid: { display: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Oferta / Recepcionados / Faltosos", font: { weight: "bold" } } }, 
-        y1: { beginAtZero: true, position: "right", grace: "10%", grid: { display: false, drawOnChartArea: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Fila de Espera", font: { weight: "bold" } } } 
-      } 
-    } 
+        {
+          type: "bar",
+          label: "Ofertas",
+          data: periods.map(p => ofertaPorMes.get(p) || 0),
+          backgroundColor: "rgba(37,99,235,0.22)",
+          borderColor: "#2563eb",
+          borderWidth: 1.5,
+          borderRadius: 10,
+          yAxisID: "y",
+          order: 4
+        },
+        {
+          type: "line",
+          label: "Fila de Espera",
+          data: periods.map(p => filaPorMes.get(p) || 0),
+          borderColor: "#dc2626",
+          backgroundColor: "rgba(220,38,38,0.10)",
+          borderWidth: 3,
+          fill: false,
+          tension: 0.28,
+          pointBackgroundColor: "#ffffff",
+          pointBorderColor: "#dc2626",
+          pointBorderWidth: 2.5,
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          yAxisID: "y1",
+          order: 1
+        },
+        {
+          type: "line",
+          label: "Recepcionados",
+          data: periods.map(p => recepcionadosPorMes.get(p) || 0),
+          borderColor: "#059669",
+          backgroundColor: "rgba(5,150,105,0.10)",
+          borderWidth: 3,
+          fill: false,
+          tension: 0.28,
+          pointBackgroundColor: "#ffffff",
+          pointBorderColor: "#059669",
+          pointBorderWidth: 2.5,
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          yAxisID: "y",
+          order: 2
+        },
+        {
+          type: "line",
+          label: "Faltosos",
+          data: periods.map(p => faltososPorMes.get(p) || 0),
+          borderColor: "#d97706",
+          backgroundColor: "rgba(217,119,6,0.10)",
+          borderWidth: 3,
+          fill: false,
+          tension: 0.28,
+          pointBackgroundColor: "#ffffff",
+          pointBorderColor: "#d97706",
+          pointBorderWidth: 2.5,
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          yAxisID: "y",
+          order: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      layout: { padding: { top: 24, right: 16, bottom: 10, left: 10 } },
+      plugins: {
+        legend: {
+          position: "top",
+          labels: {
+            usePointStyle: true,
+            pointStyle: "circle",
+            font: { weight: "bold", size: 12 }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}`
+          }
+        },
+        datalabels: {
+          color: ctx => ctx.dataset.borderColor || "#111827",
+          font: { weight: "bold", size: 10 },
+          formatter: value => {
+            if (!value) return "";
+            return value.toLocaleString("pt-BR");
+          },
+          align: ctx => ctx.dataset.type === "bar" ? "end" : "top",
+          anchor: ctx => ctx.dataset.type === "bar" ? "end" : "end",
+          offset: 6,
+          clamp: true
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: {
+            font: { weight: "bold" },
+            maxRotation: 0,
+            autoSkip: false
+          }
+        },
+        y: {
+          beginAtZero: true,
+          position: "left",
+          grace: "10%",
+          grid: { display: false },
+          ticks: {
+            font: { weight: "bold" },
+            callback: value => value.toLocaleString("pt-BR")
+          },
+          title: {
+            display: true,
+            text: "Oferta / Recepcionados / Faltosos",
+            font: { weight: "bold" }
+          }
+        },
+        y1: {
+          beginAtZero: true,
+          position: "right",
+          grace: "10%",
+          grid: { display: false, drawOnChartArea: false },
+          ticks: {
+            font: { weight: "bold" },
+            callback: value => value.toLocaleString("pt-BR")
+          },
+          title: {
+            display: true,
+            text: "Fila de Espera",
+            font: { weight: "bold" }
+          }
+        }
+      }
+    }
   });
 }
 
@@ -856,10 +966,10 @@ function sortTableFisico(colIndex) {
   renderTableBodyFisico();
 }
 
-// CORREÇÃO: Ofertas por Estabelecimento agora usa REC + FAL
+// Ofertas por Estabelecimento agora usa REC + FAL
 function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
   const agendadosEstab = aggregateBy(filteredAgendados, d => d.estabelecimento, d => d.agendados);
-  // CORREÇÃO: Ofertas = RECEPCIONADOS + FALTOSOS
+  // Ofertas = RECEPCIONADOS + FALTOSOS
   const ofertasEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados + d.faltosos);
   const recepcionadosEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados);
   const faltososEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.faltosos);
@@ -872,7 +982,7 @@ function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFatu
   const topFatQtd = [...faturadosQtdEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFinanceiro = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   
-  // CORREÇÃO: Usar função com fontes maiores
+  // função com fontes maiores
   makeHorizontalBarChartLarge("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas", false, 13);
   makeHorizontalBarChartLarge("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas (REC + FAL)", false, 13);
   makeHorizontalBarChartLarge("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados", false, 13);
