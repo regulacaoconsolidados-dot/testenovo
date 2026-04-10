@@ -1,181 +1,287 @@
-// script.js
-(function() {
-  'use strict';
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  // Dados estáticos de Telefones Úteis e Links Importantes
-  const TELEFONES_DATA = {
-    title: 'Telefones Úteis',
-    icon: 'fa-phone-alt',
-    links: [
-      { text: 'Telefones Ceaps', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/CEAPS_TELEFONES.html' },
-      { text: 'Telefones Iria Diniz', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_IRIA_DINIZ.html' },
-      { text: 'Telefones CCE´s e Outros', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_CCE_OUTROS.html' },
-      { text: 'Telefones Diversos', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_DIVERSOS.html' },
-      { text: 'Telefones – Todas as Unidades', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_UNIDADES_DE_CONTAGEM.html' },
-      { text: 'Telefones Todos os Distritos', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/DISTRITOS_CONTATOS.html' },
-      { text: 'Telefones Upas', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/UPA_TELEFONES.html' }
-    ]
-  };
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f3f4f6;
+  color: #1f2937;
+  line-height: 1.5;
+}
 
-  const IMPORTANTES_DATA = {
-    title: 'Links Importantes',
-    icon: 'fa-link',
-    links: [
-      { text: 'Sistema Vivver', url: 'https://www.contagem-mg.vivver.com/desktop' },
-      { text: 'Notas Técnicas Diretoria de Regulação', url: 'https://portal.contagem.mg.gov.br/nota-tecnica' },
-      { text: 'Prefeitura de Contagem', url: 'https://portal.contagem.mg.gov.br/' },
-      { text: 'Portal da Secretaria de Saude Contagem', url: 'https://portal.contagem.mg.gov.br/secretaria-de-saude' },
-      { text: 'Portal do Servidor', url: 'https://portal.contagem.mg.gov.br/portal/paginas-dinamicas-categoria/15/' },
-      { text: 'Aplicativos /Contagem', url: 'https://geoprocessamento.contagem.mg.gov.br/portal/apps/sites/#/geocontagem' },
-      { text: 'Aqui tem /Remédio', url: 'https://geoprocessamento.contagem.mg.gov.br/portal/apps/experiencebuilder/experience/?id=1cc51ed1bb7546e092ecad2935cc425d' },
-      { text: 'Endereço das /Unidades', url: 'https://portal.contagem.mg.gov.br/atencao-primaria' },
-      { text: 'Equipamentos da Saúde de Contagem', url: 'https://geoprocessamento.contagem.mg.gov.br/portal/apps/webappviewer/index.html?id=a29dd6c9d5944c51998c3ffa1efe0c70' },
-      { text: 'CadWeb', url: 'https://cadastro.saude.gov.br/segcartao/?contextType=external&username=string&contextValue=%2Foam&password=sercure_string&challenge_url=https%3A%2F%2Fcadastro.saude.gov.br%2Fsegcartao&request_id=-8519814493389994660&authn_try_count=0&locale=es_ES&resource_url' },
-      { text: 'Pesquisa do CNS', url: 'https://cnesadm.datasus.gov.br/cnesadm/publico/usuarios/cadastro' },
-      { text: 'Pesquisa por endereço', url: 'https://app.powerbi.com/view?r=eyJrIjoiYTRiZDcyZWYtMzAwNS00NmYyLTk3N2EtYWEwYTk2NTFhMmY1IiwidCI6ImFlODYzMzdlLTU3NWUtNDMzMC05NDc2LTkzZGU2ODJiMDAyMCJ9' },
-      { text: 'E gestor', url: 'https://egestoraps.saude.gov.br/' },
-      { text: 'Cnes', url: 'https://cnes.datasus.gov.br/pages/estabelecimentos/consulta.jsp' },
-      { text: 'Tabela Sigtap', url: 'http://sigtap.datasus.gov.br/tabela-unificada/app/sec/inicio.jsp' },
-      { text: 'Siscan', url: 'https://siscan.saude.gov.br/login.jsf' },
-      { text: 'Esus Notifica', url: 'https://notifica.saude.gov.br/login' },
-      { text: 'CRM', url: 'https://crmmg.org.br/' }
-    ]
-  };
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
 
-  function criarSection(data) {
-    const section = document.createElement('section');
-    section.className = 'category-section';
-    section.innerHTML = `
-      <h2 class="category-title"><i class="fas ${data.icon}"></i> ${data.title}</h2>
-      <div class="links-grid">
-        ${data.links.map(link => `
-          <a href="${link.url}" class="link-button" target="_blank" rel="noopener">
-            <i class="fas fa-external-link-alt"></i>
-            <span>${link.text}</span>
-          </a>
-        `).join('')}
-      </div>
-    `;
-    return section;
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1e3a8a, #1e40af);
+  color: white;
+  padding: 25px 0;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo-section i {
+  font-size: 48px;
+  color: #93c5fd;
+}
+
+.main-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #bfdbfe;
+  margin-bottom: 8px;
+}
+
+.h-meta {
+  font-size: 14px;
+  color: #e2e8f0;
+}
+
+.right-section {
+  text-align: right;
+}
+
+.slogan {
+  font-style: italic;
+  font-size: 18px;
+  color: #fef9c3;
+  max-width: 400px;
+}
+
+/* Tabs Navigation */
+.tabs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 30px 0 20px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 4px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 12px 12px 0 0;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.tab-btn i {
+  font-size: 18px;
+}
+
+.tab-btn:hover {
+  background-color: #eef2ff;
+  color: #1e3a8a;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #1e3a8a;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+  border-bottom: 3px solid #1e3a8a;
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Search dentro da aba */
+.tab-search-section {
+  margin-bottom: 24px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 40px;
+  padding: 8px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  max-width: 500px;
+  border: 1px solid #e2e8f0;
+  transition: box-shadow 0.2s;
+}
+
+.search-box:focus-within {
+  box-shadow: 0 4px 12px rgba(30,58,138,0.15);
+  border-color: #93c5fd;
+}
+
+.search-box i {
+  color: #9ca3af;
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  padding: 14px 0;
+  background: transparent;
+}
+
+/* Categories Grid */
+.categories-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.category-section {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  border: 1px solid #f0f2f5;
+  transition: box-shadow 0.2s;
+}
+
+.category-section:hover {
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+}
+
+.category-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #eef2ff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-title i {
+  font-size: 22px;
+  color: #2563eb;
+}
+
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.link-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  color: #1e293b;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.link-button:hover {
+  background-color: #1e3a8a;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(30, 58, 138, 0.2);
+  border-color: #1e3a8a;
+}
+
+.link-button i {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+  color: #2563eb;
+}
+
+.link-button:hover i {
+  color: white;
+}
+
+.primary-button {
+  background: linear-gradient(145deg, #eef2ff, #ffffff);
+  border-left: 4px solid #1e3a8a;
+}
+
+.link-button.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  background: #f3f4f6;
+}
+
+/* Footer */
+.footer {
+  background-color: #1f2937;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 40px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    text-align: center;
   }
-
-  // Injeta os blocos fixos em todas as abas
-  function injectPermanentSections() {
-    const containers = document.querySelectorAll('.tab-content .categories-grid');
-    containers.forEach(grid => {
-      // Remove placeholders antigos se existirem
-      const existing = grid.querySelectorAll('[data-permanent]');
-      existing.forEach(el => el.remove());
-
-      const telefonesSection = criarSection(TELEFONES_DATA);
-      telefonesSection.setAttribute('data-permanent', 'telefones');
-      const importantesSection = criarSection(IMPORTANTES_DATA);
-      importantesSection.setAttribute('data-permanent', 'importantes');
-
-      grid.appendChild(telefonesSection);
-      grid.appendChild(importantesSection);
-    });
+  .logo-section {
+    flex-direction: column;
+    text-align: center;
   }
-
-  // Sistema de abas
-  function initTabs() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const contents = document.querySelectorAll('.tab-content');
-
-    function switchTab(tabId) {
-      contents.forEach(c => c.classList.remove('active'));
-      tabBtns.forEach(b => b.classList.remove('active'));
-
-      const target = document.getElementById(`tab-${tabId}`);
-      const activeBtn = Array.from(tabBtns).find(b => b.dataset.tab === tabId);
-      if (target) target.classList.add('active');
-      if (activeBtn) activeBtn.classList.add('active');
-    }
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tabId = btn.dataset.tab;
-        switchTab(tabId);
-        // Limpa busca da aba anterior
-        document.querySelectorAll('.tab-search-input').forEach(i => i.value = '');
-        // Mostra todos os elementos novamente
-        const activeGrid = document.querySelector('.tab-content.active .categories-grid');
-        if (activeGrid) {
-          activeGrid.querySelectorAll('.category-section').forEach(s => s.style.display = 'block');
-          activeGrid.querySelectorAll('.link-button').forEach(l => l.style.display = 'flex');
-        }
-      });
-    });
+  .right-section {
+    text-align: center;
   }
-
-  // Busca inteligente por aba
-  function initSearch() {
-    const searchInputs = document.querySelectorAll('.tab-search-input');
-
-    function performSearch(input) {
-      const term = input.value.toLowerCase().trim();
-      const tabContent = input.closest('.tab-content');
-      if (!tabContent) return;
-
-      const sections = tabContent.querySelectorAll('.category-section');
-      const allLinks = tabContent.querySelectorAll('.link-button');
-
-      if (term === '') {
-        sections.forEach(s => s.style.display = 'block');
-        allLinks.forEach(l => l.style.display = 'flex');
-        return;
-      }
-
-      sections.forEach(section => {
-        const title = section.querySelector('.category-title')?.textContent.toLowerCase() || '';
-        const links = section.querySelectorAll('.link-button');
-        let sectionHasVisible = false;
-
-        links.forEach(link => {
-          const text = link.textContent.toLowerCase();
-          if (text.includes(term) || title.includes(term)) {
-            link.style.display = 'flex';
-            sectionHasVisible = true;
-          } else {
-            link.style.display = 'none';
-          }
-        });
-
-        section.style.display = sectionHasVisible || title.includes(term) ? 'block' : 'none';
-      });
-    }
-
-    searchInputs.forEach(input => {
-      input.addEventListener('input', () => performSearch(input));
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          input.value = '';
-          performSearch(input);
-          input.blur();
-        }
-      });
-    });
+  .slogan {
+    margin: 0 auto;
   }
-
-  // Efeito sutil nos botões
-  function initButtonEffects() {
-    document.addEventListener('click', function(e) {
-      const btn = e.target.closest('.link-button');
-      if (btn && !btn.classList.contains('disabled')) {
-        btn.style.transform = 'scale(0.98)';
-        setTimeout(() => btn.style.transform = '', 120);
-      }
-    });
+  .links-grid {
+    grid-template-columns: 1fr;
   }
-
-  // Inicialização
-  function init() {
-    injectPermanentSections();
-    initTabs();
-    initSearch();
-    initButtonEffects();
-    console.log('✅ Portal Ferramentas Administrativas carregado');
+  .tabs-nav {
+    justify-content: center;
   }
-
-  document.addEventListener('DOMContentLoaded', init);
-})();
+  .tab-btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
