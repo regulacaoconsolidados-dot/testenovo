@@ -62,13 +62,17 @@
   function injectPermanentSections() {
     const containers = document.querySelectorAll('.tab-content .categories-grid');
     containers.forEach(grid => {
-      const telefonesSection = criarSection(TELEFONES_DATA);
-      telefonesSection.setAttribute('data-permanent', 'telefones');
-      const importantesSection = criarSection(IMPORTANTES_DATA);
-      importantesSection.setAttribute('data-permanent', 'importantes');
-
-      grid.appendChild(telefonesSection);
-      grid.appendChild(importantesSection);
+      // Verifica se já foram adicionados para evitar duplicação
+      if (!grid.querySelector('[data-permanent="telefones"]')) {
+        const telefonesSection = criarSection(TELEFONES_DATA);
+        telefonesSection.setAttribute('data-permanent', 'telefones');
+        grid.appendChild(telefonesSection);
+      }
+      if (!grid.querySelector('[data-permanent="importantes"]')) {
+        const importantesSection = criarSection(IMPORTANTES_DATA);
+        importantesSection.setAttribute('data-permanent', 'importantes');
+        grid.appendChild(importantesSection);
+      }
     });
   }
 
@@ -91,64 +95,67 @@
       btn.addEventListener('click', () => {
         const tabId = btn.dataset.tab;
         switchTab(tabId);
-        // Limpa busca da aba anterior
-        document.querySelectorAll('.tab-search-input').forEach(i => i.value = '');
-        // Mostra todos os elementos novamente
-        const activeGrid = document.querySelector('.tab-content.active .categories-grid');
-        if (activeGrid) {
-          activeGrid.querySelectorAll('.category-section').forEach(s => s.style.display = 'block');
-          activeGrid.querySelectorAll('.link-button').forEach(l => l.style.display = 'flex');
-        }
       });
     });
   }
 
-  // Busca inteligente por aba
-  function initSearch() {
-    const searchInputs = document.querySelectorAll('.tab-search-input');
+  // Busca GLOBAL (centralizada) que filtra em todas as abas dinamicamente
+  function initGlobalSearch() {
+    const globalSearchInput = document.querySelector('.global-search-input');
+    if (!globalSearchInput) return;
 
-    function performSearch(input) {
-      const term = input.value.toLowerCase().trim();
-      const tabContent = input.closest('.tab-content');
-      if (!tabContent) return;
-
-      const sections = tabContent.querySelectorAll('.category-section');
-      const allLinks = tabContent.querySelectorAll('.link-button');
-
+    function performGlobalSearch() {
+      const term = globalSearchInput.value.toLowerCase().trim();
+      const allTabContents = document.querySelectorAll('.tab-content');
+      
+      // Se não houver termo, mostra todas as seções e links normalmente
       if (term === '') {
-        sections.forEach(s => s.style.display = 'block');
-        allLinks.forEach(l => l.style.display = 'flex');
+        allTabContents.forEach(tabContent => {
+          const sections = tabContent.querySelectorAll('.category-section');
+          const allLinks = tabContent.querySelectorAll('.link-button');
+          sections.forEach(s => s.style.display = 'block');
+          allLinks.forEach(l => l.style.display = 'flex');
+        });
         return;
       }
 
-      sections.forEach(section => {
-        const title = section.querySelector('.category-title')?.textContent.toLowerCase() || '';
-        const links = section.querySelectorAll('.link-button');
-        let sectionHasVisible = false;
+      // Itera sobre cada aba para aplicar o filtro
+      allTabContents.forEach(tabContent => {
+        const sections = tabContent.querySelectorAll('.category-section');
+        let tabHasVisibleItems = false;
 
-        links.forEach(link => {
-          const text = link.textContent.toLowerCase();
-          if (text.includes(term) || title.includes(term)) {
-            link.style.display = 'flex';
-            sectionHasVisible = true;
-          } else {
-            link.style.display = 'none';
-          }
+        sections.forEach(section => {
+          const title = section.querySelector('.category-title')?.textContent.toLowerCase() || '';
+          const links = section.querySelectorAll('.link-button');
+          let sectionHasVisible = false;
+
+          links.forEach(link => {
+            const text = link.textContent.toLowerCase();
+            if (text.includes(term) || title.includes(term)) {
+              link.style.display = 'flex';
+              sectionHasVisible = true;
+              tabHasVisibleItems = true;
+            } else {
+              link.style.display = 'none';
+            }
+          });
+
+          // Mostra a seção se ela tiver links visíveis ou o título corresponder
+          section.style.display = (sectionHasVisible || title.includes(term)) ? 'block' : 'none';
         });
 
-        section.style.display = sectionHasVisible || title.includes(term) ? 'block' : 'none';
+        // Opcional: você pode esconder abas vazias, mas por enquanto mantemos
+        // Apenas garantimos que se não houver itens, a aba fica sem conteúdo visível
       });
     }
 
-    searchInputs.forEach(input => {
-      input.addEventListener('input', () => performSearch(input));
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          input.value = '';
-          performSearch(input);
-          input.blur();
-        }
-      });
+    globalSearchInput.addEventListener('input', performGlobalSearch);
+    globalSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        globalSearchInput.value = '';
+        performGlobalSearch();
+        globalSearchInput.blur();
+      }
     });
   }
 
@@ -167,7 +174,7 @@
   function init() {
     injectPermanentSections();
     initTabs();
-    initSearch();
+    initGlobalSearch(); // Substitui a busca por aba
     initButtonEffects();
     console.log('✅ Portal Ferramentas Administrativas carregado com sucesso!');
   }
