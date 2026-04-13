@@ -2,198 +2,243 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>Painel Cirurgia Eletiva — Diretoria de Regulação do Acesso</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ferramentas Administrativas - Diretoria de Regulação do Acesso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-<header class="header">
-  <div class="h-icon"><i class="fa-solid fa-kit-medical"></i></div>
-  <div class="h-info">
-    <div class="h-title">Diretoria de Regulação do Acesso</div>
-    <div class="h-sub">Painel Cirurgia Eletiva | Análise Estratégica</div>
-    <div class="h-meta">
-      Superintendente: <b>Yara Ariane M. S. Souza</b>
-      &nbsp;•&nbsp; Diretora: <b>Paloma Morais</b>
-      &nbsp;•&nbsp; Desenvolvido por <b>Ana P. A. Silva — Matric. 201704</b>
-    </div>
-    <div class="lastUpdate" id="lastUpdate">Carregando dados...</div>
-  </div>
-  <div class="h-actions">
-    <button class="btn" id="btnRefresh"><i class="fa-solid fa-rotate"></i> Atualizar</button>
-    <button class="btn btn-excel" id="btnExcel"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
-  </div>
-</header>
-
-<div class="loading" id="loading"></div>
-<div class="toastBox" id="toastBox"></div>
-
-<main class="wrap">
-  <div class="card filters">
-    <div class="filtersTop">
-      <div class="filtersTitle"><i class="fa-solid fa-sliders" style="color: var(--primary)"></i> Filtros dinâmicos</div>
-      <button class="btn-clear" id="btnClear"><i class="fa-solid fa-eraser"></i> Limpar filtros</button>
-    </div>
-    <div class="filtersGrid">
-      <div class="fg"><label><i class="fa-solid fa-layer-group"></i> Grupo SIGTAP</label><select id="grupoSelect"><option value="">Todos os grupos</option></select></div>
-      <div class="fg-subgrupo"><label><i class="fa-solid fa-code-branch"></i> Subgrupo SIGTAP</label>
-        <div class="multiselect-wrapper" id="msWrapperSub">
-          <div class="ms-trigger" id="msTriggerSub"><span class="ms-label-text" id="msLabelSub">Todos</span><i class="fa-solid fa-chevron-down ms-arrow"></i></div>
-          <div class="ms-dropdown" id="msDropdownSub">
-            <div class="ms-actions"><button class="ms-btn-all" id="msBtnAllSub">Selecionar todos</button><button class="ms-btn-clr" id="msBtnClrSub">Limpar</button></div>
-            <div class="ms-search-box"><input type="text" id="msSearchSub" placeholder="Buscar subgrupo..."></div>
-            <div class="ms-list" id="msListSub"></div>
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo-section">
+          <i class="fas fa-hospital"></i>
+          <div class="title-section">
+            <h1 class="main-title">Ferramentas Administrativas</h1>
+            <p class="subtitle">Diretoria de Regulação do Acesso</p>
+            <div class="h-meta">
+              Superintendente: <b style="color:#bfdbfe">Yara Ariane M.S.Souza</b>
+              &nbsp;•&nbsp; Diretora: <b style="color:#bfdbfe">Paloma Morais</b>
+              &nbsp;•&nbsp; Desenvolvido por <b style="color:#bfdbfe">Ana P. A. Silva — Matric. 201704</b>
+            </div>
+          </div>
+        </div>
+        <div class="right-section">
+          <div class="slogan">
+            <p>"Nenhum de nós é tão bom quanto todos nós juntos!"</p>
           </div>
         </div>
       </div>
-      <div class="fg"><label><i class="fa-solid fa-tag"></i> Especialidade</label>
-        <div class="multiselect-wrapper" id="msWrapperEsp">
-          <div class="ms-trigger" id="msTriggerEsp"><span class="ms-label-text" id="msLabelEsp">Todos</span><i class="fa-solid fa-chevron-down ms-arrow"></i></div>
-          <div class="ms-dropdown" id="msDropdownEsp">
-            <div class="ms-actions"><button class="ms-btn-all" id="msBtnAllEsp">Selecionar todos</button><button class="ms-btn-clr" id="msBtnClrEsp">Limpar</button></div>
-            <div class="ms-search-box"><input type="text" id="msSearchEsp" placeholder="Buscar especialidade..."></div>
-            <div class="ms-list" id="msListEsp"></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <!-- SEÇÃO DE PESQUISA CENTRALIZADA -->
+      <div class="global-search-section">
+        <div class="search-box centered-search">
+          <i class="fas fa-search"></i>
+          <input type="text" class="global-search-input" placeholder="Buscar ferramentas, painéis ou documentos...">
+        </div>
+      </div>
+
+      <div class="tabs-container">
+        <div class="tabs-nav">
+          <button class="tab-btn active" data-tab="oci">
+            <i class="fas fa-stethoscope"></i> OCI
+          </button>
+          <button class="tab-btn" data-tab="consultas">
+            <i class="fas fa-user-md"></i> Consultas Especializadas
+          </button>
+          <button class="tab-btn" data-tab="cirurgia">
+            <i class="fas fa-procedures"></i> Cirurgia Eletiva
+          </button>
+          <button class="tab-btn" data-tab="exames">
+            <i class="fas fa-microscope"></i> Média Complexidade (Exames)
+          </button>
+          <button class="tab-btn" data-tab="cardiologia">
+            <i class="fas fa-heartbeat"></i> Cardiologia
+          </button>
+        </div>
+
+        <!-- ABA OCI -->
+        <div class="tab-content active" id="tab-oci">
+          <div class="categories-grid">
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél OCI</h2>
+              <div class="links-grid">
+                <a href="https://regulacaoconsolidados-dot.github.io/ociconsolidado/" class="link-button primary-button" target="_blank" rel="noopener">
+                  <i class="fas fa-chart-bar"></i><span>Painél OCI</span>
+                </a>
+                <a href="https://docs.google.com/spreadsheets/d/1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo/edit?gid=2108990586#gid=2108990586" class="link-button" target="_blank" rel="noopener">
+                  <i class="fas fa-database"></i><span>Banco de dados que alimenta o Painél</span>
+                </a>
+              </div>
+            </section>
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-database"></i> Banco de Dados - Consolidar OCI</h2>
+              <div class="links-grid">
+                <a href="https://prefeituracontagem-my.sharepoint.com/:x:/r/personal/hassan_zibaoui_contagem_mg_gov_br/_layouts/15/Doc.aspx?sourcedoc=%7Bd7b85dc9-61af-4ea9-bb7f-b542e5c4d850%7D&action=default&CID=6ac5c827-af01-49ea-9fa3-689fed995aa7&_SRM=2%3AE%3A10" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Planilha OCI</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268" class="link-button" target="_blank" rel="noopener"><i class="fas fa-heart"></i><span>OCI Cardiologia 1° versão</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268" class="link-button" target="_blank" rel="noopener"><i class="fas fa-heart"></i><span>OCI Cardiologia 2026</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1cQzwM6L9omcZVG7routPTSE3fZSQId31w-A6y4Sc24c/edit?gid=621858947#gid=621858947" class="link-button" target="_blank" rel="noopener"><i class="fas fa-female"></i><span>OCI Mama 1° versão</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1U14Nf5EOiz8PI5H6tnYZAUeZzfUM43unywXFEwWBTAQ/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-female"></i><span>OCI Mama 2026</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1G1YHRyt4ILeYMAM-yK_eYZi4wtHaMqwnuQWDeihhmIA/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-uterus"></i><span>OCI Utero 1° versão</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/17ifFIdWqHq3COeEBJifq6keumcWz-ppr9d4uSPhCBow/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-uterus"></i><span>OCI Utero 2026</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1PAaIUxgFU8CE3pFGzHG4OCAdtSHNrVIXc8suaPAXI50/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-bone"></i><span>OCI Ortopedia</span></a>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- ABA CONSULTAS ESPECIALIZADAS -->
+        <div class="tab-content" id="tab-consultas">
+          <div class="categories-grid">
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-code-branch"></i> Fluxos CMC</h2>
+              <div class="links-grid">
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/ESPECIALIDADES.html"  class="link-button primary-button" target="_blank" rel="noopener">
+                  <i class="fas fa-chart-bar"></i><span>Listas das Especialidades</span>
+                </a>
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/resumo_fluxos.html" class="link-button primary-button" target="_blank" rel="noopener">
+                  <i class="fas fa-chart-bar"></i><span>Resumo dos Fluxos Especialidades</span>
+                </a>
+                <a href="https://portal.contagem.mg.gov.br/nota-tecnica" class="link-button primary-button" target="_blank" rel="noopener">
+                  <i class="fas fa-chart-bar"></i><span>Notas Técnicas Diretoria de Regulação</span>
+                </a>
+              </div>
+            </section>
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-hourglass-half"></i> Painéis Pendências</h2>
+              <div class="links-grid">
+                <a href="https://compartilhacmc-commits.github.io/pendenciasgeral/" class="link-button primary-button" target="_blank" rel="noopener">
+                  <i class="fas fa-chart-bar"></i><span>Pendências Geral</span>
+                </a>
+                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Eldorado</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Sede</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritovargemdasflores/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Vargem das Flores</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritonacional/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Nacional</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritoressaca/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Ressaca</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritoindustrial/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Industrial</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritopetrolandia/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Petrolândia</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritoriacho/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Riacho</span></a>
+              </div>
+            </section>
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-calendar-check"></i> Painél Agendamentos Geral</h2>
+              <div class="info-note">
+                <i class="fas fa-sync-alt"></i>
+                <span>Atualizado sempre após o dia 11 de cada mês - Agendamento da Fila para o próximo mês</span>
+              </div>
+              <div class="links-grid">
+                <a href="https://compartilhacmc-commits.github.io/consolidadoagendados/" class="link-button primary-button" target="_blank" rel="noopener">
+                  <i class="fas fa-chart-bar"></i><span>Painél Agendamentos Geral</span>
+                </a>
+                <a href="https://docs.google.com/spreadsheets/d/14DiFK9EW36s8ntkukyhiRMJxcX0ghG5XTzWb1TwpI2Q/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél</span></a>
+              </div>
+            </section>
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-calendar-alt"></i> Painél Agendamentos Mês Atual e Próximo Mês</h2>
+              <div class="info-note">
+                <i class="fas fa-sync-alt"></i>
+                <span>Atualizado sempre após o dia 11 de cada mês - Agendamento da Fila para o próximo mês</span>
+              </div>
+              <div class="links-grid">
+                <a href="https://compartilhacmc-commits.github.io/ofertacmc/" class="link-button primary-button" target="_blank" rel="noopener">
+                  <i class="fas fa-chart-bar"></i><span>Painél Controle Agendamentos Diários</span>
+                </a>
+                <a href="https://docs.google.com/spreadsheets/d/1puNbYysRBj-5CY6fhnHNnYd9OH96cl7guMFBOLeYZV4/edit?gid=1698493941#gid=1698493941" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél</span></a>
+              </div>
+            </section>
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-sitemap"></i> Páginas CMC - Versão para os Distritos</h2>
+              <div class="links-grid">
+                <a href="https://compartilhacmc-commits.github.io/p-ginadistritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Eldorado</span></a>
+                <a href="https://compartilhacmc-commits.github.io/paginadistritonacional/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Nacional</span></a>
+                <a href="https://compartilhacmc-commits.github.io/paginadistritopetrolandia/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Petrolândia</span></a>
+                <a href="https://compartilhacmc-commits.github.io/paginasede/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Sede</span></a>
+                <a href="https://compartilhacmc-commits.github.io/paginadistritoressaca/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Ressaca</span></a>
+                <a href="https://compartilhacmc-commits.github.io/paginadistritoriacho/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Riacho</span></a>
+                <a href="https://compartilhacmc-commits.github.io/paginadistritoindustrial/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Industrial</span></a>
+                <a href="https://compartilhacmc-commits.github.io/paginadistritovargem/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Vargem</span></a>
+              </div>
+            </section>
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-laptop-medical"></i> Feluma</h2>
+              <div class="links-grid">
+                <a href="https://portal.contagem.mg.gov.br/imgeditor/file/Regula%C3%A7%C3%A3o/Central%20de%20marca%C3%A7%C3%A3o/NT%2025%20-%202025%20-%20Regula%C3%A7%C3%A3o%20de%20Consultas%20Especializadas%20via%20sistema%20VIVVER.pdf" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i><span>NT-25/2025 – Teleconsultoria Regulação</span></a>
+                <a href="https://portal.contagem.mg.gov.br/central-de-marcacao-de-consultas/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-medical-alt"></i><span>Notas Técnicas – Diretoria de Regulação</span></a>
+                <a href="https://portal-feluma.sydle.com/home" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Para Acessar a Plataforma – Clique Aqui</span></a>
+                <a href="https://www.youtube.com/watch?v=1UdBOCDlIvA" class="link-button" target="_blank" rel="noopener"><i class="fab fa-youtube"></i><span>Para Assistir o Tutorial – Youtube (3min.)</span></a>
+                <a href="https://forms.office.com/pages/responsepage.aspx?id=6TkneO0BV0yBmaJIQh4A4v7lUCKmmeREvVUmW50PDW5UMzRaUlRFRjI0N01LMERVWjdPQlY5ODlUWS4u&route=shorturl" class="link-button" target="_blank" rel="noopener"><i class="fas fa-user-plus"></i><span>Ainda sem cadastro? Preencha – Clique Aqui</span></a>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- ABA CIRURGIA ELETIVA -->
+        <div class="tab-content" id="tab-cirurgia">
+          <div class="categories-grid">
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél Cirurgia Eletiva</h2>
+              <div class="links-grid">
+                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaseletivas/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva</span></a>
+                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaeletivadiretoria/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva Diretoria</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1yX5uIgoUNqXJDG6hYxOLjZfYueviAa6M/edit?gid=1716569787#gid=1716569787" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél cirurgias eletivas</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1ax8ZpVRSZnDkTm_T1GY37ybSgrlP_8Rk/edit?gid=1716569787#gid=1716569787" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél cirurgias eletivas diretoria</span></a>
+              </div>
+            </section>
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-table"></i> Planilhas para Consolidar os Dados</h2>
+              <div class="links-grid">
+                <a href="https://docs.google.com/spreadsheets/d/1QE3yWrmgUm_EyzOG5zC7GB_XOH5k2IXEO9r0XabW4Bo/edit?gid=537625325#gid=537625325" class="link-button" target="_blank" rel="noopener"><i class="fas fa-list-ol"></i><span>Fila de espera cirurgia eletiva</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1ainEQfcuZxWGBgWfjJpzh6TbljRMkgKAvrNOJSyTLls/edit?gid=1545210975#gid=1545210975" class="link-button" target="_blank" rel="noopener"><i class="fas fa-calendar"></i><span>Consolidado 2025</span></a>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- ABA EXAMES MÉDIA COMPLEXIDADE -->
+        <div class="tab-content" id="tab-exames">
+          <div class="categories-grid">
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-folder-open"></i> Arquivos Exames</h2>
+              <div class="links-grid">
+                <a href="https://docs.google.com/spreadsheets/d/1s_HDG2-eBdYVaHdw_4e2q2ORuUePdZuLJQmIT7Z-esI/edit?pli=1&gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-ban"></i><span>Exames sem prestador</span></a>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- ABA CARDIOLOGIA -->
+        <div class="tab-content" id="tab-cardiologia">
+          <div class="categories-grid">
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél Cardiologia</h2>
+              <div class="links-grid">
+                <a href="#" class="link-button disabled" target="_blank" rel="noopener" onclick="return false;"><i class="fas fa-chart-bar"></i><span>Painél Cardiologia (em construção)</span></a>
+                <a href="#" class="link-button disabled" target="_blank" rel="noopener" onclick="return false;"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél (em construção)</span></a>
+              </div>
+            </section>
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-table"></i> Planilhas para Consolidar os Dados</h2>
+              <div class="links-grid">
+                <a href="#" class="link-button disabled" target="_blank" rel="noopener" onclick="return false;"><i class="fas fa-spinner"></i><span>Em breve</span></a>
+              </div>
+            </section>
           </div>
         </div>
       </div>
-      <div class="fg"><label><i class="fa-solid fa-calendar"></i> Período</label><select id="periodoSelect"><option value="">Todos os meses</option></select></div>
     </div>
-  </div>
+  </main>
 
-  <div class="kpis">
-    <div class="kpi kpi-fila kpi-principal"><div class="kpiIcon"><i class="fa-solid fa-clock"></i></div><div><div class="label">Fila de Espera Atual</div><div class="val" id="kFila">0</div><div class="sub" id="dataCorteInfo">Carregando...</div></div></div>
-    <div class="kpi kpi-fila-retroativa"><div class="kpiIcon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><div class="label">Fila Retroativa/2025</div><div class="val" id="kFilaRetroativaCard">0</div><div class="sub" id="dataCorteRetroativaInfoCard">Carregando...</div></div></div>
-    <div class="kpi kpi-agendados-total"><div class="kpiIcon"><i class="fa-solid fa-calendar-check"></i></div><div><div class="label">Cirurgias Agendadas</div><div class="val" id="kAgendadosTotal">0</div><div class="sub" id="subAgendados">Carregando...</div></div></div>
-    <div class="kpi kpi-real"><div class="kpiIcon"><i class="fa-solid fa-hospital-user"></i></div><div><div class="label">Cirurgias Recepcionadas</div><div class="val" id="kRecepcionados">0</div><div class="sub" id="subRecepcionados">Carregando...</div></div></div>
-    <div class="kpi kpi-falt"><div class="kpiIcon"><i class="fa-solid fa-user-slash"></i></div><div><div class="label">Faltosos</div><div class="val" id="kFaltosos">0</div><div class="sub" id="subFaltosos">Carregando...</div></div></div>
-    <div class="kpi kpi-faturados-qtd"><div class="kpiIcon"><i class="fa-solid fa-file-invoice"></i></div><div><div class="label">Faturados (Qtd)</div><div class="val" id="kFaturadosQtd">0</div><div class="sub" id="subFaturadosQtd">Carregando...</div></div></div>
-    <div class="kpi kpi-fat"><div class="kpiIcon"><i class="fa-solid fa-coins"></i></div><div><div class="label">Financeiro (R$)</div><div class="val" id="kFinanceiro">R$ 0</div><div class="sub" id="subFinanceiro">Carregando...</div></div></div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="visao_geral"><i class="fa-solid fa-chart-pie"></i> VISÃO GERAL</button>
-    <button class="tab" data-tab="financeiro"><i class="fa-solid fa-coins"></i> FINANCEIRO</button>
-    <button class="tab" data-tab="fisico_financeiro"><i class="fa-solid fa-database"></i> FÍSICO X FINANCEIRO</button>
-    <button class="tab" data-tab="consolidado_estabelecimento"><i class="fa-solid fa-building"></i> DADOS POR ESTABELECIMENTO</button>
-    <button class="tab" data-tab="agendamentos_especialidades"><i class="fa-solid fa-chart-simple"></i> AGENDAMENTOS VIVVER</button>
-    <button class="tab" data-tab="demanda_reprimida"><i class="fa-solid fa-hourglass-half"></i> FILA DE ESPERA ATUAL</button>
-    <button class="tab" data-tab="fila_retroativa"><i class="fa-solid fa-clock-rotate-left"></i> FILA RETROATIVA 2025</button>
-  </div>
-
-  <!-- ABA 1: VISÃO GERAL -->
-  <section id="tab-visao_geral" class="tabContent active">
-    <div class="topic-header">
-      <div class="topic-header-icon"><i class="fa-solid fa-chart-pie"></i></div>
-      <div><h3>Visão Geral</h3><div class="topic-sub">Panorama consolidado dos principais indicadores</div></div>
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Diretoria de Regulação do Acesso. Todos os direitos reservados.</p>
     </div>
-    <div class="indicadores-row">
-      <div class="gauge-card"><div class="gauge-head"><h3>Taxa de Faturamento</h3></div><div class="gauge-chart-wrap"><canvas id="cGaugeFat"></canvas><div class="gauge-overlay"><div class="gauge-pct-big" id="gaugeFatPct">—</div></div></div><div id="gaugeFatBadge" class="gauge-badge">—</div></div>
-      <div class="gauge-card"><div class="gauge-head"><h3>Índice de Absenteísmo</h3></div><div class="gauge-chart-wrap"><canvas id="cGaugeAbs"></canvas><div class="gauge-overlay"><div class="gauge-pct-big" id="gaugeAbsPct">—</div></div></div><div id="gaugeAbsBadge" class="gauge-badge">—</div></div>
-    </div>
-    <div class="chartCard"><div class="chartHead"><h3>Evolução mensal</h3></div><div class="chartWrap"><canvas id="cEvolucao"></canvas></div></div>
-  </section>
+  </footer>
 
-  <!-- ABA 2: FINANCEIRO -->
-  <section id="tab-financeiro" class="tabContent">
-    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-coins"></i></div><div><h3>Financeiro</h3><div class="topic-sub">Análise financeira consolidada</div></div></div>
-    <div class="chartCard"><div class="chartHead"><h3>Financeiro por Competência</h3></div><div class="chartWrap"><canvas id="cFaturamentoMensal"></canvas></div></div>
-  </section>
-
-  <!-- ABA 3: FÍSICO X FINANCEIRO -->
-  <section id="tab-fisico_financeiro" class="tabContent">
-    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-database"></i></div><div><h3>Físico x Financeiro</h3></div></div>
-    <div class="chartCard"><div class="table-title">Físico x Financeiro</div><div class="table-container-fisico"><table class="data-table-fisico" id="tabelaFisicoFinanceiro"><thead><tr><th>Estabelecimento</th><th>Mês</th><th>Agendados</th><th>Faturados</th><th>Financeiro</th></tr></thead><tbody id="tBodyFisico"><tr><td colspan="5">Carregando...</td></tr></tbody></table></div></div>
-  </section>
-
-  <!-- ABA 4: DADOS POR ESTABELECIMENTO -->
-  <section id="tab-consolidado_estabelecimento" class="tabContent">
-    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-building"></i></div><div><h3>Dados por Estabelecimento</h3></div></div>
-    <div class="row2eq"><div class="chartCard"><div class="chartWrap"><canvas id="cAgendadasPorEstab"></canvas></div></div><div class="chartCard"><div class="chartWrap"><canvas id="cOfertasPorEstab"></canvas></div></div></div>
-  </section>
-
-  <!-- ABA 5: AGENDAMENTOS VIVVER (CORRIGIDA) -->
-  <section id="tab-agendamentos_especialidades" class="tabContent">
-    <div class="topic-header">
-      <div class="topic-header-icon"><i class="fa-solid fa-chart-simple"></i></div>
-      <div><h3>Agendamentos Vivver</h3><div class="topic-sub">Acompanhamento por especialidade e subgrupo</div></div>
-    </div>
-
-    <!-- LINHA 1: Recepcionados + Faltosos lado a lado -->
-    <div class="two-tables-large">
-      <div class="chartCard table-large">
-        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Recepcionados por Especialidade</div>
-        <div class="table-wrapper-large">
-          <table class="data-table-modern" id="tableRecepcionadosVivver">
-            <thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:140px">% da Oferta</th></tr></thead>
-            <tbody id="tableRecepcionadosVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="chartCard table-large">
-        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--danger);"></i> Faltosos por Especialidade</div>
-        <div class="table-wrapper-large">
-          <table class="data-table-modern" id="tableFaltososVivver">
-            <thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:140px">% da Oferta</th></tr></thead>
-            <tbody id="tableFaltososVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- LINHA 2: Ofertas com cabeçalho congelado -->
-    <div class="chartCard table-ofertas">
-      <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Ofertas por Especialidade (REC + FAL)</div>
-      <div class="table-wrapper-sticky">
-        <table class="data-table-ofertas" id="tableOfertas">
-          <thead><tr><th>Especialidade</th><th class="text-right">Recepcionados</th><th class="text-right">Faltosos</th><th class="text-right">Total</th></tr></thead>
-          <tbody id="tableOfertasBody"><tr><td colspan="4">Carregando...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- LINHA 3: Nova tabela por Subgrupo -->
-    <div class="chartCard table-subgrupo">
-      <div class="table-title"><i class="fa-solid fa-code-branch" style="color: var(--secondary);"></i> Recepcionados e Faltosos por Subgrupo</div>
-      <div class="table-wrapper-sticky">
-        <table class="data-table-subgrupo" id="tableSubgrupo">
-          <thead><tr><th>Subgrupo</th><th class="text-right">Recepcionados</th><th class="text-right">Faltosos</th><th class="text-right">Oferta (REC+FAL)</th></tr></thead>
-          <tbody id="tableSubgrupoBody"><tr><td colspan="4">Carregando...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ABA 6: FILA DE ESPERA ATUAL -->
-  <section id="tab-demanda_reprimida" class="tabContent">
-    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-hourglass-half"></i></div><div><h3>Fila de Espera Atual</h3></div></div>
-    <div class="row2eq">
-      <div class="chartCard"><div class="table-title">Top Especialidades</div><div class="table-wrapper"><table class="data-table-simple" id="tableFilaEspecialidade"><thead><tr><th>Especialidade</th><th>Total</th><th>%</th></tr></thead><tbody id="tableFilaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
-      <div class="chartCard"><div class="table-title">Fila por Subgrupo</div><div class="table-wrapper"><table class="data-table-simple" id="tableFilaSubgrupo"><thead><tr><th>Subgrupo</th><th>Total</th><th>%</th></tr></thead><tbody id="tableFilaSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
-    </div>
-  </section>
-
-  <!-- ABA 7: FILA RETROATIVA -->
-  <section id="tab-fila_retroativa" class="tabContent">
-    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><h3>Fila Retroativa 2025</h3></div></div>
-    <div class="kpi-row">
-      <div class="kpi kpi-principal"><div><div class="label">Total Fila Retroativa</div><div class="val" id="kFilaRetroativa">0</div></div></div>
-      <div class="media-card"><div class="media-label">Média por Procedimento</div><div class="media-value" id="mediaPorProcedimento">0</div></div>
-    </div>
-    <div class="chartCard"><div class="table-title">Detalhamento Completo</div><div class="table-wrapper"><table class="data-table-detailed" id="tableFilaRetroativaCompleta"><thead><tr><th>Especialidade</th><th>Procedimento</th><th>Subgrupo</th><th>Total</th></tr></thead><tbody id="tableFilaRetroativaCompletaBody"><tr><td colspan="4">Carregando...</td></tr></tbody></table></div></div>
-  </section>
-</main>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
