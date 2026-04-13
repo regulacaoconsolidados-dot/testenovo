@@ -73,7 +73,7 @@ function parseNumberBR(value) {
   if (value == null) return 0;
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
   let s = String(value).trim();
-  if (!s || /^sem dados$/i.test(s) || s === "-" || s === "NT") return 0;
+  if (!s || /^sem dados$/i.test(s) || s === "-" || s === "NT" || s === "") return 0;
   s = s.replace(/\s/g, "").replace(/R\$/gi, "");
   const hasComma = s.includes(",");
   const hasDot = s.includes(".");
@@ -160,6 +160,96 @@ async function loadCSVSmart(url, expectedHeaders = []) {
   return dataRows.map(row => { const obj = {}; headers.forEach((header, idx) => { if (header) obj[header] = row?.[idx] ?? ""; }); return obj; }).filter(obj => Object.values(obj).some(v => normalizeText(v) !== ""));
 }
 
+// FUNÇÃO ESPECÍFICA PARA PLANILHA FATURADO (cabeçalho na linha 2)
+async function loadFaturadoSheet() {
+  const response = await fetch(URL_FATURADO, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Falha HTTP ${response.status}`);
+  const text = await response.text();
+  const parsed = Papa.parse(text, { skipEmptyLines: false });
+  const rawRows = parsed.data || [];
+  
+  console.log("Faturado - linhas brutas:", rawRows.length);
+  
+  // Cabeçalho está na linha 2 (índice 1)
+  const headers = (rawRows[1] || []).map(h => normalizeText(h));
+  console.log("Faturado - cabeçalho encontrado:", headers.slice(0, 8));
+  
+  // Dados começam na linha 3 (índice 2)
+  const dataRows = rawRows.slice(2);
+  
+  const result = [];
+  for (const row of dataRows) {
+    const obj = {};
+    headers.forEach((header, idx) => {
+      if (header) obj[header] = row?.[idx] ?? "";
+    });
+    
+    // Verifica se tem pelo menos um valor de mês preenchido
+    let hasMonthValue = false;
+    for (const key of Object.keys(obj)) {
+      if (key.match(/^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\/\d{2}$/)) {
+        const val = parseNumberBR(obj[key]);
+        if (val > 0) {
+          hasMonthValue = true;
+          break;
+        }
+      }
+    }
+    
+    if (hasMonthValue) {
+      result.push(obj);
+    }
+  }
+  
+  console.log("Faturado - linhas com dados:", result.length);
+  return result;
+}
+
+// FUNÇÃO ESPECÍFICA PARA PLANILHA FINANCEIRO (cabeçalho na linha 2)
+async function loadFinanceiroSheet() {
+  const response = await fetch(URL_FINANCEIRO, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Falha HTTP ${response.status}`);
+  const text = await response.text();
+  const parsed = Papa.parse(text, { skipEmptyLines: false });
+  const rawRows = parsed.data || [];
+  
+  console.log("Financeiro - linhas brutas:", rawRows.length);
+  
+  // Cabeçalho está na linha 2 (índice 1)
+  const headers = (rawRows[1] || []).map(h => normalizeText(h));
+  console.log("Financeiro - cabeçalho encontrado:", headers.slice(0, 8));
+  
+  // Dados começam na linha 3 (índice 2)
+  const dataRows = rawRows.slice(2);
+  
+  const result = [];
+  for (const row of dataRows) {
+    const obj = {};
+    headers.forEach((header, idx) => {
+      if (header) obj[header] = row?.[idx] ?? "";
+    });
+    
+    // Verifica se tem pelo menos um valor de mês preenchido
+    let hasMonthValue = false;
+    for (const key of Object.keys(obj)) {
+      if (key.match(/^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\/\d{2}$/)) {
+        const val = parseNumberBR(obj[key]);
+        if (val > 0) {
+          hasMonthValue = true;
+          break;
+        }
+      }
+    }
+    
+    if (hasMonthValue) {
+      result.push(obj);
+    }
+  }
+  
+  console.log("Financeiro - linhas com dados:", result.length);
+  return result;
+}
+
 function extractGrupoCodigo(grupoTexto) { const match = String(grupoTexto || "").match(/^(\d{2})/); return match ? match[1] : ""; }
 function extractSubgrupoCodigo(subgrupoTexto) { const match = String(subgrupoTexto || "").match(/^(\d{4})/); return match ? match[1] : ""; }
 function addMapSet(map, key, value) { if (!key || !value) return; if (!map.has(key)) map.set(key, new Set()); map.get(key).add(value); }
@@ -183,14 +273,17 @@ async function loadAllData() {
   if (loadingEl) loadingEl.classList.add("on");
   try {
     console.log("Iniciando carregamento dos dados...");
+    
+    // Carregar todas as planilhas
     const [filaRaw, filaRetroativaRaw, agVivverRaw, faturadoRaw, financeiroRaw, agendadosRaw] = await Promise.all([
       loadCSVSmart(URL_FILA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "TOTAL", "Data Corte"]),
       loadCSVSmart(URL_FILA_RETROATIVA, ["Código do Procedimento", "Especialidade", "Descrição do Procedimento", "Grupo", "Subgrupo", "Complexidade- Sigtap", "TOTAL", "Data Corte/ Fila de Espera"]),
       loadCSVSmart(URL_AGENDAMENTOS_VIVVER, ["CÓDIGO DO PROCEDIMENTO", "PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE", "COMPLEXIDADE", "MÊS", "FAL", "REC", "OFERTA"]),
-      loadCSVSmart(URL_FATURADO, ["Procedimento Descrição", "GRUPO", "SUB GRUPO", "ESTABELECIMENTO", "Especialidade Descrição"]),
-      loadCSVSmart(URL_FINANCEIRO, ["PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE"]),
+      loadFaturadoSheet(),  // ← FUNÇÃO CORRIGIDA
+      loadFinanceiroSheet(), // ← FUNÇÃO CORRIGIDA
       loadCSVSmart(URL_AGENDADOS, ["ESTABELECIMENTO", "ESPECIALIDADE", "Grupo Sigtap", "Sub Grupo Sigtap"])
     ]);
+    
     console.log("Dados carregados:", { 
       fila: filaRaw.length, 
       filaRetroativa: filaRetroativaRaw.length, 
@@ -282,6 +375,7 @@ async function loadAllData() {
       return { codigo: normalizeText(getField(r, ["CÓDIGO DO PROCEDIMENTO"])), descricao: normalizeText(getField(r, ["PROCEDIMENTO DESCRIÇÃO"])), especialidade, estabelecimento, grupo: grupoRaw || (GRUPOS_SIGTAP[grupoCodigo] || ""), grupoCodigo, subgrupo: subgrupoRaw, subgrupoCodigo, complexidade: normalizeText(getField(r, ["COMPLEXIDADE"])), mes: mesNorm, faltosos, recepcionados, oferta };
     }).filter(d => d.especialidade || d.descricao);
 
+    // PROCESSAR FATURADO (já vem do loadFaturadoSheet)
     dadosFaturado = [];
     const monthColumns = [...MONTHS_ORDER];
     faturadoRaw.forEach(row => {
@@ -297,13 +391,26 @@ async function loadAllData() {
       if (subgrupoRaw) subgruposSet.add(subgrupoRaw);
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
+      
       for (let i = 0; i < monthColumns.length; i++) {
-        const monthKey = monthColumns[i];
-        const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/${currentYearShort}`, `${monthKey}/25`, monthKey.toUpperCase()]));
-        if (monthValue > 0) { const mesFormatado = `${monthColumns[i]}/${currentYearShort}`; dadosFaturado.push({ codigo, descricao, especialidade, estabelecimento: estabelecimento || "Não informado", grupo: grupoRaw || (GRUPOS_SIGTAP[grupoCodigo] || ""), grupoCodigo, subgrupo: subgrupoRaw, subgrupoCodigo: extractSubgrupoCodigo(subgrupoRaw), mes: mesFormatado, quantidade: monthValue }); }
+        const monthKey = `${monthColumns[i]}/${currentYearShort}`;
+        const monthValue = parseNumberBR(getField(row, [monthKey, monthColumns[i]]));
+        if (monthValue > 0) {
+          dadosFaturado.push({ 
+            codigo, descricao, especialidade, 
+            estabelecimento: estabelecimento || "Não informado", 
+            grupo: grupoRaw || (GRUPOS_SIGTAP[grupoCodigo] || ""), 
+            grupoCodigo, 
+            subgrupo: subgrupoRaw, 
+            subgrupoCodigo: extractSubgrupoCodigo(subgrupoRaw), 
+            mes: monthKey, 
+            quantidade: monthValue 
+          });
+        }
       }
     });
 
+    // PROCESSAR FINANCEIRO (já vem do loadFinanceiroSheet)
     dadosFinanceiro = [];
     financeiroRaw.forEach(row => {
       const especialidade = normalizeText(getField(row, ["ESPECIALIDADE", "Especialidade"]));
@@ -318,10 +425,22 @@ async function loadAllData() {
       if (subgrupoRaw) subgruposSet.add(subgrupoRaw);
       addMapSet(especialidadeToGrupos, especialidade, grupoCodigo);
       addMapSet(especialidadeToSubgrupos, especialidade, subgrupoRaw);
+      
       for (let i = 0; i < monthColumns.length; i++) {
-        const monthKey = monthColumns[i];
-        const monthValue = parseNumberBR(getField(row, [monthKey, `${monthKey}/${currentYearShort}`, monthKey.toUpperCase()]));
-        if (monthValue > 0) { const mesFormatado = `${monthColumns[i]}/${currentYearShort}`; dadosFinanceiro.push({ codigo, descricao, especialidade, estabelecimento: estabelecimento || "Não informado", grupo: grupoRaw || (GRUPOS_SIGTAP[grupoCodigo] || ""), grupoCodigo, subgrupo: subgrupoRaw, subgrupoCodigo: extractSubgrupoCodigo(subgrupoRaw), mes: mesFormatado, valor: monthValue }); }
+        const monthKey = `${monthColumns[i]}/${currentYearShort}`;
+        const monthValue = parseNumberBR(getField(row, [monthKey, monthColumns[i]]));
+        if (monthValue > 0) {
+          dadosFinanceiro.push({ 
+            codigo, descricao, especialidade, 
+            estabelecimento: estabelecimento || "Não informado", 
+            grupo: grupoRaw || (GRUPOS_SIGTAP[grupoCodigo] || ""), 
+            grupoCodigo, 
+            subgrupo: subgrupoRaw, 
+            subgrupoCodigo: extractSubgrupoCodigo(subgrupoRaw), 
+            mes: monthKey, 
+            valor: monthValue 
+          });
+        }
       }
     });
 
@@ -374,6 +493,11 @@ async function loadAllData() {
         });
       });
     });
+
+    console.log("Financeiro processado - registros:", dadosFinanceiro.length);
+    console.log("Faturado processado - registros:", dadosFaturado.length);
+    console.log("Exemplo Financeiro:", dadosFinanceiro.slice(0, 3));
+    console.log("Exemplo Faturado:", dadosFaturado.slice(0, 3));
 
     const allPeriodsCollected = [...dadosFila.map(d => d.dataCorte), ...dadosFilaRetroativa.map(d => d.dataCorte), ...dadosAgendamentosVivver.map(d => d.mes), ...dadosFaturado.map(d => d.mes), ...dadosFinanceiro.map(d => d.mes), ...dadosAgendados.map(d => d.mes)].filter(Boolean);
     allPeriodos = sortPeriodos(allPeriodsCollected);
@@ -468,10 +592,11 @@ function applyFilters() {
   const filteredAgendados = dadosAgendados.filter(d => matchBaseWithDimensions(d, true));
   const filteredFaturado = dadosFaturado.filter(d => matchFaturadoFinanceiro(d));
   const filteredFinanceiro = dadosFinanceiro.filter(d => matchFaturadoFinanceiro(d));
-  // FILA RETROATIVA TAMBÉM FILTRADA
   const filteredFilaRetroativa = dadosFilaRetroativa.filter(d => matchBaseWithDimensions(d, true));
 
   console.log("Dados filtrados - Fila:", filteredFila.length, "Fila Retroativa:", filteredFilaRetroativa.length, "Agendamentos Vivver:", filteredAgVivver.length);
+  console.log("Financeiro filtrado - soma:", filteredFinanceiro.reduce((s, d) => s + d.valor, 0));
+  console.log("Faturado filtrado - soma:", filteredFaturado.reduce((s, d) => s + d.quantidade, 0));
 
   const totalFila = filteredFila.reduce((s, d) => s + d.fila, 0);
   const totalRecepcionados = filteredAgVivver.reduce((s, d) => s + d.recepcionados, 0);
@@ -674,7 +799,6 @@ function getPeriodsFromFilteredData(...groups) {
   return periods.length ? periods : allPeriodos; 
 }
 
-// CORREÇÃO PRINCIPAL: A LINHA VERMELHA USA FILA RETROATIVA
 function renderMixedEvolutionChart(periods, filaRetroativaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
   const canvas = el("cEvolucao"); if (!canvas) return;
   destroyChart("cEvolucao");
@@ -713,22 +837,18 @@ function renderMixedEvolutionChart(periods, filaRetroativaPorMes, ofertaPorMes, 
   });
 }
 
-// FUNÇÃO CORRIGIDA - A LINHA VERMELHA USA FILA RETROATIVA FILTRADA
 function renderVisaoGeral(filteredFilaRetroativa, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
-  // CORREÇÃO: Usar os dados filtrados da FILA RETROATIVA para a linha vermelha
   const filaRetroativaPorMes = aggregateBy(filteredFilaRetroativa, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
   
-  // Períodos baseados nos dados filtrados
   const allPeriodsFromData = getPeriodsFromFilteredData(filteredFilaRetroativa, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   const periods = allPeriodsFromData.length ? allPeriodsFromData : [];
   
   console.log("Períodos para visão geral (dados filtrados):", periods);
   console.log("Dados de fila retroativa por mês (com filtros aplicados):", filaRetroativaPorMes);
   
-  // Renderizar o gráfico de evolução com os dados filtrados da fila retroativa
   renderMixedEvolutionChart(periods, filaRetroativaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
   
   const agendadosPorMes = aggregateBy(filteredAgendados, d => d.mes, d => d.agendados);
@@ -1028,7 +1148,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const tabelaSearchEspec = el("tabelaSearchEspec"); if (tabelaSearchEspec) tabelaSearchEspec.addEventListener("input", () => applyFilters());
   const tabelaMonthFilterEspec = el("tabelaMonthFilterEspec"); if (tabelaMonthFilterEspec) tabelaMonthFilterEspec.addEventListener("change", () => applyFilters());
   
-  // Configurar eventos dos tabs
   document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => {
       const tabId = tab.getAttribute("data-tab");
@@ -1036,7 +1155,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   
-  // Configurar eventos dos multiselects
   const msTriggerSub = el("msTriggerSub"); if (msTriggerSub) msTriggerSub.addEventListener("click", (e) => { e.stopPropagation(); const dd = el("msDropdownSub"); if (dd) dd.classList.toggle("open"); });
   const msTriggerEsp = el("msTriggerEsp"); if (msTriggerEsp) msTriggerEsp.addEventListener("click", (e) => { e.stopPropagation(); const dd = el("msDropdownEsp"); if (dd) dd.classList.toggle("open"); });
   
@@ -1053,7 +1171,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const ddEsp = el("msDropdownEsp"); if (ddEsp) ddEsp.classList.remove("open");
   });
   
-  // Configurar ordenação da tabela físico x financeiro
   document.querySelectorAll("#tabelaFisicoFinanceiro th[data-col]").forEach(th => {
     th.addEventListener("click", () => {
       const colIndex = parseInt(th.getAttribute("data-col"));
