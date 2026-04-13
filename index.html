@@ -20,8 +20,8 @@
 <header class="header">
   <div class="h-icon"><i class="fa-solid fa-kit-medical"></i></div>
   <div class="h-info">
-    <div class="h-title">Painel Cirurgia Eletiva</div>
-    <div class="h-sub">Diretoria de Regulação do Acesso | Monitoramento Estratégico</div>
+    <div class="h-title">Diretoria de Regulação do Acesso</div>
+    <div class="h-sub">Painel Cirurgia Eletiva | Análise Estratégica</div>
     <div class="h-meta">
       Superintendente: <b>Yara Ariane M. S. Souza</b>
       &nbsp;•&nbsp; Diretora: <b>Paloma Morais</b>
@@ -107,16 +107,104 @@
   <section id="tab-financeiro" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-coins"></i></div><div><h3>Financeiro Mensal Acumulado</h3><div class="topic-sub">Leitura consolidada da base financeira por competência</div></div><div class="topic-pill"><i class="fa-solid fa-circle-info"></i> Base financeira integrada aos filtros</div></div><div class="graficos-lado"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-line"></i> Financeiro por Competência</h3><div class="chartSub">Valor financeiro mensal</div></div><div class="chartWrap" style="height: 350px;"><canvas id="cFaturamentoMensal"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Financeiro por Estabelecimento</h3><div class="chartSub">Participação por unidade</div></div><div class="chartWrap" style="height: 350px;"><canvas id="cFatEstabelecimentoFinanceiro"></canvas></div></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-table"></i> Financeiro por Estabelecimento × Competência</h3><div class="chartSub">Tabela consolidada mensal</div></div><div class="fin-table-wrap" id="finTableWrap"><div style="padding: 20px; text-align: center;">Carregando dados financeiros...</div></div></div></section>
 
   <!-- ABA 3: FÍSICO X FINANCEIRO -->
-  <section id="tab-fisico_financeiro" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-database"></i></div><div><h3>Físico x Financeiro</h3><div class="topic-sub">Comparativo entre quantidade agendada, faturada e resultado financeiro</div></div><div class="topic-pill"><i class="fa-solid fa-scale-balanced"></i> Comparação operacional e financeira</div></div><div class="chartCard"><div class="table-title" style="margin-bottom: 16px;"><div><i class="fa-solid fa-table"></i> Físico x Financeiro</div><div class="table-controls"><div class="table-chip-control"><i class="fa-solid fa-calendar"></i><select id="tableMonthFilterFisico" style="width: 170px;"><option value="">Todos os meses</option></select></div><div class="table-chip-control"><i class="fa-solid fa-search"></i><input id="tSearchFisico" placeholder="Buscar estabelecimento..." style="width: 190px;"></div></div></div><div class="table-container-fisico"><table class="data-table-fisico" id="tabelaFisicoFinanceiro"><thead><tr><th style="cursor:pointer;" data-col="0">Estabelecimento <i class="fa-solid fa-arrow-up-wide-short"></i></th><th style="cursor:pointer;" data-col="1">Mês <i class="fa-solid fa-arrow-up-wide-short"></i></th><th class="text-right" style="cursor:pointer;" data-col="2">Agendados <i class="fa-solid fa-arrow-up-wide-short"></i></th><th class="text-right" style="cursor:pointer;" data-col="3">Total Faturado <i class="fa-solid fa-arrow-up-wide-short"></i></th><th class="text-right" style="cursor:pointer;" data-col="4">Total Financeiro <i class="fa-solid fa-arrow-up-wide-short"></i></th></tr></thead><tbody id="tBodyFisico"><tr><td colspan="5">Carregando...</td></tr></tbody></table></div><div class="muted" id="tInfoFisico" style="margin-top: 12px; text-align: right;">—</div></div></section>
+  <section id="tab-fisico_financeiro" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-database"></i></div><div><h3>Físico x Financeiro</h3><div class="topic-sub">Comparativo entre quantidade agendada, faturada e resultado financeiro</div></div><div class="topic-pill"><i class="fa-solid fa-scale-balanced"></i> Comparação operacional e financeira</div></div><div class="chartCard"><div class="table-title" style="margin-bottom: 16px;"><div><i class="fa-solid fa-table"></i> Físico x Financeiro</div><div class="table-controls"><div class="table-chip-control"><i class="fa-solid fa-calendar"></i><select id="tableMonthFilterFisico" style="width: 170px;"><option value="">Todos os meses</option></select></div><div class="table-chip-control"><i class="fa-solid fa-search"></i><input id="tSearchFisico" placeholder="Buscar estabelecimento..." style="width: 190px;"></div></div></div><div class="table-container-fisico"><table class="data-table-fisico" id="tabelaFisicoFinanceiro"><thead><tr><th style="cursor:pointer;" data-col="0">Estabelecimento <i class="fa-solid fa-arrow-up-wide-short"></i></th><th style="cursor:pointer;" data-col="1">Mês <i class="fa-solid fa-arrow-up-wide-short"></i></th><th class="text-right" style="cursor:pointer;" data-col="2">Agendados <i class="fa-solid fa-arrow-up-wide-short"></i></th><th class="text-right" style="cursor:pointer;" data-col="3">Total Faturado <i class="fa-solid fa-arrow-up-wide-short"></i></th><th class="text-right" style="cursor:pointer;" data-col="4">Total Financeiro <i class="fa-solid fa-arrow-up-wide-short"></i></th></tr></thead><tbody id="tBodyFisico"><tr><td colspan="5">Carregando...</td></tr></tbody>}</div><div class="muted" id="tInfoFisico" style="margin-top: 12px; text-align: right;">—</div></div></section>
 
   <!-- ABA 4: DADOS POR ESTABELECIMENTO -->
   <section id="tab-consolidado_estabelecimento" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-building"></i></div><div><h3>Dados por Estabelecimento</h3><div class="topic-sub">Distribuição dos principais indicadores por unidade executora</div></div><div class="topic-pill"><i class="fa-solid fa-hospital"></i> Visão comparativa por estabelecimento</div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Agendadas por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cAgendadasPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Ofertas por Estabelecimento (REC + FAL)</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cOfertasPorEstab"></canvas></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Recepcionados por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cRecepcionadosPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Faltosos por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cFaltososPorEstab"></canvas></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Faturados por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cFaturadosPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Financeiro por Estabelecimento</h3></div><div class="chartWrap chartWrap-large-fonts"><canvas id="cFinanceiroPorEstab"></canvas></div></div></div></section>
 
-  <!-- ABA 5: AGENDAMENTOS VIVVER -->
-  <section id="tab-agendamentos_especialidades" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-chart-simple"></i></div><div><h3>Agendamentos Vivver</h3><div class="topic-sub">Acompanhamento das ofertas, recepcionados e faltosos por especialidade</div></div><div class="topic-pill"><i class="fa-solid fa-stethoscope"></i> Monitoramento por especialidade</div></div><div class="three-tables"><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Ofertas por Especialidade (REC + FAL)</div><div class="table-wrapper"><table class="data-table-simple" id="tableOfertas"><thead><tr><th>Especialidade</th><th class="text-right">Total</th></tr></thead><tbody id="tableOfertasBody"><tr><td colspan="2">Carregando...</td></tr></tbody></table></div></div><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Recepcionados por Especialidade</div><div class="table-wrapper"><table class="data-table-simple" id="tableRecepcionadosVivver"><thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Referente à Oferta</th></tr></thead><tbody id="tableRecepcionadosVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--danger);"></i> Faltosos por Especialidade</div><div class="table-wrapper"><table class="data-table-simple" id="tableFaltososVivver"><thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Referente à Oferta</th></tr></thead><tbody id="tableFaltososVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div></div></section>
+  <!-- ABA 5: AGENDAMENTOS VIVVER (VERSÃO CORRIGIDA) -->
+  <section id="tab-agendamentos_especialidades" class="tabContent">
+    <div class="topic-header">
+      <div class="topic-header-icon"><i class="fa-solid fa-chart-simple"></i></div>
+      <div>
+        <h3>Agendamentos Vivver</h3>
+        <div class="topic-sub">Acompanhamento das ofertas, recepcionados e faltosos por especialidade e subgrupo</div>
+      </div>
+      <div class="topic-pill"><i class="fa-solid fa-stethoscope"></i> Monitoramento por especialidade</div>
+    </div>
+
+    <!-- LINHA 1: Recepcionados + Faltosos lado a lado (aumentados) -->
+    <div class="two-tables-large">
+      <div class="chartCard table-large">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Recepcionados por Especialidade</div>
+        <div class="table-wrapper-large">
+          <table class="data-table-modern" id="tableRecepcionadosVivver">
+            <thead>
+              <tr>
+                <th>Especialidade</th>
+                <th class="text-right">Total</th>
+                <th style="width: 140px;">% Referente à Oferta</th>
+              </tr>
+            </thead>
+            <tbody id="tableRecepcionadosVivverBody">
+              <tr><td colspan="3">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="chartCard table-large">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--danger);"></i> Faltosos por Especialidade</div>
+        <div class="table-wrapper-large">
+          <table class="data-table-modern" id="tableFaltososVivver">
+            <thead>
+              <tr>
+                <th>Especialidade</th>
+                <th class="text-right">Total</th>
+                <th style="width: 140px;">% Referente à Oferta</th>
+              </tr>
+            </thead>
+            <tbody id="tableFaltososVivverBody">
+              <tr><td colspan="3">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- LINHA 2: Ofertas por Especialidade (REC + FAL) com cabeçalho congelado -->
+    <div class="chartCard table-ofertas">
+      <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Ofertas por Especialidade (REC + FAL)</div>
+      <div class="table-wrapper-sticky">
+        <table class="data-table-ofertas" id="tableOfertas">
+          <thead>
+            <tr>
+              <th>Especialidade</th>
+              <th class="text-right">Recepcionados</th>
+              <th class="text-right">Faltosos</th>
+              <th class="text-right">Total Oferta</th>
+            </tr>
+          </thead>
+          <tbody id="tableOfertasBody">
+            <tr><td colspan="4">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LINHA 3: NOVA TABELA - Recepcionados e Faltosos por Subgrupo -->
+    <div class="chartCard table-subgrupo">
+      <div class="table-title"><i class="fa-solid fa-code-branch" style="color: var(--secondary);"></i> Recepcionados e Faltosos por Subgrupo</div>
+      <div class="table-wrapper-sticky">
+        <table class="data-table-subgrupo" id="tableSubgrupo">
+          <thead>
+            <tr>
+              <th>Subgrupo</th>
+              <th class="text-right">Recepcionados</th>
+              <th class="text-right">Faltosos</th>
+              <th class="text-right">Oferta (REC + FAL)</th>
+            </tr>
+          </thead>
+          <tbody id="tableSubgrupoBody">
+            <tr><td colspan="4">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
   <!-- ABA 6: FILA DE ESPERA ATUAL -->
-  <section id="tab-demanda_reprimida" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-hourglass-half"></i></div><div><h3>Fila de Espera Atual</h3><div class="topic-sub">Leitura da demanda reprimida por especialidade, procedimento, complexidade e subgrupo</div></div><div class="topic-pill"><i class="fa-solid fa-users"></i> Acompanhamento da demanda reprimida</div></div><div class="row2eq"><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--secondary);"></i> Top Especialidades com Maior Fila</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaEspecialidade"><thead><tr><th>Especialidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Fila por Procedimento</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaProcedimento"><thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div></div><div class="row2eq"><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Fila por Complexidade</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaComplexidade"><thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Fila por Subgrupo</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-pie"></i> Fila de Espera por Complexidade</h3><div class="chartSub">Distribuição por nível de complexidade</div></div><div class="chartWrap"><canvas id="cFilaComplexidadeRosca"></canvas></div></div></div></section>
+  <section id="tab-demanda_reprimida" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-hourglass-half"></i></div><div><h3>Fila de Espera Atual</h3><div class="topic-sub">Leitura da demanda reprimida por especialidade, procedimento, complexidade e subgrupo</div></div><div class="topic-pill"><i class="fa-solid fa-users"></i> Acompanhamento da demanda reprimida</div></div><div class="row2eq"><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--secondary);"></i> Top Especialidades com Maior Fila</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaEspecialidade"><thead><tr><th>Especialidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody>}</div></div><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Fila por Procedimento</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaProcedimento"><thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>}</div></div></div><div class="row2eq"><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Fila por Complexidade</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaComplexidade"><thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody>}</div></div><div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Fila por Subgrupo</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>}</div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-pie"></i> Fila de Espera por Complexidade</h3><div class="chartSub">Distribuição por nível de complexidade</div></div><div class="chartWrap"><canvas id="cFilaComplexidadeRosca"></canvas></div></div></div></section>
 
   <!-- ABA 7: FILA RETROATIVA 2025 -->
   <section id="tab-fila_retroativa" class="tabContent">
@@ -146,16 +234,16 @@
     <div class="row2eq">
       <div class="chartCard">
         <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--secondary);"></i> Top Procedimentos - Fila Retroativa</div>
-        <div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaRetroativaProcedimento"><thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaRetroativaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div>
+        <div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaRetroativaProcedimento"><thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaRetroativaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>}</div>
       </div>
       <div class="chartCard">
         <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Fila Retroativa por Complexidade</div>
-        <div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaRetroativaComplexidade"><thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaRetroativaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div>
+        <div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaRetroativaComplexidade"><thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaRetroativaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody>}</div>
       </div>
     </div>
     <div class="chartCard">
       <div class="table-title"><i class="fa-solid fa-table"></i> Detalhamento Completo da Fila Retroativa 2025<div class="table-controls"><input type="text" id="searchFilaRetroativa" placeholder="🔍 Buscar especialidade ou procedimento..." style="width: 260px;"></div></div>
-      <div class="table-wrapper" style="max-height: 500px;"><table class="data-table-detailed" id="tableFilaRetroativaCompleta"><thead><tr><th>Código</th><th>Especialidade</th><th>Procedimento</th><th>Grupo</th><th>Subgrupo</th><th>Complexidade</th><th class="text-right">Total</th><th>Data Corte</th></tr></thead><tbody id="tableFilaRetroativaCompletaBody"><tr><td colspan="8">Carregando...</td></tr></tbody></table></div>
+      <div class="table-wrapper" style="max-height: 500px;"><table class="data-table-detailed" id="tableFilaRetroativaCompleta"><thead><tr><th>Código</th><th>Especialidade</th><th>Procedimento</th><th>Grupo</th><th>Subgrupo</th><th>Complexidade</th><th class="text-right">Total</th><th>Data Corte</th></tr></thead><tbody id="tableFilaRetroativaCompletaBody"><tr><td colspan="8">Carregando...</td></tr></tbody>}</div>
     </div>
   </section>
 </main>
