@@ -468,8 +468,10 @@ function applyFilters() {
   const filteredAgendados = dadosAgendados.filter(d => matchBaseWithDimensions(d, true));
   const filteredFaturado = dadosFaturado.filter(d => matchFaturadoFinanceiro(d));
   const filteredFinanceiro = dadosFinanceiro.filter(d => matchFaturadoFinanceiro(d));
+  // FILA RETROATIVA TAMBÉM FILTRADA
+  const filteredFilaRetroativa = dadosFilaRetroativa.filter(d => matchBaseWithDimensions(d, true));
 
-  console.log("Dados filtrados - Fila:", filteredFila.length, "Agendamentos Vivver:", filteredAgVivver.length);
+  console.log("Dados filtrados - Fila:", filteredFila.length, "Fila Retroativa:", filteredFilaRetroativa.length, "Agendamentos Vivver:", filteredAgVivver.length);
 
   const totalFila = filteredFila.reduce((s, d) => s + d.fila, 0);
   const totalRecepcionados = filteredAgVivver.reduce((s, d) => s + d.recepcionados, 0);
@@ -524,7 +526,7 @@ function applyFilters() {
   if (el("gAbsAus")) el("gAbsAus").textContent = faltososGauge.toLocaleString("pt-BR");
   createGaugeChart("cGaugeAbs", taxaAbsenteismo, absColor);
 
-  renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
+  renderVisaoGeral(filteredFilaRetroativa, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   renderFinanceiro(filteredFinanceiro);
   renderFisicoFinanceiro(filteredAgendados, filteredFaturado, filteredFinanceiro);
   renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
@@ -672,11 +674,12 @@ function getPeriodsFromFilteredData(...groups) {
   return periods.length ? periods : allPeriodos; 
 }
 
-function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
+// CORREÇÃO PRINCIPAL: A LINHA VERMELHA USA FILA RETROATIVA
+function renderMixedEvolutionChart(periods, filaRetroativaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
   const canvas = el("cEvolucao"); if (!canvas) return;
   destroyChart("cEvolucao");
   
-  const filaData = periods.map(p => filaPorMes.get(p) || 0);
+  const filaData = periods.map(p => filaRetroativaPorMes.get(p) || 0);
   const ofertaData = periods.map(p => ofertaPorMes.get(p) || 0);
   const recepData = periods.map(p => recepcionadosPorMes.get(p) || 0);
   const faltaData = periods.map(p => faltososPorMes.get(p) || 0);
@@ -686,7 +689,7 @@ function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepciona
       labels: periods, 
       datasets: [
         { type: "bar", label: "Ofertas", data: ofertaData, backgroundColor: "rgba(37,99,235,0.22)", borderColor: "#2563eb", borderWidth: 1.5, borderRadius: 10, yAxisID: "y", order: 4 },
-        { type: "line", label: "Fila de Espera", data: filaData, borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y1", order: 1 },
+        { type: "line", label: "Fila de Espera Retroativa", data: filaData, borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y1", order: 1 },
         { type: "line", label: "Recepcionados", data: recepData, borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 2 },
         { type: "line", label: "Faltosos", data: faltaData, borderColor: "#d97706", backgroundColor: "rgba(217,119,6,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#d97706", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 3 }
       ] 
@@ -704,29 +707,29 @@ function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepciona
       scales: { 
         x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } }, 
         y: { beginAtZero: true, position: "left", grace: "10%", grid: { display: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Oferta / Recepcionados / Faltosos", font: { weight: "bold" } } }, 
-        y1: { beginAtZero: true, position: "right", grace: "10%", grid: { display: false, drawOnChartArea: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Fila de Espera", font: { weight: "bold" } } } 
+        y1: { beginAtZero: true, position: "right", grace: "10%", grid: { display: false, drawOnChartArea: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Fila de Espera Retroativa", font: { weight: "bold" } } } 
       } 
     } 
   });
 }
 
-// FUNÇÃO CORRIGIDA - A LINHA DA FILA AGORA INTERAGE COM OS FILTROS
-function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
-  // CORREÇÃO: Usar APENAS os dados filtrados da fila (já vêm com os filtros aplicados)
-  const filaPorMes = aggregateBy(filteredFila, d => d.dataCorte, d => d.fila);
+// FUNÇÃO CORRIGIDA - A LINHA VERMELHA USA FILA RETROATIVA FILTRADA
+function renderVisaoGeral(filteredFilaRetroativa, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
+  // CORREÇÃO: Usar os dados filtrados da FILA RETROATIVA para a linha vermelha
+  const filaRetroativaPorMes = aggregateBy(filteredFilaRetroativa, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
   
   // Períodos baseados nos dados filtrados
-  const allPeriodsFromData = getPeriodsFromFilteredData(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
+  const allPeriodsFromData = getPeriodsFromFilteredData(filteredFilaRetroativa, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   const periods = allPeriodsFromData.length ? allPeriodsFromData : [];
   
   console.log("Períodos para visão geral (dados filtrados):", periods);
-  console.log("Dados de fila por mês (com filtros aplicados):", filaPorMes);
+  console.log("Dados de fila retroativa por mês (com filtros aplicados):", filaRetroativaPorMes);
   
-  // Renderizar o gráfico de evolução com os dados filtrados
-  renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
+  // Renderizar o gráfico de evolução com os dados filtrados da fila retroativa
+  renderMixedEvolutionChart(periods, filaRetroativaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
   
   const agendadosPorMes = aggregateBy(filteredAgendados, d => d.mes, d => d.agendados);
   const faturadosQtdPorMes = aggregateBy(filteredFaturado, d => d.mes, d => d.quantidade);
@@ -758,7 +761,7 @@ function renderAgendadasPorEspecialidadeEstabTable(filteredAgendados) {
   const tbody = el("tableAgendadasPorEspecEstabBody"); if (!tbody) return;
   const searchTerm = (el("tabelaSearchEspec")?.value || "").toLowerCase();
   const monthFilter = el("tabelaMonthFilterEspec")?.value || "";
-  if (!filteredAgendados.length) { tbody.innerHTML = '<td><td colspan="8">Nenhum dado disponível</td></tr>'; return; }
+  if (!filteredAgendados.length) { tbody.innerHTML = '<tr><td colspan="8">Nenhum dado disponível</td></tr>'; return; }
   const estabelecimentosFixos = ["Belo Horizonte", "Centro Materno Infantil", "Hospital Municipal de Contagem", "Hospital São José", "Hospital Santa Rita"];
   const normalizeEstabName = name => { const nameLower = String(name || "").toLowerCase(); if (nameLower.includes("belo horizonte") || nameLower.includes("bh")) return "Belo Horizonte"; if (nameLower.includes("centro materno") || nameLower.includes("materno infantil")) return "Centro Materno Infantil"; if (nameLower.includes("contagem")) return "Hospital Municipal de Contagem"; if (nameLower.includes("são josé") || nameLower.includes("sao jose")) return "Hospital São José"; if (nameLower.includes("santa rita")) return "Hospital Santa Rita"; return name; };
   const map = new Map();
@@ -856,10 +859,8 @@ function sortTableFisico(colIndex) {
   renderTableBodyFisico();
 }
 
-// CORREÇÃO: Ofertas por Estabelecimento agora usa REC + FAL
 function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
   const agendadosEstab = aggregateBy(filteredAgendados, d => d.estabelecimento, d => d.agendados);
-  // CORREÇÃO: Ofertas = RECEPCIONADOS + FALTOSOS
   const ofertasEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados + d.faltosos);
   const recepcionadosEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.recepcionados);
   const faltososEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.faltosos);
@@ -872,7 +873,6 @@ function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFatu
   const topFatQtd = [...faturadosQtdEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFinanceiro = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   
-  // CORREÇÃO: Usar função com fontes maiores
   makeHorizontalBarChartLarge("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas", false, 13);
   makeHorizontalBarChartLarge("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas (REC + FAL)", false, 13);
   makeHorizontalBarChartLarge("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados", false, 13);
