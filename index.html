@@ -2,243 +2,225 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ferramentas Administrativas - Diretoria de Regulação do Acesso</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel Cirurgia Eletiva — Diretoria de Regulação do Acesso</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <div class="logo-section">
-          <i class="fas fa-hospital"></i>
-          <div class="title-section">
-            <h1 class="main-title">Ferramentas Administrativas</h1>
-            <p class="subtitle">Diretoria de Regulação do Acesso</p>
-            <div class="h-meta">
-              Superintendente: <b style="color:#bfdbfe">Yara Ariane M.S.Souza</b>
-              &nbsp;•&nbsp; Diretora: <b style="color:#bfdbfe">Paloma Morais</b>
-              &nbsp;•&nbsp; Desenvolvido por <b style="color:#bfdbfe">Ana P. A. Silva — Matric. 201704</b>
-            </div>
-          </div>
-        </div>
-        <div class="right-section">
-          <div class="slogan">
-            <p>"Nenhum de nós é tão bom quanto todos nós juntos!"</p>
+
+<header class="header">
+  <div class="h-icon"><i class="fa-solid fa-kit-medical"></i></div>
+  <div class="h-info">
+    <div class="h-title">Painel Cirurgia Eletiva</div>
+    <div class="h-sub">Diretoria de Regulação do Acesso | Monitoramento Estratégico</div>
+    <div class="h-meta">
+      Superintendente: <b>Yara Ariane M. S. Souza</b>
+      &nbsp;•&nbsp; Diretora: <b>Paloma Morais</b>
+      &nbsp;•&nbsp; Desenvolvido por <b>Ana P. A. Silva — Matric. 201704</b>
+    </div>
+    <div class="lastUpdate" id="lastUpdate">Carregando dados...</div>
+  </div>
+  <div class="h-actions">
+    <button class="btn" id="btnRefresh"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+    <button class="btn btn-excel" id="btnExcel"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
+  </div>
+</header>
+
+<div class="loading" id="loading"></div>
+<div class="toastBox" id="toastBox"></div>
+
+<main class="wrap">
+  <div class="card filters">
+    <div class="filtersTop">
+      <div class="filtersTitle"><i class="fa-solid fa-sliders" style="color: var(--primary)"></i> Filtros dinâmicos</div>
+      <button class="btn-clear" id="btnClear"><i class="fa-solid fa-eraser"></i> Limpar filtros</button>
+    </div>
+    <div class="filtersGrid">
+      <div class="fg"><label><i class="fa-solid fa-layer-group"></i> Grupo SIGTAP</label><select id="grupoSelect"><option value="">Todos os grupos</option></select></div>
+      <div class="fg-subgrupo"><label><i class="fa-solid fa-code-branch"></i> Subgrupo SIGTAP</label>
+        <div class="multiselect-wrapper" id="msWrapperSub">
+          <div class="ms-trigger" id="msTriggerSub" onclick="toggleMsDropdownSub(event)"><span class="ms-label-text" id="msLabelSub">Todos</span><i class="fa-solid fa-chevron-down ms-arrow"></i></div>
+          <div class="ms-dropdown" id="msDropdownSub">
+            <div class="ms-actions"><button class="ms-btn-all" onclick="selectAllSub(event)">Selecionar todos</button><button class="ms-btn-clr" onclick="clearSubSelection(event)">Limpar</button></div>
+            <div class="ms-search-box"><input type="text" id="msSearchSub" placeholder="Buscar subgrupo..." oninput="filterMsListSub()"></div>
+            <div class="ms-list" id="msListSub"></div>
           </div>
         </div>
       </div>
-    </div>
-  </header>
-
-  <main class="main-content">
-    <div class="container">
-      <!-- SEÇÃO DE PESQUISA CENTRALIZADA -->
-      <div class="global-search-section">
-        <div class="search-box centered-search">
-          <i class="fas fa-search"></i>
-          <input type="text" class="global-search-input" placeholder="Buscar ferramentas, painéis ou documentos...">
-        </div>
-      </div>
-
-      <div class="tabs-container">
-        <div class="tabs-nav">
-          <button class="tab-btn active" data-tab="oci">
-            <i class="fas fa-stethoscope"></i> OCI
-          </button>
-          <button class="tab-btn" data-tab="consultas">
-            <i class="fas fa-user-md"></i> Consultas Especializadas
-          </button>
-          <button class="tab-btn" data-tab="cirurgia">
-            <i class="fas fa-procedures"></i> Cirurgia Eletiva
-          </button>
-          <button class="tab-btn" data-tab="exames">
-            <i class="fas fa-microscope"></i> Média Complexidade (Exames)
-          </button>
-          <button class="tab-btn" data-tab="cardiologia">
-            <i class="fas fa-heartbeat"></i> Cardiologia
-          </button>
-        </div>
-
-        <!-- ABA OCI -->
-        <div class="tab-content active" id="tab-oci">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél OCI</h2>
-              <div class="links-grid">
-                <a href="https://regulacaoconsolidados-dot.github.io/ociconsolidado/" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Painél OCI</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo/edit?gid=2108990586#gid=2108990586" class="link-button" target="_blank" rel="noopener">
-                  <i class="fas fa-database"></i><span>Banco de dados que alimenta o Painél</span>
-                </a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-database"></i> Banco de Dados - Consolidar OCI</h2>
-              <div class="links-grid">
-                <a href="https://prefeituracontagem-my.sharepoint.com/:x:/r/personal/hassan_zibaoui_contagem_mg_gov_br/_layouts/15/Doc.aspx?sourcedoc=%7Bd7b85dc9-61af-4ea9-bb7f-b542e5c4d850%7D&action=default&CID=6ac5c827-af01-49ea-9fa3-689fed995aa7&_SRM=2%3AE%3A10" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Planilha OCI</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268" class="link-button" target="_blank" rel="noopener"><i class="fas fa-heart"></i><span>OCI Cardiologia 1° versão</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268" class="link-button" target="_blank" rel="noopener"><i class="fas fa-heart"></i><span>OCI Cardiologia 2026</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1cQzwM6L9omcZVG7routPTSE3fZSQId31w-A6y4Sc24c/edit?gid=621858947#gid=621858947" class="link-button" target="_blank" rel="noopener"><i class="fas fa-female"></i><span>OCI Mama 1° versão</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1U14Nf5EOiz8PI5H6tnYZAUeZzfUM43unywXFEwWBTAQ/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-female"></i><span>OCI Mama 2026</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1G1YHRyt4ILeYMAM-yK_eYZi4wtHaMqwnuQWDeihhmIA/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-uterus"></i><span>OCI Utero 1° versão</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/17ifFIdWqHq3COeEBJifq6keumcWz-ppr9d4uSPhCBow/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-uterus"></i><span>OCI Utero 2026</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1PAaIUxgFU8CE3pFGzHG4OCAdtSHNrVIXc8suaPAXI50/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-bone"></i><span>OCI Ortopedia</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- ABA CONSULTAS ESPECIALIZADAS -->
-        <div class="tab-content" id="tab-consultas">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-code-branch"></i> Fluxos CMC</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/ESPECIALIDADES.html"  class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Listas das Especialidades</span>
-                </a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/resumo_fluxos.html" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Resumo dos Fluxos Especialidades</span>
-                </a>
-                <a href="https://portal.contagem.mg.gov.br/nota-tecnica" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Notas Técnicas Diretoria de Regulação</span>
-                </a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-hourglass-half"></i> Painéis Pendências</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/pendenciasgeral/" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Pendências Geral</span>
-                </a>
-                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Eldorado</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Sede</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritovargemdasflores/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Vargem das Flores</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritonacional/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Nacional</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoressaca/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Ressaca</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoindustrial/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Industrial</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritopetrolandia/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Petrolândia</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoriacho/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Riacho</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-calendar-check"></i> Painél Agendamentos Geral</h2>
-              <div class="info-note">
-                <i class="fas fa-sync-alt"></i>
-                <span>Atualizado sempre após o dia 11 de cada mês - Agendamento da Fila para o próximo mês</span>
-              </div>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/consolidadoagendados/" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Painél Agendamentos Geral</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/14DiFK9EW36s8ntkukyhiRMJxcX0ghG5XTzWb1TwpI2Q/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-calendar-alt"></i> Painél Agendamentos Mês Atual e Próximo Mês</h2>
-              <div class="info-note">
-                <i class="fas fa-sync-alt"></i>
-                <span>Atualizado sempre após o dia 11 de cada mês - Agendamento da Fila para o próximo mês</span>
-              </div>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/ofertacmc/" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Painél Controle Agendamentos Diários</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1puNbYysRBj-5CY6fhnHNnYd9OH96cl7guMFBOLeYZV4/edit?gid=1698493941#gid=1698493941" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-sitemap"></i> Páginas CMC - Versão para os Distritos</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/p-ginadistritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Eldorado</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritonacional/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Nacional</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritopetrolandia/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Petrolândia</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginasede/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Sede</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritoressaca/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Ressaca</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritoriacho/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Riacho</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritoindustrial/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Industrial</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritovargem/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Vargem</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-laptop-medical"></i> Feluma</h2>
-              <div class="links-grid">
-                <a href="https://portal.contagem.mg.gov.br/imgeditor/file/Regula%C3%A7%C3%A3o/Central%20de%20marca%C3%A7%C3%A3o/NT%2025%20-%202025%20-%20Regula%C3%A7%C3%A3o%20de%20Consultas%20Especializadas%20via%20sistema%20VIVVER.pdf" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i><span>NT-25/2025 – Teleconsultoria Regulação</span></a>
-                <a href="https://portal.contagem.mg.gov.br/central-de-marcacao-de-consultas/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-medical-alt"></i><span>Notas Técnicas – Diretoria de Regulação</span></a>
-                <a href="https://portal-feluma.sydle.com/home" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Para Acessar a Plataforma – Clique Aqui</span></a>
-                <a href="https://www.youtube.com/watch?v=1UdBOCDlIvA" class="link-button" target="_blank" rel="noopener"><i class="fab fa-youtube"></i><span>Para Assistir o Tutorial – Youtube (3min.)</span></a>
-                <a href="https://forms.office.com/pages/responsepage.aspx?id=6TkneO0BV0yBmaJIQh4A4v7lUCKmmeREvVUmW50PDW5UMzRaUlRFRjI0N01LMERVWjdPQlY5ODlUWS4u&route=shorturl" class="link-button" target="_blank" rel="noopener"><i class="fas fa-user-plus"></i><span>Ainda sem cadastro? Preencha – Clique Aqui</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- ABA CIRURGIA ELETIVA -->
-        <div class="tab-content" id="tab-cirurgia">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél Cirurgia Eletiva</h2>
-              <div class="links-grid">
-                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaseletivas/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva</span></a>
-                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaeletivadiretoria/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva Diretoria</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1yX5uIgoUNqXJDG6hYxOLjZfYueviAa6M/edit?gid=1716569787#gid=1716569787" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél cirurgias eletivas</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1ax8ZpVRSZnDkTm_T1GY37ybSgrlP_8Rk/edit?gid=1716569787#gid=1716569787" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél cirurgias eletivas diretoria</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-table"></i> Planilhas para Consolidar os Dados</h2>
-              <div class="links-grid">
-                <a href="https://docs.google.com/spreadsheets/d/1QE3yWrmgUm_EyzOG5zC7GB_XOH5k2IXEO9r0XabW4Bo/edit?gid=537625325#gid=537625325" class="link-button" target="_blank" rel="noopener"><i class="fas fa-list-ol"></i><span>Fila de espera cirurgia eletiva</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1ainEQfcuZxWGBgWfjJpzh6TbljRMkgKAvrNOJSyTLls/edit?gid=1545210975#gid=1545210975" class="link-button" target="_blank" rel="noopener"><i class="fas fa-calendar"></i><span>Consolidado 2025</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- ABA EXAMES MÉDIA COMPLEXIDADE -->
-        <div class="tab-content" id="tab-exames">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-folder-open"></i> Arquivos Exames</h2>
-              <div class="links-grid">
-                <a href="https://docs.google.com/spreadsheets/d/1s_HDG2-eBdYVaHdw_4e2q2ORuUePdZuLJQmIT7Z-esI/edit?pli=1&gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-ban"></i><span>Exames sem prestador</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- ABA CARDIOLOGIA -->
-        <div class="tab-content" id="tab-cardiologia">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél Cardiologia</h2>
-              <div class="links-grid">
-                <a href="#" class="link-button disabled" target="_blank" rel="noopener" onclick="return false;"><i class="fas fa-chart-bar"></i><span>Painél Cardiologia (em construção)</span></a>
-                <a href="#" class="link-button disabled" target="_blank" rel="noopener" onclick="return false;"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél (em construção)</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-table"></i> Planilhas para Consolidar os Dados</h2>
-              <div class="links-grid">
-                <a href="#" class="link-button disabled" target="_blank" rel="noopener" onclick="return false;"><i class="fas fa-spinner"></i><span>Em breve</span></a>
-              </div>
-            </section>
+      <div class="fg"><label><i class="fa-solid fa-tag"></i> Especialidade</label>
+        <div class="multiselect-wrapper" id="msWrapperEsp">
+          <div class="ms-trigger" id="msTriggerEsp" onclick="toggleMsDropdownEsp(event)"><span class="ms-label-text" id="msLabelEsp">Todos</span><i class="fa-solid fa-chevron-down ms-arrow"></i></div>
+          <div class="ms-dropdown" id="msDropdownEsp">
+            <div class="ms-actions"><button class="ms-btn-all" onclick="selectAllEsp(event)">Selecionar todos</button><button class="ms-btn-clr" onclick="clearEspSelection(event)">Limpar</button></div>
+            <div class="ms-search-box"><input type="text" id="msSearchEsp" placeholder="Buscar especialidade..." oninput="filterMsListEsp()"></div>
+            <div class="ms-list" id="msListEsp"></div>
           </div>
         </div>
       </div>
+      <div class="fg"><label><i class="fa-solid fa-calendar"></i> Período</label><select id="periodoSelect"><option value="">Todos os meses</option></select></div>
     </div>
-  </main>
+  </div>
 
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 Diretoria de Regulação do Acesso. Todos os direitos reservados.</p>
+  <div class="kpis">
+    <div class="kpi kpi-fila kpi-principal"><div class="kpiIcon"><i class="fa-solid fa-clock"></i></div><div><div class="label">Fila de Espera Atual</div><div class="val" id="kFila">0</div><div class="sub" id="dataCorteInfo">Carregando data de corte...</div></div></div>
+    <div class="kpi kpi-fila-retroativa"><div class="kpiIcon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><div class="label">Fila de Espera Retroativa/2025</div><div class="val" id="kFilaRetroativaCard">0</div><div class="sub" id="dataCorteRetroativaInfoCard">Carregando data de corte...</div></div></div>
+    <div class="kpi kpi-agendados-total"><div class="kpiIcon"><i class="fa-solid fa-calendar-check"></i></div><div><div class="label">Cirurgias Agendadas</div><div class="val" id="kAgendadosTotal">0</div><div class="sub" id="subAgendados">Carregando...</div></div></div>
+    <div class="kpi kpi-real"><div class="kpiIcon"><i class="fa-solid fa-hospital-user"></i></div><div><div class="label">Cirurgias Recepcionadas</div><div class="val" id="kRecepcionados">0</div><div class="sub" id="subRecepcionados">Carregando...</div></div></div>
+    <div class="kpi kpi-falt"><div class="kpiIcon"><i class="fa-solid fa-user-slash"></i></div><div><div class="label">Faltosos</div><div class="val" id="kFaltosos">0</div><div class="sub" id="subFaltosos">Carregando...</div></div></div>
+    <div class="kpi kpi-faturados-qtd"><div class="kpiIcon"><i class="fa-solid fa-file-invoice"></i></div><div><div class="label">Faturados (Qtd)</div><div class="val" id="kFaturadosQtd">0</div><div class="sub" id="subFaturadosQtd">Carregando...</div></div></div>
+    <div class="kpi kpi-fat"><div class="kpiIcon"><i class="fa-solid fa-coins"></i></div><div><div class="label">Financeiro (R$)</div><div class="val" id="kFinanceiro">R$ 0</div><div class="sub" id="subFinanceiro">Carregando...</div></div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('visao_geral', this)"><i class="fa-solid fa-chart-pie"></i> VISÃO GERAL</button>
+    <button class="tab" onclick="switchTab('financeiro', this)"><i class="fa-solid fa-coins"></i> FINANCEIRO</button>
+    <button class="tab" onclick="switchTab('fisico_financeiro', this)"><i class="fa-solid fa-database"></i> FÍSICO X FINANCEIRO</button>
+    <button class="tab" onclick="switchTab('consolidado_estabelecimento', this)"><i class="fa-solid fa-building"></i> DADOS POR ESTABELECIMENTO</button>
+    <button class="tab" onclick="switchTab('agendamentos_especialidades', this)"><i class="fa-solid fa-chart-simple"></i> AGENDAMENTOS VIVVER</button>
+    <button class="tab" onclick="switchTab('demanda_reprimida', this)"><i class="fa-solid fa-hourglass-half"></i> FILA DE ESPERA ATUAL</button>
+    <button class="tab" onclick="switchTab('fila_retroativa', this)"><i class="fa-solid fa-clock-rotate-left"></i> FILA RETROATIVA 2025</button>
+  </div>
+
+  <!-- ABA 1: VISÃO GERAL -->
+  <section id="tab-visao_geral" class="tabContent active">
+    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-chart-pie"></i></div><div><h3>Visão Geral</h3><div class="topic-sub">Panorama consolidado dos principais indicadores operacionais</div></div><div class="topic-pill"><i class="fa-solid fa-circle-info"></i> Leitura rápida do desempenho geral</div></div>
+    <div class="indicadores-row">
+      <div class="gauge-card"><div class="gauge-head"><h3><i class="fa-solid fa-circle-dollar-to-slot" style="color:var(--success)"></i> Taxa de Faturamento</h3><div class="gauge-sub">% de agendados que foram faturados</div></div><div class="gauge-chart-wrap"><canvas id="cGaugeFat"></canvas><div class="gauge-overlay"><div class="gauge-pct-big" id="gaugeFatPct">—</div><div class="gauge-pct-label">Fat. / Agend.</div></div></div><div id="gaugeFatBadge" class="gauge-badge">—</div><div class="gauge-divider"></div><div class="gauge-stats-row"><div class="gauge-stat-item"><span class="gauge-stat-num" id="gFatAg">0</span><span class="gauge-stat-desc">Agendado</span></div><div class="gauge-stat-item"><span class="gauge-stat-num" id="gFatFat">0</span><span class="gauge-stat-desc">Faturado</span></div><div class="gauge-stat-item"><span class="gauge-stat-num" id="gFatDiff">0</span><span class="gauge-stat-desc">Não Faturado</span></div></div><div class="gauge-zones-row"><span class="gauge-zone-item"><span class="zone-circle" style="background:#059669"></span>≥80% Ótimo</span><span class="gauge-zone-item"><span class="zone-circle" style="background:#d97706"></span>50–79% Regular</span><span class="gauge-zone-item"><span class="zone-circle" style="background:#dc2626"></span>&lt;50% Crítico</span></div></div>
+      <div class="gauge-card"><div class="gauge-head"><h3><i class="fa-solid fa-user-xmark" style="color:var(--danger)"></i> Índice de Absenteísmo Vivver</h3><div class="gauge-sub">% de agendados que não compareceram</div></div><div class="gauge-chart-wrap"><canvas id="cGaugeAbs"></canvas><div class="gauge-overlay"><div class="gauge-pct-big" id="gaugeAbsPct">—</div><div class="gauge-pct-label">Absenteísmo</div></div></div><div id="gaugeAbsBadge" class="gauge-badge">—</div><div class="gauge-divider"></div><div class="gauge-stats-row"><div class="gauge-stat-item"><span class="gauge-stat-num" id="gAbsAg">0</span><span class="gauge-stat-desc">Oferta</span></div><div class="gauge-stat-item"><span class="gauge-stat-num" id="gAbsRec">0</span><span class="gauge-stat-desc">Recepcionado</span></div><div class="gauge-stat-item"><span class="gauge-stat-num" id="gAbsAus">0</span><span class="gauge-stat-desc">Ausências</span></div></div><div class="gauge-zones-row"><span class="gauge-zone-item"><span class="zone-circle" style="background:#059669"></span>≤10% Excelente</span><span class="gauge-zone-item"><span class="zone-circle" style="background:#3b82f6"></span>11–20% Bom</span><span class="gauge-zone-item"><span class="zone-circle" style="background:#d97706"></span>21–35% Atenção</span><span class="gauge-zone-item"><span class="zone-circle" style="background:#dc2626"></span>&gt;35% Crítico</span></div></div>
     </div>
-  </footer>
+    <div class="chartCard"><div class="chartHead"><div><h3><i class="fa-solid fa-chart-line"></i> Evolução mensal dos principais indicadores</h3><div class="chartSub">Barras para oferta e linhas para fila, recepcionados e faltosos</div></div></div><div class="chartWrap chartWrap-hero"><canvas id="cEvolucao"></canvas></div></div>
+    <div class="graficos-lado"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Agendados vs Faturados por Mês</h3><div id="legendAgendadosFaturados" class="legend-with-avg"></div></div><div class="chartWrap"><canvas id="cAgendadosVsFaturadosMes"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-line"></i> Receita Financeira por Mês</h3><div class="chartSub">Evolução do valor financeiro consolidado</div></div><div class="chartWrap"><canvas id="cReceitaFinanceiraMes"></canvas></div></div></div>
+    <div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Financeiro por Estabelecimento</h3><div class="chartSub">Ranking dos estabelecimentos com maior valor financeiro</div></div><div class="chartWrap"><canvas id="cFatEstabelecimento"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-simple"></i> Funil Cirúrgico</h3><div class="chartSub">Oferta → Recepcionados → Faltosos</div></div><div class="chartWrap"><canvas id="cFunil"></canvas></div></div></div>
+    <div class="estatistica-card"><div class="estatistica-title"><div><i class="fa-solid fa-table" style="color: var(--primary);"></i> Cirurgias Agendadas por Especialidade e Estabelecimento</div><div class="table-controls"><input type="text" id="tabelaSearchEspec" placeholder="🔍 Buscar especialidade..." style="width: 220px;"><select id="tabelaMonthFilterEspec" style="width: 180px;"><option value="">Todos os meses</option></select></div></div><div class="estabelecimento-table-wrapper"><table class="estabelecimento-table" id="tableAgendadasPorEspecEstab"><thead><tr><th>Especialidade</th><th>Mês</th><th>Belo Horizonte</th><th>Centro Materno Infantil</th><th>Hospital Municipal de Contagem</th><th>Hospital São José</th><th>Hospital Santa Rita</th><th>Total</th></tr></thead><tbody id="tableAgendadasPorEspecEstabBody"><tr><td colspan="8">Carregando...</td></tr></tbody></table></div></div>
+  </section>
 
-  <script src="script.js"></script>
+  <!-- ABA 2: FINANCEIRO (MELHORADA) -->
+  <section id="tab-financeiro" class="tabContent">
+    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-coins"></i></div><div><h3>Financeiro Mensal Acumulado</h3><div class="topic-sub">Leitura consolidada da base financeira por competência</div></div><div class="topic-pill"><i class="fa-solid fa-circle-info"></i> Base financeira integrada aos filtros</div></div>
+    
+    <!-- Cards Financeiros -->
+    <div class="kpi-row" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+        <div class="kpi" style="background: var(--primary); color: white;"><div class="kpiIcon" style="background: rgba(255,255,255,0.2);"><i class="fa-solid fa-chart-line"></i></div><div><div class="label" style="color: rgba(255,255,255,0.8);">Total Financeiro</div><div class="val" id="finTotalGeral">R$ 0</div><div class="sub" style="color: rgba(255,255,255,0.7);">Consolidado no período</div></div></div>
+        <div class="kpi" style="background: var(--primary-dark); color: white;"><div class="kpiIcon" style="background: rgba(255,255,255,0.2);"><i class="fa-solid fa-calendar-week"></i></div><div><div class="label" style="color: rgba(255,255,255,0.8);">Média Mensal</div><div class="val" id="finMediaMensal">R$ 0</div><div class="sub" style="color: rgba(255,255,255,0.7);">Com base no período</div></div></div>
+        <div class="kpi" style="background: #0f7a58; color: white;"><div class="kpiIcon" style="background: rgba(255,255,255,0.2);"><i class="fa-solid fa-ranking-star"></i></div><div><div class="label" style="color: rgba(255,255,255,0.8);">Maior Mês</div><div class="val" id="finMaiorMes">R$ 0</div><div class="sub" style="color: rgba(255,255,255,0.7);" id="finMaiorMesLabel">-</div></div></div>
+        <div class="kpi" style="background: #0b6a4a; color: white;"><div class="kpiIcon" style="background: rgba(255,255,255,0.2);"><i class="fa-solid fa-chart-simple"></i></div><div><div class="label" style="color: rgba(255,255,255,0.8);">Total de Registros</div><div class="val" id="finTotalRegistros">0</div><div class="sub" style="color: rgba(255,255,255,0.7);">Linhas na base</div></div></div>
+    </div>
+
+    <div class="graficos-lado">
+      <div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-line"></i> Evolução Financeira Mensal</h3><div class="chartSub">Valor financeiro por competência (R$)</div></div><div class="chartWrap" style="height: 350px;"><canvas id="cFaturamentoMensal"></canvas></div></div>
+      <div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Financeiro por Estabelecimento (Top 10)</h3><div class="chartSub">Participação por unidade</div></div><div class="chartWrap" style="height: 350px;"><canvas id="cFatEstabelecimentoFinanceiro"></canvas></div></div>
+    </div>
+    
+    <div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-table"></i> Financeiro por Estabelecimento × Competência</h3><div class="chartSub">Tabela consolidada mensal</div></div><div class="fin-table-wrap" id="finTableWrap"><div style="padding: 20px; text-align: center;">Carregando dados financeiros...</div></div></div>
+  </section>
+
+  <!-- ABA 3: FÍSICO X FINANCEIRO (MELHORADA) -->
+  <section id="tab-fisico_financeiro" class="tabContent">
+    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-database"></i></div><div><h3>Físico x Financeiro</h3><div class="topic-sub">Comparativo entre quantidade agendada, faturada e resultado financeiro</div></div><div class="topic-pill"><i class="fa-solid fa-scale-balanced"></i> Comparação operacional e financeira</div></div>
+    
+    <!-- Gráficos Comparativos -->
+    <div class="graficos-lado">
+      <div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-simple"></i> Quantidade Agendada x Total Faturado</h3><div class="chartSub">Comparativo de produtividade</div></div><div class="chartWrap" style="height: 350px;"><canvas id="cComparativoQtd"></canvas></div></div>
+      <div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-coins"></i> Financeiro x Quantidade Faturada</h3><div class="chartSub">Correlação financeira por estabelecimento</div></div><div class="chartWrap" style="height: 350px;"><canvas id="cComparativoFinanceiro"></canvas></div></div>
+    </div>
+
+    <div class="chartCard">
+        <div class="table-title" style="margin-bottom: 16px;"><div><i class="fa-solid fa-table"></i> Físico x Financeiro</div><div class="table-controls"><div class="table-chip-control"><i class="fa-solid fa-calendar"></i><select id="tableMonthFilterFisico" style="width: 170px;"><option value="">Todos os meses</option></select></div><div class="table-chip-control"><i class="fa-solid fa-search"></i><input id="tSearchFisico" placeholder="Buscar estabelecimento..." style="width: 190px;"></div></div></div>
+        <div class="table-container-fisico"><table class="data-table-fisico" id="tabelaFisicoFinanceiro"><thead><tr><th onclick="sortTableFisico(0)" style="cursor:pointer;">Estabelecimento <i class="fa-solid fa-arrow-up-wide-short"></i></th><th onclick="sortTableFisico(1)" style="cursor:pointer;">Mês <i class="fa-solid fa-arrow-up-wide-short"></i></th><th class="text-right" onclick="sortTableFisico(2)" style="cursor:pointer;">Agendados <i class="fa-solid fa-arrow-up-wide-short"></i></th><th class="text-right" onclick="sortTableFisico(3)" style="cursor:pointer;">Total Faturado <i class="fa-solid fa-arrow-up-wide-short"></i></th><th class="text-right" onclick="sortTableFisico(4)" style="cursor:pointer;">Total Financeiro <i class="fa-solid fa-arrow-up-wide-short"></i></th></tr></thead><tbody id="tBodyFisico"><tr><td colspan="5">Carregando...</td></tr></tbody></table></div>
+        <div class="muted" id="tInfoFisico" style="margin-top: 12px; text-align: right;">—</div>
+    </div>
+  </section>
+
+  <!-- ABA 4: DADOS POR ESTABELECIMENTO -->
+  <section id="tab-consolidado_estabelecimento" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-building"></i></div><div><h3>Dados por Estabelecimento</h3><div class="topic-sub">Distribuição dos principais indicadores por unidade executora</div></div><div class="topic-pill"><i class="fa-solid fa-hospital"></i> Visão comparativa por estabelecimento</div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Agendadas por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cAgendadasPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Ofertas por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cOfertasPorEstab"></canvas></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Recepcionados por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cRecepcionadosPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Faltosos por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cFaltososPorEstab"></canvas></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Faturados por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cFaturadosPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Financeiro por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cFinanceiroPorEstab"></canvas></div></div></div></section>
+
+  <!-- ABA 5: AGENDAMENTOS VIVVER (MELHORADA) -->
+  <section id="tab-agendamentos_especialidades" class="tabContent">
+    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-chart-simple"></i></div><div><h3>Agendamentos Vivver</h3><div class="topic-sub">Acompanhamento das ofertas, recepcionados e faltosos</div></div><div class="topic-pill"><i class="fa-solid fa-stethoscope"></i> Monitoramento por especialidade e subgrupo</div></div>
+    
+    <!-- Tabelas de Especialidades Lado a Lado -->
+    <div class="three-tables">
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-user-check" style="color: var(--primary);"></i> Recepcionados por Especialidade</div><div class="table-wrapper"><table class="data-table-simple" id="tableRecepcionadosVivver"><thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Oferta</th></tr></thead><tbody id="tableRecepcionadosVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-user-slash" style="color: var(--danger);"></i> Faltosos por Especialidade</div><div class="table-wrapper"><table class="data-table-simple" id="tableFaltososVivver"><thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Oferta</th></tr></thead><tbody id="tableFaltososVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+    </div>
+    
+    <!-- Tabela Consolidada Ofertas por Especialidade -->
+    <div class="chartCard" style="margin-bottom: 24px;">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Consolidado de Ofertas por Especialidade (REC + FAL)</div>
+        <div class="table-wrapper"><table class="data-table-simple" id="tableOfertasConsolidadas"><thead><tr><th>Especialidade</th><th class="text-right">Recepcionados</th><th class="text-right">Faltosos</th><th class="text-right">Total Ofertas</th></tr></thead><tbody id="tableOfertasConsolidadasBody"><tr><td colspan="4">Carregando...</td></tr></tbody></table></div>
+    </div>
+
+    <!-- Tabelas de Subgrupos Lado a Lado -->
+    <div class="three-tables">
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-layer-group" style="color: var(--primary);"></i> Recepcionados por Subgrupo</div><div class="table-wrapper"><table class="data-table-simple" id="tableRecepcionadosSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total</th><th style="width:40%;">% Oferta</th></tr></thead><tbody id="tableRecepcionadosSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-layer-group" style="color: var(--danger);"></i> Faltosos por Subgrupo</div><div class="table-wrapper"><table class="data-table-simple" id="tableFaltososSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total</th><th style="width:40%;">% Oferta</th></tr></thead><tbody id="tableFaltososSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+    </div>
+  </section>
+
+  <!-- ABA 6: FILA DE ESPERA ATUAL (MELHORADA - Layout Pedido) -->
+  <section id="tab-demanda_reprimida" class="tabContent">
+    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-hourglass-half"></i></div><div><h3>Fila de Espera Atual</h3><div class="topic-sub">Leitura da demanda reprimida por especialidade, procedimento, complexidade e subgrupo</div></div><div class="topic-pill"><i class="fa-solid fa-users"></i> Acompanhamento da demanda reprimida</div></div>
+    
+    <!-- Layout: Sub Grupo e Especialidade na mesma linha -->
+    <div class="row2eq">
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-code-branch" style="color: var(--warning);"></i> Sub Grupo</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total</th><th style="width:40%;">% Total</th></tr></thead><tbody id="tableFilaSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-tag" style="color: var(--secondary);"></i> Especialidade</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaEspecialidade"><thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% Total</th></tr></thead><tbody id="tableFilaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+    </div>
+    
+    <!-- Layout: Procedimento e Complexidade na linha debaixo -->
+    <div class="row2eq">
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-syringe" style="color: var(--primary);"></i> Procedimento</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaProcedimento"><thead><tr><th>Procedimento</th><th class="text-right">Total</th><th style="width:40%;">% Total</th></tr></thead><tbody id="tableFilaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Complexidade</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaComplexidade"><thead><tr><th>Complexidade</th><th class="text-right">Total</th><th style="width:40%;">% Total</th></tr></thead><tbody id="tableFilaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+    </div>
+    
+    <div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-pie"></i> Distribuição por Complexidade</h3></div><div class="chartWrap"><canvas id="cFilaComplexidadeRosca"></canvas></div></div></div>
+  </section>
+
+  <!-- ABA 7: FILA RETROATIVA 2025 (MELHORADA - Layout Pedido) -->
+  <section id="tab-fila_retroativa" class="tabContent">
+    <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><h3>Demanda Fila Retroativa 2025</h3><div class="topic-sub">Demanda reprimida retroativa referente ao ano de 2025</div></div><div class="topic-pill"><i class="fa-solid fa-calendar-alt"></i> Dados retrospectivos</div></div>
+
+    <!-- KPIs -->
+    <div class="kpi-row" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 24px;">
+        <div class="kpi kpi-principal"><div class="kpiIcon"><i class="fa-solid fa-chart-line"></i></div><div><div class="label">Total Fila Retroativa 2025</div><div class="val" id="kFilaRetroativa">0</div><div class="sub" id="dataCorteRetroativaInfo">Carregando...</div></div></div>
+        <div class="kpi" style="background: linear-gradient(135deg, #10b981 0%, #059669 55%, #047857 100%); color: white;"><div class="kpiIcon" style="background: rgba(255,255,255,0.2);"><i class="fa-solid fa-calculator"></i></div><div><div class="label" style="color: rgba(255,255,255,0.8);">Média por Procedimento</div><div class="val" id="mediaPorProcedimento">0</div><div class="sub" style="color: rgba(255,255,255,0.7);">Procedimentos na fila retroativa</div></div></div>
+    </div>
+
+    <!-- Três tabelas lado a lado: Subgrupo, Procedimento, Complexidade -->
+    <div class="three-tables">
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-code-branch" style="color: var(--warning);"></i> Subgrupo</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaRetroativaSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total</th><th style="width:40%;">% Total</th></tr></thead><tbody id="tableFilaRetroativaSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-syringe" style="color: var(--primary);"></i> Procedimento</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaRetroativaProcedimento"><thead><tr><th>Procedimento</th><th class="text-right">Total</th><th style="width:40%;">% Total</th></tr></thead><tbody id="tableFilaRetroativaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Complexidade</div><div class="table-wrapper" style="max-height: 400px;"><table class="data-table-simple" id="tableFilaRetroativaComplexidade"><thead><tr><th>Complexidade</th><th class="text-right">Total</th><th style="width:40%;">% Total</th></tr></thead><tbody id="tableFilaRetroativaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- Gráfico de Evolução Mensal da Fila Retroativa -->
+    <div class="chartCard">
+      <div class="chartHead"><h3><i class="fa-solid fa-chart-line"></i> Evolução Mensal da Fila Retroativa</h3><div class="chartSub">Comparativo da demanda retroativa por competência</div></div>
+      <div class="chartWrap" style="height: 400px;"><canvas id="cEvolucaoFilaRetroativa"></canvas></div>
+    </div>
+
+    <!-- Tabela Detalhada Completa (Já existente, mantida) -->
+    <div class="chartCard">
+      <div class="table-title"><i class="fa-solid fa-table"></i> Detalhamento Completo da Fila Retroativa 2025<div class="table-controls"><input type="text" id="searchFilaRetroativa" placeholder="🔍 Buscar especialidade ou procedimento..." style="width: 260px;"></div></div>
+      <div class="table-wrapper" style="max-height: 500px;"><table class="data-table-detailed" id="tableFilaRetroativaCompleta"><thead><tr><th>Código</th><th>Especialidade</th><th>Procedimento</th><th>Grupo</th><th>Subgrupo</th><th>Complexidade</th><th class="text-right">Total</th><th>Data Corte</th></tr></thead><tbody id="tableFilaRetroativaCompletaBody"><tr><td colspan="8">Carregando...</td></tr></tbody></table></div>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
