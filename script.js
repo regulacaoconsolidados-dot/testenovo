@@ -738,6 +738,16 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
   if (monthSelect && !monthSelect.dataset.bound) { monthSelect.dataset.bound = "1"; monthSelect.addEventListener("change", () => renderAgendadasPorEspecialidadeEstabTable(filteredAgendados)); }
 }
 
+function getPeriodsFromFilteredData(...groups) { 
+  const arr = []; 
+  groups.flat().forEach(item => { 
+    if (item.mes) arr.push(item.mes); 
+    if (item.dataCorte) arr.push(item.dataCorte); 
+  }); 
+  const periods = sortPeriodos(arr); 
+  return periods.length ? periods : allPeriodos; 
+}
+
 function renderFinanceiro(filteredFinanceiro) {
   const periods = getPeriodsFromFilteredData(filteredFinanceiro);
   const financeiroPorMes = aggregateBy(filteredFinanceiro, d => d.mes, d => d.valor);
