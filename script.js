@@ -1,5 +1,7 @@
 // Registrar o plugin ChartDataLabels
-Chart.register(ChartDataLabels);
+if (typeof ChartDataLabels !== 'undefined') {
+    Chart.register(ChartDataLabels);
+}
 
 const el = id => document.getElementById(id);
 
@@ -178,6 +180,92 @@ function getDominantYearShort(periodos) {
 
 function aggregateBy(items, keyFn, valFn) { const map = new Map(); items.forEach(item => { const key = keyFn(item); if (!key) return; map.set(key, (map.get(key) || 0) + valFn(item)); }); return map; }
 
+// GRÁFICO DE EVOLUÇÃO MENSAL - FUNÇÃO PRINCIPAL CORRIGIDA
+function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
+  const canvas = el("cEvolucaoMista");
+  if (!canvas) {
+    console.error("Canvas cEvolucaoMista não encontrado no HTML");
+    return;
+  }
+  
+  destroyChart("cEvolucaoMista");
+  
+  const filaData = periods.map(p => filaPorMes.get(p) || 0);
+  const ofertaData = periods.map(p => ofertaPorMes.get(p) || 0);
+  const recepData = periods.map(p => recepcionadosPorMes.get(p) || 0);
+  const faltData = periods.map(p => faltososPorMes.get(p) || 0);
+  
+  charts.cEvolucaoMista = new Chart(canvas.getContext("2d"), {
+    type: "line",
+    data: {
+      labels: periods,
+      datasets: [
+        { label: "Fila de Espera", data: filaData, borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.1)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 7 },
+        { label: "Ofertas", data: ofertaData, borderColor: "#d97706", backgroundColor: "rgba(217,119,6,0.1)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#d97706", pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 7 },
+        { label: "Recepcionados", data: recepData, borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.1)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 7 },
+        { label: "Faltosos", data: faltData, borderColor: "#8b5cf6", backgroundColor: "rgba(139,92,246,0.1)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#8b5cf6", pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 7 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { position: "top", labels: { font: { size: 11, weight: "bold" }, boxWidth: 12, usePointStyle: true } },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } },
+        datalabels: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: "Quantidade", font: { weight: "bold", size: 11 } }, grid: { color: "rgba(148,163,184,0.1)" }, ticks: { callback: value => value.toLocaleString("pt-BR") } },
+        x: { grid: { display: false }, ticks: { font: { weight: "bold", size: 10, rotation: periods.length > 8 ? 45 : 0 } } }
+      }
+    }
+  });
+}
+
+function makeLineChart(canvasId, labels, datasets, showDatalabels = true, useMoney = false) {
+  const canvas = el(canvasId);
+  if (!canvas) return;
+  destroyChart(canvasId);
+  
+  charts[canvasId] = new Chart(canvas.getContext("2d"), {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "top", labels: { font: { size: 11, weight: "bold" }, boxWidth: 12, usePointStyle: true } },
+        tooltip: { callbacks: { label: ctx => useMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } },
+        datalabels: showDatalabels ? { color: "#1f2937", font: { weight: "bold", size: 10 }, formatter: value => value ? (useMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR")) : "", align: "top", offset: 6 } : { display: false }
+      },
+      scales: { y: { beginAtZero: true, grid: { color: "rgba(148,163,184,0.1)" }, ticks: { callback: value => useMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } }
+    }
+  });
+}
+
+function makeDoughnutChartWithPercentages(canvasId, labels, data, colors) {
+  const canvas = el(canvasId);
+  if (!canvas) return;
+  destroyChart(canvasId);
+  
+  const total = data.reduce((a, b) => a + b, 0);
+  
+  charts[canvasId] = new Chart(canvas.getContext("2d"), {
+    type: "doughnut",
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 8 }] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "right", labels: { font: { size: 10 }, boxWidth: 10, usePointStyle: true } },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw.toLocaleString("pt-BR")} (${((ctx.raw / total) * 100).toFixed(1)}%)` } },
+        datalabels: { color: "#fff", font: { weight: "bold", size: 11 }, formatter: (value) => { const percent = total > 0 ? ((value / total) * 100).toFixed(1) : "0"; return percent + "%"; } }
+      }
+    }
+  });
+}
+
 async function loadAllData() {
   const loadingEl = el("loading");
   if (loadingEl) loadingEl.classList.add("on");
@@ -191,6 +279,7 @@ async function loadAllData() {
       loadCSVSmart(URL_FINANCEIRO, ["PROCEDIMENTO DESCRIÇÃO", "GRUPO", "SUBGRUPO", "ESTABELECIMENTO", "ESPECIALIDADE"]),
       loadCSVSmart(URL_AGENDADOS, ["ESTABELECIMENTO", "ESPECIALIDADE", "Grupo Sigtap", "Sub Grupo Sigtap"])
     ]);
+    
     console.log("Dados carregados:", { 
       fila: filaRaw.length, 
       filaRetroativa: filaRetroativaRaw.length, 
@@ -557,7 +646,6 @@ function renderPercentReferenceTable(tbodyId, valueMap, referenceMap, color = "#
     const percent = ref > 0 ? ((value / ref) * 100) : 0; 
     const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0;
     const percentDisplay = percent > 0 ? `${percent.toFixed(1)}%` : "0%";
-    // Determina se a barra é muito pequena para mostrar o texto dentro
     const isBarTooSmall = barWidth < 15;
     return `<tr>
       <td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 45))}</td>
@@ -611,7 +699,6 @@ function makeHorizontalBarChart(id, labels, values, color, datasetLabel, isMoney
         tooltip: { callbacks: { label: ctx => isMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } }, 
         datalabels: { 
           color: function(context) {
-            // Se o valor for muito pequeno (menos de 5% do máximo), coloca texto escuro fora da barra
             const value = context.dataset.data[context.dataIndex];
             const maxValue = Math.max(...context.dataset.data);
             const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
@@ -622,21 +709,18 @@ function makeHorizontalBarChart(id, labels, values, color, datasetLabel, isMoney
             const value = context.dataset.data[context.dataIndex];
             const maxValue = Math.max(...context.dataset.data);
             const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
-            // Se a barra for muito pequena, ancora o texto no final da barra (fora)
             return percentage < 12 ? "end" : "center";
           },
           align: function(context) {
             const value = context.dataset.data[context.dataIndex];
             const maxValue = Math.max(...context.dataset.data);
             const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
-            // Se a barra for pequena, alinha o texto à direita (fora da barra)
             return percentage < 12 ? "right" : "center";
           },
           offset: function(context) {
             const value = context.dataset.data[context.dataIndex];
             const maxValue = Math.max(...context.dataset.data);
             const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
-            // Dá um espaçamento extra quando o texto está fora da barra
             return percentage < 12 ? 8 : 0;
           },
           formatter: value => { 
@@ -705,7 +789,7 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
   const allPeriodsFromData = getPeriodsFromFilteredData(combinedFilaData, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   const periods = allPeriodsFromData.length ? allPeriodsFromData : [];
   
-  console.log("Períodos para visão geral (incluindo dados retroativos):", periods);
+  console.log("Períodos para visão geral:", periods);
   
   const filaPorMes = aggregateBy(combinedFilaData, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
@@ -779,7 +863,7 @@ function renderFinTable(filteredFinanceiro) {
   filteredFinanceiro.forEach(d => { const estab = d.estabelecimento || "Não informado"; if (!map.has(estab)) map.set(estab, {}); map.get(estab)[d.mes] = (map.get(estab)[d.mes] || 0) + d.valor; });
   const rows = [...map.entries()].map(([estab, vals]) => ({ estabelecimento: estab, valores: vals, total: periods.reduce((s, p) => s + (vals[p] || 0), 0) })).sort((a, b) => b.total - a.total);
   const totalsByMonth = {}; periods.forEach(p => totalsByMonth[p] = 0); rows.forEach(r => periods.forEach(p => totalsByMonth[p] += (r.valores[p] || 0))); const grandTotal = rows.reduce((s, r) => s + r.total, 0);
-  wrap.innerHTML = `<table class="fin-table"><thead><tr><th>Estabelecimento</th>${periods.map(p => `<th>${escapeHtml(p)}</th>`).join("")}<th>Total</th></tr></thead><tbody>${rows.map(r => `<tr><td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(r.estabelecimento)}</td>${periods.map(p => `<td>${(r.valores[p] || 0) > 0 ? formatMoney(r.valores[p]) : "<span class='nt-value'>NT</span>"}</td>`).join("")}<td><strong>${formatMoney(r.total)}</strong></td></tr>`).join("")}<tr class="total-row"><td><strong>TOTAL GERAL</strong></td>${periods.map(p => `<td><strong>${formatMoney(totalsByMonth[p])}</strong></td>`).join("")}<td><strong>${formatMoney(grandTotal)}</strong></td></tr></tbody></table>`;
+  wrap.innerHTML = `<table class="fin-table"><thead><tr><th>Estabelecimento</th>${periods.map(p => `<th>${escapeHtml(p)}</th>`).join("")}<th>Total</th></tr></thead><tbody>${rows.map(r => `<td><td title="${escapeHtml(r.estabelecimento)}">${escapeHtml(r.estabelecimento)}</td>${periods.map(p => `<td>${(r.valores[p] || 0) > 0 ? formatMoney(r.valores[p]) : "<span class='nt-value'>NT</span>"}</td>`).join("")}<td><strong>${formatMoney(r.total)}</strong></td></tr>`).join("")}<tr class="total-row"><td><strong>TOTAL GERAL</strong></td>${periods.map(p => `<td><strong>${formatMoney(totalsByMonth[p])}</strong></td>`).join("")}<td><strong>${formatMoney(grandTotal)}</strong></td></tr></tbody></table>`;
 }
 
 function renderFisicoFinanceiro(filteredAgendados, filteredFaturado, filteredFinanceiro) {
@@ -838,7 +922,7 @@ function renderTableBodyFisico() {
       <td>${escapeHtml(r.mes || "-")}</td>
       <td class="text-right">${r.agendados.toLocaleString("pt-BR")}</td>
       <td class="text-right">${r.faturadosQtd.toLocaleString("pt-BR")}</td>
-      <td class="text-right">${formatMoney(r.financeiroValor)}</td>
+            <td class="text-right">${formatMoney(r.financeiroValor)}</td>
     </tr>
   `).join("");
   const tInfoFisico = el("tInfoFisico"); 
@@ -1036,7 +1120,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnRefresh = el("btnRefresh"); if (btnRefresh) btnRefresh.addEventListener("click", loadAllData);
   const btnExcel = el("btnExcel"); if (btnExcel) btnExcel.addEventListener("click", exportExcel);
   const btnClear = el("btnClear");
-  if (btnClear) { btnClear.addEventListener("click", () => { selectedSubgrupos.clear(); selectedEspecialidades.clear(); const grupoSelect = el("grupoSelect"); if (grupoSelect) grupoSelect.value = ""; const periodoSelect = el("periodoSelect"); if (periodoSelect) periodoSelect.value = ""; const tableMonthFilterFisico = el("tableMonthFilterFisico"); if (tableMonthFilterFisico) tableMonthFilterFisico.value = ""; const tabelaMonthFilterEspec = el("tabelaMonthFilterEspec"); if (tabelaMonthFilterEspec) tabelaMonthFilterEspec.value = ""; const msSearchSub = el("msSearchSub"); if (msSearchSub) msSearchSub.value = ""; const msSearchEsp = el("msSearchEsp"); if (msSearchEsp) msSearchEsp.value = ""; const tSearchFisico = el("tSearchFisico"); if (tSearchFisico) tSearchFisico.value = ""; const tabelaSearchEspec = el("tabelaSearchEspec"); if (tabelaSearchEspec) tabelaSearchEspec.value = ""; const searchFilaRetroativa = el("searchFilaRetroativa"); if (searchFilaRetroativa) searchFilaRetroativa.value = ""; currentTableMonthFilterFisico = ""; currentChartFilter = null; buildSubgrupoList(); buildEspecialidadeList(); applyFilters(); toast("Filtros limpos", "info"); }); }
+  if (btnClear) { btnClear.addEventListener("click", () => { 
+    selectedSubgrupos.clear(); 
+    selectedEspecialidades.clear(); 
+    const grupoSelect = el("grupoSelect"); if (grupoSelect) grupoSelect.value = ""; 
+    const periodoSelect = el("periodoSelect"); if (periodoSelect) periodoSelect.value = ""; 
+    const tableMonthFilterFisico = el("tableMonthFilterFisico"); if (tableMonthFilterFisico) tableMonthFilterFisico.value = ""; 
+    const tabelaMonthFilterEspec = el("tabelaMonthFilterEspec"); if (tabelaMonthFilterEspec) tabelaMonthFilterEspec.value = ""; 
+    const msSearchSub = el("msSearchSub"); if (msSearchSub) msSearchSub.value = ""; 
+    const msSearchEsp = el("msSearchEsp"); if (msSearchEsp) msSearchEsp.value = ""; 
+    const tSearchFisico = el("tSearchFisico"); if (tSearchFisico) tSearchFisico.value = ""; 
+    const tabelaSearchEspec = el("tabelaSearchEspec"); if (tabelaSearchEspec) tabelaSearchEspec.value = ""; 
+    const searchFilaRetroativa = el("searchFilaRetroativa"); if (searchFilaRetroativa) searchFilaRetroativa.value = ""; 
+    currentTableMonthFilterFisico = ""; 
+    currentChartFilter = null; 
+    buildSubgrupoList(); 
+    buildEspecialidadeList(); 
+    applyFilters(); 
+    toast("Filtros limpos", "info"); 
+  }); }
   const grupoSelect = el("grupoSelect"); if (grupoSelect) grupoSelect.addEventListener("change", () => { buildSubgrupoList(); applyFilters(); });
   const periodoSelect = el("periodoSelect"); if (periodoSelect) periodoSelect.addEventListener("change", () => { applyFilters(); });
   const tableMonthFilterFisico = el("tableMonthFilterFisico"); if (tableMonthFilterFisico) tableMonthFilterFisico.addEventListener("change", e => { currentTableMonthFilterFisico = e.target.value || ""; renderTableBodyFisico(); });
