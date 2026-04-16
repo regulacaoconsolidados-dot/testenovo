@@ -552,7 +552,26 @@ function renderPercentReferenceTable(tbodyId, valueMap, referenceMap, color = "#
   const arr = [...valueMap.entries()].sort((a, b) => b[1] - a[1]);
   if (!arr.length) { tbody.innerHTML = `<tr><td colspan="3">Nenhum dado disponível</td></tr>`; return; }
   const maxValue = arr[0][1] || 1;
-  tbody.innerHTML = arr.map(([name, value]) => { const ref = referenceMap.get(name) || 0; const percent = ref > 0 ? ((value / ref) * 100) : 0; const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0; const percentDisplay = percent > 0 ? `${percent.toFixed(1)}%` : "0%"; return `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 45))}</td><td class="text-right font-700">${value.toLocaleString("pt-BR")}</td><td><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);"><span style="${barWidth < 15 ? 'position:absolute;left:100%;margin-left:8px;color:#111' : ''}">${percentDisplay}</span></div></div></td></tr>`; }).join("");
+  tbody.innerHTML = arr.map(([name, value]) => { 
+    const ref = referenceMap.get(name) || 0; 
+    const percent = ref > 0 ? ((value / ref) * 100) : 0; 
+    const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0;
+    const percentDisplay = percent > 0 ? `${percent.toFixed(1)}%` : "0%";
+    // Determina se a barra é muito pequena para mostrar o texto dentro
+    const isBarTooSmall = barWidth < 15;
+    return `<tr>
+      <td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 45))}</td>
+      <td class="text-right font-700">${value.toLocaleString("pt-BR")}</td>
+      <td>
+        <div class="progress-bar-container" style="position: relative;">
+          <div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">
+            ${!isBarTooSmall ? `<span style="color: white;">${percentDisplay}</span>` : ''}
+          </div>
+          ${isBarTooSmall ? `<span style="position: absolute; left: ${Math.max(barWidth + 5, 0)}%; top: 50%; transform: translateY(-50%); color: #1f2937; font-size: 11px; font-weight: 700; white-space: nowrap;">${percentDisplay}</span>` : ''}
+        </div>
+      </td>
+    </tr>`; 
+  }).join("");
 }
 
 function renderPercentageTotalTable(tbodyId, dataMap, color = "#0b5e42") {
@@ -569,65 +588,70 @@ function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete chart
 function makeHorizontalBarChart(id, labels, values, color, datasetLabel, isMoney = false, dataLabelFontSize = 13) {
   const canvas = el(id); if (!canvas) return;
   destroyChart(id);
-  charts[id] = new Chart(canvas.getContext("2d"), { type: "bar", data: { labels, datasets: [{ label: datasetLabel, data: values, backgroundColor: color, borderRadius: 8, barPercentage: 0.72, categoryPercentage: 0.82 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", layout: { padding: { top: 8, right: 24, bottom: 8, left: 8 } }, plugins: { legend: { display: true, position: "top", labels: { font: { weight: "bold", size: 13 } } }, tooltip: { callbacks: { label: ctx => isMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } }, datalabels: { color: "#ffffff", font: { weight: "bold", size: dataLabelFontSize }, anchor: "center", align: "center", formatter: value => { if (!value) return ""; return isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); } } }, scales: { x: { beginAtZero: true, grid: { color: "rgba(148,163,184,0.10)" }, ticks: { font: { weight: "bold", size: 11 }, callback: value => isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } }, y: { grid: { display: false }, ticks: { font: { weight: "bold", size: 11 } } } } } });
-}
-
-function makeDoughnutChartWithPercentages(id, labels, values, colors) {
-  const canvas = el(id); if (!canvas) return;
-  destroyChart(id);
-  const total = values.reduce((a, b) => a + b, 0);
-  charts[id] = new Chart(canvas.getContext("2d"), { type: "doughnut", data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: "62%", plugins: { legend: { position: "bottom", labels: { font: { weight: "bold", size: 12 }, generateLabels: chart => { const data = chart.data; return data.labels.map((label, i) => ({ text: `${label}: ${(data.datasets[0].data[i] || 0).toLocaleString("pt-BR")} (${total > 0 ? (((data.datasets[0].data[i] || 0) / total) * 100).toFixed(1) : "0.0"}%)`, fillStyle: data.datasets[0].backgroundColor[i], hidden: false, index: i })); } } }, tooltip: { callbacks: { label: ctx => { const value = ctx.raw || 0; const percent = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0"; return `${ctx.label}: ${value.toLocaleString("pt-BR")} (${percent}%)`; } } }, datalabels: { color: "#fff", font: { weight: "bold", size: 13 }, formatter: value => { if (!value || total <= 0) return ""; const p = (value / total) * 100; return p >= 5 ? `${p.toFixed(1)}%` : ""; } } } } });
-}
-
-function makeLineChart(id, labels, datasets, yMoney = false, withDataLabels = true) {
-  const canvas = el(id); if (!canvas) return;
-  destroyChart(id);
-  charts[id] = new Chart(canvas.getContext("2d"), { type: "line", data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, layout: { padding: { top: 28, right: 24, bottom: 12, left: 12 } }, plugins: { legend: { position: "top", labels: { font: { weight: "bold", size: 12 }, usePointStyle: true, pointStyle: "circle", boxWidth: 10 } }, tooltip: { callbacks: { label: ctx => { const val = ctx.raw || 0; return yMoney ? `${ctx.dataset.label}: ${formatMoney(val)}` : `${ctx.dataset.label}: ${val.toLocaleString("pt-BR")}`; } } }, datalabels: { display: withDataLabels, color: ctx => ctx.dataset.borderColor || "#1F2937", font: { weight: "bold", size: 11 }, align: "top", anchor: "end", offset: 8, clamp: true, formatter: value => { if (!value) return ""; return yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); } } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } }, y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.12)" }, ticks: { font: { weight: "bold" }, callback: value => yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } } } } });
-}
-
-function getPeriodsFromFilteredData(...groups) { 
-  const arr = []; 
-  groups.flat().forEach(item => { 
-    if (item.mes) arr.push(item.mes); 
-    if (item.dataCorte) arr.push(item.dataCorte); 
-  }); 
-  const periods = sortPeriodos(arr); 
-  return periods.length ? periods : allPeriodos; 
-}
-
-function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
-  const canvas = el("cEvolucao"); if (!canvas) return;
-  destroyChart("cEvolucao");
-  
-  const filaData = periods.map(p => filaPorMes.get(p) || 0);
-  const ofertaData = periods.map(p => ofertaPorMes.get(p) || 0);
-  const recepData = periods.map(p => recepcionadosPorMes.get(p) || 0);
-  const faltaData = periods.map(p => faltososPorMes.get(p) || 0);
-  
-  charts.cEvolucao = new Chart(canvas.getContext("2d"), { 
+  charts[id] = new Chart(canvas.getContext("2d"), { 
+    type: "bar", 
     data: { 
-      labels: periods, 
-      datasets: [
-        { type: "bar", label: "Ofertas", data: ofertaData, backgroundColor: "rgba(37,99,235,0.22)", borderColor: "#2563eb", borderWidth: 1.5, borderRadius: 10, yAxisID: "y", order: 4 },
-        { type: "line", label: "Fila de Espera", data: filaData, borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y1", order: 1 },
-        { type: "line", label: "Recepcionados", data: recepData, borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 2 },
-        { type: "line", label: "Faltosos", data: faltaData, borderColor: "#d97706", backgroundColor: "rgba(217,119,6,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#d97706", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 3 }
-      ] 
+      labels, 
+      datasets: [{ 
+        label: datasetLabel, 
+        data: values, 
+        backgroundColor: color, 
+        borderRadius: 8, 
+        barPercentage: 0.72, 
+        categoryPercentage: 0.82 
+      }] 
     }, 
     options: { 
       responsive: true, 
       maintainAspectRatio: false, 
-      interaction: { mode: "index", intersect: false }, 
-      layout: { padding: { top: 24, right: 16, bottom: 10, left: 10 } }, 
+      indexAxis: "y", 
+      layout: { padding: { top: 8, right: 24, bottom: 8, left: 8 } }, 
       plugins: { 
-        legend: { position: "top", labels: { usePointStyle: true, pointStyle: "circle", font: { weight: "bold", size: 12 } } }, 
-        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } }, 
-        datalabels: { color: ctx => ctx.dataset.borderColor || "#111827", font: { weight: "bold", size: 10 }, formatter: value => { if (!value) return ""; return value.toLocaleString("pt-BR"); }, align: ctx => ctx.dataset.type === "bar" ? "end" : "top", anchor: ctx => ctx.dataset.type === "bar" ? "end" : "end", offset: 6, clamp: true } 
+        legend: { display: true, position: "top", labels: { font: { weight: "bold", size: 13 } } }, 
+        tooltip: { callbacks: { label: ctx => isMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } }, 
+        datalabels: { 
+          color: function(context) {
+            // Se o valor for muito pequeno (menos de 5% do máximo), coloca texto escuro fora da barra
+            const value = context.dataset.data[context.dataIndex];
+            const maxValue = Math.max(...context.dataset.data);
+            const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+            return percentage < 12 ? "#1f2937" : "#ffffff";
+          },
+          font: { weight: "bold", size: dataLabelFontSize }, 
+          anchor: function(context) {
+            const value = context.dataset.data[context.dataIndex];
+            const maxValue = Math.max(...context.dataset.data);
+            const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+            // Se a barra for muito pequena, ancora o texto no final da barra (fora)
+            return percentage < 12 ? "end" : "center";
+          },
+          align: function(context) {
+            const value = context.dataset.data[context.dataIndex];
+            const maxValue = Math.max(...context.dataset.data);
+            const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+            // Se a barra for pequena, alinha o texto à direita (fora da barra)
+            return percentage < 12 ? "right" : "center";
+          },
+          offset: function(context) {
+            const value = context.dataset.data[context.dataIndex];
+            const maxValue = Math.max(...context.dataset.data);
+            const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+            // Dá um espaçamento extra quando o texto está fora da barra
+            return percentage < 12 ? 8 : 0;
+          },
+          formatter: value => { 
+            if (!value) return ""; 
+            return isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); 
+          } 
+        } 
       }, 
       scales: { 
-        x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } }, 
-        y: { beginAtZero: true, position: "left", grace: "10%", grid: { display: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Oferta / Recepcionados / Faltosos", font: { weight: "bold" } } }, 
-        y1: { beginAtZero: true, position: "right", grace: "10%", grid: { display: false, drawOnChartArea: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Fila de Espera", font: { weight: "bold" } } } 
+        x: { 
+          beginAtZero: true, 
+          grid: { color: "rgba(148,163,184,0.10)" }, 
+          ticks: { font: { weight: "bold", size: 11 }, callback: value => isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } 
+        }, 
+        y: { grid: { display: false }, ticks: { font: { weight: "bold", size: 11 } } } 
       } 
     } 
   });
