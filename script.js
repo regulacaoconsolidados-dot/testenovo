@@ -375,7 +375,6 @@ async function loadAllData() {
       });
     });
 
-    // Coletar todos os períodos para os filtros
     const allPeriodsCollected = [...dadosFila.map(d => d.dataCorte), ...dadosFilaRetroativa.map(d => d.dataCorte), ...dadosAgendamentosVivver.map(d => d.mes), ...dadosFaturado.map(d => d.mes), ...dadosFinanceiro.map(d => d.mes), ...dadosAgendados.map(d => d.mes)].filter(Boolean);
     allPeriodos = sortPeriodos(allPeriodsCollected);
     console.log("Períodos encontrados:", allPeriodos);
@@ -486,7 +485,6 @@ function applyFilters() {
   const totalFaturadosQtd = filteredFaturado.reduce((s, d) => s + d.quantidade, 0);
   const totalFinanceiro = filteredFinanceiro.reduce((s, d) => s + d.valor, 0);
   
-  // Card Fila Retroativa (total com filtros)
   const totalFilaRetroativa = dadosFilaRetroativa.reduce((s, d) => s + d.fila, 0);
   const kFilaRetroativaCard = el("kFilaRetroativaCard");
   if (kFilaRetroativaCard) kFilaRetroativaCard.innerText = totalFilaRetroativa.toLocaleString("pt-BR");
@@ -539,7 +537,7 @@ function applyFilters() {
   renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   renderAgendamentosVivver(filteredAgVivver);
   renderFila(filteredFila);
-  renderFilaRetroativa(); // Atualiza a aba retroativa com os filtros aplicados
+  renderFilaRetroativa();
 }
 
 function renderSimpleRankingTable(tbodyId, dataMap, isMoney = false) {
@@ -554,7 +552,7 @@ function renderPercentReferenceTable(tbodyId, valueMap, referenceMap, color = "#
   const arr = [...valueMap.entries()].sort((a, b) => b[1] - a[1]);
   if (!arr.length) { tbody.innerHTML = `<tr><td colspan="3">Nenhum dado disponível</td></tr>`; return; }
   const maxValue = arr[0][1] || 1;
-  tbody.innerHTML = arr.map(([name, value]) => { const ref = referenceMap.get(name) || 0; const percent = ref > 0 ? ((value / ref) * 100) : 0; const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0; return `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 45))}</td><td class="text-right font-700">${value.toLocaleString("pt-BR")}</td><td><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">${percent > 0 ? `<span>${percent.toFixed(1)}%</span>` : ""}</div></div></td></tr>`; }).join("");
+  tbody.innerHTML = arr.map(([name, value]) => { const ref = referenceMap.get(name) || 0; const percent = ref > 0 ? ((value / ref) * 100) : 0; const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0; const percentDisplay = percent > 0 ? `${percent.toFixed(1)}%` : "0%"; return `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 45))}</td><td class="text-right font-700">${value.toLocaleString("pt-BR")}</td><td><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);"><span style="${barWidth < 15 ? 'position:absolute;left:100%;margin-left:8px;color:#111' : ''}">${percentDisplay}</span></div></div></td></tr>`; }).join("");
 }
 
 function renderPercentageTotalTable(tbodyId, dataMap, color = "#0b5e42") {
@@ -563,7 +561,7 @@ function renderPercentageTotalTable(tbodyId, dataMap, color = "#0b5e42") {
   const total = arr.reduce((s, [,v]) => s + v, 0);
   const maxValue = arr[0]?.[1] || 1;
   if (!arr.length) { tbody.innerHTML = `<tr><td colspan="3">Nenhum dado disponível</td></tr>`; return; }
-  tbody.innerHTML = arr.map(([name, value]) => { const percent = total > 0 ? (value / total) * 100 : 0; const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0; return `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 55))}</td><td class="text-right font-700">${value.toLocaleString("pt-BR")}</td><td><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">${percent > 0 ? `<span>${percent.toFixed(1)}%</span>` : ""}</div></div></td></tr>`; }).join("");
+  tbody.innerHTML = arr.map(([name, value]) => { const percent = total > 0 ? (value / total) * 100 : 0; const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0; const percentDisplay = percent > 0 ? `${percent.toFixed(1)}%` : "0%"; return `<tr><td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 55))}</td><td class="text-right font-700">${value.toLocaleString("pt-BR")}</td><td><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);"><span style="${barWidth < 15 ? 'position:absolute;left:100%;margin-left:8px;color:#111' : ''}">${percentDisplay}</span></div></div></td></tr>`; }).join("");
 }
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
@@ -679,27 +677,17 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
 }
 
 function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
-  // CORREÇÃO: Incorporar dados retroativos na evolução da fila
-  // Combinar dados da fila principal com os dados retroativos para ter uma visão completa
   const combinedFilaData = [...filteredFila, ...dadosFilaRetroativa];
-  
-  // Obter todos os períodos disponíveis (meses e datas de corte)
   const allPeriodsFromData = getPeriodsFromFilteredData(combinedFilaData, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
-  
-  // Se não houver períodos, usar um array vazio
   const periods = allPeriodsFromData.length ? allPeriodsFromData : [];
   
   console.log("Períodos para visão geral (incluindo dados retroativos):", periods);
   
-  // Agora usar os dados combinados para a fila
   const filaPorMes = aggregateBy(combinedFilaData, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
   
-  console.log("Dados de fila por mês (combinados):", filaPorMes);
-  
-  // Renderizar o gráfico de evolução com os dados combinados
   renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
   
   const agendadosPorMes = aggregateBy(filteredAgendados, d => d.mes, d => d.agendados);
@@ -731,20 +719,17 @@ function renderFinanceiro(filteredFinanceiro) {
   const financeiroPorMes = aggregateBy(filteredFinanceiro, d => d.mes, d => d.valor);
   const financeiroEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento, d => d.valor);
   
-  // Atualizar Cards
   const totalGeral = filteredFinanceiro.reduce((s, d) => s + d.valor, 0);
   const mediaMensal = periods.length > 0 ? totalGeral / periods.length : 0;
   let maiorValor = 0, maiorMes = "";
   for (const [mes, valor] of financeiroPorMes.entries()) {
       if (valor > maiorValor) { maiorValor = valor; maiorMes = mes; }
   }
-  const totalRegistros = filteredFinanceiro.length;
   
   if (el("finTotalGeral")) el("finTotalGeral").innerText = formatMoney(totalGeral);
   if (el("finMediaMensal")) el("finMediaMensal").innerText = formatMoney(mediaMensal);
   if (el("finMaiorMes")) el("finMaiorMes").innerText = formatMoney(maiorValor);
   if (el("finMaiorMesLabel")) el("finMaiorMesLabel").innerText = maiorMes || "-";
-  if (el("finTotalRegistros")) el("finTotalRegistros").innerText = totalRegistros.toLocaleString("pt-BR");
 
   makeLineChart("cFaturamentoMensal", periods, [{ label: "Financeiro", data: periods.map(p => financeiroPorMes.get(p) || 0), borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8 }], true, true);
   const topEstab = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
@@ -771,7 +756,6 @@ function renderFisicoFinanceiro(filteredAgendados, filteredFaturado, filteredFin
   filteredFinanceiro.forEach(d => { const row = addRow(d.estabelecimento || "Não informado", d.mes); row.financeiroValor += d.valor; });
   currentTableDataFisico = [...map.values()].sort((a, b) => b.financeiroValor - a.financeiroValor);
   
-  // Renderizar gráficos comparativos
   const estabelecimentosMap = new Map();
   currentTableDataFisico.forEach(item => {
       const estab = item.estabelecimento;
@@ -788,7 +772,7 @@ function renderFisicoFinanceiro(filteredAgendados, filteredFaturado, filteredFin
   const financeiroData = topEstabs.map(([,v]) => v.financeiroValor);
   
   makeHorizontalBarChart("cComparativoQtd", labels, agendadosData, "#b6923e", "Agendados", false);
-  // Segundo gráfico: Faturados vs Financeiro (usando um gráfico de barras duplas ou um segundo gráfico)
+  
   const canvasCompFin = el("cComparativoFinanceiro");
   if (canvasCompFin) {
       destroyChart("cComparativoFinanceiro");
@@ -862,7 +846,6 @@ function renderAgendamentosVivver(filteredAgVivver) {
   const recepEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.recepcionados);
   const faltEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.faltosos);
   
-  // Tabela Consolidada Ofertas por Especialidade
   const consolidatedOfertas = new Map();
   filteredAgVivver.forEach(d => {
       if (!d.especialidade) return;
@@ -879,7 +862,6 @@ function renderAgendamentosVivver(filteredAgVivver) {
       else tbodyOfertas.innerHTML = '<tr><td colspan="4">Nenhum dado disponível</td></tr>';
   }
   
-  // Tabelas por Subgrupo
   const recepSub = aggregateBy(filteredAgVivver, d => d.subgrupo, d => d.recepcionados);
   const faltSub = aggregateBy(filteredAgVivver, d => d.subgrupo, d => d.faltosos);
   const ofertaSub = aggregateBy(filteredAgVivver, d => d.subgrupo, d => d.oferta);
@@ -906,7 +888,6 @@ function renderFila(filteredFila) {
 }
 
 function renderFilaRetroativa() {
-  // Aplicar os filtros de grupo, subgrupo, especialidade e período aos dados retroativos
   let filteredRetroativa = dadosFilaRetroativa.filter(d => {
       const grupo = el("grupoSelect")?.value || "";
       const periodo = el("periodoSelect")?.value || "";
@@ -921,7 +902,6 @@ function renderFilaRetroativa() {
   const kFilaRetroativa = el("kFilaRetroativa");
   if (kFilaRetroativa) kFilaRetroativa.innerText = totalFilaRetroativa.toLocaleString("pt-BR");
   
-  // Cálculo da média por procedimento
   const procedimentosUnicos = new Set();
   filteredRetroativa.forEach(d => {
     if (d.codigo && d.codigo.trim() !== "") {
@@ -952,8 +932,8 @@ function renderFilaRetroativa() {
   renderPercentageTotalTable("tableFilaRetroativaSubgrupoBody", filaRetroativaSubgrupo, "#d97706");
   renderPercentageTotalTable("tableFilaRetroativaProcedimentoBody", filaRetroativaProcedimento, "#a855f7");
   renderPercentageTotalTable("tableFilaRetroativaComplexidadeBody", filaRetroativaComplexidade, "#8b5cf6");
+  renderPercentageTotalTable("tableFilaRetroativaComplexidadeDetalhadaBody", filaRetroativaComplexidade, "#8b5cf6");
   
-  // Gráfico de Evolução Mensal da Fila Retroativa
   const filaPorMes = aggregateBy(filteredRetroativa, d => d.dataCorte, d => d.fila);
   const periods = getPeriodsFromFilteredData(filteredRetroativa);
   const lineData = periods.map(p => filaPorMes.get(p) || 0);
