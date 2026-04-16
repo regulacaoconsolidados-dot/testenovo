@@ -566,23 +566,23 @@ function renderPercentageTotalTable(tbodyId, dataMap, color = "#0b5e42") {
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
-function makeHorizontalBarChart(id, labels, values, color, datasetLabel, isMoney = false, dataLabelFontSize = 11) {
+function makeHorizontalBarChart(id, labels, values, color, datasetLabel, isMoney = false, dataLabelFontSize = 13) {
   const canvas = el(id); if (!canvas) return;
   destroyChart(id);
-  charts[id] = new Chart(canvas.getContext("2d"), { type: "bar", data: { labels, datasets: [{ label: datasetLabel, data: values, backgroundColor: color, borderRadius: 8, barPercentage: 0.72, categoryPercentage: 0.82 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", layout: { padding: { top: 8, right: 24, bottom: 8, left: 8 } }, plugins: { legend: { display: true, position: "top", labels: { font: { weight: "bold", size: 12 } } }, tooltip: { callbacks: { label: ctx => isMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } }, datalabels: { color: "#ffffff", font: { weight: "bold", size: dataLabelFontSize }, anchor: "center", align: "center", formatter: value => { if (!value) return ""; return isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); } } }, scales: { x: { beginAtZero: true, grid: { color: "rgba(148,163,184,0.10)" }, ticks: { font: { weight: "bold", size: 10 }, callback: value => isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } }, y: { grid: { display: false }, ticks: { font: { weight: "bold", size: 10 } } } } } });
+  charts[id] = new Chart(canvas.getContext("2d"), { type: "bar", data: { labels, datasets: [{ label: datasetLabel, data: values, backgroundColor: color, borderRadius: 8, barPercentage: 0.72, categoryPercentage: 0.82 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", layout: { padding: { top: 8, right: 24, bottom: 8, left: 8 } }, plugins: { legend: { display: true, position: "top", labels: { font: { weight: "bold", size: 13 } } }, tooltip: { callbacks: { label: ctx => isMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } }, datalabels: { color: "#ffffff", font: { weight: "bold", size: dataLabelFontSize }, anchor: "center", align: "center", formatter: value => { if (!value) return ""; return isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); } } }, scales: { x: { beginAtZero: true, grid: { color: "rgba(148,163,184,0.10)" }, ticks: { font: { weight: "bold", size: 11 }, callback: value => isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } }, y: { grid: { display: false }, ticks: { font: { weight: "bold", size: 11 } } } } } });
 }
 
 function makeDoughnutChartWithPercentages(id, labels, values, colors) {
   const canvas = el(id); if (!canvas) return;
   destroyChart(id);
   const total = values.reduce((a, b) => a + b, 0);
-  charts[id] = new Chart(canvas.getContext("2d"), { type: "doughnut", data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: "62%", plugins: { legend: { position: "bottom", labels: { font: { weight: "bold", size: 11 }, generateLabels: chart => { const data = chart.data; return data.labels.map((label, i) => ({ text: `${label}: ${(data.datasets[0].data[i] || 0).toLocaleString("pt-BR")} (${total > 0 ? (((data.datasets[0].data[i] || 0) / total) * 100).toFixed(1) : "0.0"}%)`, fillStyle: data.datasets[0].backgroundColor[i], hidden: false, index: i })); } } }, tooltip: { callbacks: { label: ctx => { const value = ctx.raw || 0; const percent = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0"; return `${ctx.label}: ${value.toLocaleString("pt-BR")} (${percent}%)`; } } }, datalabels: { color: "#fff", font: { weight: "bold", size: 13 }, formatter: value => { if (!value || total <= 0) return ""; const p = (value / total) * 100; return p >= 5 ? `${p.toFixed(1)}%` : ""; } } } } });
+  charts[id] = new Chart(canvas.getContext("2d"), { type: "doughnut", data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: "62%", plugins: { legend: { position: "bottom", labels: { font: { weight: "bold", size: 12 }, generateLabels: chart => { const data = chart.data; return data.labels.map((label, i) => ({ text: `${label}: ${(data.datasets[0].data[i] || 0).toLocaleString("pt-BR")} (${total > 0 ? (((data.datasets[0].data[i] || 0) / total) * 100).toFixed(1) : "0.0"}%)`, fillStyle: data.datasets[0].backgroundColor[i], hidden: false, index: i })); } } }, tooltip: { callbacks: { label: ctx => { const value = ctx.raw || 0; const percent = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0"; return `${ctx.label}: ${value.toLocaleString("pt-BR")} (${percent}%)`; } } }, datalabels: { color: "#fff", font: { weight: "bold", size: 13 }, formatter: value => { if (!value || total <= 0) return ""; const p = (value / total) * 100; return p >= 5 ? `${p.toFixed(1)}%` : ""; } } } } });
 }
 
 function makeLineChart(id, labels, datasets, yMoney = false, withDataLabels = true) {
   const canvas = el(id); if (!canvas) return;
   destroyChart(id);
-  charts[id] = new Chart(canvas.getContext("2d"), { type: "line", data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, layout: { padding: { top: 28, right: 24, bottom: 12, left: 12 } }, plugins: { legend: { position: "top", labels: { font: { weight: "bold", size: 12 }, usePointStyle: true, pointStyle: "circle", boxWidth: 10 } }, tooltip: { callbacks: { label: ctx => { const val = ctx.raw || 0; return yMoney ? `${ctx.dataset.label}: ${formatMoney(val)}` : `${ctx.dataset.label}: ${val.toLocaleString("pt-BR")}`; } } }, datalabels: { display: withDataLabels, color: ctx => ctx.dataset.borderColor || "#1F2937", font: { weight: "bold", size: 10 }, align: "top", anchor: "end", offset: 8, clamp: true, formatter: value => { if (!value) return ""; return yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); } } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } }, y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.12)" }, ticks: { font: { weight: "bold" }, callback: value => yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } } } } });
+  charts[id] = new Chart(canvas.getContext("2d"), { type: "line", data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, layout: { padding: { top: 28, right: 24, bottom: 12, left: 12 } }, plugins: { legend: { position: "top", labels: { font: { weight: "bold", size: 12 }, usePointStyle: true, pointStyle: "circle", boxWidth: 10 } }, tooltip: { callbacks: { label: ctx => { const val = ctx.raw || 0; return yMoney ? `${ctx.dataset.label}: ${formatMoney(val)}` : `${ctx.dataset.label}: ${val.toLocaleString("pt-BR")}`; } } }, datalabels: { display: withDataLabels, color: ctx => ctx.dataset.borderColor || "#1F2937", font: { weight: "bold", size: 11 }, align: "top", anchor: "end", offset: 8, clamp: true, formatter: value => { if (!value) return ""; return yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR"); } } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } }, y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.12)" }, ticks: { font: { weight: "bold" }, callback: value => yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } } } } });
 }
 
 function getPeriodsFromFilteredData(...groups) { 
@@ -659,7 +659,7 @@ function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValu
   if (currentChartFilter !== "faturados") datasets.push({ label: "Agendados", data: agendadosValues, backgroundColor: "#b6923e", borderRadius: 8 });
   if (currentChartFilter !== "agendados") datasets.push({ label: "Faturados", data: faturadosValues, backgroundColor: "#059669", borderRadius: 8 });
   if (datasets.length === 0) datasets.push({ label: "Agendados", data: agendadosValues, backgroundColor: "#b6923e", borderRadius: 8 });
-  charts.cAgendadosVsFaturadosMes = new Chart(canvas.getContext("2d"), { type: "bar", data: { labels: periods, datasets: datasets }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 12, right: 20, bottom: 10, left: 10 } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } }, datalabels: { color: "#fff", font: { weight: "bold", size: 11 }, formatter: value => value ? value.toLocaleString("pt-BR") : "", anchor: "center", align: "center" } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: "bold" } } }, y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.10)" }, ticks: { font: { weight: "bold" } } } } } });
+  charts.cAgendadosVsFaturadosMes = new Chart(canvas.getContext("2d"), { type: "bar", data: { labels: periods, datasets: datasets }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 12, right: 20, bottom: 10, left: 10 } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } }, datalabels: { color: "#fff", font: { weight: "bold", size: 12 }, formatter: value => value ? value.toLocaleString("pt-BR") : "", anchor: "center", align: "center" } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: "bold" } } }, y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.10)" }, ticks: { font: { weight: "bold" } } } } } });
 }
 
 function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
@@ -703,7 +703,7 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
   makeLineChart("cReceitaFinanceiraMes", periods, [{ label: "Receita Financeira", data: periods.map(p => financeiroPorMes.get(p) || 0), borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8 }], true, true);
   const financeiroEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento, d => d.valor);
   const topFinanceiroEstab = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  makeHorizontalBarChart("cFatEstabelecimento", topFinanceiroEstab.map(([k]) => truncateLabel(k, 28)), topFinanceiroEstab.map(([,v]) => v), "#059669", "Financeiro", true);
+  makeHorizontalBarChart("cFatEstabelecimento", topFinanceiroEstab.map(([k]) => truncateLabel(k, 28)), topFinanceiroEstab.map(([,v]) => v), "#059669", "Financeiro", true, 12);
   const totalOferta = filteredAgVivver.reduce((s, d) => s + d.oferta, 0);
   const totalRecepcionados = filteredAgVivver.reduce((s, d) => s + d.recepcionados, 0);
   const totalFaltosos = filteredAgVivver.reduce((s, d) => s + d.faltosos, 0);
@@ -733,7 +733,7 @@ function renderFinanceiro(filteredFinanceiro) {
 
   makeLineChart("cFaturamentoMensal", periods, [{ label: "Financeiro", data: periods.map(p => financeiroPorMes.get(p) || 0), borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8 }], true, true);
   const topEstab = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-  makeHorizontalBarChart("cFatEstabelecimentoFinanceiro", topEstab.map(([k]) => truncateLabel(k, 28)), topEstab.map(([,v]) => v), "#059669", "Financeiro por Estabelecimento", true);
+  makeHorizontalBarChart("cFatEstabelecimentoFinanceiro", topEstab.map(([k]) => truncateLabel(k, 28)), topEstab.map(([,v]) => v), "#059669", "Financeiro por Estabelecimento", true, 12);
   renderFinTable(filteredFinanceiro);
 }
 
@@ -771,14 +771,14 @@ function renderFisicoFinanceiro(filteredAgendados, filteredFaturado, filteredFin
   const faturadosData = topEstabs.map(([,v]) => v.faturadosQtd);
   const financeiroData = topEstabs.map(([,v]) => v.financeiroValor);
   
-  makeHorizontalBarChart("cComparativoQtd", labels, agendadosData, "#b6923e", "Agendados", false);
+  makeHorizontalBarChart("cComparativoQtd", labels, agendadosData, "#b6923e", "Agendados", false, 12);
   
   const canvasCompFin = el("cComparativoFinanceiro");
   if (canvasCompFin) {
       destroyChart("cComparativoFinanceiro");
       charts.cComparativoFinanceiro = new Chart(canvasCompFin.getContext("2d"), {
           type: "bar", data: { labels: labels, datasets: [{ label: "Financeiro (R$)", data: financeiroData, backgroundColor: "#059669", borderRadius: 8, yAxisID: "y1" }, { label: "Total Faturado (Qtd)", data: faturadosData, backgroundColor: "#2563eb", borderRadius: 8, yAxisID: "y" }] },
-          options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, plugins: { tooltip: { callbacks: { label: ctx => { if (ctx.dataset.label === "Financeiro (R$)") return formatMoney(ctx.raw); return `${ctx.dataset.label}: ${ctx.raw.toLocaleString("pt-BR")}`; } } }, datalabels: { color: "#fff", font: { weight: "bold", size: 10 }, formatter: (value, ctx) => { if (!value) return ""; if (ctx.dataset.label === "Financeiro (R$)") return formatMoneyCompact(value); return value.toLocaleString("pt-BR"); }, anchor: "center", align: "center" } }, scales: { y: { beginAtZero: true, title: { display: true, text: "Quantidade Faturada" }, ticks: { callback: value => value.toLocaleString("pt-BR") } }, y1: { position: "right", beginAtZero: true, title: { display: true, text: "Financeiro (R$)" }, ticks: { callback: value => formatMoneyCompact(value) }, grid: { drawOnChartArea: false } } } }
+          options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, plugins: { tooltip: { callbacks: { label: ctx => { if (ctx.dataset.label === "Financeiro (R$)") return formatMoney(ctx.raw); return `${ctx.dataset.label}: ${ctx.raw.toLocaleString("pt-BR")}`; } } }, datalabels: { color: "#fff", font: { weight: "bold", size: 11 }, formatter: (value, ctx) => { if (!value) return ""; if (ctx.dataset.label === "Financeiro (R$)") return formatMoneyCompact(value); return value.toLocaleString("pt-BR"); }, anchor: "center", align: "center" } }, scales: { y: { beginAtZero: true, title: { display: true, text: "Quantidade Faturada" }, ticks: { callback: value => value.toLocaleString("pt-BR") }, grid: { display: false } }, y1: { position: "right", beginAtZero: true, title: { display: true, text: "Financeiro (R$)" }, ticks: { callback: value => formatMoneyCompact(value) }, grid: { drawOnChartArea: false, display: false } }, x: { grid: { display: false } } } }
       });
   }
   
@@ -833,12 +833,12 @@ function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFatu
   const topFalt = [...faltososEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFatQtd = [...faturadosQtdEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFinanceiro = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  makeHorizontalBarChart("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas");
-  makeHorizontalBarChart("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas");
-  makeHorizontalBarChart("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados");
-  makeHorizontalBarChart("cFaltososPorEstab", topFalt.map(([k]) => truncateLabel(k, 28)), topFalt.map(([,v]) => v), "#dc2626", "Faltosos");
-  makeHorizontalBarChart("cFaturadosPorEstab", topFatQtd.map(([k]) => truncateLabel(k, 28)), topFatQtd.map(([,v]) => v), "#2563eb", "Faturados");
-  makeHorizontalBarChart("cFinanceiroPorEstab", topFinanceiro.map(([k]) => truncateLabel(k, 28)), topFinanceiro.map(([,v]) => v), "#059669", "Financeiro", true);
+  makeHorizontalBarChart("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas", false, 13);
+  makeHorizontalBarChart("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas", false, 13);
+  makeHorizontalBarChart("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados", false, 13);
+  makeHorizontalBarChart("cFaltososPorEstab", topFalt.map(([k]) => truncateLabel(k, 28)), topFalt.map(([,v]) => v), "#dc2626", "Faltosos", false, 13);
+  makeHorizontalBarChart("cFaturadosPorEstab", topFatQtd.map(([k]) => truncateLabel(k, 28)), topFatQtd.map(([,v]) => v), "#2563eb", "Faturados", false, 13);
+  makeHorizontalBarChart("cFinanceiroPorEstab", topFinanceiro.map(([k]) => truncateLabel(k, 28)), topFinanceiro.map(([,v]) => v), "#059669", "Financeiro", true, 13);
 }
 
 function renderAgendamentosVivver(filteredAgVivver) {
@@ -927,12 +927,9 @@ function renderFilaRetroativa() {
   
   const filaRetroativaSubgrupo = aggregateBy(filteredRetroativa, d => d.subgrupo, d => d.fila);
   const filaRetroativaProcedimento = aggregateBy(filteredRetroativa, d => d.descricao, d => d.fila);
-  const filaRetroativaComplexidade = aggregateBy(filteredRetroativa, d => d.complexidade, d => d.fila);
   
   renderPercentageTotalTable("tableFilaRetroativaSubgrupoBody", filaRetroativaSubgrupo, "#d97706");
   renderPercentageTotalTable("tableFilaRetroativaProcedimentoBody", filaRetroativaProcedimento, "#a855f7");
-  renderPercentageTotalTable("tableFilaRetroativaComplexidadeBody", filaRetroativaComplexidade, "#8b5cf6");
-  renderPercentageTotalTable("tableFilaRetroativaComplexidadeDetalhadaBody", filaRetroativaComplexidade, "#8b5cf6");
   
   const filaPorMes = aggregateBy(filteredRetroativa, d => d.dataCorte, d => d.fila);
   const periods = getPeriodsFromFilteredData(filteredRetroativa);
