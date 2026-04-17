@@ -470,14 +470,18 @@ function createGaugeChart(canvasId, percent, color) {
 
 function applyFilters() {
   console.log("Aplicando filtros...");
+  
+  // Aplicar filtros em TODOS os datasets
   const filteredFila = dadosFila.filter(d => matchBaseWithDimensions(d, true));
+  const filteredFilaRetroativa = dadosFilaRetroativa.filter(d => matchBaseWithDimensions(d, true));
   const filteredAgVivver = dadosAgendamentosVivver.filter(d => matchBaseWithDimensions(d, true));
   const filteredAgendados = dadosAgendados.filter(d => matchBaseWithDimensions(d, true));
   const filteredFaturado = dadosFaturado.filter(d => matchFaturadoFinanceiro(d));
   const filteredFinanceiro = dadosFinanceiro.filter(d => matchFaturadoFinanceiro(d));
 
-  console.log("Dados filtrados - Fila:", filteredFila.length, "Agendamentos Vivver:", filteredAgVivver.length);
+  console.log("Dados filtrados - Fila:", filteredFila.length, "Fila Retroativa:", filteredFilaRetroativa.length, "Agendamentos Vivver:", filteredAgVivver.length);
 
+  // Cálculo dos totais
   const totalFila = filteredFila.reduce((s, d) => s + d.fila, 0);
   const totalRecepcionados = filteredAgVivver.reduce((s, d) => s + d.recepcionados, 0);
   const totalFaltosos = filteredAgVivver.reduce((s, d) => s + d.faltosos, 0);
@@ -485,7 +489,10 @@ function applyFilters() {
   const totalFaturadosQtd = filteredFaturado.reduce((s, d) => s + d.quantidade, 0);
   const totalFinanceiro = filteredFinanceiro.reduce((s, d) => s + d.valor, 0);
   
-  const totalFilaRetroativa = dadosFilaRetroativa.reduce((s, d) => s + d.fila, 0);
+  // TOTAL FILA RETROATIVA COM FILTROS - CORRIGIDO!
+  const totalFilaRetroativa = filteredFilaRetroativa.reduce((s, d) => s + d.fila, 0);
+  
+  // Atualizar KPIs
   const kFilaRetroativaCard = el("kFilaRetroativaCard");
   if (kFilaRetroativaCard) kFilaRetroativaCard.innerText = totalFilaRetroativa.toLocaleString("pt-BR");
 
@@ -531,13 +538,14 @@ function applyFilters() {
   if (el("gAbsAus")) el("gAbsAus").textContent = faltososGauge.toLocaleString("pt-BR");
   createGaugeChart("cGaugeAbs", taxaAbsenteismo, absColor);
 
-  renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
+  // Renderizar todas as abas com os dados FILTRADOS
+  renderVisaoGeral(filteredFila, filteredFilaRetroativa, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   renderFinanceiro(filteredFinanceiro);
   renderFisicoFinanceiro(filteredAgendados, filteredFaturado, filteredFinanceiro);
   renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   renderAgendamentosVivver(filteredAgVivver);
   renderFila(filteredFila);
-  renderFilaRetroativa();
+  renderFilaRetroativa(filteredFilaRetroativa);
 }
 
 function renderSimpleRankingTable(tbodyId, dataMap, isMoney = false) {
@@ -711,12 +719,13 @@ function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
   updateLegendActiveStyle();
 }
 
-function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
-  const combinedFilaData = [...filteredFila, ...dadosFilaRetroativa];
+function renderVisaoGeral(filteredFila, filteredFilaRetroativa, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro) {
+  // Combinar dados de fila principal e retroativa para o gráfico de evolução
+  const combinedFilaData = [...filteredFila, ...filteredFilaRetroativa];
   const allPeriodsFromData = getPeriodsFromFilteredData(combinedFilaData, filteredAgVivver, filteredAgendados, filteredFaturado, filteredFinanceiro);
   const periods = allPeriodsFromData.length ? allPeriodsFromData : [];
   
-  console.log("Períodos para visão geral (incluindo dados retroativos):", periods);
+  console.log("Períodos para visão geral (incluindo dados retroativos filtrados):", periods);
   
   const filaPorMes = aggregateBy(combinedFilaData, d => d.dataCorte, d => d.fila);
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
@@ -922,17 +931,7 @@ function renderFila(filteredFila) {
   makeDoughnutChartWithPercentages("cFilaComplexidadeRosca", complexArr.map(([k]) => truncateLabel(k || "Sem Dados", 28)), complexArr.map(([,v]) => v), ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626", "#3b82f6", "#059669"]);
 }
 
-function renderFilaRetroativa() {
-  let filteredRetroativa = dadosFilaRetroativa.filter(d => {
-      const grupo = el("grupoSelect")?.value || "";
-      const periodo = el("periodoSelect")?.value || "";
-      const especialidadeMatch = !selectedEspecialidades.size || selectedEspecialidades.has(d.especialidade);
-      const periodoMatch = !periodo || d.dataCorte === periodo;
-      let grupoMatch = !grupo || d.grupoCodigo === grupo;
-      let subgrupoMatch = !selectedSubgrupos.size || selectedSubgrupos.has(d.subgrupo);
-      return especialidadeMatch && periodoMatch && grupoMatch && subgrupoMatch;
-  });
-  
+function renderFilaRetroativa(filteredRetroativa) {
   const totalFilaRetroativa = filteredRetroativa.reduce((s, d) => s + d.fila, 0);
   const kFilaRetroativa = el("kFilaRetroativa");
   if (kFilaRetroativa) kFilaRetroativa.innerText = totalFilaRetroativa.toLocaleString("pt-BR");
@@ -1010,7 +1009,10 @@ function renderFilaRetroativa() {
   const searchInput = el("searchFilaRetroativa");
   if (searchInput && !searchInput.dataset.bound) {
     searchInput.dataset.bound = "1";
-    searchInput.addEventListener("input", () => renderFilaRetroativa());
+    searchInput.addEventListener("input", () => {
+      const filtered = dadosFilaRetroativa.filter(d => matchBaseWithDimensions(d, true));
+      renderFilaRetroativa(filtered);
+    });
   }
 }
 
