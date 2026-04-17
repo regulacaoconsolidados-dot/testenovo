@@ -101,7 +101,7 @@
     <div class="chartCard"><div class="chartHead"><div><h3><i class="fa-solid fa-chart-line"></i> Evolução mensal dos principais indicadores</h3><div class="chartSub">Barras para oferta e linhas para fila, recepcionados e faltosos</div></div></div><div class="chartWrap chartWrap-hero"><canvas id="cEvolucao"></canvas></div></div>
     <div class="graficos-lado"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Agendados vs Faturados por Mês</h3><div id="legendAgendadosFaturados" class="legend-with-avg"></div></div><div class="chartWrap"><canvas id="cAgendadosVsFaturadosMes"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-line"></i> Receita Financeira por Mês</h3><div class="chartSub">Evolução do valor financeiro consolidado</div></div><div class="chartWrap"><canvas id="cReceitaFinanceiraMes"></canvas></div></div></div>
     <div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Financeiro por Estabelecimento</h3><div class="chartSub">Ranking dos estabelecimentos com maior valor financeiro</div></div><div class="chartWrap"><canvas id="cFatEstabelecimento"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-simple"></i> Funil Cirúrgico</h3><div class="chartSub">Oferta → Recepcionados → Faltosos</div></div><div class="chartWrap"><canvas id="cFunil"></canvas></div></div></div>
-    <div class="estatistica-card"><div class="estatistica-title"><div><i class="fa-solid fa-table" style="color: var(--primary);"></i> Cirurgias Agendadas por Especialidade e Estabelecimento</div><div class="table-controls"><input type="text" id="tabelaSearchEspec" placeholder="🔍 Buscar especialidade..." style="width: 220px;"><select id="tabelaMonthFilterEspec" style="width: 180px;"><option value="">Todos os meses</option></select></div></div><div class="estabelecimento-table-wrapper"><table class="estabelecimento-table" id="tableAgendadasPorEspecEstab"><thead><tr><th>Especialidade</th><th>Mês</th><th>Belo Horizonte</th><th>Centro Materno Infantil</th><th>Hospital Municipal de Contagem</th><th>Hospital São José</th><th>Hospital Santa Rita</th><th>Total</th></tr></thead><tbody id="tableAgendadasPorEspecEstabBody"><tr><td colspan="8">Carregando...络‹</td></tbody>}</table></div></div>
+    <div class="estatistica-card"><div class="estatistica-title"><div><i class="fa-solid fa-table" style="color: var(--primary);"></i> Cirurgias Agendadas por Especialidade e Estabelecimento</div><div class="table-controls"><input type="text" id="tabelaSearchEspec" placeholder="🔍 Buscar especialidade..." style="width: 220px;"><select id="tabelaMonthFilterEspec" style="width: 180px;"><option value="">Todos os meses</option></select></div></div><div class="estabelecimento-table-wrapper"><table class="estabelecimento-table" id="tableAgendadasPorEspecEstab"><thead><tr><th>Especialidade</th><th>Mês</th><th>Belo Horizonte</th><th>Centro Materno Infantil</th><th>Hospital Municipal de Contagem</th><th>Hospital São José</th><th>Hospital Santa Rita</th><th>Total</th></tr></thead><tbody id="tableAgendadasPorEspecEstabBody"><tr><td colspan="8">Carregando...络‹</tbody>}</table></div></div>
   </section>
 
   <!-- ABA 2: FINANCEIRO -->
@@ -111,7 +111,6 @@
   <section id="tab-fisico_financeiro" class="tabContent">
     <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-database"></i></div><div><h3>Físico x Financeiro</h3><div class="topic-sub">Comparativo entre quantidade agendada, faturada e resultado financeiro</div></div><div class="topic-pill"><i class="fa-solid fa-scale-balanced"></i> Comparação operacional e financeira</div></div>
     
-    <!-- NOVOS GRÁFICOS FÍSICO X FINANCEIRO -->
     <div class="row2eq" style="margin-bottom: 28px;">
       <div class="chartCard">
         <div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Quantidade Agendada x Total Faturado por Estabelecimento</h3><div class="chartSub">Comparativo físico (quantidade faturada) - Barras Horizontais</div></div>
@@ -133,7 +132,7 @@
   <!-- ABA 4: DADOS POR ESTABELECIMENTO -->
   <section id="tab-consolidado_estabelecimento" class="tabContent"><div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-building"></i></div><div><h3>Dados por Estabelecimento</h3><div class="topic-sub">Distribuição dos principais indicadores por unidade executora</div></div><div class="topic-pill"><i class="fa-solid fa-hospital"></i> Visão comparativa por estabelecimento</div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Agendadas por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cAgendadasPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Ofertas por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cOfertasPorEstab"></canvas></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Recepcionados por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cRecepcionadosPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Faltosos por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cFaltososPorEstab"></canvas></div></div></div><div class="row2eq"><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Faturados por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cFaturadosPorEstab"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3><i class="fa-solid fa-chart-bar"></i> Financeiro por Estabelecimento</h3></div><div class="chartWrap"><canvas id="cFinanceiroPorEstab"></canvas></div></div></div></section>
 
-  <!-- ABA 5: AGENDAMENTOS VIVVER - REFORMULADA -->
+  <!-- ABA 5: AGENDAMENTOS VIVVER - REFORMULADA COM CABEÇALHOS CORRIGIDOS -->
   <section id="tab-agendamentos_especialidades" class="tabContent">
     <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-chart-simple"></i></div><div><h3>Agendamentos Vivver</h3><div class="topic-sub">Acompanhamento detalhado de recepcionados e faltosos</div></div><div class="topic-pill"><i class="fa-solid fa-stethoscope"></i> Monitoramento avançado</div></div>
     
@@ -141,30 +140,55 @@
     <div class="row2eq" style="margin-bottom: 20px;">
       <div class="chartCard">
         <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Recepcionados por Subgrupo</div>
-        <div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableRecepcionadosSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total</th><th style="width:40%;">% da Oferta do Subgrupo</th></tr></thead><tbody id="tableRecepcionadosSubgrupoBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Subgrupo</th><th class="text-right">Total</th><th style="width:40%;">% da Oferta do Subgrupo</th></tr></thead>
+            <tbody id="tableRecepcionadosSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
       </div>
       <div class="chartCard">
         <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--danger);"></i> Faltosos por Subgrupo</div>
-        <div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableFaltososSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total</th><th style="width:40%;">% da Oferta do Subgrupo</th></tr></thead><tbody id="tableFaltososSubgrupoBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Subgrupo</th><th class="text-right">Total</th><th style="width:40%;">% da Oferta do Subgrupo</th></tr></thead>
+            <tbody id="tableFaltososSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- Segunda Linha: Especialidades -->
+    <!-- Segunda Linha: Especialidades - CABEÇALHOS CORRIGIDOS -->
     <div class="row2eq" style="margin-bottom: 20px;">
       <div class="chartCard">
         <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Recepcionados por Especialidade</div>
-        <div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableRecepcionadosVivverBody"><thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% da Oferta da Especialidade</th></tr></thead><tbody id="tableRecepcionadosVivverBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% da Oferta da Especialidade</th></tr></thead>
+            <tbody id="tableRecepcionadosVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
       </div>
       <div class="chartCard">
         <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--danger);"></i> Faltosos por Especialidade</div>
-        <div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableFaltososVivverBody"><thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% da Oferta da Especialidade</th></tr></thead><tbody id="tableFaltososVivverBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Especialidade</th><th class="text-right">Total</th><th style="width:40%;">% da Oferta da Especialidade</th></tr></thead>
+            <tbody id="tableFaltososVivverBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- Consolidado de Ofertas por Especialidade (REC + FAL) -->
     <div class="chartCard">
       <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: var(--warning);"></i> Consolidado de Ofertas por Especialidade (REC + FAL)</div>
-      <div class="table-wrapper"><table class="data-table-simple" id="tableOfertasConsolidado"><thead><tr><th>Especialidade</th><th class="text-right">Recepcionados</th><th class="text-right">Faltosos</th><th class="text-right">Total da Oferta</th></tr></thead><tbody id="tableOfertasConsolidadoBody"><tr><td colspan="4">Carregando...络‹</tbody>}</table></div>
+      <div class="table-wrapper">
+        <table class="data-table-simple">
+          <thead><tr><th>Especialidade</th><th class="text-right">Recepcionados</th><th class="text-right">Faltosos</th><th class="text-right">Total da Oferta</th></tr></thead>
+          <tbody id="tableOfertasConsolidadoBody"><tr><td colspan="4">Carregando...</td></tr></tbody>
+        </table>
+      </div>
     </div>
   </section>
 
@@ -172,19 +196,48 @@
   <section id="tab-demanda_reprimida" class="tabContent">
     <div class="topic-header"><div class="topic-header-icon"><i class="fa-solid fa-hourglass-half"></i></div><div><h3>Fila de Espera Atual</h3><div class="topic-sub">Distribuição da demanda por subgrupo, especialidade, procedimento e complexidade</div></div><div class="topic-pill"><i class="fa-solid fa-users"></i> Análise detalhada</div></div>
     
-    <!-- Primeira Linha: Sub Grupo e Especialidade -->
     <div class="row2eq" style="margin-bottom: 20px;">
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #d97706;"></i> Sub Grupo</div><div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableFilaSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaSubgrupoBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div></div>
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #2563eb;"></i> Especialidade</div><div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableFilaEspecialidade"><thead><tr><th>Especialidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaEspecialidadeBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div></div>
+      <div class="chartCard">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #d97706;"></i> Sub Grupo</div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Subgrupo</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
+            <tbody id="tableFilaSubgrupoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chartCard">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #2563eb;"></i> Especialidade</div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Especialidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
+            <tbody id="tableFilaEspecialidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- Segunda Linha: Procedimento e Complexidade (Tabelas) -->
     <div class="row2eq" style="margin-bottom: 20px;">
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #059669;"></i> Procedimento</div><div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableFilaProcedimento"><thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaProcedimentoBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div></div>
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Complexidade</div><div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableFilaComplexidade"><thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaComplexidadeBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div></div>
+      <div class="chartCard">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #059669;"></i> Procedimento</div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
+            <tbody id="tableFilaProcedimentoBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chartCard">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Complexidade</div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
+            <tbody id="tableFilaComplexidadeBody"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- Gráfico de Rosca: Distribuição por Complexidade -->
     <div class="row2eq">
       <div class="chartCard">
         <div class="chartHead"><h3><i class="fa-solid fa-chart-pie"></i> Distribuição por Complexidade</h3><div class="chartSub">Percentual dentro do gráfico e legenda detalhada abaixo</div></div>
@@ -201,25 +254,53 @@
       <div class="topic-pill"><i class="fa-solid fa-calendar-alt"></i> Dados 2025</div>
     </div>
 
-    <!-- KPI Row -->
     <div class="kpi-row" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px;">
       <div class="kpi kpi-retroativa" style="background: var(--kpi-retroativa); color: white;"><div class="kpiIcon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><div class="label">Total na Fila Retroativa</div><div class="val" id="kFilaRetroativaTotalValue">0</div><div class="sub" id="dataCorteRetroativaInfo">Carregando data de corte...</div></div></div>
       <div class="media-card"><div class="media-label"><i class="fa-solid fa-chart-line"></i> Média por Procedimento</div><div class="media-value" id="kMediaRetroativa">0</div><div class="media-sub">Procedimentos cadastrados</div></div>
     </div>
 
-    <!-- Primeira Linha: Subgrupo e Procedimento -->
     <div class="row2eq" style="margin-bottom: 20px;">
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #d97706;"></i> Subgrupo</div><div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableFilaRetroativaSubgrupo"><thead><tr><th>Subgrupo</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaRetroativaSubgrupoBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div></div>
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #059669;"></i> Procedimento</div><div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableFilaRetroativaProcedimento"><thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaRetroativaProcedimentoBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div></div>
+      <div class="chartCard">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #d97706;"></i> Subgrupo</div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Subgrupo</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
+            <tbody id="tableFilaRetroativaSubgrupoBody"><tr><td colspan="3">Carregando...络‹</tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chartCard">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #059669;"></i> Procedimento</div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Procedimento</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
+            <tbody id="tableFilaRetroativaProcedimentoBody"><tr><td colspan="3">Carregando...络‹</tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- Segunda Linha: Complexidade e Evolução Mensal -->
     <div class="row2eq" style="margin-bottom: 20px;">
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Complexidade</div><div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableFilaRetroativaComplexidade"><thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead><tbody id="tableFilaRetroativaComplexidadeBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div></div>
-      <div class="chartCard"><div class="table-title"><i class="fa-solid fa-chart-line"></i> Evolução Mensal da Fila Retroativa</div><div class="table-wrapper" style="max-height: 420px;"><table class="data-table-simple" id="tableEvolucaoMensalRetroativa"><thead><tr><th>Mês/Ano</th><th class="text-right">Total na Fila</th><th style="width:40%;">% Acumulado</th></tr></thead><tbody id="tableEvolucaoMensalRetroativaBody"><tr><td colspan="3">Carregando...络‹</tbody>}</table></div></div>
+      <div class="chartCard">
+        <div class="table-title"><i class="fa-solid fa-chart-simple" style="color: #8b5cf6;"></i> Complexidade</div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Complexidade</th><th class="text-right">Total na Fila</th><th style="width:40%;">% do Total</th></tr></thead>
+            <tbody id="tableFilaRetroativaComplexidadeBody"><tr><td colspan="3">Carregando...络‹</tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chartCard">
+        <div class="table-title"><i class="fa-solid fa-chart-line"></i> Evolução Mensal da Fila Retroativa</div>
+        <div class="table-wrapper" style="max-height: 420px;">
+          <table class="data-table-simple">
+            <thead><tr><th>Mês/Ano</th><th class="text-right">Total na Fila</th><th style="width:40%;">% Acumulado</th></tr></thead>
+            <tbody id="tableEvolucaoMensalRetroativaBody"><tr><td colspan="3">Carregando...络‹</tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- Detalhamento Completo -->
     <div class="chartCard">
       <div class="table-title"><i class="fa-solid fa-table"></i> Detalhamento Completo da Fila Retroativa 2025<div class="table-controls"><input type="text" id="searchFilaRetroativa" placeholder="🔍 Buscar especialidade ou procedimento..." style="width: 260px;"></div></div>
       <div class="table-wrapper" style="max-height: 500px;"><table class="data-table-detailed" id="tableFilaRetroativaCompleta"><thead><tr><th>Código</th><th>Especialidade</th><th>Procedimento</th><th>Grupo</th><th>Subgrupo</th><th>Complexidade</th><th class="text-right">Total</th><th>Data Corte</th></tr></thead><tbody id="tableFilaRetroativaCompletaBody"><tr><td colspan="8">Carregando...络‹</tbody>}</table></div>
