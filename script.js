@@ -12,25 +12,12 @@ const URL_FILA_RETROATIVA = "https://docs.google.com/spreadsheets/d/1ax8ZpVRSZnD
 
 const MONTHS_ORDER = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 const MONTH_HEADER_MAP = {
-  "JANEIRO": "jan",
-  "FEVEREIRO": "fev",
-  "MARCO": "mar",
-  "MARÇO": "mar",
-  "ABRIL": "abr",
-  "MAIO": "mai",
-  "JUNHO": "jun",
-  "JULHO": "jul",
-  "AGOSTO": "ago",
-  "SETEMBRO": "set",
-  "OUTUBRO": "out",
-  "NOVEMBRO": "nov",
-  "DEZEMBRO": "dez"
+  "JANEIRO": "jan", "FEVEREIRO": "fev", "MARCO": "mar", "MARÇO": "mar", "ABRIL": "abr",
+  "MAIO": "mai", "JUNHO": "jun", "JULHO": "jul", "AGOSTO": "ago", "SETEMBRO": "set",
+  "OUTUBRO": "out", "NOVEMBRO": "nov", "DEZEMBRO": "dez"
 };
 
-const GRUPOS_SIGTAP = {
-  "03": "03 - Procedimentos clínicos",
-  "04": "04 - Procedimentos cirúrgicos"
-};
+const GRUPOS_SIGTAP = { "03": "03 - Procedimentos clínicos", "04": "04 - Procedimentos cirúrgicos" };
 
 // Variáveis globais
 let dadosFila = [];
@@ -109,7 +96,7 @@ function formatMoney(v) {
 function formatMoneyCompact(v) {
   const n = Number(v || 0);
   if (n >= 1000000) return "R$ " + (n / 1000000).toFixed(1) + "M";
-  if (n >= 1000) return "R$ " + (n / 1000).toFixed(1) + " mil";
+  if (n >= 1000) return "R$ " + (n / 1000).toFixed(1) + "k";
   return formatMoney(n);
 }
 
@@ -262,6 +249,13 @@ function aggregateBy(items, keyFn, valFn) {
   return map;
 }
 
+function destroyChart(id) {
+  if (charts[id]) {
+    charts[id].destroy();
+    delete charts[id];
+  }
+}
+
 async function loadAllData() {
   const loadingEl = el("loading");
   if (loadingEl) loadingEl.classList.add("on");
@@ -376,7 +370,6 @@ async function loadAllData() {
 
     latestDataCorteRetroativa = latestRetroativaDateValue || "Não disponível";
     
-    // Atualiza KPI de data de corte retroativa
     const dataCorteRetroativaCard = el("dataCorteRetroativaInfoCard");
     if (dataCorteRetroativaCard) {
       dataCorteRetroativaCard.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
@@ -426,7 +419,7 @@ async function loadAllData() {
       financeiroValor: parseNumberBR(getField(r, ["TOTAL FINANCEIRO", "Total Financeiro"]))
     })).filter(d => d.mes && (d.agendados > 0 || d.faturadoQtd > 0 || d.financeiroValor > 0));
 
-    // Processa Agendados - Nova estrutura com Grupo e Subgrupo
+    // Processa Agendados
     dadosAgendados = [];
     agendadosRaw.forEach(r => {
       const estabelecimento = normalizeText(getField(r, ["ESTABELECIMENTO", "Estabelecimento"]));
@@ -438,7 +431,6 @@ async function loadAllData() {
       if (especialidade) especialidadesSet.add(especialidade);
       if (grupoSigtap) gruposSet.add(extractGrupoCodigo(grupoSigtap));
       
-      // Adiciona relação especialidade-grupo/subgrupo
       if (especialidade && grupoSigtap) {
         addMapSet(especialidadeToGrupos, especialidade, extractGrupoCodigo(grupoSigtap));
       }
@@ -446,7 +438,6 @@ async function loadAllData() {
         addMapSet(especialidadeToSubgrupos, especialidade, subGrupoSigtap);
       }
       
-      // Processa os meses
       Object.keys(r).forEach(col => {
         const shortMonth = monthNameToShort(col);
         if (!shortMonth) return;
@@ -785,6 +776,510 @@ function createGaugeChart(canvasId, percent, color) {
   });
 }
 
+// Função para renderizar tabelas com percentual inteligente (fora da barra quando pequeno)
+function renderSmartProgressTable(tbodyId, dataMap, referenceMap = null, color = "#0b5e42", isPercentOfTotal = false) {
+  const tbody = el(tbodyId);
+  if (!tbody) return;
+  let items = [...dataMap.entries()].sort((a, b) => b[1] - a[1]);
+  if (!items.length) { 
+    tbody.innerHTML = `<tr><td colspan="3">Nenhum dado disponível</td></tr>`; 
+    return; 
+  }
+  const total = isPercentOfTotal ? items.reduce((s, [,v]) => s + v, 0) : 0;
+  const maxValue = items[0][1] || 1;
+  tbody.innerHTML = items.map(([name, value]) => {
+    let percent = 0;
+    if (referenceMap && referenceMap.has(name)) {
+      percent = referenceMap.get(name) > 0 ? (value / referenceMap.get(name)) * 100 : 0;
+    } else if (isPercentOfTotal && total > 0) {
+      percent = (value / total) * 100;
+    }
+    const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0;
+    const showLabelInside = barWidth > 18;
+    return `
+      <tr>
+        <td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 55))}</td>
+        <td class="text-right font-700">${value.toLocaleString("pt-BR")}</td>
+        <td>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">
+              ${showLabelInside && percent > 0 ? `<span>${percent.toFixed(1)}%</span>` : ""}
+            </div>
+            ${!showLabelInside && percent > 0 ? `<span style="position: absolute; left: ${Math.min(barWidth + 5, 98)}%; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 800; color: #333; white-space: nowrap;">${percent.toFixed(1)}%</span>` : ""}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function makeHorizontalBarChart(id, labels, values, color, datasetLabel, isMoney = false, dataLabelFontSize = 13) {
+  const canvas = el(id);
+  if (!canvas) return;
+  destroyChart(id);
+  charts[id] = new Chart(canvas.getContext("2d"), {
+    type: "bar",
+    data: { labels, datasets: [{ label: datasetLabel, data: values, backgroundColor: color, borderRadius: 8, barPercentage: 0.72, categoryPercentage: 0.82 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: "y",
+      layout: { padding: { top: 8, right: 24, bottom: 8, left: 8 } },
+      plugins: {
+        legend: { display: true, position: "top", labels: { font: { weight: "bold", size: 13 } } },
+        tooltip: { callbacks: { label: ctx => isMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } },
+        datalabels: {
+          color: "#ffffff", font: { weight: "bold", size: dataLabelFontSize },
+          anchor: "center", align: "center",
+          formatter: value => value ? (isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR")) : ""
+        }
+      },
+      scales: {
+        x: { beginAtZero: true, grid: { color: "rgba(148,163,184,0.10)" }, ticks: { font: { weight: "bold", size: 11 }, callback: value => isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } },
+        y: { grid: { display: false }, ticks: { font: { weight: "bold", size: 11 } } }
+      }
+    }
+  });
+}
+
+function makeDoughnutChartWithDetails(id, labels, values, colors) {
+  const canvas = el(id);
+  if (!canvas) return;
+  destroyChart(id);
+  const total = values.reduce((a, b) => a + b, 0);
+  charts[id] = new Chart(canvas.getContext("2d"), {
+    type: "doughnut",
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: "62%",
+      plugins: {
+        legend: { 
+          position: "bottom", 
+          labels: { 
+            font: { weight: "bold", size: 12 }, 
+            generateLabels: chart => chart.data.labels.map((label, i) => ({
+              text: `${label}: ${(chart.data.datasets[0].data[i] || 0).toLocaleString("pt-BR")} (${total > 0 ? ((chart.data.datasets[0].data[i] / total) * 100).toFixed(1) : "0.0"}%)`,
+              fillStyle: chart.data.datasets[0].backgroundColor[i],
+              hidden: false,
+              index: i
+            }))
+          } 
+        },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw.toLocaleString("pt-BR")} (${total > 0 ? ((ctx.raw / total) * 100).toFixed(1) : "0.0"}%)` } },
+        datalabels: { color: "#fff", font: { weight: "bold", size: 14 }, formatter: value => value && total > 0 ? `${((value / total) * 100).toFixed(1)}%` : "" }
+      }
+    }
+  });
+}
+
+function makeLineChart(id, labels, datasets, yMoney = false, withDataLabels = true) {
+  const canvas = el(id);
+  if (!canvas) return;
+  destroyChart(id);
+  charts[id] = new Chart(canvas.getContext("2d"), {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      layout: { padding: { top: 28, right: 24, bottom: 12, left: 12 } },
+      plugins: {
+        legend: { position: "top", labels: { font: { weight: "bold", size: 12 }, usePointStyle: true, pointStyle: "circle", boxWidth: 10 } },
+        tooltip: { callbacks: { label: ctx => yMoney ? `${ctx.dataset.label}: ${formatMoney(ctx.raw)}` : `${ctx.dataset.label}: ${ctx.raw.toLocaleString("pt-BR")}` } },
+        datalabels: {
+          display: withDataLabels,
+          color: ctx => ctx.dataset.borderColor || "#1F2937",
+          font: { weight: "bold", size: 10 },
+          align: "top",
+          anchor: "end",
+          offset: 8,
+          clamp: true,
+          formatter: value => value ? (yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR")) : ""
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } },
+        y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.12)" }, ticks: { font: { weight: "bold" }, callback: value => yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") } }
+      }
+    }
+  });
+}
+
+function getPeriodsFromFilteredData(...groups) {
+  const arr = [];
+  groups.flat().forEach(item => {
+    if (item.mes) arr.push(item.mes);
+    if (item.dataCorte) arr.push(item.dataCorte);
+  });
+  const periods = sortPeriodos(arr);
+  return periods.length ? periods : allPeriodos;
+}
+
+function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
+  const canvas = el("cEvolucao");
+  if (!canvas) return;
+  destroyChart("cEvolucao");
+  charts.cEvolucao = new Chart(canvas.getContext("2d"), {
+    data: {
+      labels: periods,
+      datasets: [
+        { type: "bar", label: "Ofertas", data: periods.map(p => ofertaPorMes.get(p) || 0), backgroundColor: "rgba(37,99,235,0.22)", borderColor: "#2563eb", borderWidth: 1.5, borderRadius: 10, yAxisID: "y", order: 4 },
+        { type: "line", label: "Fila de Espera", data: periods.map(p => filaPorMes.get(p) || 0), borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#dc2626", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y1", order: 1 },
+        { type: "line", label: "Recepcionados", data: periods.map(p => recepcionadosPorMes.get(p) || 0), borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#059669", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 2 },
+        { type: "line", label: "Faltosos", data: periods.map(p => faltososPorMes.get(p) || 0), borderColor: "#d97706", backgroundColor: "rgba(217,119,6,0.10)", borderWidth: 3, fill: false, tension: 0.28, pointBackgroundColor: "#ffffff", pointBorderColor: "#d97706", pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 8, yAxisID: "y", order: 3 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, layout: { padding: { top: 24, right: 16, bottom: 10, left: 10 } },
+      plugins: {
+        legend: { position: "top", labels: { usePointStyle: true, pointStyle: "circle", font: { weight: "bold", size: 12 } } },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } },
+        datalabels: { color: ctx => ctx.dataset.borderColor || "#111827", font: { weight: "bold", size: 10 }, formatter: value => value ? value.toLocaleString("pt-BR") : "", align: ctx => ctx.dataset.type === "bar" ? "end" : "top", anchor: ctx => ctx.dataset.type === "bar" ? "end" : "end", offset: 6, clamp: true }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false } },
+        y: { beginAtZero: true, position: "left", grace: "10%", grid: { display: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Oferta / Recepcionados / Faltosos", font: { weight: "bold" } } },
+        y1: { beginAtZero: true, position: "right", grace: "10%", grid: { display: false, drawOnChartArea: false }, ticks: { font: { weight: "bold" }, callback: value => value.toLocaleString("pt-BR") }, title: { display: true, text: "Fila de Espera", font: { weight: "bold" } } }
+      }
+    }
+  });
+}
+
+function renderAgendadasPorEspecialidadeEstabTable(filteredAgendados) {
+  const tbody = el("tableAgendadasPorEspecEstabBody");
+  if (!tbody) return;
+  const searchTerm = (el("tabelaSearchEspec")?.value || "").toLowerCase();
+  const monthFilter = el("tabelaMonthFilterEspec")?.value || "";
+  if (!filteredAgendados.length) {
+    tbody.innerHTML = '<tr><td colspan="8">Nenhum dado disponível</td></tr>';
+    return;
+  }
+  const estabelecimentosFixos = ["Belo Horizonte", "Centro Materno Infantil", "Hospital Municipal de Contagem", "Hospital São José", "Hospital Santa Rita"];
+  const normalizeEstabName = name => {
+    const nameLower = String(name || "").toLowerCase();
+    if (nameLower.includes("belo horizonte") || nameLower.includes("bh")) return "Belo Horizonte";
+    if (nameLower.includes("centro materno") || nameLower.includes("materno infantil")) return "Centro Materno Infantil";
+    if (nameLower.includes("contagem")) return "Hospital Municipal de Contagem";
+    if (nameLower.includes("são josé") || nameLower.includes("sao jose")) return "Hospital São José";
+    if (nameLower.includes("santa rita")) return "Hospital Santa Rita";
+    return name;
+  };
+  const map = new Map();
+  filteredAgendados.forEach(d => {
+    if (!d.especialidade) return;
+    const key = `${d.especialidade}||${d.mes}`;
+    if (!map.has(key)) {
+      map.set(key, { especialidade: d.especialidade, mes: d.mes, valores: { "Belo Horizonte": 0, "Centro Materno Infantil": 0, "Hospital Municipal de Contagem": 0, "Hospital São José": 0, "Hospital Santa Rita": 0 }, total: 0 });
+    }
+    const item = map.get(key);
+    const estabNormalizado = normalizeEstabName(d.estabelecimento);
+    if (estabelecimentosFixos.includes(estabNormalizado)) item.valores[estabNormalizado] += d.agendados;
+    item.total += d.agendados;
+  });
+  let rows = [...map.values()].sort((a, b) => {
+    if (a.especialidade !== b.especialidade) return a.especialidade.localeCompare(b.especialidade, "pt-BR");
+    return periodoSortValue(a.mes) - periodoSortValue(b.mes);
+  });
+  if (monthFilter) rows = rows.filter(r => r.mes === monthFilter);
+  if (searchTerm) rows = rows.filter(r => r.especialidade.toLowerCase().includes(searchTerm));
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="8">Nenhum dado encontrado com os filtros aplicados</td></tr>';
+    return;
+  }
+  const totalsByEstab = { "Belo Horizonte": 0, "Centro Materno Infantil": 0, "Hospital Municipal de Contagem": 0, "Hospital São José": 0, "Hospital Santa Rita": 0 };
+  let grandTotal = 0;
+  rows.forEach(row => {
+    estabelecimentosFixos.forEach(estab => totalsByEstab[estab] += row.valores[estab]);
+    grandTotal += row.total;
+  });
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td title="${escapeHtml(r.especialidade)}">${escapeHtml(truncateLabel(r.especialidade, 35))}</td>
+      <td>${escapeHtml(r.mes)}</td>
+      <td class="text-right">${r.valores["Belo Horizonte"].toLocaleString("pt-BR")}</td>
+      <td class="text-right">${r.valores["Centro Materno Infantil"].toLocaleString("pt-BR")}</td>
+      <td class="text-right">${r.valores["Hospital Municipal de Contagem"].toLocaleString("pt-BR")}</td>
+      <td class="text-right">${r.valores["Hospital São José"].toLocaleString("pt-BR")}</td>
+      <td class="text-right">${r.valores["Hospital Santa Rita"].toLocaleString("pt-BR")}</td>
+      <td class="text-right font-800" style="background:#f0fdfa;">${r.total.toLocaleString("pt-BR")}</td>
+    </tr>
+  `).join("") + `
+    <tr class="total-row">
+      <td colspan="2" class="font-800">TOTAL GERAL</td>
+      <td class="text-right font-800">${totalsByEstab["Belo Horizonte"].toLocaleString("pt-BR")}</td>
+      <td class="text-right font-800">${totalsByEstab["Centro Materno Infantil"].toLocaleString("pt-BR")}</td>
+      <td class="text-right font-800">${totalsByEstab["Hospital Municipal de Contagem"].toLocaleString("pt-BR")}</td>
+      <td class="text-right font-800">${totalsByEstab["Hospital São José"].toLocaleString("pt-BR")}</td>
+      <td class="text-right font-800">${totalsByEstab["Hospital Santa Rita"].toLocaleString("pt-BR")}</td>
+      <td class="text-right font-800">${grandTotal.toLocaleString("pt-BR")}</td>
+    </tr>
+  `;
+}
+
+function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues) {
+  const canvas = el("cAgendadosVsFaturadosMes");
+  if (!canvas) return;
+  destroyChart("cAgendadosVsFaturadosMes");
+  const datasets = [];
+  if (currentChartFilter !== "faturados") datasets.push({ label: "Agendados", data: agendadosValues, backgroundColor: "#b6923e", borderRadius: 8 });
+  if (currentChartFilter !== "agendados") datasets.push({ label: "Faturados", data: faturadosValues, backgroundColor: "#059669", borderRadius: 8 });
+  charts.cAgendadosVsFaturadosMes = new Chart(canvas.getContext("2d"), {
+    type: "bar", data: { labels: periods, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false, layout: { padding: { top: 12, right: 20, bottom: 10, left: 10 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}` } },
+        datalabels: { color: "#fff", font: { weight: "bold", size: 11 }, formatter: value => value ? value.toLocaleString("pt-BR") : "", anchor: "center", align: "center" }
+      },
+      scales: { x: { grid: { display: false }, ticks: { font: { weight: "bold" } } }, y: { beginAtZero: true, grace: "10%", grid: { color: "rgba(148,163,184,0.10)" }, ticks: { font: { weight: "bold" } } } }
+    }
+  });
+}
+
+function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
+  const legendContainer = el("legendAgendadosFaturados");
+  if (!legendContainer) return;
+  const legendItems = legendContainer.querySelectorAll(".legend-item");
+  if (legendItems.length !== 2) return;
+  const agendadosItem = legendItems[0];
+  const faturadosItem = legendItems[1];
+  const newAgendadosItem = agendadosItem.cloneNode(true);
+  const newFaturadosItem = faturadosItem.cloneNode(true);
+  agendadosItem.parentNode.replaceChild(newAgendadosItem, agendadosItem);
+  faturadosItem.parentNode.replaceChild(newFaturadosItem, faturadosItem);
+  newAgendadosItem.style.cursor = "pointer";
+  newFaturadosItem.style.cursor = "pointer";
+  function updateLegendActiveStyle() {
+    newAgendadosItem.classList.remove("active-filter");
+    newFaturadosItem.classList.remove("active-filter");
+    if (currentChartFilter === "agendados") newAgendadosItem.classList.add("active-filter");
+    else if (currentChartFilter === "faturados") newFaturadosItem.classList.add("active-filter");
+  }
+  newAgendadosItem.addEventListener("click", (e) => {
+    e.stopPropagation();
+    currentChartFilter = currentChartFilter === "agendados" ? null : "agendados";
+    renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues);
+    updateLegendActiveStyle();
+  });
+  newFaturadosItem.addEventListener("click", (e) => {
+    e.stopPropagation();
+    currentChartFilter = currentChartFilter === "faturados" ? null : "faturados";
+    renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues);
+    updateLegendActiveStyle();
+  });
+  updateLegendActiveStyle();
+}
+
+// NOVOS GRÁFICOS FÍSICO X FINANCEIRO
+function renderFisicoFinanceiroCharts(filteredAgendados, filteredFinanceiro) {
+  // Gráfico 1: Quantidade Agendada x Total Faturado por Estabelecimento (Horizontal)
+  const agendadoPorEstab = aggregateBy(filteredAgendados, d => d.estabelecimento || "Não informado", d => d.agendados);
+  const faturadoPorEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento || "Não informado", d => d.faturadoQtd);
+  const estabelecimentos = new Set([...agendadoPorEstab.keys(), ...faturadoPorEstab.keys()]);
+  const labelsHor = Array.from(estabelecimentos).sort();
+  const agendadoValuesHor = labelsHor.map(l => agendadoPorEstab.get(l) || 0);
+  const faturadoValuesHor = labelsHor.map(l => faturadoPorEstab.get(l) || 0);
+  
+  const canvasHor = el("cAgendadoVsFaturadoHorizontal");
+  if (canvasHor) {
+    destroyChart("cAgendadoVsFaturadoHorizontal");
+    charts.cAgendadoVsFaturadoHorizontal = new Chart(canvasHor.getContext("2d"), {
+      type: "bar",
+      data: { labels: labelsHor, datasets: [
+        { label: "Agendados", data: agendadoValuesHor, backgroundColor: "#b6923e", borderRadius: 8 },
+        { label: "Faturados (Qtd)", data: faturadoValuesHor, backgroundColor: "#059669", borderRadius: 8 }
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false, indexAxis: "y",
+        plugins: {
+          legend: { position: "top", labels: { font: { weight: "bold", size: 12 } } },
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw.toLocaleString("pt-BR")}` } },
+          datalabels: { color: "#fff", font: { weight: "bold", size: 11 }, anchor: "center", align: "center", formatter: value => value ? value.toLocaleString("pt-BR") : "" }
+        },
+        scales: { x: { beginAtZero: true, ticks: { font: { weight: "bold" } } }, y: { ticks: { font: { weight: "bold", size: 10 } } } }
+      }
+    });
+  }
+
+  // Gráfico 2: Financeiro x Quantidade Faturada por Estabelecimento (Vertical)
+  const financeiroPorEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento || "Não informado", d => d.financeiroValor);
+  const financeiroLabels = Array.from(financeiroPorEstab.keys()).sort((a,b) => (financeiroPorEstab.get(b)||0) - (financeiroPorEstab.get(a)||0)).slice(0,15);
+  const financeiroValues = financeiroLabels.map(l => financeiroPorEstab.get(l) || 0);
+  const faturadoParaFinanceiro = financeiroLabels.map(l => faturadoPorEstab.get(l) || 0);
+  
+  const canvasVert = el("cFinanceiroVsFaturadoVertical");
+  if (canvasVert) {
+    destroyChart("cFinanceiroVsFaturadoVertical");
+    charts.cFinanceiroVsFaturadoVertical = new Chart(canvasVert.getContext("2d"), {
+      type: "bar",
+      data: { labels: financeiroLabels, datasets: [
+        { label: "Financeiro (R$)", data: financeiroValues, backgroundColor: "#0b5e42", borderRadius: 8, yAxisID: "y", type: 'bar' },
+        { label: "Faturados (Qtd)", data: faturadoParaFinanceiro, backgroundColor: "#2563eb", borderRadius: 8, yAxisID: "y1", type: 'bar' }
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "top", labels: { font: { weight: "bold", size: 12 } } },
+          tooltip: { callbacks: { label: ctx => ctx.dataset.label === "Financeiro (R$)" ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR") } },
+          datalabels: { color: "#fff", font: { weight: "bold", size: 10 }, anchor: "center", align: "center", formatter: (value, ctx) => ctx.dataset.label === "Financeiro (R$)" ? formatMoneyCompact(value) : value.toLocaleString("pt-BR") }
+        },
+        scales: { 
+          y: { beginAtZero: true, position: "left", title: { display: true, text: "Financeiro (R$)", font: { weight: "bold" } }, ticks: { callback: v => formatMoneyCompact(v) } },
+          y1: { beginAtZero: true, position: "right", title: { display: true, text: "Faturados (Qtd)", font: { weight: "bold" } }, grid: { drawOnChartArea: false } },
+          x: { ticks: { font: { weight: "bold", size: 10, maxRotation: 45, minRotation: 45 } } }
+        }
+      }
+    });
+  }
+}
+
+// NOVAS FUNÇÕES PARA ABA AGENDAMENTOS VIVVER
+function renderAgendamentosVivverReformulado(filteredAgVivver) {
+  // Por Subgrupo
+  const ofertaPorSubgrupo = aggregateBy(filteredAgVivver, d => d.subgrupo || "Sem Subgrupo", d => d.oferta);
+  const recepPorSubgrupo = aggregateBy(filteredAgVivver, d => d.subgrupo || "Sem Subgrupo", d => d.recepcionados);
+  const faltPorSubgrupo = aggregateBy(filteredAgVivver, d => d.subgrupo || "Sem Subgrupo", d => d.faltosos);
+  renderSmartProgressTable("tableRecepcionadosSubgrupoBody", recepPorSubgrupo, ofertaPorSubgrupo, "#059669");
+  renderSmartProgressTable("tableFaltososSubgrupoBody", faltPorSubgrupo, ofertaPorSubgrupo, "#dc2626");
+
+  // Por Especialidade
+  const ofertaPorEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.oferta);
+  const recepPorEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.recepcionados);
+  const faltPorEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.faltosos);
+  renderSmartProgressTable("tableRecepcionadosVivverBody", recepPorEsp, ofertaPorEsp, "#059669");
+  renderSmartProgressTable("tableFaltososVivverBody", faltPorEsp, ofertaPorEsp, "#dc2626");
+
+  // Consolidado de Ofertas por Especialidade (REC + FAL)
+  const consolidadoBody = el("tableOfertasConsolidadoBody");
+  if (consolidadoBody) {
+    const espList = [...new Set([...ofertaPorEsp.keys(), ...recepPorEsp.keys(), ...faltPorEsp.keys()])].sort();
+    consolidadoBody.innerHTML = espList.map(esp => {
+      const oferta = ofertaPorEsp.get(esp) || 0;
+      const recep = recepPorEsp.get(esp) || 0;
+      const falt = faltPorEsp.get(esp) || 0;
+      return `
+        <tr>
+          <td title="${escapeHtml(esp)}">${escapeHtml(truncateLabel(esp, 50))}</td>
+          <td class="text-right">${recep.toLocaleString("pt-BR")}</td>
+          <td class="text-right">${falt.toLocaleString("pt-BR")}</td>
+          <td class="text-right font-800">${oferta.toLocaleString("pt-BR")}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+}
+
+// NOVA FUNÇÃO PARA ABA FILA DE ESPERA ATUAL (REFORMULADA)
+function renderFilaReformulado(filteredFila) {
+  // Tabelas: Subgrupo, Especialidade, Procedimento, Complexidade
+  const filaSubgrupo = aggregateBy(filteredFila, d => d.subgrupo || "Sem Subgrupo", d => d.fila);
+  const filaEspecialidade = aggregateBy(filteredFila, d => d.especialidade, d => d.fila);
+  const filaProcedimento = aggregateBy(filteredFila, d => d.descricao, d => d.fila);
+  const filaComplexidade = aggregateBy(filteredFila, d => d.complexidade || "Sem Complexidade", d => d.fila);
+  
+  renderSmartProgressTable("tableFilaSubgrupoBody", filaSubgrupo, null, "#d97706", true);
+  renderSmartProgressTable("tableFilaEspecialidadeBody", filaEspecialidade, null, "#2563eb", true);
+  renderSmartProgressTable("tableFilaProcedimentoBody", filaProcedimento, null, "#059669", true);
+  renderSmartProgressTable("tableFilaComplexidadeBody", filaComplexidade, null, "#8b5cf6", true);
+  
+  // Gráfico de Rosca - Distribuição por Complexidade
+  const complexArr = [...filaComplexidade.entries()].sort((a, b) => b[1] - a[1]);
+  makeDoughnutChartWithDetails(
+    "cFilaComplexidadeRosca",
+    complexArr.map(([k]) => truncateLabel(k || "Sem Dados", 28)),
+    complexArr.map(([,v]) => v),
+    ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626", "#3b82f6", "#059669"]
+  );
+}
+
+// NOVA FUNÇÃO PARA ABA FILA RETROATIVA 2025 (REFORMULADA)
+function renderFilaRetroativaReformulado() {
+  const grupo = el("grupoSelect")?.value || "";
+  const periodo = el("periodoSelect")?.value || "";
+  const filtered = dadosFilaRetroativa.filter(d => 
+    (!selectedEspecialidades.size || selectedEspecialidades.has(d.especialidade)) &&
+    (!periodo || d.dataCorte === periodo) &&
+    (!grupo || d.grupoCodigo === grupo) &&
+    (!selectedSubgrupos.size || selectedSubgrupos.has(d.subgrupo))
+  );
+
+  const totalFila = filtered.reduce((s, d) => s + d.fila, 0);
+  const mediaPorProcedimento = filtered.length > 0 ? totalFila / filtered.length : 0;
+  
+  const kTotalHeader = el("kFilaRetroativaTotalHeader");
+  const kTotalValue = el("kFilaRetroativaTotalValue");
+  const kMedia = el("kMediaRetroativa");
+  const dataCorteRetroativaInfo = el("dataCorteRetroativaInfo");
+  
+  if (kTotalHeader) kTotalHeader.innerText = totalFila.toLocaleString("pt-BR");
+  if (kTotalValue) kTotalValue.innerText = totalFila.toLocaleString("pt-BR");
+  if (kMedia) kMedia.innerText = mediaPorProcedimento.toFixed(1);
+  if (dataCorteRetroativaInfo) dataCorteRetroativaInfo.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
+
+  // Tabelas: Subgrupo, Procedimento, Complexidade, Evolução Mensal
+  const subgrupoMap = aggregateBy(filtered, d => d.subgrupo || "Sem Subgrupo", d => d.fila);
+  const procedimentoMap = aggregateBy(filtered, d => d.descricao || "Sem Procedimento", d => d.fila);
+  const complexidadeMap = aggregateBy(filtered, d => d.complexidade || "Sem Complexidade", d => d.fila);
+  
+  renderSmartProgressTable("tableFilaRetroativaSubgrupoBody", subgrupoMap, null, "#d97706", true);
+  renderSmartProgressTable("tableFilaRetroativaProcedimentoBody", procedimentoMap, null, "#059669", true);
+  renderSmartProgressTable("tableFilaRetroativaComplexidadeBody", complexidadeMap, null, "#8b5cf6", true);
+
+  // Evolução Mensal da Fila Retroativa
+  const evolucaoMensal = aggregateBy(filtered, d => d.dataCorte || "Sem Data", d => d.fila);
+  const mesesOrdenados = sortPeriodos([...evolucaoMensal.keys()]);
+  let acumulado = 0;
+  const evolucaoBody = el("tableEvolucaoMensalRetroativaBody");
+  if (evolucaoBody) {
+    evolucaoBody.innerHTML = mesesOrdenados.map(mes => {
+      const valor = evolucaoMensal.get(mes) || 0;
+      acumulado += valor;
+      const percentual = totalFila > 0 ? (acumulado / totalFila) * 100 : 0;
+      return `
+        <tr>
+          <td title="${escapeHtml(mes)}">${escapeHtml(mes)}</td>
+          <td class="text-right">${valor.toLocaleString("pt-BR")}</td>
+          <td class="text-right">${percentual.toFixed(1)}%</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  // Detalhamento Completo
+  renderTabelaRetroativaDetalhada(filtered);
+}
+
+function renderTabelaRetroativaDetalhada(data) {
+  const tbody = el("tableFilaRetroativaCompletaBody");
+  if (!tbody) return;
+  const searchTerm = (el("searchFilaRetroativa")?.value || "").toLowerCase();
+  let filteredData = [...data];
+  if (searchTerm) {
+    filteredData = filteredData.filter(d => 
+      d.especialidade?.toLowerCase().includes(searchTerm) || 
+      d.descricao?.toLowerCase().includes(searchTerm) ||
+      d.codigo?.toLowerCase().includes(searchTerm)
+    );
+  }
+  if (!filteredData.length) {
+    tbody.innerHTML = `<tr><td colspan="8">Nenhum dado encontrado</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filteredData.map(d => `
+    <tr>
+      <td>${escapeHtml(d.codigo || "-")}</td>
+      <td title="${escapeHtml(d.especialidade)}">${escapeHtml(truncateLabel(d.especialidade, 40))}</td>
+      <td title="${escapeHtml(d.descricao)}">${escapeHtml(truncateLabel(d.descricao, 50))}</td>
+      <td>${escapeHtml(d.grupo || "-")}</td>
+      <td>${escapeHtml(d.subgrupo || "-")}</td>
+      <td>${escapeHtml(d.complexidade || "-")}</td>
+      <td class="text-right">${d.fila.toLocaleString("pt-BR")}</td>
+      <td>${escapeHtml(d.dataCorte || "-")}</td>
+    </tr>
+  `).join("");
+}
+
+// Função principal applyFilters que chama todas as renderizações
 function applyFilters() {
   console.log("Aplicando filtros...");
   
@@ -800,6 +1295,7 @@ function applyFilters() {
   const totalFaturadosQtd = filteredFinanceiro.reduce((s, d) => s + d.faturadoQtd, 0);
   const totalFinanceiro = filteredFinanceiro.reduce((s, d) => s + d.financeiroValor, 0);
 
+  // Atualizar KPIs
   const kFila = el("kFila");
   const kRecepcionados = el("kRecepcionados");
   const kFaltosos = el("kFaltosos");
@@ -922,653 +1418,20 @@ function applyFilters() {
   
   createGaugeChart("cGaugeAbs", taxaAbsenteismo, absColor);
 
+  // Chamar todas as funções de renderização
   renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro);
   renderFinanceiro(filteredFinanceiro);
   renderFisicoFinanceiro(filteredAgendados, filteredFinanceiro);
+  renderFisicoFinanceiroCharts(filteredAgendados, filteredFinanceiro); // NOVOS GRÁFICOS
   renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFinanceiro);
-  renderAgendamentosVivver(filteredAgVivver);
-  renderFila(filteredFila);
-  renderFilaRetroativa();
-}
-
-function renderSimpleRankingTable(tbodyId, dataMap, isMoney = false) {
-  const tbody = el(tbodyId);
-  if (!tbody) return;
-  const arr = [...dataMap.entries()].sort((a, b) => b[1] - a[1]);
-  if (!arr.length) {
-    tbody.innerHTML = `<tr><td colspan="2">Nenhum dado disponível</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = arr.map(([name, value]) => `
-    <tr>
-      <td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 55))}</td>
-      <td class="text-right font-700">${isMoney ? formatMoney(value) : value.toLocaleString("pt-BR")}</td>
-    </tr>
-  `).join("");
-}
-
-function renderPercentReferenceTable(tbodyId, valueMap, referenceMap, color = "#0b5e42") {
-  const tbody = el(tbodyId);
-  if (!tbody) return;
-  const arr = [...valueMap.entries()].sort((a, b) => b[1] - a[1]);
-  if (!arr.length) {
-    tbody.innerHTML = `<tr><td colspan="3">Nenhum dado disponível</td></tr>`;
-    return;
-  }
-  const maxValue = arr[0][1] || 1;
-  tbody.innerHTML = arr.map(([name, value]) => {
-    const ref = referenceMap.get(name) || 0;
-    const percent = ref > 0 ? ((value / ref) * 100) : 0;
-    const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0;
-    return `
-      <tr>
-        <td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 45))}</td>
-        <td class="text-right font-700">${value.toLocaleString("pt-BR")}</td>
-        <td>
-          <div class="progress-bar-container">
-            <div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">
-              ${percent > 0 ? `<span>${percent.toFixed(1)}%</span>` : ""}
-            </div>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join("");
-}
-
-function renderPercentageTotalTable(tbodyId, dataMap, color = "#0b5e42") {
-  const tbody = el(tbodyId);
-  if (!tbody) return;
-  const arr = [...dataMap.entries()].sort((a, b) => b[1] - a[1]);
-  const total = arr.reduce((s, [,v]) => s + v, 0);
-  const maxValue = arr[0]?.[1] || 1;
-  if (!arr.length) {
-    tbody.innerHTML = `<tr><td colspan="3">Nenhum dado disponível</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = arr.map(([name, value]) => {
-    const percent = total > 0 ? (value / total) * 100 : 0;
-    const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0;
-    return `
-      <tr>
-        <td title="${escapeHtml(name)}">${escapeHtml(truncateLabel(name, 55))}</td>
-        <td class="text-right font-700">${value.toLocaleString("pt-BR")}</td>
-        <td>
-          <div class="progress-bar-container">
-            <div class="progress-bar-fill" style="width:${barWidth}%; background: linear-gradient(90deg, ${color}, ${color}dd);">
-              ${percent > 0 ? `<span>${percent.toFixed(1)}%</span>` : ""}
-            </div>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join("");
-}
-
-function destroyChart(id) {
-  if (charts[id]) {
-    charts[id].destroy();
-    delete charts[id];
-  }
-}
-
-function makeHorizontalBarChart(id, labels, values, color, datasetLabel, isMoney = false, dataLabelFontSize = 11) {
-  const canvas = el(id);
-  if (!canvas) return;
-  destroyChart(id);
-  charts[id] = new Chart(canvas.getContext("2d"), {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [{
-        label: datasetLabel,
-        data: values,
-        backgroundColor: color,
-        borderRadius: 8,
-        barPercentage: 0.72,
-        categoryPercentage: 0.82
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: "y",
-      layout: { padding: { top: 8, right: 24, bottom: 8, left: 8 } },
-      plugins: {
-        legend: {
-          display: true,
-          position: "top",
-          labels: { font: { weight: "bold", size: 12 } }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => isMoney ? formatMoney(ctx.raw) : ctx.raw.toLocaleString("pt-BR")
-          }
-        },
-        datalabels: {
-          color: "#ffffff",
-          font: { weight: "bold", size: dataLabelFontSize },
-          anchor: "center",
-          align: "center",
-          formatter: value => {
-            if (!value) return "";
-            return isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR");
-          }
-        }
-      },
-      scales: {
-        x: {
-          beginAtZero: true,
-          grid: { color: "rgba(148,163,184,0.10)" },
-          ticks: {
-            font: { weight: "bold", size: 10 },
-            callback: value => isMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR")
-          }
-        },
-        y: {
-          grid: { display: false },
-          ticks: { font: { weight: "bold", size: 10 } }
-        }
-      }
-    }
-  });
-}
-
-function makeDoughnutChartWithPercentages(id, labels, values, colors) {
-  const canvas = el(id);
-  if (!canvas) return;
-  destroyChart(id);
-  const total = values.reduce((a, b) => a + b, 0);
-  charts[id] = new Chart(canvas.getContext("2d"), {
-    type: "doughnut",
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        backgroundColor: colors,
-        borderWidth: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: "62%",
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: {
-            font: { weight: "bold", size: 11 },
-            generateLabels: chart => {
-              const data = chart.data;
-              return data.labels.map((label, i) => ({
-                text: `${label}: ${(data.datasets[0].data[i] || 0).toLocaleString("pt-BR")} (${total > 0 ? (((data.datasets[0].data[i] || 0) / total) * 100).toFixed(1) : "0.0"}%)`,
-                fillStyle: data.datasets[0].backgroundColor[i],
-                hidden: false,
-                index: i
-              }));
-            }
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => {
-              const value = ctx.raw || 0;
-              const percent = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
-              return `${ctx.label}: ${value.toLocaleString("pt-BR")} (${percent}%)`;
-            }
-          }
-        },
-        datalabels: {
-          color: "#fff",
-          font: { weight: "bold", size: 13 },
-          formatter: value => {
-            if (!value || total <= 0) return "";
-            const p = (value / total) * 100;
-            return p >= 5 ? `${p.toFixed(1)}%` : "";
-          }
-        }
-      }
-    }
-  });
-}
-
-function makeLineChart(id, labels, datasets, yMoney = false, withDataLabels = true) {
-  const canvas = el(id);
-  if (!canvas) return;
-  destroyChart(id);
-  charts[id] = new Chart(canvas.getContext("2d"), {
-    type: "line",
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      layout: { padding: { top: 28, right: 24, bottom: 12, left: 12 } },
-      plugins: {
-        legend: {
-          position: "top",
-          labels: {
-            font: { weight: "bold", size: 12 },
-            usePointStyle: true,
-            pointStyle: "circle",
-            boxWidth: 10
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => {
-              const val = ctx.raw || 0;
-              return yMoney
-                ? `${ctx.dataset.label}: ${formatMoney(val)}`
-                : `${ctx.dataset.label}: ${val.toLocaleString("pt-BR")}`;
-            }
-          }
-        },
-        datalabels: {
-          display: withDataLabels,
-          color: ctx => ctx.dataset.borderColor || "#1F2937",
-          font: { weight: "bold", size: 10 },
-          align: "top",
-          anchor: "end",
-          offset: 8,
-          clamp: true,
-          formatter: value => {
-            if (!value) return "";
-            return yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR");
-          }
-        }
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: { font: { weight: "bold" }, maxRotation: 0, autoSkip: false }
-        },
-        y: {
-          beginAtZero: true,
-          grace: "10%",
-          grid: { color: "rgba(148,163,184,0.12)" },
-          ticks: {
-            font: { weight: "bold" },
-            callback: value => yMoney ? formatMoneyCompact(value) : value.toLocaleString("pt-BR")
-          }
-        }
-      }
-    }
-  });
-}
-
-function getPeriodsFromFilteredData(...groups) {
-  const arr = [];
-  groups.flat().forEach(item => {
-    if (item.mes) arr.push(item.mes);
-    if (item.dataCorte) arr.push(item.dataCorte);
-  });
-  const periods = sortPeriodos(arr);
-  return periods.length ? periods : allPeriodos;
-}
-
-function renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes) {
-  const canvas = el("cEvolucao");
-  if (!canvas) return;
-  destroyChart("cEvolucao");
-  charts.cEvolucao = new Chart(canvas.getContext("2d"), {
-    data: {
-      labels: periods,
-      datasets: [
-        {
-          type: "bar",
-          label: "Ofertas",
-          data: periods.map(p => ofertaPorMes.get(p) || 0),
-          backgroundColor: "rgba(37,99,235,0.22)",
-          borderColor: "#2563eb",
-          borderWidth: 1.5,
-          borderRadius: 10,
-          yAxisID: "y",
-          order: 4
-        },
-        {
-          type: "line",
-          label: "Fila de Espera",
-          data: periods.map(p => filaPorMes.get(p) || 0),
-          borderColor: "#dc2626",
-          backgroundColor: "rgba(220,38,38,0.10)",
-          borderWidth: 3,
-          fill: false,
-          tension: 0.28,
-          pointBackgroundColor: "#ffffff",
-          pointBorderColor: "#dc2626",
-          pointBorderWidth: 2.5,
-          pointRadius: 5,
-          pointHoverRadius: 8,
-          yAxisID: "y1",
-          order: 1
-        },
-        {
-          type: "line",
-          label: "Recepcionados",
-          data: periods.map(p => recepcionadosPorMes.get(p) || 0),
-          borderColor: "#059669",
-          backgroundColor: "rgba(5,150,105,0.10)",
-          borderWidth: 3,
-          fill: false,
-          tension: 0.28,
-          pointBackgroundColor: "#ffffff",
-          pointBorderColor: "#059669",
-          pointBorderWidth: 2.5,
-          pointRadius: 5,
-          pointHoverRadius: 8,
-          yAxisID: "y",
-          order: 2
-        },
-        {
-          type: "line",
-          label: "Faltosos",
-          data: periods.map(p => faltososPorMes.get(p) || 0),
-          borderColor: "#d97706",
-          backgroundColor: "rgba(217,119,6,0.10)",
-          borderWidth: 3,
-          fill: false,
-          tension: 0.28,
-          pointBackgroundColor: "#ffffff",
-          pointBorderColor: "#d97706",
-          pointBorderWidth: 2.5,
-          pointRadius: 5,
-          pointHoverRadius: 8,
-          yAxisID: "y",
-          order: 3
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      layout: { padding: { top: 24, right: 16, bottom: 10, left: 10 } },
-      plugins: {
-        legend: {
-          position: "top",
-          labels: {
-            usePointStyle: true,
-            pointStyle: "circle",
-            font: { weight: "bold", size: 12 }
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}`
-          }
-        },
-        datalabels: {
-          color: ctx => ctx.dataset.borderColor || "#111827",
-          font: { weight: "bold", size: 10 },
-          formatter: value => {
-            if (!value) return "";
-            return value.toLocaleString("pt-BR");
-          },
-          align: ctx => ctx.dataset.type === "bar" ? "end" : "top",
-          anchor: ctx => ctx.dataset.type === "bar" ? "end" : "end",
-          offset: 6,
-          clamp: true
-        }
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: {
-            font: { weight: "bold" },
-            maxRotation: 0,
-            autoSkip: false
-          }
-        },
-        y: {
-          beginAtZero: true,
-          position: "left",
-          grace: "10%",
-          grid: { display: false },
-          ticks: {
-            font: { weight: "bold" },
-            callback: value => value.toLocaleString("pt-BR")
-          },
-          title: {
-            display: true,
-            text: "Oferta / Recepcionados / Faltosos",
-            font: { weight: "bold" }
-          }
-        },
-        y1: {
-          beginAtZero: true,
-          position: "right",
-          grace: "10%",
-          grid: { display: false, drawOnChartArea: false },
-          ticks: {
-            font: { weight: "bold" },
-            callback: value => value.toLocaleString("pt-BR")
-          },
-          title: {
-            display: true,
-            text: "Fila de Espera",
-            font: { weight: "bold" }
-          }
-        }
-      }
-    }
-  });
-}
-
-function renderAgendadasPorEspecialidadeEstabTable(filteredAgendados) {
-  const tbody = el("tableAgendadasPorEspecEstabBody");
-  if (!tbody) return;
-  const searchTerm = (el("tabelaSearchEspec")?.value || "").toLowerCase();
-  const monthFilter = el("tabelaMonthFilterEspec")?.value || "";
-  if (!filteredAgendados.length) {
-    tbody.innerHTML = '<tr><td colspan="8">Nenhum dado disponível</td></tr>';
-    return;
-  }
-  const estabelecimentosFixos = [
-    "Belo Horizonte",
-    "Centro Materno Infantil",
-    "Hospital Municipal de Contagem",
-    "Hospital São José",
-    "Hospital Santa Rita"
-  ];
-  const normalizeEstabName = name => {
-    const nameLower = String(name || "").toLowerCase();
-    if (nameLower.includes("belo horizonte") || nameLower.includes("bh")) return "Belo Horizonte";
-    if (nameLower.includes("centro materno") || nameLower.includes("materno infantil")) return "Centro Materno Infantil";
-    if (nameLower.includes("contagem")) return "Hospital Municipal de Contagem";
-    if (nameLower.includes("são josé") || nameLower.includes("sao jose")) return "Hospital São José";
-    if (nameLower.includes("santa rita")) return "Hospital Santa Rita";
-    return name;
-  };
-  const map = new Map();
-  filteredAgendados.forEach(d => {
-    if (!d.especialidade) return;
-    const key = `${d.especialidade}||${d.mes}`;
-    if (!map.has(key)) {
-      map.set(key, {
-        especialidade: d.especialidade,
-        mes: d.mes,
-        valores: {
-          "Belo Horizonte": 0,
-          "Centro Materno Infantil": 0,
-          "Hospital Municipal de Contagem": 0,
-          "Hospital São José": 0,
-          "Hospital Santa Rita": 0
-        },
-        total: 0
-      });
-    }
-    const item = map.get(key);
-    const estabNormalizado = normalizeEstabName(d.estabelecimento);
-    if (estabelecimentosFixos.includes(estabNormalizado)) {
-      item.valores[estabNormalizado] += d.agendados;
-    }
-    item.total += d.agendados;
-  });
-  let rows = [...map.values()].sort((a, b) => {
-    if (a.especialidade !== b.especialidade) {
-      return a.especialidade.localeCompare(b.especialidade, "pt-BR");
-    }
-    return periodoSortValue(a.mes) - periodoSortValue(b.mes);
-  });
-  if (monthFilter) rows = rows.filter(r => r.mes === monthFilter);
-  if (searchTerm) rows = rows.filter(r => r.especialidade.toLowerCase().includes(searchTerm));
-  if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="8">Nenhum dado encontrado com os filtros aplicados</td></tr>';
-    return;
-  }
-  const totalsByEstab = {
-    "Belo Horizonte": 0,
-    "Centro Materno Infantil": 0,
-    "Hospital Municipal de Contagem": 0,
-    "Hospital São José": 0,
-    "Hospital Santa Rita": 0
-  };
-  let grandTotal = 0;
-  rows.forEach(row => {
-    estabelecimentosFixos.forEach(estab => {
-      totalsByEstab[estab] += row.valores[estab];
-    });
-    grandTotal += row.total;
-  });
-  tbody.innerHTML =
-    rows.map(r => `
-      <tr>
-        <td title="${escapeHtml(r.especialidade)}">${escapeHtml(truncateLabel(r.especialidade, 35))}</td>
-        <td>${escapeHtml(r.mes)}</td>
-        <td class="text-right">${r.valores["Belo Horizonte"].toLocaleString("pt-BR")}</td>
-        <td class="text-right">${r.valores["Centro Materno Infantil"].toLocaleString("pt-BR")}</td>
-        <td class="text-right">${r.valores["Hospital Municipal de Contagem"].toLocaleString("pt-BR")}</td>
-        <td class="text-right">${r.valores["Hospital São José"].toLocaleString("pt-BR")}</td>
-        <td class="text-right">${r.valores["Hospital Santa Rita"].toLocaleString("pt-BR")}</td>
-        <td class="text-right font-800" style="background:#f0fdfa;">${r.total.toLocaleString("pt-BR")}</td>
-      </tr>
-    `).join("")
-    +
-    `<tr class="total-row">
-      <td colspan="2" class="font-800">TOTAL GERAL</td>
-      <td class="text-right font-800">${totalsByEstab["Belo Horizonte"].toLocaleString("pt-BR")}</td>
-      <td class="text-right font-800">${totalsByEstab["Centro Materno Infantil"].toLocaleString("pt-BR")}</td>
-      <td class="text-right font-800">${totalsByEstab["Hospital Municipal de Contagem"].toLocaleString("pt-BR")}</td>
-      <td class="text-right font-800">${totalsByEstab["Hospital São José"].toLocaleString("pt-BR")}</td>
-      <td class="text-right font-800">${totalsByEstab["Hospital Santa Rita"].toLocaleString("pt-BR")}</td>
-      <td class="text-right font-800">${grandTotal.toLocaleString("pt-BR")}</td>
-    </tr>`;
-}
-
-function renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues) {
-  const canvas = el("cAgendadosVsFaturadosMes");
-  if (!canvas) return;
-  destroyChart("cAgendadosVsFaturadosMes");
-  const datasets = [];
-  if (currentChartFilter !== "faturados") {
-    datasets.push({
-      label: "Agendados",
-      data: agendadosValues,
-      backgroundColor: "#b6923e",
-      borderRadius: 8
-    });
-  }
-  if (currentChartFilter !== "agendados") {
-    datasets.push({
-      label: "Faturados",
-      data: faturadosValues,
-      backgroundColor: "#059669",
-      borderRadius: 8
-    });
-  }
-  charts.cAgendadosVsFaturadosMes = new Chart(canvas.getContext("2d"), {
-    type: "bar",
-    data: {
-      labels: periods,
-      datasets: datasets
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: { padding: { top: 12, right: 20, bottom: 10, left: 10 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}`
-          }
-        },
-        datalabels: {
-          color: "#fff",
-          font: { weight: "bold", size: 11 },
-          formatter: value => value ? value.toLocaleString("pt-BR") : "",
-          anchor: "center",
-          align: "center"
-        }
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: { font: { weight: "bold" } }
-        },
-        y: {
-          beginAtZero: true,
-          grace: "10%",
-          grid: { color: "rgba(148,163,184,0.10)" },
-          ticks: { font: { weight: "bold" } }
-        }
-      }
-    }
-  });
-}
-
-function setupChartLegendClick(periods, agendadosValues, faturadosValues) {
-  const legendContainer = el("legendAgendadosFaturados");
-  if (!legendContainer) return;
-  const legendItems = legendContainer.querySelectorAll(".legend-item");
-  if (legendItems.length !== 2) return;
-  const agendadosItem = legendItems[0];
-  const faturadosItem = legendItems[1];
-  const newAgendadosItem = agendadosItem.cloneNode(true);
-  const newFaturadosItem = faturadosItem.cloneNode(true);
-  agendadosItem.parentNode.replaceChild(newAgendadosItem, agendadosItem);
-  faturadosItem.parentNode.replaceChild(newFaturadosItem, faturadosItem);
-  newAgendadosItem.style.cursor = "pointer";
-  newFaturadosItem.style.cursor = "pointer";
-  function updateLegendActiveStyle() {
-    newAgendadosItem.classList.remove("active-filter");
-    newFaturadosItem.classList.remove("active-filter");
-    if (currentChartFilter === "agendados") {
-      newAgendadosItem.classList.add("active-filter");
-    } else if (currentChartFilter === "faturados") {
-      newFaturadosItem.classList.add("active-filter");
-    }
-  }
-  newAgendadosItem.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (currentChartFilter === "agendados") {
-      currentChartFilter = null;
-    } else {
-      currentChartFilter = "agendados";
-    }
-    renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues);
-    updateLegendActiveStyle();
-  });
-  newFaturadosItem.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (currentChartFilter === "faturados") {
-      currentChartFilter = null;
-    } else {
-      currentChartFilter = "faturados";
-    }
-    renderAgendadosVsFaturadosChart(periods, agendadosValues, faturadosValues);
-    updateLegendActiveStyle();
-  });
-  updateLegendActiveStyle();
+  renderAgendamentosVivverReformulado(filteredAgVivver); // REFORMULADO
+  renderFilaReformulado(filteredFila); // REFORMULADO
+  renderFilaRetroativaReformulado(); // REFORMULADO
 }
 
 function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, filteredFinanceiro) {
-  // Combinar fila atual com fila retroativa para o gráfico de evolução
   const filteredFilaRetroativa = (dadosFilaRetroativa || []).filter(d => matchBaseWithDimensions(d, true));
   const todasFila = [...filteredFila, ...filteredFilaRetroativa];
-  
-  console.log("Dados para evolução - Fila atual:", filteredFila.length, "Fila retroativa:", filteredFilaRetroativa.length, "Total:", todasFila.length);
   
   const periods = getPeriodsFromFilteredData(todasFila, filteredAgVivver, filteredAgendados, filteredFinanceiro);
 
@@ -1576,9 +1439,6 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
   const ofertaPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.oferta);
   const recepcionadosPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.recepcionados);
   const faltososPorMes = aggregateBy(filteredAgVivver, d => d.mes, d => d.faltosos);
-
-  console.log("Períodos encontrados:", periods);
-  console.log("Fila por mês (combinada):", filaPorMes);
 
   renderMixedEvolutionChart(periods, filaPorMes, ofertaPorMes, recepcionadosPorMes, faltososPorMes);
 
@@ -1648,7 +1508,7 @@ function renderVisaoGeral(filteredFila, filteredAgVivver, filteredAgendados, fil
   const totalRecepcionados = filteredAgVivver.reduce((s, d) => s + d.recepcionados, 0);
   const totalFaltosos = filteredAgVivver.reduce((s, d) => s + d.faltosos, 0);
 
-  makeDoughnutChartWithPercentages(
+  makeDoughnutChartWithDetails(
     "cFunil",
     ["Ofertas", "Recepcionados", "Faltosos"],
     [totalOferta, totalRecepcionados, totalFaltosos],
@@ -1675,6 +1535,7 @@ function renderFinanceiro(filteredFinanceiro) {
   const periods = getPeriodsFromFilteredData(filteredFinanceiro);
   const financeiroPorMes = aggregateBy(filteredFinanceiro, d => d.mes, d => d.financeiroValor);
   const financeiroEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento, d => d.financeiroValor);
+  
   makeLineChart(
     "cFaturamentoMensal",
     periods,
@@ -1695,6 +1556,7 @@ function renderFinanceiro(filteredFinanceiro) {
     true,
     true
   );
+  
   const topEstab = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   makeHorizontalBarChart(
     "cFatEstabelecimentoFinanceiro",
@@ -1704,6 +1566,7 @@ function renderFinanceiro(filteredFinanceiro) {
     "Financeiro por Estabelecimento",
     true
   );
+  
   renderFinTable(filteredFinanceiro);
 }
 
@@ -1722,25 +1585,16 @@ function renderFinTable(filteredFinanceiro) {
     map.get(estab)[d.mes] = (map.get(estab)[d.mes] || 0) + d.financeiroValor;
   });
   const rows = [...map.entries()]
-    .map(([estab, vals]) => ({
-      estabelecimento: estab,
-      valores: vals,
-      total: periods.reduce((s, p) => s + (vals[p] || 0), 0)
-    }))
+    .map(([estab, vals]) => ({ estabelecimento: estab, valores: vals, total: periods.reduce((s, p) => s + (vals[p] || 0), 0) }))
     .sort((a, b) => b.total - a.total);
   const totalsByMonth = {};
   periods.forEach(p => totalsByMonth[p] = 0);
   rows.forEach(r => periods.forEach(p => totalsByMonth[p] += (r.valores[p] || 0)));
   const grandTotal = rows.reduce((s, r) => s + r.total, 0);
+  
   wrap.innerHTML = `
     <table class="fin-table">
-      <thead>
-        <tr>
-          <th>Estabelecimento</th>
-          ${periods.map(p => `<th>${escapeHtml(p)}</th>`).join("")}
-          <th>Total</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Estabelecimento</th>${periods.map(p => `<th>${escapeHtml(p)}</th>`).join("")}<th>Total</th></tr></thead>
       <tbody>
         ${rows.map(r => `
           <tr>
@@ -1764,25 +1618,12 @@ function renderFisicoFinanceiro(filteredAgendados, filteredFinanceiro) {
   const addRow = (estabelecimento, mes) => {
     const key = `${estabelecimento}||${mes}`;
     if (!map.has(key)) {
-      map.set(key, {
-        estabelecimento,
-        mes,
-        agendados: 0,
-        faturadosQtd: 0,
-        financeiroValor: 0
-      });
+      map.set(key, { estabelecimento, mes, agendados: 0, faturadosQtd: 0, financeiroValor: 0 });
     }
     return map.get(key);
   };
-  filteredAgendados.forEach(d => {
-    const row = addRow(d.estabelecimento || "Não informado", d.mes);
-    row.agendados += d.agendados;
-  });
-  filteredFinanceiro.forEach(d => {
-    const row = addRow(d.estabelecimento || "Não informado", d.mes);
-    row.faturadosQtd += d.faturadoQtd;
-    row.financeiroValor += d.financeiroValor;
-  });
+  filteredAgendados.forEach(d => { const row = addRow(d.estabelecimento || "Não informado", d.mes); row.agendados += d.agendados; });
+  filteredFinanceiro.forEach(d => { const row = addRow(d.estabelecimento || "Não informado", d.mes); row.faturadosQtd += d.faturadoQtd; row.financeiroValor += d.financeiroValor; });
   currentTableDataFisico = [...map.values()].sort((a, b) => b.financeiroValor - a.financeiroValor);
   renderTableBodyFisico();
 }
@@ -1846,211 +1687,20 @@ function renderEstabelecimento(filteredAgVivver, filteredAgendados, filteredFina
   const faltososEstab = aggregateBy(filteredAgVivver, d => d.estabelecimento, d => d.faltosos);
   const faturadosQtdEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento, d => d.faturadoQtd);
   const financeiroEstab = aggregateBy(filteredFinanceiro, d => d.estabelecimento, d => d.financeiroValor);
+  
   const topAgendados = [...agendadosEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topOfertas = [...ofertasEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topRecep = [...recepcionadosEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFalt = [...faltososEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFatQtd = [...faturadosQtdEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const topFinanceiro = [...financeiroEstab.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
+  
   makeHorizontalBarChart("cAgendadasPorEstab", topAgendados.map(([k]) => truncateLabel(k, 28)), topAgendados.map(([,v]) => v), "#b6923e", "Agendadas");
   makeHorizontalBarChart("cOfertasPorEstab", topOfertas.map(([k]) => truncateLabel(k, 28)), topOfertas.map(([,v]) => v), "#d97706", "Ofertas");
   makeHorizontalBarChart("cRecepcionadosPorEstab", topRecep.map(([k]) => truncateLabel(k, 28)), topRecep.map(([,v]) => v), "#059669", "Recepcionados");
   makeHorizontalBarChart("cFaltososPorEstab", topFalt.map(([k]) => truncateLabel(k, 28)), topFalt.map(([,v]) => v), "#dc2626", "Faltosos");
   makeHorizontalBarChart("cFaturadosPorEstab", topFatQtd.map(([k]) => truncateLabel(k, 28)), topFatQtd.map(([,v]) => v), "#2563eb", "Faturados");
   makeHorizontalBarChart("cFinanceiroPorEstab", topFinanceiro.map(([k]) => truncateLabel(k, 28)), topFinanceiro.map(([,v]) => v), "#059669", "Financeiro", true);
-}
-
-function renderAgendamentosVivver(filteredAgVivver) {
-  const ofertasEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.oferta);
-  const recepEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.recepcionados);
-  const faltEsp = aggregateBy(filteredAgVivver, d => d.especialidade, d => d.faltosos);
-  renderSimpleRankingTable("tableOfertasBody", ofertasEsp, false);
-  renderPercentReferenceTable("tableRecepcionadosVivverBody", recepEsp, ofertasEsp, "#059669");
-  renderPercentReferenceTable("tableFaltososVivverBody", faltEsp, ofertasEsp, "#dc2626");
-}
-
-function renderFila(filteredFila) {
-  const filaEspecialidade = aggregateBy(filteredFila, d => d.especialidade, d => d.fila);
-  const filaProcedimento = aggregateBy(filteredFila, d => d.descricao, d => d.fila);
-  const filaComplexidade = aggregateBy(filteredFila, d => d.complexidade, d => d.fila);
-  const filaSubgrupo = aggregateBy(filteredFila, d => d.subgrupo, d => d.fila);
-  const filaMes = aggregateBy(filteredFila, d => d.dataCorte, d => d.fila);
-  renderPercentageTotalTable("tableFilaEspecialidadeBody", filaEspecialidade, "#2563eb");
-  renderPercentageTotalTable("tableFilaProcedimentoBody", filaProcedimento, "#059669");
-  renderPercentageTotalTable("tableFilaComplexidadeBody", filaComplexidade, "#8b5cf6");
-  renderPercentageTotalTable("tableFilaSubgrupoBody", filaSubgrupo, "#d97706");
-  const complexArr = [...filaComplexidade.entries()].sort((a, b) => b[1] - a[1]);
-  makeDoughnutChartWithPercentages(
-    "cFilaComplexidadeRosca",
-    complexArr.map(([k]) => truncateLabel(k || "Sem Dados", 28)),
-    complexArr.map(([,v]) => v),
-    ["#8b5cf6", "#ec4899", "#10b981", "#d97706", "#dc2626", "#3b82f6", "#059669"]
-  );
-  const periods = [...filaMes.keys()].sort((a, b) => periodoSortValue(a) - periodoSortValue(b));
-  const values = periods.map(p => filaMes.get(p) || 0);
-  const trendLabels = [...periods];
-  const trendDataReal = [...values];
-  const last3 = values.slice(-3);
-  let growth = 0;
-  if (last3.length >= 2) {
-    growth = (last3[last3.length - 1] - last3[0]) / (last3.length - 1);
-  }
-  const lastValue = values[values.length - 1] || 0;
-  const projectionData = Array(periods.length).fill(null);
-  for (let i = 1; i <= 3; i++) {
-    trendLabels.push(`Proj. ${i}`);
-    projectionData.push(Math.max(0, Math.round(lastValue + growth * i)));
-  }
-  destroyChart("cTendenciaFila");
-  const cTendenciaFila = el("cTendenciaFila");
-  if (cTendenciaFila) {
-    charts.cTendenciaFila = new Chart(cTendenciaFila.getContext("2d"), {
-      type: "line",
-      data: {
-        labels: trendLabels,
-        datasets: [
-          {
-            label: "Fila Real",
-            data: [...trendDataReal, ...Array(3).fill(null)],
-            borderColor: "#dc2626",
-            backgroundColor: "rgba(220,38,38,0.10)",
-            borderWidth: 3,
-            fill: true,
-            tension: 0.3,
-            pointBackgroundColor: "#ffffff",
-            pointBorderColor: "#dc2626",
-            pointBorderWidth: 2.5,
-            pointRadius: 5,
-            pointHoverRadius: 8
-          },
-          {
-            label: "Projeção",
-            data: projectionData,
-            borderColor: "#d97706",
-            borderDash: [6, 4],
-            borderWidth: 3,
-            backgroundColor: "rgba(217,119,6,0.05)",
-            fill: false,
-            tension: 0.3,
-            pointBackgroundColor: "#ffffff",
-            pointBorderColor: "#d97706",
-            pointBorderWidth: 2.5,
-            pointRadius: 5,
-            pointHoverRadius: 8
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: { top: 24, right: 20, bottom: 10, left: 10 } },
-        plugins: {
-          legend: {
-            position: "top",
-            labels: { font: { weight: "bold" } }
-          },
-          tooltip: {
-            callbacks: {
-              label: ctx => `${ctx.dataset.label}: ${(ctx.raw || 0).toLocaleString("pt-BR")}`
-            }
-          },
-          datalabels: {
-            display: true,
-            color: ctx => ctx.dataset.borderColor || "#1F2937",
-            font: { weight: "bold", size: 10 },
-            formatter: value => value ? value.toLocaleString("pt-BR") : "",
-            align: "top",
-            anchor: "end",
-            offset: 6,
-            clamp: true
-          }
-        },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: { font: { weight: "bold" } }
-          },
-          y: {
-            beginAtZero: true,
-            grace: "10%",
-            grid: { color: "rgba(148,163,184,0.12)" },
-            ticks: { font: { weight: "bold" } }
-          }
-        }
-      }
-    });
-  }
-}
-
-// Função para renderizar a aba Fila Retroativa 2025 (apenas tabelas, sem gráficos removidos)
-function renderFilaRetroativa() {
-  const grupo = el("grupoSelect")?.value || "";
-  const periodo = el("periodoSelect")?.value || "";
-  const especialidadeMatch = (item) => !selectedEspecialidades.size || selectedEspecialidades.has(item.especialidade);
-  const periodoMatch = (item) => !periodo || item.dataCorte === periodo;
-  const grupoMatch = (item) => !grupo || item.grupoCodigo === grupo;
-  const subgrupoMatch = (item) => !selectedSubgrupos.size || selectedSubgrupos.has(item.subgrupo);
-  
-  const filtered = dadosFilaRetroativa.filter(item => 
-    especialidadeMatch(item) && periodoMatch(item) && grupoMatch(item) && subgrupoMatch(item)
-  );
-
-  const totalFila = filtered.reduce((s, d) => s + d.fila, 0);
-  const mediaPorProcedimento = filtered.length > 0 ? totalFila / filtered.length : 0;
-
-// Atualiza KPIs retroativa
-const kTotalHeader = el("kFilaRetroativaTotalHeader");
-const kTotalValue = el("kFilaRetroativaTotalValue");
-const kMedia = el("kMediaRetroativa");
-const dataCorteRetroativaInfo = el("dataCorteRetroativaInfo");
-const dataCorteRetroativaInfoCard = el("dataCorteRetroativaInfoCard");
-
-if (kTotalHeader) kTotalHeader.innerText = totalFila.toLocaleString("pt-BR");
-if (kTotalValue) kTotalValue.innerText = totalFila.toLocaleString("pt-BR");
-if (kMedia) kMedia.innerText = mediaPorProcedimento.toFixed(1);
-if (dataCorteRetroativaInfo) dataCorteRetroativaInfo.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
-if (dataCorteRetroativaInfoCard) dataCorteRetroativaInfoCard.innerHTML = `<i class="fa-regular fa-calendar"></i> Data de corte: ${latestDataCorteRetroativa}`;
-
-  // Tabela: Top Especialidades
-  const especialidadeMap = aggregateBy(filtered, d => d.especialidade || "Não informado", d => d.fila);
-  renderPercentageTotalTable("tableFilaRetroativaEspecialidadeBody", especialidadeMap, "#8b5cf6");
-
-  // Tabela: Top Procedimentos
-  const procedimentoMap = aggregateBy(filtered, d => d.descricao || "Não informado", d => d.fila);
-  renderPercentageTotalTable("tableFilaRetroativaProcedimentoBody", procedimentoMap, "#8b5cf6");
-
-  // Tabela Detalhada
-  renderTabelaRetroativaDetalhada(filtered);
-}
-
-function renderTabelaRetroativaDetalhada(data) {
-  const tbody = el("tableFilaRetroativaCompletaBody");
-  if (!tbody) return;
-  const searchTerm = (el("searchFilaRetroativa")?.value || "").toLowerCase();
-  let filteredData = [...data];
-  if (searchTerm) {
-    filteredData = filteredData.filter(d => 
-      d.especialidade?.toLowerCase().includes(searchTerm) || 
-      d.descricao?.toLowerCase().includes(searchTerm) ||
-      d.codigo?.toLowerCase().includes(searchTerm)
-    );
-  }
-  if (!filteredData.length) {
-    tbody.innerHTML = `<tr><td colspan="8">Nenhum dado encontrado</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = filteredData.map(d => `
-    <tr>
-      <td>${escapeHtml(d.codigo || "-")}</td>
-      <td title="${escapeHtml(d.especialidade)}">${escapeHtml(truncateLabel(d.especialidade, 40))}</td>
-      <td title="${escapeHtml(d.descricao)}">${escapeHtml(truncateLabel(d.descricao, 50))}</td>
-      <td>${escapeHtml(d.grupo || "-")}</td>
-      <td>${escapeHtml(d.subgrupo || "-")}</td>
-      <td>${escapeHtml(d.complexidade || "-")}</td>
-      <td class="text-right">${d.fila.toLocaleString("pt-BR")}</td>
-      <td>${escapeHtml(d.dataCorte || "-")}</td>
-    </tr>
-  `).join("");
 }
 
 function exportExcel() {
@@ -2067,13 +1717,7 @@ function exportExcel() {
   }));
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.json_to_sheet(data);
-  ws["!cols"] = [
-    { wch: 45 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 18 },
-    { wch: 22 }
-  ];
+  ws["!cols"] = [{ wch: 45 }, { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 22 }];
   XLSX.utils.book_append_sheet(wb, ws, "Fisico_Financeiro");
   XLSX.writeFile(wb, `painel_cirurgia_eletiva_${new Date().toISOString().slice(0, 10)}.xlsx`);
   toast("Excel exportado com sucesso!", "success");
@@ -2090,6 +1734,7 @@ function switchTab(id, btn) {
   }, 120);
 }
 
+// Inicialização
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM carregado, inicializando painel...");
   loadAllData();
@@ -2132,31 +1777,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const grupoSelect = el("grupoSelect");
-  if (grupoSelect) {
-    grupoSelect.addEventListener("change", () => {
-      buildSubgrupoList();
-      applyFilters();
-    });
-  }
+  if (grupoSelect) grupoSelect.addEventListener("change", () => { buildSubgrupoList(); applyFilters(); });
 
   const periodoSelect = el("periodoSelect");
   if (periodoSelect) periodoSelect.addEventListener("change", applyFilters);
 
   const tableMonthFilterFisico = el("tableMonthFilterFisico");
-  if (tableMonthFilterFisico) {
-    tableMonthFilterFisico.addEventListener("change", e => {
-      currentTableMonthFilterFisico = e.target.value || "";
-      renderTableBodyFisico();
-    });
-  }
+  if (tableMonthFilterFisico) tableMonthFilterFisico.addEventListener("change", e => { currentTableMonthFilterFisico = e.target.value || ""; renderTableBodyFisico(); });
 
   const tSearchFisico = el("tSearchFisico");
   if (tSearchFisico) tSearchFisico.addEventListener("input", renderTableBodyFisico);
 
   const searchFilaRetroativa = el("searchFilaRetroativa");
-  if (searchFilaRetroativa) {
-    searchFilaRetroativa.addEventListener("input", () => renderFilaRetroativa());
-  }
+  if (searchFilaRetroativa) searchFilaRetroativa.addEventListener("input", () => renderFilaRetroativaReformulado());
 
   document.addEventListener("click", () => closeAllDropdowns());
   
