@@ -155,7 +155,13 @@ const PALETTE_ORANGE  = ['#d35400','#e67e22','#f39c12','#f5b041','#f8c471','#fad
 const PALETTE_ROSE    = ['#922b21','#c0392b','#e74c3c','#ec7063','#f1948a','#f5b7b1'];
 const PALETTE_GRAPE   = ['#512e5f','#7d3c98','#9b59b6','#bb8fce','#d2b4de','#e8daef'];
 const PALETTE_MONTHS  = ['#e74c3c','#3498db','#e67e22','#2ecc71','#9b59b6','#1abc9c','#f39c12','#e91e63','#00bcd4','#ff5722','#8bc34a','#673ab7'];
-const PALETTE_GREEN   = ['#1a7a3f','#27ae60','#2ecc71','#52be80','#76d7c4'];
+
+// NOVA PALETA ESCURA para gráficos de distrito (Agendamentos por Distrito)
+const PALETTE_DISTRICT_DARK = [
+  '#0d2137', '#122a47', '#1a3a5c', '#1e4d7a',
+  '#1a5c4a', '#0f4d3a', '#1e3d2e', '#2d1f3d',
+  '#3d1f2d', '#4a1a1a', '#2d2d1a', '#1a1a3d'
+];
 
 const SITUACAO_COLORS = {
   AGE: { bg: 'rgba(41,128,185,0.85)',  border: '#2980b9', label: 'Agendados (AGE)' },
@@ -966,7 +972,7 @@ function renderChartMeses() {
 }
 
 // ============================================================
-// GRÁFICOS - AGENDAMENTOS POR DISTRITO
+// GRÁFICOS - AGENDAMENTOS POR DISTRITO (CORES ESCURAS MODERNAS)
 // ============================================================
 
 function renderChartPrimeiraConsultaDistrito() {
@@ -977,24 +983,52 @@ function renderChartPrimeiraConsultaDistrito() {
   const entries = sortedEntries(counts);
   const labels = entries.map(e => e[0]);
   const data = entries.map(e => e[1]);
+  
   destroyChart(chartPrimeiraConsultaDistrito);
   chartPrimeiraConsultaDistrito = new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [{
-        label: '1ª Consulta', data,
-        backgroundColor: 'rgba(46,204,113,0.85)',
-        borderColor: '#27ae60',
-        borderWidth: 2, borderRadius: 8, borderSkipped: false,
+        label: '1ª Consulta',
+        data,
+        backgroundColor: labels.map((_, i) => PALETTE_DISTRICT_DARK[i % PALETTE_DISTRICT_DARK.length] + 'ee'),
+        borderColor: labels.map((_, i) => PALETTE_DISTRICT_DARK[i % PALETTE_DISTRICT_DARK.length]),
+        borderWidth: 2,
+        borderRadius: 10,
+        borderSkipped: false,
+        hoverBackgroundColor: labels.map((_, i) => PALETTE_DISTRICT_DARK[i % PALETTE_DISTRICT_DARK.length]),
       }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: TOOLTIP_BASE, datalabels: { anchor: 'center', align: 'center', color: '#fff', font: { family: 'Inter', size: 13, weight: 'bold' }, formatter: val => val > 0 ? fmt(val) : '' } },
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_BASE,
+          backgroundColor: 'rgba(10,20,35,0.95)',
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: '#e0e6ed',
+          font: { family: 'Inter', size: 13, weight: '800' },
+          formatter: val => val > 0 ? fmt(val) : '',
+          offset: 4,
+        }
+      },
+      layout: { padding: { top: 30 } },
       scales: {
-        x: { ticks: { font: { family: 'Inter', size: 10, weight: '600' }, color: '#3d5166', maxRotation: 30 }, grid: { display: false } },
-        y: { beginAtZero: true, ticks: { font: { family: 'Inter', size: 10 }, color: '#7a8fa6' }, grid: { display: false } }
+        x: {
+          ticks: { font: { family: 'Inter', size: 11, weight: '700' }, color: '#1a2a3a', maxRotation: 35 },
+          grid: { display: false }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { font: { family: 'Inter', size: 10, weight: '600' }, color: '#3d5166' },
+          grid: { color: 'rgba(30,58,95,0.06)', drawBorder: false }
+        }
       }
     }
   });
@@ -1008,24 +1042,55 @@ function renderChartRetornoDistrito() {
   const entries = sortedEntries(counts);
   const labels = entries.map(e => e[0]);
   const data = entries.map(e => e[1]);
+  
+  // Paleta escura com tons roxos/vinhos para Retorno
+  const darkPaletteRetorno = ['#2d1f3d', '#3d1f2d', '#4a1a2a', '#3d1a3d', '#1f2d3d', '#2d3d1f', '#3d2d1f', '#1f3d3d', '#3d1f1f', '#1f1f3d', '#2d2d1a', '#1a2d2d'];
+  
   destroyChart(chartRetornoDistrito);
   chartRetornoDistrito = new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [{
-        label: 'Retorno', data,
-        backgroundColor: 'rgba(155,89,182,0.85)',
-        borderColor: '#8e44ad',
-        borderWidth: 2, borderRadius: 8, borderSkipped: false,
+        label: 'Retorno',
+        data,
+        backgroundColor: labels.map((_, i) => darkPaletteRetorno[i % darkPaletteRetorno.length] + 'ee'),
+        borderColor: labels.map((_, i) => darkPaletteRetorno[i % darkPaletteRetorno.length]),
+        borderWidth: 2,
+        borderRadius: 10,
+        borderSkipped: false,
+        hoverBackgroundColor: labels.map((_, i) => darkPaletteRetorno[i % darkPaletteRetorno.length]),
       }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: TOOLTIP_BASE, datalabels: { anchor: 'center', align: 'center', color: '#fff', font: { family: 'Inter', size: 13, weight: 'bold' }, formatter: val => val > 0 ? fmt(val) : '' } },
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_BASE,
+          backgroundColor: 'rgba(10,20,35,0.95)',
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: '#e0e6ed',
+          font: { family: 'Inter', size: 13, weight: '800' },
+          formatter: val => val > 0 ? fmt(val) : '',
+          offset: 4,
+        }
+      },
+      layout: { padding: { top: 30 } },
       scales: {
-        x: { ticks: { font: { family: 'Inter', size: 10, weight: '600' }, color: '#3d5166', maxRotation: 30 }, grid: { display: false } },
-        y: { beginAtZero: true, ticks: { font: { family: 'Inter', size: 10 }, color: '#7a8fa6' }, grid: { display: false } }
+        x: {
+          ticks: { font: { family: 'Inter', size: 11, weight: '700' }, color: '#1a2a3a', maxRotation: 35 },
+          grid: { display: false }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { font: { family: 'Inter', size: 10, weight: '600' }, color: '#3d5166' },
+          grid: { color: 'rgba(30,58,95,0.06)', drawBorder: false }
+        }
       }
     }
   });
@@ -1037,26 +1102,70 @@ function renderChartComparativoDistrito() {
   const distritos = [...new Set(filteredData.map(r => r.distrito).filter(Boolean))].sort();
   const pcCounts = distritos.map(d => filteredData.filter(r => r.distrito === d && r.tipoAtendimento === 'Primeira Consulta').length);
   const retCounts = distritos.map(d => filteredData.filter(r => r.distrito === d && r.tipoAtendimento === 'Retorno').length);
+  
   destroyChart(chartComparativoDistrito);
   chartComparativoDistrito = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: distritos,
       datasets: [
-        { label: '1ª Consulta', data: pcCounts, backgroundColor: 'rgba(46,204,113,0.85)', borderColor: '#27ae60', borderWidth: 2, borderRadius: 6 },
-        { label: 'Retorno', data: retCounts, backgroundColor: 'rgba(155,89,182,0.85)', borderColor: '#8e44ad', borderWidth: 2, borderRadius: 6 }
+        {
+          label: '1ª Consulta',
+          data: pcCounts,
+          backgroundColor: 'rgba(26,58,92,0.90)',
+          borderColor: '#0d2137',
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+        },
+        {
+          label: 'Retorno',
+          data: retCounts,
+          backgroundColor: 'rgba(61,31,45,0.90)',
+          borderColor: '#3d1f2d',
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+        }
       ]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'top', labels: { font: { family: 'Inter', size: 12, weight: '600' }, color: '#3d5166', usePointStyle: true, pointStyleWidth: 10 } },
-        tooltip: TOOLTIP_BASE,
-        datalabels: { anchor: 'center', align: 'center', color: '#fff', font: { family: 'Inter', size: 11, weight: 'bold' }, formatter: val => val > 0 ? fmt(val) : '' }
+        legend: {
+          position: 'top',
+          labels: {
+            font: { family: 'Inter', size: 13, weight: '700' },
+            color: '#1a2a3a',
+            usePointStyle: true,
+            pointStyleWidth: 12,
+            padding: 20,
+          }
+        },
+        tooltip: {
+          ...TOOLTIP_BASE,
+          backgroundColor: 'rgba(10,20,35,0.95)',
+        },
+        datalabels: {
+          anchor: 'center',
+          align: 'center',
+          color: '#fff',
+          font: { family: 'Inter', size: 11, weight: 'bold' },
+          formatter: val => val > 0 ? fmt(val) : ''
+        }
       },
+      layout: { padding: { top: 10 } },
       scales: {
-        x: { ticks: { font: { family: 'Inter', size: 10, weight: '600' }, color: '#3d5166', maxRotation: 35 }, grid: { display: false } },
-        y: { beginAtZero: true, ticks: { font: { family: 'Inter', size: 10 }, color: '#7a8fa6' }, grid: { display: false } }
+        x: {
+          ticks: { font: { family: 'Inter', size: 11, weight: '700' }, color: '#1a2a3a', maxRotation: 35 },
+          grid: { display: false }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { font: { family: 'Inter', size: 10, weight: '600' }, color: '#3d5166' },
+          grid: { color: 'rgba(30,58,95,0.06)', drawBorder: false }
+        }
       }
     }
   });
@@ -1070,6 +1179,14 @@ function renderChartDistritoRosca() {
   const labels = entries.map(e => e[0]);
   const data = entries.map(e => e[1]);
   const total = data.reduce((a,b) => a+b, 0);
+  
+  // Paleta escura moderna para o gráfico de rosca
+  const darkDoughnutPalette = [
+    '#0d2137', '#122a47', '#1a3a5c', '#1e4d7a',
+    '#1a5c4a', '#0f4d3a', '#2d1f3d', '#4a1a1a',
+    '#3d2d1f', '#1f3d3d', '#1f1f3d', '#2d2d1a'
+  ];
+  
   destroyChart(chartDistritoRosca);
   chartDistritoRosca = new Chart(ctx, {
     type: 'doughnut',
@@ -1077,17 +1194,50 @@ function renderChartDistritoRosca() {
       labels,
       datasets: [{
         data,
-        backgroundColor: ['#e74c3c','#3498db','#e67e22','#2ecc71','#9b59b6','#1abc9c','#f39c12','#e91e63'],
-        borderColor: '#fff', borderWidth: 3,
+        backgroundColor: labels.map((_, i) => darkDoughnutPalette[i % darkDoughnutPalette.length]),
+        borderColor: '#ffffff',
+        borderWidth: 3,
+        hoverBorderColor: '#e0e6ed',
+        hoverBorderWidth: 4,
       }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
       plugins: {
-        legend: { position: 'right', labels: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#3d5166', padding: 14 } },
-        tooltip: { ...TOOLTIP_BASE, callbacks: { label: ctx => ` ${fmt(ctx.raw)} agendamentos (${total > 0 ? (ctx.raw/total*100).toFixed(1) : 0}%)` } },
-        datalabels: { color: '#fff', font: { family: 'Inter', size: 11, weight: 'bold' }, formatter: (val) => total > 0 ? (val/total*100).toFixed(0) + '%' : '' },
-        centerText: { enabled: true, value: fmt(total), label: 'Total', fontSize: 22, valueColor: '#1e3a5f', labelColor: '#7a8fa6' }
+        legend: {
+          position: 'right',
+          labels: {
+            font: { family: 'Inter', size: 11, weight: '700' },
+            color: '#1a2a3a',
+            padding: 16,
+            usePointStyle: true,
+            pointStyleWidth: 10,
+          }
+        },
+        tooltip: {
+          ...TOOLTIP_BASE,
+          backgroundColor: 'rgba(10,20,35,0.95)',
+          callbacks: {
+            label: ctx => ` ${fmt(ctx.raw)} agendamentos (${total > 0 ? (ctx.raw/total*100).toFixed(1) : 0}%)`
+          }
+        },
+        datalabels: {
+          color: '#ffffff',
+          font: { family: 'Inter', size: 11, weight: 'bold' },
+          formatter: (val) => total > 0 ? (val/total*100).toFixed(0) + '%' : '',
+          textStrokeColor: 'rgba(0,0,0,0.3)',
+          textStrokeWidth: 2,
+        },
+        centerText: {
+          enabled: true,
+          value: fmt(total),
+          label: 'Total de Agendamentos',
+          fontSize: 26,
+          valueColor: '#0d2137',
+          labelColor: '#3d5166'
+        }
       }
     }
   });
@@ -1524,7 +1674,7 @@ function renderChartTransferidosMensal() {
 }
 
 // ============================================================
-// TABELA CONSOLIDADA (FORMATAÇÃO INTOCADA)
+// TABELA CONSOLIDADA
 // ============================================================
 function buildTableData() {
   const map = {};
