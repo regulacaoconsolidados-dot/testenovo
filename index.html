@@ -90,12 +90,21 @@
           </div>
         </div>
 
-        <!-- FILTRO 2: Data da Criação do Agendamento -->
+        <!-- FILTRO 2: Distrito -->
         <div class="filter-group">
-          <label><i class="fas fa-calendar-day"></i> Data da Criação do Agendamento</label>
-          <div class="date-wrapper">
-            <input type="text" id="filterDataInicio" class="filter-input date-input" placeholder="dd/mm/aaaa" readonly />
-            <i class="fas fa-calendar-check date-icon"></i>
+          <label><i class="fas fa-map-marker-alt"></i> Distrito</label>
+          <div class="multi-select-wrapper" id="multiSelectDistrito">
+            <div class="multi-select-trigger" onclick="toggleMultiSelect('multiSelectDistrito')">
+              <span class="multi-select-placeholder">Todos</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="multi-select-dropdown">
+              <div class="multi-select-options" id="multiSelectDistritoOptions"></div>
+              <div class="multi-select-actions">
+                <button onclick="selectAllMultiSelect('multiSelectDistrito')">Todos</button>
+                <button onclick="clearMultiSelect('multiSelectDistrito')">Limpar</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -201,21 +210,12 @@
           </div>
         </div>
 
-        <!-- FILTRO 8: Distrito -->
+        <!-- FILTRO 8: Data da Criação do Agendamento -->
         <div class="filter-group">
-          <label><i class="fas fa-map-marker-alt"></i> Distrito</label>
-          <div class="multi-select-wrapper" id="multiSelectDistrito">
-            <div class="multi-select-trigger" onclick="toggleMultiSelect('multiSelectDistrito')">
-              <span class="multi-select-placeholder">Todos</span>
-              <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="multi-select-dropdown">
-              <div class="multi-select-options" id="multiSelectDistritoOptions"></div>
-              <div class="multi-select-actions">
-                <button onclick="selectAllMultiSelect('multiSelectDistrito')">Todos</button>
-                <button onclick="clearMultiSelect('multiSelectDistrito')">Limpar</button>
-              </div>
-            </div>
+          <label><i class="fas fa-calendar-day"></i> Data da Criação do Agendamento</label>
+          <div class="date-wrapper">
+            <input type="text" id="filterDataInicio" class="filter-input date-input" placeholder="dd/mm/aaaa" readonly />
+            <i class="fas fa-calendar-check date-icon"></i>
           </div>
         </div>
 
