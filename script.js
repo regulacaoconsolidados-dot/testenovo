@@ -175,10 +175,8 @@ let currentPage   = 1;
 let sortColIdx    = -1;
 let sortAscFlag   = true;
 
-// Multiselect state
 const multiSelectState = {};
 
-// Instâncias dos gráficos
 let chartDistrito, chartTipoAtendimento, chartEspecialidade, chartPrestador;
 let chartSituacao, chartMeses;
 let chartAbsenteismoEsp, chartAbsenteismoDist, chartAbsenteismoMensal, chartAbsenteismoPrestador;
@@ -273,33 +271,29 @@ function getOperador(codigo) {
 
 function fmt(n) { return (n || 0).toLocaleString('pt-BR'); }
 
+// ============================================================
+// PARSE DATE - CORRIGIDO (aceita vários formatos)
+// ============================================================
 function parseDate(str) {
   if (!str) return null;
   str = str.toString().trim();
-  
-  // Ignora timezone e pega só a parte da data: "2026-04-30T..." → "2026-04-30"
-  // ou "30/04/2026 10:00" → "30/04/2026"
-  let dateOnly = str.split('T')[0];  // remove hora no formato ISO
-  dateOnly = dateOnly.split(' ')[0]; // remove hora genérica
-  
-  let m;
-  
-  // Tenta dd/mm/aaaa
-  m = dateOnly.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (m) return new Date(+m[3], +m[2] - 1, +m[1]);
 
-  // Tenta aaaa-mm-dd
-  m = dateOnly.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+  // Formato dd/mm/aaaa (ex: 17/09/2023)
+  let m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
 
-  // Tenta mm/dd/aaaa (formato americano alternativo)
-  m = dateOnly.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (m) return new Date(+m[3], +m[1] - 1, +m[2]);
+  // Formato aaaa-mm-dd (ex: 2023-09-17)
+  m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
 
-  // Última tentativa: criar direto (pode funcionar com formato ISO)
-  const parsed = new Date(dateOnly);
-  if (!isNaN(parsed.getTime())) return parsed;
-  
+  // Formato dd/mm/aaaa hh:mm (ex: 17/09/2023 14:30)
+  m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+\d{1,2}:\d{2}/);
+  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
+
+  // Formato mm/dd/aaaa (ex: 09/17/2023)
+  m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return new Date(+m[3], +m[1]-1, +m[2]);
+
   return null;
 }
 
@@ -651,7 +645,7 @@ function populateMultiSelectOptions() {
 }
 
 // ============================================================
-// APLICAR FILTROS
+// APLICAR FILTROS - CORRIGIDO
 // ============================================================
 function applyFilters() {
   const prestadoresSelecionados    = getMultiSelectValues('multiSelectPrestador');
@@ -661,7 +655,9 @@ function applyFilters() {
   const mesesSelecionados          = getMultiSelectValues('multiSelectMes');
   const unidadesSelecionadas       = getMultiSelectValues('multiSelectUnidade');
   const distritosSelecionados      = getMultiSelectValues('multiSelectDistrito');
-  const dataCriacaoSelecionada     = window._fpInicio ? window._fpInicio.selectedDates[0] : null;
+  
+  // Pega a data selecionada no flatpickr
+  const dataCriacaoSelecionada = window._fpInicio ? window._fpInicio.selectedDates[0] : null;
 
   filteredData = allData.filter(r => {
     if (prestadoresSelecionados.length > 0 && !prestadoresSelecionados.includes(r.unidadeExecutante)) return false;
@@ -671,10 +667,13 @@ function applyFilters() {
     if (mesesSelecionados.length > 0 && !mesesSelecionados.includes(r.mesAgendamento)) return false;
     if (unidadesSelecionadas.length > 0 && !unidadesSelecionadas.includes(r.unidadeSolicitante)) return false;
     if (distritosSelecionados.length > 0 && !distritosSelecionados.includes(r.distrito)) return false;
+    
+    // FILTRO DE DATA DA CRIAÇÃO DO AGENDAMENTO - CORRIGIDO
     if (dataCriacaoSelecionada) {
       if (!r.dataCriacaoParsed) return false;
       if (!isSameDay(r.dataCriacaoParsed, dataCriacaoSelecionada)) return false;
     }
+    
     return true;
   });
 
@@ -1884,7 +1883,10 @@ function initDatePickers() {
     dateFormat: 'd/m/Y',
     allowInput: false,
     disableMobile: false,
-    onChange: () => applyFilters()
+    onChange: function(selectedDates, dateStr, instance) {
+      // Quando uma data é selecionada, aplica os filtros
+      applyFilters();
+    }
   });
 }
 
