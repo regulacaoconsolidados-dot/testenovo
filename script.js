@@ -272,27 +272,20 @@ function getOperador(codigo) {
 function fmt(n) { return (n || 0).toLocaleString('pt-BR'); }
 
 // ============================================================
-// PARSE DATE - CORRIGIDO (aceita vários formatos)
+// PARSE DATE
 // ============================================================
 function parseDate(str) {
   if (!str) return null;
   str = str.toString().trim();
 
-  // Formato dd/mm/aaaa (ex: 17/09/2023)
   let m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (m) return new Date(+m[3], +m[2]-1, +m[1]);
 
-  // Formato aaaa-mm-dd (ex: 2023-09-17)
   m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (m) return new Date(+m[1], +m[2]-1, +m[3]);
 
-  // Formato dd/mm/aaaa hh:mm (ex: 17/09/2023 14:30)
   m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+\d{1,2}:\d{2}/);
   if (m) return new Date(+m[3], +m[2]-1, +m[1]);
-
-  // Formato mm/dd/aaaa (ex: 09/17/2023)
-  m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (m) return new Date(+m[3], +m[1]-1, +m[2]);
 
   return null;
 }
@@ -536,7 +529,7 @@ async function loadData() {
 }
 
 // ============================================================
-// NORMALIZAR DADOS
+// NORMALIZAR DADOS (CORRIGIDO - SEM DUPLICAÇÃO)
 // ============================================================
 function normalizeData(rows) {
   return rows.map(row => {
@@ -564,7 +557,15 @@ function normalizeData(rows) {
     const situacao      = (get('SITUAÇÃO','SITUACAO') || '').toUpperCase().trim();
     const operCod       = get('OPERADOR AGENDAMENTO');
 
-    const dataCriacao       = get('DATA CRIAÇÃO DO AGENDAMENTO','DATA CRIACAO DO AGENDAMENTO','DATA CRIAÇÃO','DATA_CRIACAO');
+    // DATA CRIAÇÃO DO AGENDAMENTO
+    const dataCriacao = get(
+      'DATA CRIAÇÃO DO AGENDAMENTO',
+      'DATA CRIACAO DO AGENDAMENTO',
+      'DATA CRIAÇÃO',
+      'DATA CRIACAO',
+      'DATA_CRIAÇÃO',
+      'DATA_CRIACAO'
+    );
     const dataCriacaoParsed = parseDate(dataCriacao);
 
     const dataAgenda       = get('DATA AGENDA','DATA_AGENDA');
@@ -645,7 +646,7 @@ function populateMultiSelectOptions() {
 }
 
 // ============================================================
-// APLICAR FILTROS - CORRIGIDO
+// APLICAR FILTROS
 // ============================================================
 function applyFilters() {
   const prestadoresSelecionados    = getMultiSelectValues('multiSelectPrestador');
@@ -656,7 +657,6 @@ function applyFilters() {
   const unidadesSelecionadas       = getMultiSelectValues('multiSelectUnidade');
   const distritosSelecionados      = getMultiSelectValues('multiSelectDistrito');
   
-  // Pega a data selecionada no flatpickr
   const dataCriacaoSelecionada = window._fpInicio ? window._fpInicio.selectedDates[0] : null;
 
   filteredData = allData.filter(r => {
@@ -668,7 +668,6 @@ function applyFilters() {
     if (unidadesSelecionadas.length > 0 && !unidadesSelecionadas.includes(r.unidadeSolicitante)) return false;
     if (distritosSelecionados.length > 0 && !distritosSelecionados.includes(r.distrito)) return false;
     
-    // FILTRO DE DATA DA CRIAÇÃO DO AGENDAMENTO - CORRIGIDO
     if (dataCriacaoSelecionada) {
       if (!r.dataCriacaoParsed) return false;
       if (!isSameDay(r.dataCriacaoParsed, dataCriacaoSelecionada)) return false;
@@ -966,7 +965,7 @@ function renderChartMeses() {
 }
 
 // ============================================================
-// GRÁFICOS - AGENDAMENTOS POR DISTRITO (CORES ORIGINAIS)
+// GRÁFICOS - AGENDAMENTOS POR DISTRITO
 // ============================================================
 
 function renderChartPrimeiraConsultaDistrito() {
@@ -1884,7 +1883,6 @@ function initDatePickers() {
     allowInput: false,
     disableMobile: false,
     onChange: function(selectedDates, dateStr, instance) {
-      // Quando uma data é selecionada, aplica os filtros
       applyFilters();
     }
   });
