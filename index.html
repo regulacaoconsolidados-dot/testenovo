@@ -62,14 +62,13 @@
     <section class="filters-section card">
       <div class="filters-header">
         <i class="fas fa-filter"></i>
-        <span>Filtros (O painel apresenta dados apenas dos meses anteriores, pois é necessário aguardar o fechamento do ciclo mensal para consolidar.)</span>
+        <span>Filtros</span>
         <button class="btn-clear-filters" onclick="clearFilters()">
           <i class="fas fa-times"></i> Limpar filtros
         </button>
       </div>
       <div class="filters-grid">
 
-        <!-- FILTRO 1: Total de agendamentos no mês -->
         <div class="filter-group">
           <label><i class="fas fa-calendar-alt"></i> Total de agendamentos no mês</label>
           <div class="multi-select-wrapper" id="multiSelectMes">
@@ -90,25 +89,14 @@
           </div>
         </div>
 
-        <!-- FILTRO 2: Distrito -->
         <div class="filter-group">
-          <label><i class="fas fa-map-marker-alt"></i> Distrito</label>
-          <div class="multi-select-wrapper" id="multiSelectDistrito">
-            <div class="multi-select-trigger" onclick="toggleMultiSelect('multiSelectDistrito')">
-              <span class="multi-select-placeholder">Todos</span>
-              <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="multi-select-dropdown">
-              <div class="multi-select-options" id="multiSelectDistritoOptions"></div>
-              <div class="multi-select-actions">
-                <button onclick="selectAllMultiSelect('multiSelectDistrito')">Todos</button>
-                <button onclick="clearMultiSelect('multiSelectDistrito')">Limpar</button>
-              </div>
-            </div>
+          <label><i class="fas fa-calendar-day"></i> Data da Criação do Agendamento</label>
+          <div class="date-wrapper">
+            <input type="text" id="filterDataInicio" class="filter-input date-input" placeholder="dd/mm/aaaa" readonly />
+            <i class="fas fa-calendar-check date-icon"></i>
           </div>
         </div>
 
-        <!-- FILTRO 3: Prestador -->
         <div class="filter-group">
           <label><i class="fas fa-building"></i> Prestador</label>
           <div class="multi-select-wrapper" id="multiSelectPrestador">
@@ -129,7 +117,6 @@
           </div>
         </div>
 
-        <!-- FILTRO 4: Especialidade -->
         <div class="filter-group">
           <label><i class="fas fa-stethoscope"></i> Especialidade</label>
           <div class="multi-select-wrapper" id="multiSelectEspecialidade">
@@ -150,7 +137,6 @@
           </div>
         </div>
 
-        <!-- FILTRO 5: Tipo de Serviço -->
         <div class="filter-group">
           <label><i class="fas fa-notes-medical"></i> Tipo de Serviço</label>
           <div class="multi-select-wrapper" id="multiSelectTipoServico">
@@ -168,7 +154,6 @@
           </div>
         </div>
 
-        <!-- FILTRO 6: Profissional Médico -->
         <div class="filter-group">
           <label><i class="fas fa-user-md"></i> Profissional Médico</label>
           <div class="multi-select-wrapper" id="multiSelectProfissional">
@@ -189,7 +174,6 @@
           </div>
         </div>
 
-        <!-- FILTRO 7: Unidade de Saúde -->
         <div class="filter-group">
           <label><i class="fas fa-clinic-medical"></i> Unidade de Saúde</label>
           <div class="multi-select-wrapper" id="multiSelectUnidade">
@@ -210,12 +194,20 @@
           </div>
         </div>
 
-        <!-- FILTRO 8: Data da Criação do Agendamento -->
         <div class="filter-group">
-          <label><i class="fas fa-calendar-day"></i> Data da Criação do Agendamento</label>
-          <div class="date-wrapper">
-            <input type="text" id="filterDataInicio" class="filter-input date-input" placeholder="dd/mm/aaaa" readonly />
-            <i class="fas fa-calendar-check date-icon"></i>
+          <label><i class="fas fa-map-marker-alt"></i> Distrito</label>
+          <div class="multi-select-wrapper" id="multiSelectDistrito">
+            <div class="multi-select-trigger" onclick="toggleMultiSelect('multiSelectDistrito')">
+              <span class="multi-select-placeholder">Todos</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="multi-select-dropdown">
+              <div class="multi-select-options" id="multiSelectDistritoOptions"></div>
+              <div class="multi-select-actions">
+                <button onclick="selectAllMultiSelect('multiSelectDistrito')">Todos</button>
+                <button onclick="clearMultiSelect('multiSelectDistrito')">Limpar</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -264,452 +256,113 @@
     <!-- ===== ABAS ===== -->
     <section class="tabs-section">
       <nav class="tabs-nav" id="tabsNav">
-        <button class="tab-btn active" data-tab="visao-geral">
-          <i class="fas fa-chart-pie"></i> Visão Geral
-        </button>
-        <button class="tab-btn" data-tab="tabela">
-          <i class="fas fa-table"></i> Tabela
-        </button>
-        <button class="tab-btn" data-tab="agendamentos-distrito">
-          <i class="fas fa-map-marker-alt"></i> Agendamentos por Distrito
-        </button>
-        <button class="tab-btn" data-tab="absenteismo">
-          <i class="fas fa-user-times"></i> Absenteísmo
-        </button>
-        <button class="tab-btn" data-tab="recepcionados">
-          <i class="fas fa-user-check"></i> Recepcionados
-        </button>
-        <button class="tab-btn" data-tab="cancelados">
-          <i class="fas fa-times-circle"></i> Cancelados
-        </button>
-        <button class="tab-btn" data-tab="transferidos">
-          <i class="fas fa-exchange-alt"></i> Transferidos
-        </button>
+        <button class="tab-btn active" data-tab="visao-geral"><i class="fas fa-chart-pie"></i> Visão Geral</button>
+        <button class="tab-btn" data-tab="tabela"><i class="fas fa-table"></i> Tabela</button>
+        <button class="tab-btn" data-tab="agendamentos-distrito"><i class="fas fa-map-marker-alt"></i> Agendamentos por Distrito</button>
+        <button class="tab-btn" data-tab="absenteismo"><i class="fas fa-user-times"></i> Absenteísmo</button>
+        <button class="tab-btn" data-tab="recepcionados"><i class="fas fa-user-check"></i> Recepcionados</button>
+        <button class="tab-btn" data-tab="cancelados"><i class="fas fa-times-circle"></i> Cancelados</button>
+        <button class="tab-btn" data-tab="transferidos"><i class="fas fa-exchange-alt"></i> Transferidos</button>
       </nav>
 
       <div class="tabs-content">
 
-        <!-- ===== ABA: VISÃO GERAL ===== -->
+        <!-- Visão Geral -->
         <div class="tab-panel active" id="tab-visao-geral">
-          
-          <!-- LINHA 1: Distrito (wide) + 1ª Consulta vs Retorno -->
           <section class="charts-row charts-row-main">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-red"></div>
-                  <h4>Agendamentos por Distrito</h4>
-                </div>
-                <span class="chart-badge">Barras Verticais</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartDistrito"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-green"></div>
-                  <h4>1ª Consulta vs Retorno</h4>
-                </div>
-                <span class="chart-badge">Barras</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartTipoAtendimento"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-red"></div><h4>Agendamentos por Distrito</h4></div><span class="chart-badge">Barras Verticais</span></div><div class="chart-body"><canvas id="chartDistrito"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-green"></div><h4>1ª Consulta vs Retorno</h4></div><span class="chart-badge">Barras</span></div><div class="chart-body"><canvas id="chartTipoAtendimento"></canvas></div></div>
           </section>
-
-          <!-- LINHA 2: Especialidade + Prestador -->
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-purple"></div>
-                  <h4>Agendamentos por Especialidade</h4>
-                </div>
-                <span class="chart-badge">Barras Horizontais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartEspecialidade"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-blue"></div>
-                  <h4>Agendamentos por Prestador</h4>
-                </div>
-                <span class="chart-badge">Barras Verticais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartPrestador"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-purple"></div><h4>Agendamentos por Especialidade</h4></div><span class="chart-badge">Barras Horizontais</span></div><div class="chart-body chart-body-tall"><canvas id="chartEspecialidade"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-blue"></div><h4>Agendamentos por Prestador</h4></div><span class="chart-badge">Barras Verticais</span></div><div class="chart-body chart-body-tall"><canvas id="chartPrestador"></canvas></div></div>
           </section>
-
-          <!-- LINHA 3: Situação + Distribuição por Mês -->
-          <section class="charts-row charts-row-equal charts-row-small">
-            <div class="chart-card chart-card-small">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-teal"></div>
-                  <h4>Quantidade de Consultas Agendadas por Situação</h4>
-                </div>
-                <span class="chart-badge">Barras Verticais</span>
-              </div>
-              <div class="chart-body chart-body-small">
-                <canvas id="chartSituacao"></canvas>
-              </div>
-            </div>
-            <div class="chart-card chart-card-small">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-orange"></div>
-                  <h4>Distribuição de Agendamentos por Mês</h4>
-                </div>
-                <span class="chart-badge">Rosca</span>
-              </div>
-              <div class="chart-body chart-body-doughnut-small">
-                <canvas id="chartMeses"></canvas>
-              </div>
-            </div>
+          <section class="charts-row charts-row-small">
+            <div class="chart-card chart-card-small"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-teal"></div><h4>Quantidade de Consultas por Situação</h4></div><span class="chart-badge">Barras Verticais</span></div><div class="chart-body chart-body-small"><canvas id="chartSituacao"></canvas></div></div>
+            <div class="chart-card chart-card-small"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-orange"></div><h4>Distribuição por Mês</h4></div><span class="chart-badge">Rosca</span></div><div class="chart-body chart-body-doughnut-small"><canvas id="chartMeses"></canvas></div></div>
           </section>
-
         </div>
 
-        <!-- ===== ABA: TABELA ===== -->
+        <!-- Tabela -->
         <div class="tab-panel" id="tab-tabela">
           <section class="table-section card">
             <div class="table-header">
-              <div class="table-title-group">
-                <i class="fas fa-table"></i>
-                <h4>CONSOLIDADO / AGENDAMENTOS</h4>
-              </div>
+              <div class="table-title-group"><i class="fas fa-table"></i><h4>CONSOLIDADO / AGENDAMENTOS</h4></div>
               <div class="table-controls">
-                <div class="search-box">
-                  <i class="fas fa-search"></i>
-                  <input type="text" id="tableSearch" placeholder="Buscar registros..." oninput="filterTable()" />
-                </div>
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" id="tableSearch" placeholder="Buscar registros..." oninput="filterTable()" /></div>
                 <select id="tablePageSize" class="filter-select small-select" onchange="renderTable()">
-                  <option value="15">15 por página</option>
-                  <option value="25">25 por página</option>
-                  <option value="50">50 por página</option>
-                  <option value="100">100 por página</option>
-                  <option value="500">500 por página</option>
-                  <option value="1000">1.000 por página</option>
+                  <option value="15">15</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="1000">1000</option>
                 </select>
               </div>
             </div>
             <div class="table-responsive">
               <table class="data-table" id="mainTable">
-                <thead>
-                  <tr>
-                    <th onclick="sortTable(0)">Distrito <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(1)">Unidade Solicitante <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(2)">Tipo de Serviço <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(3)">CBO / Especialidade <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(4)">Profissional Médico <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(5)">Unidade Executante <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(6)" class="text-center">AGE <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(7)" class="text-center">REC <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(8)" class="text-center">FAL <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(9)" class="text-center">CAN <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(10)" class="text-center">TRA <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(11)" class="text-center">Total Agend. <i class="fas fa-sort"></i></th>
-                    <th onclick="sortTable(12)" class="text-center">% Absent. <i class="fas fa-sort"></i></th>
-                  </tr>
-                </thead>
-                <tbody id="tableBody">
-                  <tr><td colspan="13" class="empty-msg">Aguardando dados...</td></tr>
-                </tbody>
+                <thead><tr><th onclick="sortTable(0)">Distrito <i class="fas fa-sort"></i></th><th onclick="sortTable(1)">Unidade Solicitante <i class="fas fa-sort"></i></th><th onclick="sortTable(2)">Tipo de Serviço <i class="fas fa-sort"></i></th><th onclick="sortTable(3)">CBO / Especialidade <i class="fas fa-sort"></i></th><th onclick="sortTable(4)">Profissional Médico <i class="fas fa-sort"></i></th><th onclick="sortTable(5)">Unidade Executante <i class="fas fa-sort"></i></th><th onclick="sortTable(6)" class="text-center">AGE <i class="fas fa-sort"></i></th><th onclick="sortTable(7)" class="text-center">REC <i class="fas fa-sort"></i></th><th onclick="sortTable(8)" class="text-center">FAL <i class="fas fa-sort"></i></th><th onclick="sortTable(9)" class="text-center">CAN <i class="fas fa-sort"></i></th><th onclick="sortTable(10)" class="text-center">TRA <i class="fas fa-sort"></i></th><th onclick="sortTable(11)" class="text-center">Total Agend. <i class="fas fa-sort"></i></th><th onclick="sortTable(12)" class="text-center">% Absent. <i class="fas fa-sort"></i></th></tr></thead>
+                <tbody id="tableBody"><tr><td colspan="13" class="empty-msg">Aguardando dados...</td></tr></tbody>
                 <tfoot id="tableFoot"></tfoot>
               </table>
             </div>
-            <div class="table-footer">
-              <span id="tablePaginationInfo">Mostrando 0 registros</span>
-              <div class="pagination" id="pagination"></div>
-            </div>
+            <div class="table-footer"><span id="tablePaginationInfo">Mostrando 0 registros</span><div class="pagination" id="pagination"></div></div>
           </section>
         </div>
 
-        <!-- ===== ABA: AGENDAMENTOS POR DISTRITO ===== -->
+        <!-- Agendamentos por Distrito -->
         <div class="tab-panel" id="tab-agendamentos-distrito">
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-green"></div>
-                  <h4>1ª Consulta por Distrito</h4>
-                </div>
-                <span class="chart-badge">Barras Verticais</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartPrimeiraConsultaDistrito"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-purple"></div>
-                  <h4>Retorno por Distrito</h4>
-                </div>
-                <span class="chart-badge">Barras Verticais</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartRetornoDistrito"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-green"></div><h4>1ª Consulta por Distrito</h4></div><span class="chart-badge">Barras Verticais</span></div><div class="chart-body"><canvas id="chartPrimeiraConsultaDistrito"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-purple"></div><h4>Retorno por Distrito</h4></div><span class="chart-badge">Barras Verticais</span></div><div class="chart-body"><canvas id="chartRetornoDistrito"></canvas></div></div>
           </section>
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-blue"></div>
-                  <h4>Comparativo 1ª Consulta vs Retorno por Distrito</h4>
-                </div>
-                <span class="chart-badge">Barras Agrupadas</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartComparativoDistrito"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-teal"></div>
-                  <h4>Total de Agendamentos por Distrito</h4>
-                </div>
-                <span class="chart-badge">Rosca</span>
-              </div>
-              <div class="chart-body chart-body-doughnut">
-                <canvas id="chartDistritoRosca"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-blue"></div><h4>Comparativo 1ª Consulta vs Retorno</h4></div><span class="chart-badge">Barras Agrupadas</span></div><div class="chart-body chart-body-tall"><canvas id="chartComparativoDistrito"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-teal"></div><h4>Total de Agendamentos por Distrito</h4></div><span class="chart-badge">Rosca</span></div><div class="chart-body chart-body-doughnut"><canvas id="chartDistritoRosca"></canvas></div></div>
           </section>
         </div>
 
-        <!-- ===== ABA: ABSENTEÍSMO ===== -->
+        <!-- Absenteísmo -->
         <div class="tab-panel" id="tab-absenteismo">
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-warning"></div>
-                  <h4>% Absenteísmo por Especialidade</h4>
-                </div>
-                <span class="chart-badge">Barras Horizontais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartAbsenteismoEsp"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-warning"></div>
-                  <h4>% Absenteísmo por Distrito</h4>
-                </div>
-                <span class="chart-badge">Barras Verticais</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartAbsenteismoDist"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-warning"></div><h4>% Absenteísmo por Especialidade</h4></div><span class="chart-badge">Barras Horizontais</span></div><div class="chart-body chart-body-tall"><canvas id="chartAbsenteismoEsp"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-warning"></div><h4>% Absenteísmo por Distrito</h4></div><span class="chart-badge">Barras Verticais</span></div><div class="chart-body"><canvas id="chartAbsenteismoDist"></canvas></div></div>
           </section>
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-danger"></div>
-                  <h4>Evolução Mensal do Absenteísmo</h4>
-                </div>
-                <span class="chart-badge">Linha</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartAbsenteismoMensal"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-orange"></div>
-                  <h4>Absenteísmo por Prestador</h4>
-                </div>
-                <span class="chart-badge">Barras Horizontais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartAbsenteismoPrestador"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-danger"></div><h4>Evolução Mensal do Absenteísmo</h4></div><span class="chart-badge">Linha</span></div><div class="chart-body"><canvas id="chartAbsenteismoMensal"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-orange"></div><h4>Absenteísmo por Prestador</h4></div><span class="chart-badge">Barras Horizontais</span></div><div class="chart-body chart-body-tall"><canvas id="chartAbsenteismoPrestador"></canvas></div></div>
           </section>
         </div>
 
-        <!-- ===== ABA: RECEPCIONADOS ===== -->
+        <!-- Recepcionados -->
         <div class="tab-panel" id="tab-recepcionados">
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-blue"></div>
-                  <h4>Recepcionados por Distrito</h4>
-                </div>
-                <span class="chart-badge">Barras Verticais</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartRecepcionadosDistrito"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-purple"></div>
-                  <h4>Recepcionados por Especialidade</h4>
-                </div>
-                <span class="chart-badge">Barras Horizontais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartRecepcionadosEspecialidade"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-blue"></div><h4>Recepcionados por Distrito</h4></div><span class="chart-badge">Barras Verticais</span></div><div class="chart-body"><canvas id="chartRecepcionadosDistrito"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-purple"></div><h4>Recepcionados por Especialidade</h4></div><span class="chart-badge">Barras Horizontais</span></div><div class="chart-body chart-body-tall"><canvas id="chartRecepcionadosEspecialidade"></canvas></div></div>
           </section>
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-teal"></div>
-                  <h4>Recepcionados por Prestador</h4>
-                </div>
-                <span class="chart-badge">Barras Horizontais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartRecepcionadosPrestador"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-green"></div>
-                  <h4>Evolução Mensal de Recepcionados</h4>
-                </div>
-                <span class="chart-badge">Linha</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartRecepcionadosMensal"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-teal"></div><h4>Recepcionados por Prestador</h4></div><span class="chart-badge">Barras Horizontais</span></div><div class="chart-body chart-body-tall"><canvas id="chartRecepcionadosPrestador"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-green"></div><h4>Evolução Mensal de Recepcionados</h4></div><span class="chart-badge">Linha</span></div><div class="chart-body"><canvas id="chartRecepcionadosMensal"></canvas></div></div>
           </section>
         </div>
 
-        <!-- ===== ABA: CANCELADOS ===== -->
+        <!-- Cancelados -->
         <div class="tab-panel" id="tab-cancelados">
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-danger"></div>
-                  <h4>% Cancelamentos por Distrito</h4>
-                </div>
-                <span class="chart-badge">Barras Verticais</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartCancelamentosDist"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-danger"></div>
-                  <h4>% Cancelamentos por Especialidade</h4>
-                </div>
-                <span class="chart-badge">Barras Horizontais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartCancelamentosEsp"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-danger"></div><h4>% Cancelamentos por Distrito</h4></div><span class="chart-badge">Barras Verticais</span></div><div class="chart-body"><canvas id="chartCancelamentosDist"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-danger"></div><h4>% Cancelamentos por Especialidade</h4></div><span class="chart-badge">Barras Horizontais</span></div><div class="chart-body chart-body-tall"><canvas id="chartCancelamentosEsp"></canvas></div></div>
           </section>
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-warning"></div>
-                  <h4>Cancelamentos por Prestador</h4>
-                </div>
-                <span class="chart-badge">Barras Horizontais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartCancelamentosPrestador"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-orange"></div>
-                  <h4>Evolução Mensal de Cancelamentos</h4>
-                </div>
-                <span class="chart-badge">Linha</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartCancelamentosMensal"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-warning"></div><h4>Cancelamentos por Prestador</h4></div><span class="chart-badge">Barras Horizontais</span></div><div class="chart-body chart-body-tall"><canvas id="chartCancelamentosPrestador"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-orange"></div><h4>Evolução Mensal de Cancelamentos</h4></div><span class="chart-badge">Linha</span></div><div class="chart-body"><canvas id="chartCancelamentosMensal"></canvas></div></div>
           </section>
         </div>
 
-        <!-- ===== ABA: TRANSFERIDOS ===== -->
+        <!-- Transferidos -->
         <div class="tab-panel" id="tab-transferidos">
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-purple"></div>
-                  <h4>Transferidos por Distrito</h4>
-                </div>
-                <span class="chart-badge">Barras Verticais</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartTransferidosDistrito"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-purple"></div>
-                  <h4>Transferidos por Especialidade</h4>
-                </div>
-                <span class="chart-badge">Barras Horizontais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartTransferidosEspecialidade"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-purple"></div><h4>Transferidos por Distrito</h4></div><span class="chart-badge">Barras Verticais</span></div><div class="chart-body"><canvas id="chartTransferidosDistrito"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-purple"></div><h4>Transferidos por Especialidade</h4></div><span class="chart-badge">Barras Horizontais</span></div><div class="chart-body chart-body-tall"><canvas id="chartTransferidosEspecialidade"></canvas></div></div>
           </section>
           <section class="charts-row charts-row-equal">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-teal"></div>
-                  <h4>Transferidos por Prestador</h4>
-                </div>
-                <span class="chart-badge">Barras Horizontais</span>
-              </div>
-              <div class="chart-body chart-body-tall">
-                <canvas id="chartTransferidosPrestador"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div class="chart-title-group">
-                  <div class="chart-dot dot-green"></div>
-                  <h4>Evolução Mensal de Transferidos</h4>
-                </div>
-                <span class="chart-badge">Linha</span>
-              </div>
-              <div class="chart-body">
-                <canvas id="chartTransferidosMensal"></canvas>
-              </div>
-            </div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-teal"></div><h4>Transferidos por Prestador</h4></div><span class="chart-badge">Barras Horizontais</span></div><div class="chart-body chart-body-tall"><canvas id="chartTransferidosPrestador"></canvas></div></div>
+            <div class="chart-card"><div class="chart-header"><div class="chart-title-group"><div class="chart-dot dot-green"></div><h4>Evolução Mensal de Transferidos</h4></div><span class="chart-badge">Linha</span></div><div class="chart-body"><canvas id="chartTransferidosMensal"></canvas></div></div>
           </section>
         </div>
 
@@ -718,7 +371,6 @@
 
   </main>
 
-  <!-- ===================== FOOTER ===================== -->
   <footer class="footer">
     <p>Diretoria de Regulação do Acesso – Prefeitura Municipal de Contagem | Desenvolvido por Ana P. A. Silva – Matric. 201704</p>
     <p id="lastUpdate">Última atualização: –</p>
