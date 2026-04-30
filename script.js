@@ -276,10 +276,30 @@ function fmt(n) { return (n || 0).toLocaleString('pt-BR'); }
 function parseDate(str) {
   if (!str) return null;
   str = str.toString().trim();
-  let m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
-  m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+  
+  // Ignora timezone e pega só a parte da data: "2026-04-30T..." → "2026-04-30"
+  // ou "30/04/2026 10:00" → "30/04/2026"
+  let dateOnly = str.split('T')[0];  // remove hora no formato ISO
+  dateOnly = dateOnly.split(' ')[0]; // remove hora genérica
+  
+  let m;
+  
+  // Tenta dd/mm/aaaa
+  m = dateOnly.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return new Date(+m[3], +m[2] - 1, +m[1]);
+
+  // Tenta aaaa-mm-dd
+  m = dateOnly.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+
+  // Tenta mm/dd/aaaa (formato americano alternativo)
+  m = dateOnly.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return new Date(+m[3], +m[1] - 1, +m[2]);
+
+  // Última tentativa: criar direto (pode funcionar com formato ISO)
+  const parsed = new Date(dateOnly);
+  if (!isNaN(parsed.getTime())) return parsed;
+  
   return null;
 }
 
