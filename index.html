@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏥 SISTEMA OCI v4.0 - Painel de Monitoramento</title>
+    <title>🏥 SISTEMA OCI v5.0 - Versão Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -16,11 +16,11 @@
         .gradient-header::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%); animation: rotate 25s linear infinite; pointer-events: none; }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .card-blue { border-left: 5px solid #3b82f6; } .card-amber { border-left: 5px solid #f59e0b; } .card-emerald { border-left: 5px solid #10b981; } .card-rose { border-left: 5px solid #ef4444; } .card-purple { border-left: 5px solid #8b5cf6; }
-        .stat-card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); } .stat-card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
-        .tab-btn { cursor: pointer; position: relative; } .tab-btn.active { color: #3b82f6; } .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background: #3b82f6; border-radius: 10px 10px 0 0; }
+        .stat-card-hover { transition: all 0.3s; } .stat-card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
+        .tab-btn { cursor: pointer; } .tab-btn.active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
         .tab-content { display: none; } .tab-content.active { display: block; animation: fadeIn 0.35s ease; }
         @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
-        .sidebar-item { transition: all 0.2s ease; } .sidebar-item:hover { background: rgba(255,255,255,0.06); } .sidebar-item.active { background: rgba(59,130,246,0.15); border-left: 4px solid #3b82f6; }
+        .sidebar-item { transition: all 0.2s; } .sidebar-item:hover { background: rgba(255,255,255,0.06); } .sidebar-item.active { background: rgba(59,130,246,0.15); border-left: 4px solid #3b82f6; }
         .screen { display: none; } .screen.active { display: flex; justify-content: center; align-items: center; }
         .alert-card { border-left: 4px solid; animation: pulse-alert 2s infinite; } @keyframes pulse-alert { 0%,100%{opacity:1} 50%{opacity:0.85} }
         .progress-bar-grossa { height: 18px !important; border-radius: 12px !important; }
@@ -29,46 +29,72 @@
     </style>
 </head>
 <body class="h-screen flex overflow-hidden">
+
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><p class="text-white mt-4 font-bold">Carregando...</p></div>
 
-<!-- LOGIN -->
+<!-- ============ LOGIN ============ -->
 <div id="screenLogin" class="screen active fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 100%);">
-    <div class="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl text-center"><div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div><h1 class="text-2xl font-extrabold text-slate-800 mb-1">Sistema OCI</h1><p class="text-slate-500 text-sm mb-8">Painel de Monitoramento v4.0</p><div class="text-left space-y-4"><div><label class="block text-xs font-bold uppercase mb-1">Nome</label><input type="text" id="loginNome" placeholder="Administrador OCI" class="w-full px-4 py-3 border-2 rounded-xl outline-none focus:border-blue-500"></div><div><label class="block text-xs font-bold uppercase mb-1">CPF</label><input type="text" id="loginCPF" placeholder="12345678909" maxlength="11" class="w-full px-4 py-3 border-2 rounded-xl outline-none focus:border-blue-500"></div><div><label class="block text-xs font-bold uppercase mb-1">Senha</label><input type="password" id="loginSenha" placeholder="******" class="w-full px-4 py-3 border-2 rounded-xl outline-none focus:border-blue-500"></div></div><button id="btnLogin" class="w-full mt-6 bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all">🔓 ENTRAR</button><p class="text-xs text-slate-400 mt-4">Admin: 12345678909 | admin</p><p class="text-xs text-rose-500 mt-2 cursor-pointer hover:underline font-bold" onclick="showScreen('screenResetAdmin')">🔑 Esqueci a senha</p></div>
+    <div class="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl text-center border border-slate-100">
+        <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Sistema OCI</h1>
+        <p class="text-slate-500 text-sm mb-8">Painel de Monitoramento Hospitalar v5.0</p>
+        <div class="text-left space-y-4">
+            <div><label class="block text-xs font-bold uppercase mb-1">Nome</label><input type="text" id="loginNome" placeholder="Administrador OCI" class="w-full px-4 py-3 border-2 rounded-xl outline-none focus:border-blue-500"></div>
+            <div><label class="block text-xs font-bold uppercase mb-1">CPF</label><input type="text" id="loginCPF" placeholder="12345678909" maxlength="11" class="w-full px-4 py-3 border-2 rounded-xl outline-none focus:border-blue-500"></div>
+            <div><label class="block text-xs font-bold uppercase mb-1">Senha</label><input type="password" id="loginSenha" placeholder="******" class="w-full px-4 py-3 border-2 rounded-xl outline-none focus:border-blue-500"></div>
+        </div>
+        <button id="btnLogin" class="w-full mt-6 bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all">🔓 ENTRAR</button>
+        <p class="text-xs text-slate-400 mt-4">Admin: 12345678909 | admin</p>
+        <p class="text-xs text-rose-500 mt-2 cursor-pointer hover:underline font-bold" onclick="showScreen('screenResetAdmin')">🔑 Esqueci a senha / Redefinir</p>
+    </div>
 </div>
 
-<!-- REDEFINIR SENHA -->
+<!-- ============ REDEFINIR SENHA ============ -->
 <div id="screenResetAdmin" class="screen fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 100%);">
-    <div class="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl text-center"><div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🔑</div><h1 class="text-2xl font-extrabold">Redefinir Senha</h1><p class="text-slate-500 text-sm mb-6">Código padrão: 123456</p><div class="text-left space-y-4"><div><label class="block text-xs font-bold uppercase mb-1">Nome</label><input type="text" id="resetAdminNome" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div><div><label class="block text-xs font-bold uppercase mb-1">CPF</label><input type="text" id="resetAdminCPF" maxlength="11" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div><div><label class="block text-xs font-bold uppercase mb-1">Código</label><input type="password" id="resetAdminCodigo" maxlength="6" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div><div><label class="block text-xs font-bold uppercase mb-1">Nova Senha</label><input type="password" id="resetAdminNovaSenha" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div><div><label class="block text-xs font-bold uppercase mb-1">Confirmar</label><input type="password" id="resetAdminConfirma" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div></div><button id="btnResetAdmin" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold">✅ REDEFINIR</button><p class="text-xs text-slate-400 mt-4 cursor-pointer hover:underline" onclick="showScreen('screenLogin')">🔙 Voltar</p></div>
+    <div class="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl text-center border border-slate-100">
+        <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🔑</div>
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Redefinir Senha Admin</h1>
+        <p class="text-slate-500 text-sm mb-6">Digite o código de segurança</p>
+        <div class="text-left space-y-4">
+            <div><label class="block text-xs font-bold uppercase mb-1">Nome</label><input type="text" id="resetAdminNome" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
+            <div><label class="block text-xs font-bold uppercase mb-1">CPF</label><input type="text" id="resetAdminCPF" maxlength="11" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
+            <div><label class="block text-xs font-bold uppercase mb-1">Código</label><input type="password" id="resetAdminCodigo" placeholder="123456" maxlength="6" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
+            <div><label class="block text-xs font-bold uppercase mb-1">Nova Senha</label><input type="password" id="resetAdminNovaSenha" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
+            <div><label class="block text-xs font-bold uppercase mb-1">Confirmar</label><input type="password" id="resetAdminConfirma" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
+        </div>
+        <button id="btnResetAdmin" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold hover:bg-rose-700 transition-all">✅ REDEFINIR</button>
+        <p class="text-xs text-slate-400 mt-4 cursor-pointer hover:underline" onclick="showScreen('screenLogin')">🔙 Voltar ao Login</p>
+    </div>
 </div>
 
-<!-- SISTEMA -->
+<!-- ============ SISTEMA ============ -->
 <div id="screenSistema" class="hidden h-full w-full flex overflow-hidden">
     <aside class="w-64 gradient-header text-white hidden md:flex flex-col h-full shadow-2xl z-50 flex-shrink-0">
-        <div class="p-6 flex items-center gap-3 border-b border-white/10"><div class="bg-blue-600 p-2 rounded-xl">🏥</div><span class="text-lg font-extrabold">OCI <span class="text-blue-400">v4.0</span></span></div>
-        <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto custom-scrollbar">
+        <div class="p-6 flex items-center gap-3 border-b border-white/10"><div class="bg-blue-600 p-2 rounded-xl">🏥</div><span class="text-lg font-extrabold">OCI <span class="text-blue-400">v5.0</span></span></div>
+        <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
             <a href="#" onclick="switchTab('visao-geral')" class="sidebar-item active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold"><i class="fas fa-th-large w-4"></i> Visão Geral</a>
             <a href="#" onclick="switchTab('monitoramento')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-users w-4"></i> Monitoramento</a>
             <a href="#" onclick="switchTab('retornos')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-calendar-check w-4"></i> Retornos</a>
             <a href="#" onclick="switchTab('absenteismo')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-user-clock w-4"></i> Absenteísmo</a>
-            <div class="border-t border-white/10 my-4"></div>
             <a href="#" onclick="switchTab('apac')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-file-invoice w-4"></i> APAC</a>
-            <button onclick="exportarExcel()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-green-400 font-bold"><i class="fas fa-download"></i> Exportar Excel</button>
+            <div class="border-t border-white/10 my-4"></div>
+            <button onclick="exportarExcel('retornos')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-green-400 font-bold"><i class="fas fa-download"></i> Baixar Fila Retorno</button>
+            <button onclick="exportarExcel('apac')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold"><i class="fas fa-file-excel"></i> Baixar OCIs Fechadas</button>
         </nav>
         <div class="p-4 border-t border-white/10"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold">A</div><div><p class="text-xs font-bold" id="sidebarNome">Admin</p><button onclick="logout()" class="text-[10px] text-red-400">Sair</button></div></div></div>
     </aside>
 
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f0f4f8]">
-        <!-- CABEÇALHO COM SININHO E BUSCA -->
         <header class="h-20 gradient-header text-white flex items-center justify-between px-8 z-40 flex-shrink-0 border-b border-white/10">
-            <div><h2 class="text-xl font-extrabold" id="headerTitle">Visão Geral</h2><p class="text-blue-300 text-[10px] font-bold uppercase">Sistema OCI Avançado v4.0</p></div>
+            <div><h2 class="text-xl font-extrabold" id="headerTitle">Visão Geral</h2><p class="text-blue-300 text-[10px] font-bold uppercase">Sistema OCI Avançado v5.0</p></div>
             <div class="flex items-center gap-5">
-                <div class="relative hidden lg:block"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" placeholder="Buscar paciente ou CPF..." class="pl-10 pr-4 py-2 bg-white/10 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 w-64 text-sm text-white placeholder-slate-400 backdrop-blur-sm outline-none"></div>
-                <div class="relative cursor-pointer bg-white/10 p-2.5 rounded-xl hover:bg-white/20 transition-all"><i class="far fa-bell text-lg"></i><span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold" id="alertCount">0</span></div>
+                <div class="relative hidden lg:block"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" id="globalSearch" placeholder="Buscar paciente ou CPF..." class="pl-10 pr-4 py-2 bg-white/10 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 w-64 text-sm text-white placeholder-slate-400 outline-none"></div>
+                <div class="relative cursor-pointer bg-white/10 p-2.5 rounded-xl hover:bg-white/20"><i class="far fa-bell text-lg"></i><span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold" id="alertCount">0</span></div>
                 <div class="text-right hidden sm:block"><p class="text-[10px] text-blue-300 font-bold uppercase">Status</p><p class="text-xs text-emerald-400 font-bold flex items-center gap-1.5"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> Online</p></div>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8">
             <div class="mb-6 flex gap-6 overflow-x-auto border-b border-slate-200">
                 <button onclick="switchTab('visao-geral')" id="tab-visao-geral" class="tab-btn active pb-3 text-sm font-bold flex items-center gap-2 whitespace-nowrap text-blue-600"><i class="fas fa-th-large"></i> Visão Geral</button>
                 <button onclick="switchTab('monitoramento')" id="tab-monitoramento" class="tab-btn pb-3 text-sm font-bold text-slate-400"><i class="fas fa-users"></i> Monitoramento</button>
@@ -77,13 +103,13 @@
                 <button onclick="switchTab('apac')" id="tab-apac" class="tab-btn pb-3 text-sm font-bold text-slate-400"><i class="fas fa-file-medical"></i> APAC</button>
             </div>
 
-            <!-- VISÃO GERAL -->
+            <!-- ==================== VISÃO GERAL ==================== -->
             <div id="content-visao-geral" class="tab-content active space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="statsGrid"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="alertasGrid"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3><div class="h-72"><canvas id="chartPerformance"></canvas></div></div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-pie text-purple-500"></i> Pacientes por Especialidade</h3><div class="h-72 flex justify-center"><canvas id="chartSpecialty"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-pie text-purple-500"></i> Pacientes por Especialidade</h3><div class="h-72"><canvas id="chartSpecialty"></canvas></div></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-bar text-emerald-500"></i> Taxa de Comparecimento</h3><div class="h-64"><canvas id="chartComparecimento"></canvas></div></div>
@@ -92,33 +118,84 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="infoCards"></div>
             </div>
 
-            <!-- OUTRAS ABAS (placeholder com dados simulados) -->
-            <div id="content-monitoramento" class="tab-content"><div class="bg-white p-8 rounded-2xl shadow-sm text-center"><h2 class="text-xl font-bold">👥 Monitoramento de Pacientes</h2><p class="text-slate-500 mt-2">Tabela com 150 pacientes mock carregados.</p><div class="mt-4 p-4 bg-blue-50 rounded-xl text-left text-sm">✅ Dados simulados prontos!<br>📊 150 pacientes | 5 especialidades | 5 status diferentes</div></div></div>
-            <div id="content-retornos" class="tab-content"><div class="bg-white p-8 rounded-2xl shadow-sm text-center"><h2 class="text-xl font-bold">📋 Retornos</h2><p class="text-slate-500 mt-2">Fila de pacientes aptos para agendamento.</p><div class="mt-4 p-4 bg-amber-50 rounded-xl text-left text-sm">🟡 Dados simulados: ~30 pacientes aguardando retorno</div></div></div>
-            <div id="content-absenteismo" class="tab-content"><div class="bg-white p-8 rounded-2xl shadow-sm text-center"><h2 class="text-xl font-bold">🚫 Absenteísmo</h2><p class="text-slate-500 mt-2">Controle de faltas.</p><div class="mt-4 p-4 bg-rose-50 rounded-xl text-left text-sm">🔴 Dados simulados: ~30 faltas registradas</div></div></div>
-            <div id="content-apac" class="tab-content"><div class="bg-white p-8 rounded-2xl shadow-sm text-center"><h2 class="text-xl font-bold">📄 APAC</h2><p class="text-slate-500 mt-2">OCIs fechadas para faturamento.</p><div class="mt-4 p-4 bg-purple-50 rounded-xl text-left text-sm">🟣 Dados simulados: ~30 OCIs fechadas</div></div></div>
+            <!-- ==================== MONITORAMENTO ==================== -->
+            <div id="content-monitoramento" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 items-center justify-between">
+                        <h3 class="text-lg font-bold">👥 Monitoramento de Pacientes</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <input type="text" id="buscaMonitoramento" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('monitoramento')">
+                            <select id="filtroEspecialidadeMonitoramento" class="px-3 py-2 border rounded-xl text-sm" onchange="filtrarTabela('monitoramento')"><option value="">Todas</option></select>
+                            <select id="filtroStatusMonitoramento" class="px-3 py-2 border rounded-xl text-sm" onchange="filtrarTabela('monitoramento')"><option value="">Status</option><option value="em_andamento">Em Andamento</option><option value="apto_retorno">Apto Retorno</option><option value="oci_fechada">OCI Fechada</option><option value="faltou">Faltou</option></select>
+                            <select id="itensPorPaginaMonitoramento" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('monitoramento')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="bg-slate-50"><th class="px-6 py-4 text-xs font-bold uppercase">Nº SOL</th><th class="px-6 py-4 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-4 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-4 text-xs font-bold uppercase">Progresso</th><th class="px-6 py-4 text-xs font-bold uppercase">Exames</th><th class="px-6 py-4 text-xs font-bold uppercase">Status</th><th class="px-6 py-4 text-xs font-bold uppercase">Previsão</th></tr></thead><tbody class="divide-y" id="tabelaMonitoramento"></tbody></table></div>
+                    <div class="p-4 border-t" id="paginacaoMonitoramento"></div>
+                </div>
+            </div>
+
+            <!-- ==================== RETORNOS ==================== -->
+            <div id="content-retornos" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between"><h3 class="text-lg font-bold">📋 Pacientes Aptos para Retorno</h3><div class="flex gap-2"><input type="text" id="buscaRetornos" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos')"><select id="itensPorPaginaRetornos" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('retornos')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select><button onclick="exportarExcel('retornos')" class="bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-download"></i> Excel</button></div></div>
+                    <div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-slate-50"><th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-3 text-xs font-bold uppercase">CPF</th><th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-3 text-xs font-bold uppercase">Exames</th><th class="px-6 py-3 text-xs font-bold uppercase">Data</th></tr></thead><tbody id="tabelaRetornos"></tbody></table></div>
+                    <div class="p-4 border-t" id="paginacaoRetornos"></div>
+                </div>
+            </div>
+
+            <!-- ==================== ABSENTEÍSMO ==================== -->
+            <div id="content-absenteismo" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between"><h3 class="text-lg font-bold">🚫 Absenteísmo</h3><div class="flex gap-2"><input type="text" id="buscaAbsenteismo" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('absenteismo')"><select id="itensPorPaginaAbsenteismo" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('absenteismo')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select></div></div>
+                    <div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-slate-50"><th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-3 text-xs font-bold uppercase">CPF</th><th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-3 text-xs font-bold uppercase">Data</th><th class="px-6 py-3 text-xs font-bold uppercase">Status</th></tr></thead><tbody id="tabelaAbsenteismo"></tbody></table></div>
+                    <div class="p-4 border-t" id="paginacaoAbsenteismo"></div>
+                </div>
+            </div>
+
+            <!-- ==================== APAC ==================== -->
+            <div id="content-apac" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between"><h3 class="text-lg font-bold">📄 OCIs Fechadas (APAC)</h3><div class="flex gap-2"><input type="text" id="buscaAPAC" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('apac')"><select id="itensPorPaginaAPAC" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('apac')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select><button onclick="exportarExcel('apac')" class="bg-purple-600 text-white px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-download"></i> Excel</button></div></div>
+                    <div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-slate-50"><th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-3 text-xs font-bold uppercase">CPF</th><th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-3 text-xs font-bold uppercase">Fechamento</th><th class="px-6 py-3 text-xs font-bold uppercase">Status</th></tr></thead><tbody id="tabelaAPAC"></tbody></table></div>
+                    <div class="p-4 border-t" id="paginacaoAPAC"></div>
+                </div>
+            </div>
         </div>
     </main>
 </div>
 
 <script>
+// ============================================
+// CONFIGURAÇÃO
+// ============================================
 const db = window.supabase.createClient('https://hheuvkyhwujdrvjvtryg.supabase.co', 'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe');
 const CODIGO_SEGURANCA = '123456';
 let usuarioLogado = null, pacientes = [], consultas = [], especialidades = [], charts = {};
+let paginaAtual = {monitoramento:1, retornos:1, absenteismo:1, apac:1};
+let itensPorPagina = {monitoramento:100, retornos:100, absenteismo:100, apac:100};
 
 function showLoading(){ document.getElementById('loadingOverlay').classList.add('show'); }
 function hideLoading(){ document.getElementById('loadingOverlay').classList.remove('show'); }
 function validarCPF(cpf){ cpf=cpf.replace(/\D/g,''); if(cpf.length!==11||/^(\d)\1{10}$/.test(cpf))return false; let s=0; for(let i=0;i<9;i++)s+=parseInt(cpf[i])*(10-i); let r=(s*10)%11; if(r===10)r=0; if(r!==parseInt(cpf[9]))return false; s=0; for(let i=0;i<10;i++)s+=parseInt(cpf[i])*(11-i); r=(s*10)%11; if(r===10)r=0; return r===parseInt(cpf[10]); }
+function formatarCPF(cpf){ cpf=cpf.replace(/\D/g,''); return cpf.length===11?cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'):cpf; }
+function formatarData(data){ if(!data)return'—'; return new Date(data.split('T')[0]).toLocaleDateString('pt-BR'); }
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';}); const el=document.getElementById(id); el.classList.add('active'); el.style.display=(id==='screenSistema')?'flex':'flex'; }
 
+// ============================================
+// DADOS MOCK
+// ============================================
 function gerarDadosMock(){
     especialidades=[{id:1,nome:'Cardiologia',icone:'🫀',exames_obrigatorios:'ECG; LAB; ERG',prazo_retorno_dias:60},{id:2,nome:'Ortopedia',icone:'🦴',exames_obrigatorios:'RX; USG; TOMO',prazo_retorno_dias:60},{id:3,nome:'Oncologia',icone:'🎗️',exames_obrigatorios:'BIO; AP; USG',prazo_retorno_dias:30},{id:4,nome:'Oftalmologia',icone:'👁️',exames_obrigatorios:'MAP; BIO; TONO',prazo_retorno_dias:60},{id:5,nome:'Otorrino',icone:'👂',exames_obrigatorios:'AUDIO; VIDEO',prazo_retorno_dias:60}];
-    const nomes=['Maria Silva','João Santos','Ana Oliveira','Carlos Pereira','Fernanda Costa','Lucas Almeida','Juliana Souza','Roberto Lima','Patrícia Ferreira','Marcos Ribeiro'];
-    pacientes=[]; for(let i=0;i<150;i++){ pacientes.push({id:i+1, nome:nomes[i%10]+' '+(i+1), cpf:String(10000000000+Math.floor(Math.random()*90000000000))}); }
+    const nomes=['Maria Silva','João Santos','Ana Oliveira','Carlos Pereira','Fernanda Costa'];
+    pacientes=[]; for(let i=0;i<150;i++){ pacientes.push({id:i+1, nome:nomes[i%5]+' '+(i+1), cpf:String(10000000000+Math.floor(Math.random()*90000000000))}); }
     const st=['em_andamento','aguardando_exame','apto_retorno','oci_fechada','faltou'];
     consultas=[]; for(let i=0;i<150;i++){ consultas.push({id:i+1,paciente_id:i+1,especialidade_id:Math.floor(Math.random()*5)+1,status:st[Math.floor(Math.random()*5)],data_agendada:`2025-${String(Math.floor(Math.random()*6)+1).padStart(2,'0')}-${String(Math.floor(Math.random()*28)+1).padStart(2,'0')}`}); }
 }
 
+// ============================================
+// ATUALIZAR TUDO
+// ============================================
 function atualizarTudo(){
     const hoje=new Date();
     const totalAtivos=consultas.filter(c=>c.status==='em_andamento'||c.status==='aguardando_exame').length;
@@ -131,27 +208,65 @@ function atualizarTudo(){
 
     const ocisPendentes=consultas.filter(c=>{if(c.status==='oci_fechada'||c.status==='faltou')return false;const dias=Math.floor((hoje-new Date(c.data_agendada))/86400000);const e=especialidades.find(x=>x.id===c.especialidade_id);return dias>(e?.prazo_retorno_dias||60);});
     document.getElementById('alertCount').textContent=ocisPendentes.length;
-    document.getElementById('alertasGrid').innerHTML=`<div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-rose-500 alert-card"><h4 class="font-bold text-sm text-rose-600 mb-2"><i class="fas fa-exclamation-triangle"></i> OCIs Pendentes</h4><p class="text-3xl font-extrabold">${ocisPendentes.length}</p><p class="text-xs text-slate-500 mt-1">Pacientes acima do prazo</p></div><div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-amber-500"><h4 class="font-bold text-sm text-amber-600 mb-2"><i class="fas fa-flask"></i> Exames Atrasados</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='aguardando_exame').length}</p><p class="text-xs text-slate-500 mt-1">Aguardando envio</p></div><div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-orange-500"><h4 class="font-bold text-sm text-orange-600 mb-2"><i class="fas fa-calendar-times"></i> Retornos Vencidos</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='apto_retorno'&&Math.floor((hoje-new Date(c.data_agendada))/86400000)>30).length}</p><p class="text-xs text-slate-500 mt-1">Aguardando agendamento</p></div>`;
+    document.getElementById('alertasGrid').innerHTML=`<div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-rose-500 alert-card"><h4 class="font-bold text-sm text-rose-600 mb-2"><i class="fas fa-exclamation-triangle"></i> OCIs Pendentes</h4><p class="text-3xl font-extrabold">${ocisPendentes.length}</p></div><div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-amber-500"><h4 class="font-bold text-sm text-amber-600 mb-2"><i class="fas fa-flask"></i> Exames Atrasados</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='aguardando_exame').length}</p></div><div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-orange-500"><h4 class="font-bold text-sm text-orange-600 mb-2"><i class="fas fa-calendar-times"></i> Retornos Vencidos</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='apto_retorno'&&Math.floor((hoje-new Date(c.data_agendada))/86400000)>30).length}</p></div>`;
 
-    document.getElementById('infoCards').innerHTML=`<div class="bg-white p-5 rounded-2xl shadow-sm border card-purple"><h4 class="font-bold text-sm mb-3"><i class="fas fa-stethoscope text-purple-500"></i> Regras</h4><div class="space-y-2">${especialidades.map(e=>`<div class="flex justify-between p-2 bg-slate-50 rounded-lg"><span class="text-xs font-bold">${e.icone} ${e.nome}</span><span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg">${e.prazo_retorno_dias}d</span></div>`).join('')}</div></div><div class="bg-white p-5 rounded-2xl shadow-sm border card-blue"><h4 class="font-bold text-sm mb-3"><i class="fas fa-chart-bar text-blue-500"></i> Indicadores</h4><div class="space-y-3"><div><div class="flex justify-between mb-1"><span class="text-xs">Comparecimento</span><span class="text-xs font-bold text-emerald-600">${consultas.filter(c=>c.status!=='faltou').length}/${consultas.length}</span></div><div class="w-full bg-slate-100 h-1.5 rounded-full"><div class="bg-emerald-500 h-full rounded-full" style="width:${Math.round((consultas.filter(c=>c.status!=='faltou').length/consultas.length)*100)}%"></div></div></div><div><div class="flex justify-between mb-1"><span class="text-xs">OCIs Fechadas</span><span class="text-xs font-bold text-blue-600">${pct}%</span></div><div class="w-full bg-slate-100 h-1.5 rounded-full"><div class="bg-blue-500 h-full rounded-full" style="width:${pct}%"></div></div></div></div></div><div class="bg-white p-5 rounded-2xl shadow-sm border card-emerald"><h4 class="font-bold text-sm mb-3"><i class="fas fa-cog text-emerald-500"></i> Parâmetros</h4><div class="space-y-2 text-xs">${['⏱️ Prazo Padrão: 60 dias','🎗️ Prazo Oncologia: 30 dias','🎯 Meta OCI: 90%','⚠️ Alerta: 80% do prazo','🔴 Crítico: 100% do prazo'].map(p=>`<div class="p-2 bg-slate-50 rounded-lg font-bold">${p}</div>`).join('')}</div></div>`;
+    document.getElementById('infoCards').innerHTML=`<div class="bg-white p-5 rounded-2xl shadow-sm border card-purple"><h4 class="font-bold text-sm mb-3"><i class="fas fa-stethoscope text-purple-500"></i> Regras</h4><div class="space-y-2">${especialidades.map(e=>`<div class="flex justify-between p-2 bg-slate-50 rounded-lg"><span class="text-xs font-bold">${e.icone} ${e.nome}</span><span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg">${e.prazo_retorno_dias}d</span></div>`).join('')}</div></div><div class="bg-white p-5 rounded-2xl shadow-sm border card-blue"><h4 class="font-bold text-sm mb-3"><i class="fas fa-chart-bar text-blue-500"></i> Indicadores</h4><div class="space-y-3"><div class="flex justify-between"><span class="text-xs">Comparecimento</span><span class="text-xs font-bold text-emerald-600">${consultas.filter(c=>c.status!=='faltou').length}/${consultas.length}</span></div><div class="flex justify-between"><span class="text-xs">OCIs Fechadas</span><span class="text-xs font-bold text-blue-600">${pct}%</span></div></div></div><div class="bg-white p-5 rounded-2xl shadow-sm border card-emerald"><h4 class="font-bold text-sm mb-3"><i class="fas fa-cog text-emerald-500"></i> Parâmetros</h4><div class="space-y-2 text-xs">${['⏱️ Prazo Padrão: 60 dias','🎗️ Prazo Oncologia: 30 dias','🎯 Meta OCI: 90%'].map(p=>`<div class="p-2 bg-slate-50 rounded-lg font-bold">${p}</div>`).join('')}</div></div>`;
 
+    renderizarTabelas();
     renderizarGraficos();
 }
 
+// ============================================
+// TABELAS COM PAGINAÇÃO
+// ============================================
+function getDadosFiltrados(tipo){
+    let dados=[];
+    if(tipo==='monitoramento') dados=[...consultas];
+    else if(tipo==='retornos') dados=consultas.filter(c=>c.status==='apto_retorno');
+    else if(tipo==='absenteismo') dados=consultas.filter(c=>c.status==='faltou');
+    else if(tipo==='apac') dados=consultas.filter(c=>c.status==='oci_fechada');
+    const busca=document.getElementById('busca'+tipo.charAt(0).toUpperCase()+tipo.slice(1))?.value?.toLowerCase()||'';
+    if(busca) dados=dados.filter(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};return`SOL-${String(c.id).padStart(4,'0')}`.toLowerCase().includes(busca)||(p.nome||'').toLowerCase().includes(busca)||(p.cpf||'').includes(busca);});
+    if(tipo==='monitoramento'){const fe=document.getElementById('filtroEspecialidadeMonitoramento')?.value;const fs=document.getElementById('filtroStatusMonitoramento')?.value;if(fe)dados=dados.filter(c=>c.especialidade_id==parseInt(fe));if(fs)dados=dados.filter(c=>c.status===fs);}
+    return dados;
+}
+
+function renderizarTabelas(){
+    ['monitoramento','retornos','absenteismo','apac'].forEach(tipo=>{
+        const dados=getDadosFiltrados(tipo); const total=dados.length; const ipp=itensPorPagina[tipo]; const totalPag=Math.ceil(total/ipp)||1;
+        if(paginaAtual[tipo]>totalPag) paginaAtual[tipo]=totalPag;
+        const inicio=(paginaAtual[tipo]-1)*ipp; const paginados=dados.slice(inicio,inicio+ipp);
+        if(tipo==='monitoramento'){
+            document.getElementById('tabelaMonitoramento').innerHTML=paginados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};const stMap={'em_andamento':{t:'Em Andamento',c:'text-blue-600'},'aguardando_exame':{t:'Ag. Exame',c:'text-amber-600'},'apto_retorno':{t:'Apto Retorno',c:'text-emerald-600'},'oci_fechada':{t:'Fechada',c:'text-purple-600'},'faltou':{t:'Faltou',c:'text-rose-600'}};const st=stMap[c.status]||{t:c.status,c:'text-slate-600'};const prog=c.status==='oci_fechada'?100:c.status==='apto_retorno'?75:c.status==='em_andamento'?40:10;let cp='bg-emerald-500';if(prog<30)cp='bg-rose-500';else if(prog<70)cp='bg-amber-500';else if(prog<100)cp='bg-blue-500';return`<tr><td class="px-6 py-4"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">SOL-${String(c.id).padStart(4,'0')}</span></td><td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">${(p.nome||'?')[0]}</div><div><p class="font-bold text-sm">${p.nome||'—'}</p><p class="text-xs text-slate-400">${formatarCPF(p.cpf||'')}</p></div></div></td><td class="px-6 py-4"><span class="px-3 py-1.5 bg-blue-50 rounded-full text-sm font-bold">${e.icone||''} ${e.nome||'—'}</span></td><td class="px-6 py-4"><div class="w-72"><div class="w-full bg-slate-100 h-5 rounded-full overflow-hidden progress-bar-grossa"><div class="${cp} h-full rounded-full flex items-center justify-center text-white text-xs font-bold" style="width:${prog}%">${prog}%</div></div></div></td><td class="px-6 py-4"><div class="flex gap-1.5">${(e.exames_obrigatorios||'').split(';').slice(0,3).map(ex=>`<span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-600 text-xs font-bold">${ex.trim()}</span>`).join('')}</div></td><td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-sm font-bold ${st.c}">${st.t}</span></td><td class="px-6 py-4 text-sm font-bold text-slate-500">${c.status==='oci_fechada'?'✅ Concluído':c.status==='faltou'?'❌ Falta':`⏳ ${e.prazo_retorno_dias||60}d`}</td></tr>`;}).join('');
+        }else if(tipo==='retornos'){document.getElementById('tabelaRetornos').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhum paciente</td></tr>':paginados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};return`<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3 text-emerald-600 font-bold text-xs">✅</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td></tr>`;}).join('');}
+        else if(tipo==='absenteismo'){document.getElementById('tabelaAbsenteismo').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhuma falta</td></tr>':paginados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};return`<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">Faltou</span></td></tr>`;}).join('');}
+        else if(tipo==='apac'){document.getElementById('tabelaAPAC').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhuma OCI fechada</td></tr>':paginados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};return`<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-bold">✅ Fechada</span></td></tr>`;}).join('');}
+        let pagHTML=''; for(let i=1;i<=totalPag;i++) pagHTML+=`<button onclick="paginaAtual['${tipo}']=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i===paginaAtual[tipo]?'bg-blue-600 text-white':'bg-slate-100'}">${i}</button>`;
+        document.getElementById('paginacao'+tipo.charAt(0).toUpperCase()+tipo.slice(1)).innerHTML=`<span class="text-xs text-slate-500">${total} registros | Pág ${paginaAtual[tipo]} de ${totalPag}</span><div class="flex gap-1">${pagHTML}</div>`;
+    });
+    document.getElementById('filtroEspecialidadeMonitoramento').innerHTML='<option value="">Todas</option>'+especialidades.map(e=>`<option value="${e.id}">${e.icone} ${e.nome}</option>`).join('');
+}
+
+function filtrarTabela(tipo){ paginaAtual[tipo]=1; renderizarTabelas(); }
+function mudarItensPorPagina(tipo){ itensPorPagina[tipo]=parseInt(document.getElementById('itensPorPagina'+tipo.charAt(0).toUpperCase()+tipo.slice(1))?.value||100); paginaAtual[tipo]=1; renderizarTabelas(); }
+
+// ============================================
+// GRÁFICOS
+// ============================================
 function renderizarGraficos(){
     Object.values(charts).forEach(c=>c.destroy());
     setTimeout(()=>{
         const ctx1=document.getElementById('chartPerformance')?.getContext('2d');
-        if(ctx1) charts.p=new Chart(ctx1,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'OCIs Fechadas',data:[65,78,72,85,82,86],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff',pointBorderColor:'#3b82f6',pointBorderWidth:3},{label:'Comparecimento',data:[88,85,90,92,89,91],borderColor:'#10b981',borderWidth:3,borderDash:[5,5],tension:0.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:20}}},scales:{y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}}}});
+        if(ctx1) charts.p=new Chart(ctx1,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'OCIs Fechadas',data:[65,78,72,85,82,86],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff'},{label:'Comparecimento',data:[88,85,90,92,89,91],borderColor:'#10b981',borderWidth:3,borderDash:[5,5],tension:0.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true}}},scales:{y:{grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}}});
 
         const ctx2=document.getElementById('chartSpecialty')?.getContext('2d');
-        if(ctx2){const por={};consultas.forEach(c=>{const e=especialidades.find(x=>x.id===c.especialidade_id);por[e?e.nome:'Outros']=(por[e?e.nome:'Outros']||0)+1;});charts.s=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(por),datasets:[{data:Object.values(por),backgroundColor:['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#ec4899'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{padding:20,usePointStyle:true,generateLabels:function(c){return c.data.labels.map((l,i)=>({text:`${l}: ${c.data.datasets[0].data[i]} pac.`,fillStyle:c.data.datasets[0].backgroundColor[i],strokeStyle:c.data.datasets[0].backgroundColor[i],pointStyle:'circle',index:i}))}}}}}})};
+        if(ctx2){const por={};consultas.forEach(c=>{const e=especialidades.find(x=>x.id===c.especialidade_id);por[e?e.nome:'Outros']=(por[e?e.nome:'Outros']||0)+1;});charts.s=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(por),datasets:[{data:Object.values(por),backgroundColor:['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#ec4899']}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true}}}}});}
 
         const ctx3=document.getElementById('chartComparecimento')?.getContext('2d');
-        if(ctx3) charts.c=new Chart(ctx3,{type:'bar',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{data:[88,85,90,92,89,91],backgroundColor:'#10b981',borderRadius:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:80,max:100,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}},animation:{onComplete:function(){const ctx=this.ctx;this.data.datasets[0].data.forEach((v,i)=>{const m=this.getDatasetMeta(0);ctx.save();ctx.fillStyle='white';ctx.font='bold 14px Plus Jakarta Sans';ctx.textAlign='center';ctx.fillText(v+'%',m.data[i].x,m.data[i].y+20);ctx.restore();});}}}});
+        if(ctx3) charts.c=new Chart(ctx3,{type:'bar',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{data:[88,85,90,92,89,91],backgroundColor:'#10b981',borderRadius:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:80,max:100,grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}}});
 
         const ctx4=document.getElementById('chartTempoMedio')?.getContext('2d');
-        if(ctx4) charts.t=new Chart(ctx4,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'Dias',data:[18,16,14,12,11,10],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff',pointBorderColor:'#f59e0b',pointBorderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'d'}},x:{grid:{display:false}}}}});
+        if(ctx4) charts.t=new Chart(ctx4,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'Dias',data:[18,16,14,12,11,10],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}}});
     },300);
 }
 
@@ -162,10 +277,16 @@ function switchTab(tabId){
     document.getElementById('content-'+tabId).classList.add('active');
     document.querySelectorAll('.sidebar-item').forEach(a=>a.classList.remove('active'));
     document.getElementById('sidebar-'+tabId)?.classList.add('active');
+    document.getElementById('headerTitle').textContent=document.getElementById('tab-'+tabId)?.textContent.trim()||'Painel OCI';
+    setTimeout(renderizarTabelas,100);
 }
-function logout(){ usuarioLogado=null; document.getElementById('screenSistema').classList.remove('active'); document.getElementById('screenSistema').style.display='none'; showScreen('screenLogin'); }
-function exportarExcel(){ alert('📊 Exportando relatório...'); }
 
+function exportarExcel(tipo){ const dados=getDadosFiltrados(tipo); if(!dados.length)return alert('Nenhum dado.'); const ws=XLSX.utils.json_to_sheet(dados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};return{Paciente:p.nome,CPF:formatarCPF(p.cpf),Especialidade:e.nome,Data:formatarData(c.data_agendada),Status:c.status};})); XLSX.writeFile(XLSX.utils.book_new(),`relatorio_${tipo}_${new Date().toISOString().slice(0,10)}.xlsx`); }
+function logout(){ usuarioLogado=null; document.getElementById('screenSistema').classList.remove('active'); document.getElementById('screenSistema').style.display='none'; showScreen('screenLogin'); }
+
+// ============================================
+// EVENTOS
+// ============================================
 document.addEventListener('DOMContentLoaded',()=>{
     gerarDadosMock();
     document.getElementById('btnLogin').addEventListener('click',()=>{
@@ -179,10 +300,17 @@ document.addEventListener('DOMContentLoaded',()=>{
         }else{alert('❌ CPF ou Senha inválidos!');}
     });
     document.getElementById('btnResetAdmin').addEventListener('click',()=>{
-        if(document.getElementById('resetAdminCodigo').value===CODIGO_SEGURANCA){alert('✅ Senha redefinida!');showScreen('screenLogin');}
-        else{alert('❌ Código incorreto!');}
+        const codigo=document.getElementById('resetAdminCodigo').value.trim();
+        const nova=document.getElementById('resetAdminNovaSenha').value;
+        const confirma=document.getElementById('resetAdminConfirma').value;
+        if(codigo!==CODIGO_SEGURANCA)return alert('❌ Código incorreto! Use: '+CODIGO_SEGURANCA);
+        if(nova.length<4)return alert('Senha 4+ caracteres!');
+        if(nova!==confirma)return alert('Senhas não conferem!');
+        alert('✅ Senha redefinida com sucesso!');
+        showScreen('screenLogin');
     });
     ['loginNome','loginCPF','loginSenha'].forEach(id=>{document.getElementById(id)?.addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('btnLogin').click();});});
+    console.log('✅ SISTEMA OCI v5.0 COMPLETO! 🚀');
 });
 </script>
 </body>
