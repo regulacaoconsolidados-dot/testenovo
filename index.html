@@ -26,6 +26,20 @@
         .progress-bar-grossa { height: 18px !important; border-radius: 12px !important; }
         .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         .loading-overlay.show { display: flex; } .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Estilo para tooltips dos gráficos */
+        .chart-container { position: relative; }
+        .chart-label-badge {
+            position: absolute;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            pointer-events: none;
+            z-index: 10;
+        }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden">
@@ -108,12 +122,24 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="statsGrid"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="alertasGrid"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3><div class="h-72"><canvas id="chartPerformance"></canvas></div></div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-pie text-purple-500"></i> Pacientes por Especialidade</h3><div class="h-72"><canvas id="chartSpecialty"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3>
+                        <div class="h-72 position-relative"><canvas id="chartPerformance"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-chart-pie text-purple-500"></i> Distribuição no Período</h3>
+                        <div class="h-72 position-relative"><canvas id="chartSpecialty"></canvas></div>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-bar text-emerald-500"></i> Taxa de Comparecimento</h3><div class="h-64"><canvas id="chartComparecimento"></canvas></div></div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-clock text-amber-500"></i> Tempo Médio OCI (dias)</h3><div class="h-64"><canvas id="chartTempoMedio"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-chart-bar text-emerald-500"></i> Taxa de Comparecimento</h3>
+                        <div class="h-64"><canvas id="chartComparecimento"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-clock text-amber-500"></i> Tempo Médio OCI (dias)</h3>
+                        <div class="h-64"><canvas id="chartTempoMedio"></canvas></div>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="infoCards"></div>
             </div>
@@ -212,7 +238,7 @@ function gerarDadosMock(){
 }
 
 // ============================================
-// ATUALIZAR TUDO (cards, tabelas, gráficos)
+// ATUALIZAR TUDO
 // ============================================
 function atualizarTudo(){
     const hoje=new Date();
@@ -249,7 +275,7 @@ function atualizarTudo(){
     `;
 
     renderizarTabelas();
-    renderizarGraficos(); // CHAMADA PRINCIPAL DOS GRÁFICOS
+    renderizarGraficos();
 }
 
 // ============================================
@@ -317,7 +343,7 @@ function renderizarTabelas(){
                 return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3 text-emerald-600 font-bold text-xs">✅</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td></tr>`;
             }).join('');
         } else if(tipo==='absenteismo'){
-            document.getElementById('tabelaAbsenteismo').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhuma falta</td></tr>':paginados.map(c=>{
+            document.getElementById('tabelaAbsenteismo').innerHTML=paginados.length===0?'<td><td colspan="5" class="text-center py-8">Nenhuma falta</td></tr>':paginados.map(c=>{
                 const p=pacientes.find(x=>x.id===c.paciente_id)||{};
                 const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
                 return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">Faltou</span></td></tr>`;
@@ -347,7 +373,7 @@ function mudarItensPorPagina(tipo){
 }
 
 // ============================================
-// GRÁFICOS CORRIGIDOS (com verificação e logs)
+// GRÁFICOS ESTILIZADOS (com legendas em branco e negrito fixas dentro dos gráficos)
 // ============================================
 function renderizarGraficos(){
     // Destroi gráficos antigos se existirem
@@ -363,7 +389,6 @@ function renderizarGraficos(){
     const canvasTempoMedio = document.getElementById('chartTempoMedio');
     
     if(!canvasPerformance || !canvasSpecialty || !canvasComparecimento || !canvasTempoMedio){
-        console.warn("Aguardando elementos canvas...");
         setTimeout(()=>renderizarGraficos(), 200);
         return;
     }
@@ -373,49 +398,298 @@ function renderizarGraficos(){
     const ctx3 = canvasComparecimento.getContext('2d');
     const ctx4 = canvasTempoMedio.getContext('2d');
     
-    // GRÁFICO 1: Desempenho OCI
+    // GRÁFICO 1: Desempenho OCI (Linha com rótulos de dados)
     charts.p = new Chart(ctx1, {
         type: 'line',
         data: {
             labels: ['Jan','Fev','Mar','Abr','Mai','Jun'],
             datasets: [
-                {label: 'OCIs Fechadas', data: [65,78,72,85,82,86], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: '#3b82f6', pointBorderWidth: 3},
-                {label: 'Comparecimento', data: [88,85,90,92,89,91], borderColor: '#10b981', borderWidth: 3, borderDash: [5,5], tension: 0.4, pointRadius: 0}
+                {
+                    label: 'OCIs Fechadas', 
+                    data: [65,78,72,85,82,86], 
+                    borderColor: '#3b82f6', 
+                    backgroundColor: 'rgba(59,130,246,0.05)', 
+                    borderWidth: 3, 
+                    fill: true, 
+                    tension: 0.3, 
+                    pointRadius: 5, 
+                    pointBackgroundColor: '#3b82f6', 
+                    pointBorderColor: '#fff', 
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 7
+                },
+                {
+                    label: 'Comparecimento', 
+                    data: [88,85,90,92,89,91], 
+                    borderColor: '#10b981', 
+                    borderWidth: 2.5, 
+                    borderDash: [8,4], 
+                    tension: 0.3, 
+                    pointRadius: 4, 
+                    pointBackgroundColor: '#10b981', 
+                    pointBorderColor: '#fff', 
+                    pointBorderWidth: 2
+                }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } } }, scales: { y: { grid: { color: '#f1f5f9' }, ticks: { callback: v => v+'%' } }, x: { grid: { display: false } } } }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { 
+                    position: 'top', 
+                    align: 'end',
+                    labels: { 
+                        usePointStyle: true, 
+                        boxWidth: 10,
+                        font: { weight: 'bold', size: 12 },
+                        padding: 15
+                    } 
+                },
+                tooltip: { backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#cbd5e1', padding: 10, cornerRadius: 8 }
+            }, 
+            scales: { 
+                y: { 
+                    grid: { color: '#e2e8f0', drawBorder: false }, 
+                    ticks: { callback: v => v+'%', font: { weight: 'bold', size: 11 }, color: '#475569' },
+                    title: { display: true, text: 'Percentual (%)', color: '#64748b', font: { size: 11 } }
+                }, 
+                x: { 
+                    grid: { display: false }, 
+                    ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' }
+                } 
+            },
+            // Plugin para mostrar valores nos pontos
+            plugins: {
+                tooltip: { enabled: true },
+                datalabels: false
+            }
+        }
     });
     
-    // GRÁFICO 2: Pacientes por Especialidade
+    // Adicionar rótulos de dados manualmente no canvas (valores fixos)
+    setTimeout(() => {
+        const canvas = canvasPerformance;
+        const ctx = canvas.getContext('2d');
+        if(ctx && charts.p && charts.p.data) {
+            // Os valores serão exibidos nos pontos através do plugin customizado
+            ctx.font = 'bold 11px "Plus Jakarta Sans"';
+            ctx.fillStyle = '#1e293b';
+            ctx.textAlign = 'center';
+            // Tentar obter as posições dos pontos
+            if(charts.p.getDatasetMeta(0).data && charts.p.getDatasetMeta(0).data.length > 0) {
+                const points1 = charts.p.getDatasetMeta(0).data;
+                const points2 = charts.p.getDatasetMeta(1).data;
+                const data1 = charts.p.data.datasets[0].data;
+                const data2 = charts.p.data.datasets[1].data;
+                
+                for(let i = 0; i < points1.length; i++) {
+                    if(points1[i] && points1[i].x && points1[i].y) {
+                        ctx.fillStyle = '#3b82f6';
+                        ctx.fillText(data1[i]+'%', points1[i].x, points1[i].y - 12);
+                        ctx.fillStyle = '#10b981';
+                        ctx.fillText(data2[i]+'%', points2[i].x, points2[i].y - 12);
+                    }
+                }
+            }
+        }
+    }, 300);
+    
+    // GRÁFICO 2: Distribuição no Período (Doughnut com estilo)
     const por={};
     consultas.forEach(c=>{
         const e=especialidades.find(x=>x.id===c.especialidade_id);
         por[e?e.nome:'Outros'] = (por[e?e.nome:'Outros']||0)+1;
     });
+    
+    const labelsDist = Object.keys(por);
+    const dataDist = Object.values(por);
+    const totalDist = dataDist.reduce((a,b)=>a+b,0);
+    const colorsDist = ['#3b82f6', '#8b5cf6', '#ef4444', '#f59e0b', '#ec4899'];
+    
     charts.s = new Chart(ctx2, {
         type: 'doughnut',
         data: {
-            labels: Object.keys(por),
-            datasets: [{ data: Object.values(por), backgroundColor: ['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#ec4899'], borderWidth: 0, hoverOffset: 8 }]
+            labels: labelsDist,
+            datasets: [{ 
+                data: dataDist, 
+                backgroundColor: colorsDist.slice(0, labelsDist.length),
+                borderWidth: 0,
+                hoverOffset: 10,
+                cutout: '65%'
+            }]
         },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, generateLabels: function(c){ return c.data.labels.map((l,i)=>({ text: `${l}: ${c.data.datasets[0].data[i]} pac.`, fillStyle: c.data.datasets[0].backgroundColor[i], strokeStyle: c.data.datasets[0].backgroundColor[i], pointStyle: 'circle', index: i })); } } } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: { weight: 'bold', size: 11 },
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        padding: 14,
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const percentage = ((value / totalDist) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${value} (${percentage}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        strokeStyle: data.datasets[0].backgroundColor[i],
+                                        pointStyle: 'circle',
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const percentage = ((value / totalDist) * 100).toFixed(1);
+                            return `${context.label}: ${value} pacientes (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
     });
     
-    // GRÁFICO 3: Taxa de Comparecimento
+    // GRÁFICO 3: Taxa de Comparecimento (Barras com valores dentro - estilo modelo 5)
     charts.c = new Chart(ctx3, {
         type: 'bar',
-        data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ data: [88,85,90,92,89,91], backgroundColor: '#10b981', borderRadius: 10 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 80, max: 100, grid: { color: '#f1f5f9' }, ticks: { callback: v => v+'%' } }, x: { grid: { display: false } } } }
+        data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+            datasets: [{ 
+                data: [88, 85, 90, 92, 89, 91], 
+                backgroundColor: '#10b981',
+                borderRadius: 8,
+                barPercentage: 0.65,
+                categoryPercentage: 0.8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { 
+                    callbacks: { label: (ctx) => `Taxa: ${ctx.raw}%` }
+                }
+            },
+            scales: {
+                y: { 
+                    min: 70, 
+                    max: 100, 
+                    grid: { color: '#e2e8f0' }, 
+                    ticks: { callback: v => v+'%', font: { weight: 'bold' }, stepSize: 5 },
+                    title: { display: true, text: 'Percentual (%)', color: '#64748b' }
+                },
+                x: { 
+                    grid: { display: false },
+                    ticks: { font: { weight: 'bold' } }
+                }
+            },
+            // Plugin para mostrar valores nas barras
+            layout: { padding: { top: 20 } }
+        }
     });
     
-    // GRÁFICO 4: Tempo Médio OCI
+    // Adicionar valores dentro das barras
+    setTimeout(() => {
+        const ctx = canvasComparecimento.getContext('2d');
+        if(ctx && charts.c && charts.c.getDatasetMeta(0).data) {
+            const bars = charts.c.getDatasetMeta(0).data;
+            const values = [88, 85, 90, 92, 89, 91];
+            ctx.font = 'bold 14px "Plus Jakarta Sans"';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.shadowBlur = 0;
+            for(let i = 0; i < bars.length; i++) {
+                if(bars[i] && bars[i].x && bars[i].y) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(values[i]+'%', bars[i].x, bars[i].y - 8);
+                    // Sombra para melhor legibilidade
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                    ctx.fillText(values[i]+'%', bars[i].x, bars[i].y - 8);
+                    ctx.shadowColor = 'transparent';
+                }
+            }
+        }
+    }, 300);
+    
+    // GRÁFICO 4: Tempo Médio OCI (Linha com rótulos)
     charts.t = new Chart(ctx4, {
         type: 'line',
-        data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'Dias', data: [18,16,14,12,11,10], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b', pointBorderWidth: 3 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f1f5f9' }, ticks: { callback: v => v+'d' } }, x: { grid: { display: false } } } }
+        data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+            datasets: [{ 
+                label: 'Dias', 
+                data: [18, 16, 14, 12, 11, 10], 
+                borderColor: '#f59e0b', 
+                backgroundColor: 'rgba(245,158,11,0.05)', 
+                borderWidth: 3, 
+                fill: true, 
+                tension: 0.3, 
+                pointRadius: 5, 
+                pointBackgroundColor: '#f59e0b', 
+                pointBorderColor: '#fff', 
+                pointBorderWidth: 2,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (ctx) => `Média: ${ctx.raw} dias` } }
+            },
+            scales: {
+                y: { 
+                    grid: { color: '#e2e8f0' }, 
+                    ticks: { callback: v => v+'d', font: { weight: 'bold' } },
+                    title: { display: true, text: 'Dias', color: '#64748b' }
+                },
+                x: { 
+                    grid: { display: false },
+                    ticks: { font: { weight: 'bold' } }
+                }
+            }
+        }
     });
     
-    console.log('✅ Todos os gráficos renderizados com sucesso!');
+    // Adicionar valores nos pontos do gráfico de tempo
+    setTimeout(() => {
+        const ctx = canvasTempoMedio.getContext('2d');
+        if(ctx && charts.t && charts.t.getDatasetMeta(0).data) {
+            const points = charts.t.getDatasetMeta(0).data;
+            const values = [18, 16, 14, 12, 11, 10];
+            ctx.font = 'bold 12px "Plus Jakarta Sans"';
+            ctx.fillStyle = '#f59e0b';
+            ctx.textAlign = 'center';
+            for(let i = 0; i < points.length; i++) {
+                if(points[i] && points[i].x && points[i].y) {
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.fillText(values[i]+'d', points[i].x, points[i].y - 12);
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowColor = 'rgba(0,0,0,0.2)';
+                    ctx.fillText(values[i]+'d', points[i].x, points[i].y - 12);
+                    ctx.shadowColor = 'transparent';
+                }
+            }
+        }
+    }, 300);
+    
+    console.log('✅ Gráficos estilizados renderizados com legendas fixas!');
 }
 
 function switchTab(tabId){
@@ -425,7 +699,6 @@ function switchTab(tabId){
     if(document.getElementById('content-'+tabId)) document.getElementById('content-'+tabId).classList.add('active');
     document.getElementById('headerTitle').textContent = document.getElementById('tab-'+tabId)?.textContent.trim() || 'Painel OCI';
     setTimeout(renderizarTabelas, 100);
-    // Se a aba for "visao-geral" e os gráficos não existirem, recria
     if(tabId === 'visao-geral') setTimeout(renderizarGraficos, 150);
 }
 
@@ -456,7 +729,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             document.getElementById('screenLogin').style.display='none';
             document.getElementById('screenSistema').classList.add('active');
             document.getElementById('screenSistema').style.display='flex';
-            atualizarTudo(); // Chama a função que contém os gráficos
+            atualizarTudo();
         } else {
             alert('❌ CPF ou Senha inválidos!');
         }
@@ -477,7 +750,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         document.getElementById(id)?.addEventListener('keypress',e=>{if(e.key==='Enter') document.getElementById('btnLogin').click();});
     });
     
-    console.log('✅ SISTEMA OCI v5.0 COMPLETO E CORRIGIDO! 🚀');
+    console.log('✅ SISTEMA OCI v5.0 - Gráficos com legendas fixas! 🚀');
 });
 </script>
 </body>
