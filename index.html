@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏥 SISTEMA OCI v5.0 - Versão Final</title>
+    <title>🏥 SISTEMA OCI v5.0 - Gráficos com Labels</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -26,20 +26,6 @@
         .progress-bar-grossa { height: 18px !important; border-radius: 12px !important; }
         .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         .loading-overlay.show { display: flex; } .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* Estilo para tooltips dos gráficos */
-        .chart-container { position: relative; }
-        .chart-label-badge {
-            position: absolute;
-            background: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            pointer-events: none;
-            z-index: 10;
-        }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden">
@@ -124,11 +110,11 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm">
                         <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3>
-                        <div class="h-72 position-relative"><canvas id="chartPerformance"></canvas></div>
+                        <div class="h-72"><canvas id="chartPerformance"></canvas></div>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm">
                         <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-chart-pie text-purple-500"></i> Distribuição no Período</h3>
-                        <div class="h-72 position-relative"><canvas id="chartSpecialty"></canvas></div>
+                        <div class="h-72"><canvas id="chartSpecialty"></canvas></div>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -192,6 +178,55 @@
 </div>
 
 <script>
+// ============================================
+// PLUGIN PARA LABELS BRANCAS E NEGRITO NOS GRÁFICOS
+// ============================================
+const labelPlugin = {
+    id: 'customLabels',
+    afterDatasetsDraw(chart, args, options) {
+        const { ctx, data, chartArea: { top, bottom, left, right } } = chart;
+        
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+            const meta = chart.getDatasetMeta(datasetIndex);
+            if (!meta.hidden) {
+                meta.data.forEach((element, index) => {
+                    const value = dataset.data[index];
+                    if (value !== undefined && element.x && element.y) {
+                        // Define o estilo do texto
+                        ctx.save();
+                        ctx.font = 'bold 13px "Plus Jakarta Sans"';
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                        ctx.shadowBlur = 4;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        
+                        let suffix = '';
+                        if (chart.config.type === 'line') {
+                            suffix = (dataset.label === 'Dias' || dataset.label === 'Tempo Médio') ? 'd' : '%';
+                            ctx.fillText(value + suffix, element.x, element.y - 12);
+                        } else if (chart.config.type === 'bar') {
+                            suffix = '%';
+                            ctx.fillText(value + suffix, element.x, element.y - 8);
+                        } else if (chart.config.type === 'doughnut') {
+                            // Para doughnut, calcular porcentagem
+                            const total = dataset.data.reduce((a,b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            ctx.font = 'bold 12px "Plus Jakarta Sans"';
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillText(percentage + '%', element.x, element.y);
+                        }
+                        ctx.restore();
+                    }
+                });
+            }
+        });
+    }
+};
+
+// Registrar o plugin
+Chart.register(labelPlugin);
+
 // ============================================
 // CONFIGURAÇÃO
 // ============================================
@@ -343,7 +378,7 @@ function renderizarTabelas(){
                 return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3 text-emerald-600 font-bold text-xs">✅</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td></tr>`;
             }).join('');
         } else if(tipo==='absenteismo'){
-            document.getElementById('tabelaAbsenteismo').innerHTML=paginados.length===0?'<td><td colspan="5" class="text-center py-8">Nenhuma falta</td></tr>':paginados.map(c=>{
+            document.getElementById('tabelaAbsenteismo').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhuma falta</td></tr>':paginados.map(c=>{
                 const p=pacientes.find(x=>x.id===c.paciente_id)||{};
                 const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
                 return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">Faltou</span></td></tr>`;
@@ -373,7 +408,7 @@ function mudarItensPorPagina(tipo){
 }
 
 // ============================================
-// GRÁFICOS ESTILIZADOS (com legendas em branco e negrito fixas dentro dos gráficos)
+// GRÁFICOS ESTILIZADOS COM LABELS BRANCAS
 // ============================================
 function renderizarGraficos(){
     // Destroi gráficos antigos se existirem
@@ -398,7 +433,7 @@ function renderizarGraficos(){
     const ctx3 = canvasComparecimento.getContext('2d');
     const ctx4 = canvasTempoMedio.getContext('2d');
     
-    // GRÁFICO 1: Desempenho OCI (Linha com rótulos de dados)
+    // GRÁFICO 1: Desempenho OCI (Linha)
     charts.p = new Chart(ctx1, {
         type: 'line',
         data: {
@@ -442,8 +477,9 @@ function renderizarGraficos(){
                     labels: { 
                         usePointStyle: true, 
                         boxWidth: 10,
-                        font: { weight: 'bold', size: 12 },
-                        padding: 15
+                        font: { weight: 'bold', size: 12, family: 'Plus Jakarta Sans' },
+                        padding: 15,
+                        color: '#1e293b'
                     } 
                 },
                 tooltip: { backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#cbd5e1', padding: 10, cornerRadius: 8 }
@@ -451,51 +487,18 @@ function renderizarGraficos(){
             scales: { 
                 y: { 
                     grid: { color: '#e2e8f0', drawBorder: false }, 
-                    ticks: { callback: v => v+'%', font: { weight: 'bold', size: 11 }, color: '#475569' },
-                    title: { display: true, text: 'Percentual (%)', color: '#64748b', font: { size: 11 } }
+                    ticks: { callback: v => v+'%', font: { weight: 'bold', size: 11, family: 'Plus Jakarta Sans' }, color: '#475569' },
+                    title: { display: true, text: 'Percentual (%)', color: '#64748b', font: { size: 11, family: 'Plus Jakarta Sans' } }
                 }, 
                 x: { 
                     grid: { display: false }, 
-                    ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' }
+                    ticks: { font: { weight: 'bold', size: 11, family: 'Plus Jakarta Sans' }, color: '#475569' }
                 } 
-            },
-            // Plugin para mostrar valores nos pontos
-            plugins: {
-                tooltip: { enabled: true },
-                datalabels: false
             }
         }
     });
     
-    // Adicionar rótulos de dados manualmente no canvas (valores fixos)
-    setTimeout(() => {
-        const canvas = canvasPerformance;
-        const ctx = canvas.getContext('2d');
-        if(ctx && charts.p && charts.p.data) {
-            // Os valores serão exibidos nos pontos através do plugin customizado
-            ctx.font = 'bold 11px "Plus Jakarta Sans"';
-            ctx.fillStyle = '#1e293b';
-            ctx.textAlign = 'center';
-            // Tentar obter as posições dos pontos
-            if(charts.p.getDatasetMeta(0).data && charts.p.getDatasetMeta(0).data.length > 0) {
-                const points1 = charts.p.getDatasetMeta(0).data;
-                const points2 = charts.p.getDatasetMeta(1).data;
-                const data1 = charts.p.data.datasets[0].data;
-                const data2 = charts.p.data.datasets[1].data;
-                
-                for(let i = 0; i < points1.length; i++) {
-                    if(points1[i] && points1[i].x && points1[i].y) {
-                        ctx.fillStyle = '#3b82f6';
-                        ctx.fillText(data1[i]+'%', points1[i].x, points1[i].y - 12);
-                        ctx.fillStyle = '#10b981';
-                        ctx.fillText(data2[i]+'%', points2[i].x, points2[i].y - 12);
-                    }
-                }
-            }
-        }
-    }, 300);
-    
-    // GRÁFICO 2: Distribuição no Período (Doughnut com estilo)
+    // GRÁFICO 2: Distribuição no Período (Doughnut)
     const por={};
     consultas.forEach(c=>{
         const e=especialidades.find(x=>x.id===c.especialidade_id);
@@ -526,10 +529,11 @@ function renderizarGraficos(){
                 legend: {
                     position: 'bottom',
                     labels: {
-                        font: { weight: 'bold', size: 11 },
+                        font: { weight: 'bold', size: 11, family: 'Plus Jakarta Sans' },
                         usePointStyle: true,
                         pointStyle: 'circle',
                         padding: 14,
+                        color: '#1e293b',
                         generateLabels: function(chart) {
                             const data = chart.data;
                             if (data.labels.length && data.datasets.length) {
@@ -562,7 +566,7 @@ function renderizarGraficos(){
         }
     });
     
-    // GRÁFICO 3: Taxa de Comparecimento (Barras com valores dentro - estilo modelo 5)
+    // GRÁFICO 3: Taxa de Comparecimento (Barras)
     charts.c = new Chart(ctx3, {
         type: 'bar',
         data: {
@@ -589,44 +593,19 @@ function renderizarGraficos(){
                     min: 70, 
                     max: 100, 
                     grid: { color: '#e2e8f0' }, 
-                    ticks: { callback: v => v+'%', font: { weight: 'bold' }, stepSize: 5 },
-                    title: { display: true, text: 'Percentual (%)', color: '#64748b' }
+                    ticks: { callback: v => v+'%', font: { weight: 'bold', family: 'Plus Jakarta Sans' }, stepSize: 5 },
+                    title: { display: true, text: 'Percentual (%)', color: '#64748b', font: { family: 'Plus Jakarta Sans' } }
                 },
                 x: { 
                     grid: { display: false },
-                    ticks: { font: { weight: 'bold' } }
+                    ticks: { font: { weight: 'bold', family: 'Plus Jakarta Sans' } }
                 }
             },
-            // Plugin para mostrar valores nas barras
-            layout: { padding: { top: 20 } }
+            layout: { padding: { top: 25, bottom: 10 } }
         }
     });
     
-    // Adicionar valores dentro das barras
-    setTimeout(() => {
-        const ctx = canvasComparecimento.getContext('2d');
-        if(ctx && charts.c && charts.c.getDatasetMeta(0).data) {
-            const bars = charts.c.getDatasetMeta(0).data;
-            const values = [88, 85, 90, 92, 89, 91];
-            ctx.font = 'bold 14px "Plus Jakarta Sans"';
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            ctx.shadowBlur = 0;
-            for(let i = 0; i < bars.length; i++) {
-                if(bars[i] && bars[i].x && bars[i].y) {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillText(values[i]+'%', bars[i].x, bars[i].y - 8);
-                    // Sombra para melhor legibilidade
-                    ctx.fillStyle = '#ffffff';
-                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                    ctx.fillText(values[i]+'%', bars[i].x, bars[i].y - 8);
-                    ctx.shadowColor = 'transparent';
-                }
-            }
-        }
-    }, 300);
-    
-    // GRÁFICO 4: Tempo Médio OCI (Linha com rótulos)
+    // GRÁFICO 4: Tempo Médio OCI (Linha)
     charts.t = new Chart(ctx4, {
         type: 'line',
         data: {
@@ -656,40 +635,18 @@ function renderizarGraficos(){
             scales: {
                 y: { 
                     grid: { color: '#e2e8f0' }, 
-                    ticks: { callback: v => v+'d', font: { weight: 'bold' } },
-                    title: { display: true, text: 'Dias', color: '#64748b' }
+                    ticks: { callback: v => v+'d', font: { weight: 'bold', family: 'Plus Jakarta Sans' } },
+                    title: { display: true, text: 'Dias', color: '#64748b', font: { family: 'Plus Jakarta Sans' } }
                 },
                 x: { 
                     grid: { display: false },
-                    ticks: { font: { weight: 'bold' } }
+                    ticks: { font: { weight: 'bold', family: 'Plus Jakarta Sans' } }
                 }
             }
         }
     });
     
-    // Adicionar valores nos pontos do gráfico de tempo
-    setTimeout(() => {
-        const ctx = canvasTempoMedio.getContext('2d');
-        if(ctx && charts.t && charts.t.getDatasetMeta(0).data) {
-            const points = charts.t.getDatasetMeta(0).data;
-            const values = [18, 16, 14, 12, 11, 10];
-            ctx.font = 'bold 12px "Plus Jakarta Sans"';
-            ctx.fillStyle = '#f59e0b';
-            ctx.textAlign = 'center';
-            for(let i = 0; i < points.length; i++) {
-                if(points[i] && points[i].x && points[i].y) {
-                    ctx.fillStyle = '#f59e0b';
-                    ctx.fillText(values[i]+'d', points[i].x, points[i].y - 12);
-                    ctx.fillStyle = '#fff';
-                    ctx.shadowColor = 'rgba(0,0,0,0.2)';
-                    ctx.fillText(values[i]+'d', points[i].x, points[i].y - 12);
-                    ctx.shadowColor = 'transparent';
-                }
-            }
-        }
-    }, 300);
-    
-    console.log('✅ Gráficos estilizados renderizados com legendas fixas!');
+    console.log('✅ Gráficos com labels brancas e negrito renderizados!');
 }
 
 function switchTab(tabId){
@@ -750,7 +707,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         document.getElementById(id)?.addEventListener('keypress',e=>{if(e.key==='Enter') document.getElementById('btnLogin').click();});
     });
     
-    console.log('✅ SISTEMA OCI v5.0 - Gráficos com legendas fixas! 🚀');
+    console.log('✅ SISTEMA OCI v5.0 - Plugin de labels registrado!');
 });
 </script>
 </body>
