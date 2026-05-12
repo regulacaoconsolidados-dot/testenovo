@@ -104,12 +104,13 @@
             </div>
 
             <!-- ==================== VISÃO GERAL ==================== -->
+                        <!-- VISÃO GERAL -->
             <div id="content-visao-geral" class="tab-content active space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="statsGrid"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="alertasGrid"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3><div class="h-72"><canvas id="chartPerformance"></canvas></div></div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-pie text-purple-500"></i> Pacientes por Especialidade</h3><div class="h-72"><canvas id="chartSpecialty"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-pie text-purple-500"></i> Pacientes por Especialidade</h3><div class="h-72 flex justify-center"><canvas id="chartSpecialty"></canvas></div></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-bar text-emerald-500"></i> Taxa de Comparecimento</h3><div class="h-64"><canvas id="chartComparecimento"></canvas></div></div>
@@ -117,6 +118,15 @@
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="infoCards"></div>
             </div>
+
+            <!-- OUTRAS ABAS (placeholder com dados simulados) -->
+            <div id="content-monitoramento" class="tab-content"><div class="bg-white p-8 rounded-2xl shadow-sm text-center"><h2 class="text-xl font-bold">👥 Monitoramento de Pacientes</h2><p class="text-slate-500 mt-2">Tabela com 150 pacientes mock carregados.</p><div class="mt-4 p-4 bg-blue-50 rounded-xl text-left text-sm">✅ Dados simulados prontos!<br>📊 150 pacientes | 5 especialidades | 5 status diferentes</div></div></div>
+            <div id="content-retornos" class="tab-content"><div class="bg-white p-8 rounded-2xl shadow-sm text-center"><h2 class="text-xl font-bold">📋 Retornos</h2><p class="text-slate-500 mt-2">Fila de pacientes aptos para agendamento.</p><div class="mt-4 p-4 bg-amber-50 rounded-xl text-left text-sm">🟡 Dados simulados: ~30 pacientes aguardando retorno</div></div></div>
+            <div id="content-absenteismo" class="tab-content"><div class="bg-white p-8 rounded-2xl shadow-sm text-center"><h2 class="text-xl font-bold">🚫 Absenteísmo</h2><p class="text-slate-500 mt-2">Controle de faltas.</p><div class="mt-4 p-4 bg-rose-50 rounded-xl text-left text-sm">🔴 Dados simulados: ~30 faltas registradas</div></div></div>
+            <div id="content-apac" class="tab-content"><div class="bg-white p-8 rounded-2xl shadow-sm text-center"><h2 class="text-xl font-bold">📄 APAC</h2><p class="text-slate-500 mt-2">OCIs fechadas para faturamento.</p><div class="mt-4 p-4 bg-purple-50 rounded-xl text-left text-sm">🟣 Dados simulados: ~30 OCIs fechadas</div></div></div>
+        </div>
+    </main>
+</div>
 
             <!-- ==================== MONITORAMENTO ==================== -->
             <div id="content-monitoramento" class="tab-content space-y-4">
