@@ -255,19 +255,33 @@ function mudarItensPorPagina(tipo){ itensPorPagina[tipo]=parseInt(document.getEl
 // ============================================
 function renderizarGraficos(){
     Object.values(charts).forEach(c=>c.destroy());
-    setTimeout(()=>{
-        const ctx1=document.getElementById('chartPerformance')?.getContext('2d');
-        if(ctx1) charts.p=new Chart(ctx1,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'OCIs Fechadas',data:[65,78,72,85,82,86],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff'},{label:'Comparecimento',data:[88,85,90,92,89,91],borderColor:'#10b981',borderWidth:3,borderDash:[5,5],tension:0.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true}}},scales:{y:{grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}}});
+    
+    // Verificar se os canvas existem antes de renderizar
+    const ctx1=document.getElementById('chartPerformance')?.getContext('2d');
+    const ctx2=document.getElementById('chartSpecialty')?.getContext('2d');
+    const ctx3=document.getElementById('chartComparecimento')?.getContext('2d');
+    const ctx4=document.getElementById('chartTempoMedio')?.getContext('2d');
+    
+    if(!ctx1 || !ctx2 || !ctx3 || !ctx4){
+        // Se os canvas não estão prontos, tenta de novo em 500ms
+        setTimeout(()=>renderizarGraficos(),500);
+        return;
+    }
+    
+    // GRÁFICO 1: Desempenho OCI
+    charts.p=new Chart(ctx1,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'OCIs Fechadas',data:[65,78,72,85,82,86],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff',pointBorderColor:'#3b82f6',pointBorderWidth:3},{label:'Comparecimento',data:[88,85,90,92,89,91],borderColor:'#10b981',borderWidth:3,borderDash:[5,5],tension:0.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:20}}},scales:{y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}}}});
 
-        const ctx2=document.getElementById('chartSpecialty')?.getContext('2d');
-        if(ctx2){const por={};consultas.forEach(c=>{const e=especialidades.find(x=>x.id===c.especialidade_id);por[e?e.nome:'Outros']=(por[e?e.nome:'Outros']||0)+1;});charts.s=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(por),datasets:[{data:Object.values(por),backgroundColor:['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#ec4899']}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true}}}}});}
+    // GRÁFICO 2: Pacientes por Especialidade
+    const por={};consultas.forEach(c=>{const e=especialidades.find(x=>x.id===c.especialidade_id);por[e?e.nome:'Outros']=(por[e?e.nome:'Outros']||0)+1;});
+    charts.s=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(por),datasets:[{data:Object.values(por),backgroundColor:['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#ec4899'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{padding:20,usePointStyle:true,generateLabels:function(c){return c.data.labels.map((l,i)=>({text:`${l}: ${c.data.datasets[0].data[i]} pac.`,fillStyle:c.data.datasets[0].backgroundColor[i],strokeStyle:c.data.datasets[0].backgroundColor[i],pointStyle:'circle',index:i}))}}}}}});
 
-        const ctx3=document.getElementById('chartComparecimento')?.getContext('2d');
-        if(ctx3) charts.c=new Chart(ctx3,{type:'bar',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{data:[88,85,90,92,89,91],backgroundColor:'#10b981',borderRadius:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:80,max:100,grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}}});
+    // GRÁFICO 3: Taxa de Comparecimento
+    charts.c=new Chart(ctx3,{type:'bar',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{data:[88,85,90,92,89,91],backgroundColor:'#10b981',borderRadius:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:80,max:100,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}},animation:{onComplete:function(){const ctx=this.ctx;this.data.datasets[0].data.forEach((v,i)=>{const m=this.getDatasetMeta(0);ctx.save();ctx.fillStyle='white';ctx.font='bold 14px Plus Jakarta Sans';ctx.textAlign='center';ctx.fillText(v+'%',m.data[i].x,m.data[i].y+20);ctx.restore();});}}});
 
-        const ctx4=document.getElementById('chartTempoMedio')?.getContext('2d');
-        if(ctx4) charts.t=new Chart(ctx4,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'Dias',data:[18,16,14,12,11,10],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}}});
-    },300);
+    // GRÁFICO 4: Tempo Médio OCI
+    charts.t=new Chart(ctx4,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'Dias',data:[18,16,14,12,11,10],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff',pointBorderColor:'#f59e0b',pointBorderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'d'}},x:{grid:{display:false}}}}});
+    
+    console.log('✅ Gráficos renderizados com sucesso!');
 }
 
 function switchTab(tabId){
