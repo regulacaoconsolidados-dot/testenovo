@@ -130,7 +130,7 @@
                             <select id="itensPorPaginaMonitoramento" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('monitoramento')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select>
                         </div>
                     </div>
-                    <div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="bg-slate-50"><th class="px-6 py-4 text-xs font-bold uppercase">Nº SOL</th><th class="px-6 py-4 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-4 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-4 text-xs font-bold uppercase">Progresso</th><th class="px-6 py-4 text-xs font-bold uppercase">Exames</th><th class="px-6 py-4 text-xs font-bold uppercase">Status</th><th class="px-6 py-4 text-xs font-bold uppercase">Previsão</th></tr></thead><tbody class="divide-y" id="tabelaMonitoramento"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="bg-slate-50"><th class="px-6 py-4 text-xs font-bold uppercase">Nº SOL</th><th class="px-6 py-4 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-4 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-4 text-xs font-bold uppercase">Progresso</th><th class="px-6 py-4 text-xs font-bold uppercase">Exames</th><th class="px-6 py-4 text-xs font-bold uppercase">Status</th><th class="px-6 py-4 text-xs font-bold uppercase">Previsão</th></tr></thead><tbody class="divide-y" id="tabelaMonitoramento"></tbody>能有</div>
                     <div class="p-4 border-t" id="paginacaoMonitoramento"></div>
                 </div>
             </div>
@@ -139,7 +139,7 @@
             <div id="content-retornos" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between"><h3 class="text-lg font-bold">📋 Pacientes Aptos para Retorno</h3><div class="flex gap-2"><input type="text" id="buscaRetornos" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos')"><select id="itensPorPaginaRetornos" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('retornos')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select><button onclick="exportarExcel('retornos')" class="bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-download"></i> Excel</button></div></div>
-                    <div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-slate-50"><th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-3 text-xs font-bold uppercase">CPF</th><th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-3 text-xs font-bold uppercase">Exames</th><th class="px-6 py-3 text-xs font-bold uppercase">Data</th></tr></thead><tbody id="tabelaRetornos"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-slate-50"><th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-3 text-xs font-bold uppercase">CPF</th><th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-3 text-xs font-bold uppercase">Exames</th><th class="px-6 py-3 text-xs font-bold uppercase">Data</th> </tr></thead><tbody id="tabelaRetornos"></tbody></table></div>
                     <div class="p-4 border-t" id="paginacaoRetornos"></div>
                 </div>
             </div>
@@ -148,7 +148,7 @@
             <div id="content-absenteismo" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between"><h3 class="text-lg font-bold">🚫 Absenteísmo</h3><div class="flex gap-2"><input type="text" id="buscaAbsenteismo" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('absenteismo')"><select id="itensPorPaginaAbsenteismo" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('absenteismo')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select></div></div>
-                    <div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-slate-50"><th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-3 text-xs font-bold uppercase">CPF</th><th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-3 text-xs font-bold uppercase">Data</th><th class="px-6 py-3 text-xs font-bold uppercase">Status</th></tr></thead><tbody id="tabelaAbsenteismo"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-slate-50"><th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-3 text-xs font-bold uppercase">CPF</th><th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-3 text-xs font-bold uppercase">Data</th><th class="px-6 py-3 text-xs font-bold uppercase">Status</th> </tr></thead><tbody id="tabelaAbsenteismo"></tbody></table></div>
                     <div class="p-4 border-t" id="paginacaoAbsenteismo"></div>
                 </div>
             </div>
@@ -157,7 +157,7 @@
             <div id="content-apac" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between"><h3 class="text-lg font-bold">📄 OCIs Fechadas (APAC)</h3><div class="flex gap-2"><input type="text" id="buscaAPAC" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('apac')"><select id="itensPorPaginaAPAC" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('apac')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select><button onclick="exportarExcel('apac')" class="bg-purple-600 text-white px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-download"></i> Excel</button></div></div>
-                    <div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-slate-50"><th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-3 text-xs font-bold uppercase">CPF</th><th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-3 text-xs font-bold uppercase">Fechamento</th><th class="px-6 py-3 text-xs font-bold uppercase">Status</th></tr></thead><tbody id="tabelaAPAC"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-slate-50"><th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th><th class="px-6 py-3 text-xs font-bold uppercase">CPF</th><th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th><th class="px-6 py-3 text-xs font-bold uppercase">Fechamento</th><th class="px-6 py-3 text-xs font-bold uppercase">Status</th> </tr></thead><tbody id="tabelaAPAC"></tbody></table></div>
                     <div class="p-4 border-t" id="paginacaoAPAC"></div>
                 </div>
             </div>
@@ -186,15 +186,33 @@ function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>{s.clas
 // DADOS MOCK
 // ============================================
 function gerarDadosMock(){
-    especialidades=[{id:1,nome:'Cardiologia',icone:'🫀',exames_obrigatorios:'ECG; LAB; ERG',prazo_retorno_dias:60},{id:2,nome:'Ortopedia',icone:'🦴',exames_obrigatorios:'RX; USG; TOMO',prazo_retorno_dias:60},{id:3,nome:'Oncologia',icone:'🎗️',exames_obrigatorios:'BIO; AP; USG',prazo_retorno_dias:30},{id:4,nome:'Oftalmologia',icone:'👁️',exames_obrigatorios:'MAP; BIO; TONO',prazo_retorno_dias:60},{id:5,nome:'Otorrino',icone:'👂',exames_obrigatorios:'AUDIO; VIDEO',prazo_retorno_dias:60}];
+    especialidades=[
+        {id:1,nome:'Cardiologia',icone:'🫀',exames_obrigatorios:'ECG; LAB; ERG',prazo_retorno_dias:60},
+        {id:2,nome:'Ortopedia',icone:'🦴',exames_obrigatorios:'RX; USG; TOMO',prazo_retorno_dias:60},
+        {id:3,nome:'Oncologia',icone:'🎗️',exames_obrigatorios:'BIO; AP; USG',prazo_retorno_dias:30},
+        {id:4,nome:'Oftalmologia',icone:'👁️',exames_obrigatorios:'MAP; BIO; TONO',prazo_retorno_dias:60},
+        {id:5,nome:'Otorrino',icone:'👂',exames_obrigatorios:'AUDIO; VIDEO',prazo_retorno_dias:60}
+    ];
     const nomes=['Maria Silva','João Santos','Ana Oliveira','Carlos Pereira','Fernanda Costa'];
-    pacientes=[]; for(let i=0;i<150;i++){ pacientes.push({id:i+1, nome:nomes[i%5]+' '+(i+1), cpf:String(10000000000+Math.floor(Math.random()*90000000000))}); }
+    pacientes=[]; 
+    for(let i=0;i<150;i++){ 
+        pacientes.push({id:i+1, nome:nomes[i%5]+' '+(i+1), cpf:String(10000000000+Math.floor(Math.random()*90000000000))}); 
+    }
     const st=['em_andamento','aguardando_exame','apto_retorno','oci_fechada','faltou'];
-    consultas=[]; for(let i=0;i<150;i++){ consultas.push({id:i+1,paciente_id:i+1,especialidade_id:Math.floor(Math.random()*5)+1,status:st[Math.floor(Math.random()*5)],data_agendada:`2025-${String(Math.floor(Math.random()*6)+1).padStart(2,'0')}-${String(Math.floor(Math.random()*28)+1).padStart(2,'0')}`}); }
+    consultas=[]; 
+    for(let i=0;i<150;i++){ 
+        consultas.push({
+            id:i+1,
+            paciente_id:i+1,
+            especialidade_id:Math.floor(Math.random()*5)+1,
+            status:st[Math.floor(Math.random()*5)],
+            data_agendada:`2025-${String(Math.floor(Math.random()*6)+1).padStart(2,'0')}-${String(Math.floor(Math.random()*28)+1).padStart(2,'0')}`
+        }); 
+    }
 }
 
 // ============================================
-// ATUALIZAR
+// ATUALIZAR TUDO (cards, tabelas, gráficos)
 // ============================================
 function atualizarTudo(){
     const hoje=new Date();
@@ -204,16 +222,34 @@ function atualizarTudo(){
     const faltas=consultas.filter(c=>c.status==='faltou').length;
     const pct=consultas.length>0?Math.round((fechadas/consultas.length)*100):0;
 
-    document.getElementById('statsGrid').innerHTML=`<div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-blue"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-users"></i></div><span class="text-emerald-500 text-xs font-bold bg-emerald-50 px-2 py-1 rounded-lg">+12%</span></div><p class="text-slate-500 text-xs font-bold uppercase">Pacientes Ativos</p><h3 class="text-3xl font-extrabold mt-1">${totalAtivos}</h3></div><div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-amber"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-clock"></i></div><span class="text-amber-600 text-xs font-bold bg-amber-50 px-2 py-1 rounded-lg">Urgente</span></div><p class="text-slate-500 text-xs font-bold uppercase">Aptos Retorno</p><h3 class="text-3xl font-extrabold mt-1">${aptos}</h3></div><div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-emerald"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-check-double"></i></div><span class="text-emerald-600 text-xs font-bold bg-emerald-50 px-2 py-1 rounded-lg">Meta 90%</span></div><p class="text-slate-500 text-xs font-bold uppercase">OCIs Fechadas</p><h3 class="text-3xl font-extrabold mt-1">${pct}%</h3></div><div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-rose"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-user-slash"></i></div><span class="text-rose-500 text-xs font-bold bg-rose-50 px-2 py-1 rounded-lg">-5%</span></div><p class="text-slate-500 text-xs font-bold uppercase">Absenteísmo</p><h3 class="text-3xl font-extrabold mt-1">${faltas}</h3></div>`;
+    document.getElementById('statsGrid').innerHTML=`
+        <div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-blue"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-users"></i></div><span class="text-emerald-500 text-xs font-bold bg-emerald-50 px-2 py-1 rounded-lg">+12%</span></div><p class="text-slate-500 text-xs font-bold uppercase">Pacientes Ativos</p><h3 class="text-3xl font-extrabold mt-1">${totalAtivos}</h3></div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-amber"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-clock"></i></div><span class="text-amber-600 text-xs font-bold bg-amber-50 px-2 py-1 rounded-lg">Urgente</span></div><p class="text-slate-500 text-xs font-bold uppercase">Aptos Retorno</p><h3 class="text-3xl font-extrabold mt-1">${aptos}</h3></div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-emerald"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-check-double"></i></div><span class="text-emerald-600 text-xs font-bold bg-emerald-50 px-2 py-1 rounded-lg">Meta 90%</span></div><p class="text-slate-500 text-xs font-bold uppercase">OCIs Fechadas</p><h3 class="text-3xl font-extrabold mt-1">${pct}%</h3></div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-rose"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-user-slash"></i></div><span class="text-rose-500 text-xs font-bold bg-rose-50 px-2 py-1 rounded-lg">-5%</span></div><p class="text-slate-500 text-xs font-bold uppercase">Absenteísmo</p><h3 class="text-3xl font-extrabold mt-1">${faltas}</h3></div>
+    `;
 
-    const ocisPendentes=consultas.filter(c=>{if(c.status==='oci_fechada'||c.status==='faltou')return false;const dias=Math.floor((hoje-new Date(c.data_agendada))/86400000);const e=especialidades.find(x=>x.id===c.especialidade_id);return dias>(e?.prazo_retorno_dias||60);});
+    const ocisPendentes=consultas.filter(c=>{
+        if(c.status==='oci_fechada'||c.status==='faltou')return false;
+        const dias=Math.floor((hoje-new Date(c.data_agendada))/86400000);
+        const e=especialidades.find(x=>x.id===c.especialidade_id);
+        return dias>(e?.prazo_retorno_dias||60);
+    });
     document.getElementById('alertCount').textContent=ocisPendentes.length;
-    document.getElementById('alertasGrid').innerHTML=`<div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-rose-500 alert-card"><h4 class="font-bold text-sm text-rose-600 mb-2"><i class="fas fa-exclamation-triangle"></i> OCIs Pendentes</h4><p class="text-3xl font-extrabold">${ocisPendentes.length}</p></div><div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-amber-500"><h4 class="font-bold text-sm text-amber-600 mb-2"><i class="fas fa-flask"></i> Exames Atrasados</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='aguardando_exame').length}</p></div><div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-orange-500"><h4 class="font-bold text-sm text-orange-600 mb-2"><i class="fas fa-calendar-times"></i> Retornos Vencidos</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='apto_retorno'&&Math.floor((hoje-new Date(c.data_agendada))/86400000)>30).length}</p></div>`;
+    document.getElementById('alertasGrid').innerHTML=`
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-rose-500 alert-card"><h4 class="font-bold text-sm text-rose-600 mb-2"><i class="fas fa-exclamation-triangle"></i> OCIs Pendentes</h4><p class="text-3xl font-extrabold">${ocisPendentes.length}</p></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-amber-500"><h4 class="font-bold text-sm text-amber-600 mb-2"><i class="fas fa-flask"></i> Exames Atrasados</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='aguardando_exame').length}</p></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-orange-500"><h4 class="font-bold text-sm text-orange-600 mb-2"><i class="fas fa-calendar-times"></i> Retornos Vencidos</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='apto_retorno'&&Math.floor((hoje-new Date(c.data_agendada))/86400000)>30).length}</p></div>
+    `;
 
-    document.getElementById('infoCards').innerHTML=`<div class="bg-white p-5 rounded-2xl shadow-sm border card-purple"><h4 class="font-bold text-sm mb-3"><i class="fas fa-stethoscope text-purple-500"></i> Regras</h4><div class="space-y-2">${especialidades.map(e=>`<div class="flex justify-between p-2 bg-slate-50 rounded-lg"><span class="text-xs font-bold">${e.icone} ${e.nome}</span><span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg">${e.prazo_retorno_dias}d</span></div>`).join('')}</div></div><div class="bg-white p-5 rounded-2xl shadow-sm border card-blue"><h4 class="font-bold text-sm mb-3"><i class="fas fa-chart-bar text-blue-500"></i> Indicadores</h4><div class="space-y-3"><div class="flex justify-between"><span class="text-xs">Comparecimento</span><span class="text-xs font-bold text-emerald-600">${consultas.filter(c=>c.status!=='faltou').length}/${consultas.length}</span></div><div class="flex justify-between"><span class="text-xs">OCIs Fechadas</span><span class="text-xs font-bold text-blue-600">${pct}%</span></div></div></div><div class="bg-white p-5 rounded-2xl shadow-sm border card-emerald"><h4 class="font-bold text-sm mb-3"><i class="fas fa-cog text-emerald-500"></i> Parâmetros</h4><div class="space-y-2 text-xs">${['⏱️ Prazo Padrão: 60 dias','🎗️ Prazo Oncologia: 30 dias','🎯 Meta OCI: 90%'].map(p=>`<div class="p-2 bg-slate-50 rounded-lg font-bold">${p}</div>`).join('')}</div></div>`;
+    document.getElementById('infoCards').innerHTML=`
+        <div class="bg-white p-5 rounded-2xl shadow-sm border card-purple"><h4 class="font-bold text-sm mb-3"><i class="fas fa-stethoscope text-purple-500"></i> Regras</h4><div class="space-y-2">${especialidades.map(e=>`<div class="flex justify-between p-2 bg-slate-50 rounded-lg"><span class="text-xs font-bold">${e.icone} ${e.nome}</span><span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg">${e.prazo_retorno_dias}d</span></div>`).join('')}</div></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border card-blue"><h4 class="font-bold text-sm mb-3"><i class="fas fa-chart-bar text-blue-500"></i> Indicadores</h4><div class="space-y-3"><div class="flex justify-between"><span class="text-xs">Comparecimento</span><span class="text-xs font-bold text-emerald-600">${consultas.filter(c=>c.status!=='faltou').length}/${consultas.length}</span></div><div class="flex justify-between"><span class="text-xs">OCIs Fechadas</span><span class="text-xs font-bold text-blue-600">${pct}%</span></div></div></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border card-emerald"><h4 class="font-bold text-sm mb-3"><i class="fas fa-cog text-emerald-500"></i> Parâmetros</h4><div class="space-y-2 text-xs">${['⏱️ Prazo Padrão: 60 dias','🎗️ Prazo Oncologia: 30 dias','🎯 Meta OCI: 90%'].map(p=>`<div class="p-2 bg-slate-50 rounded-lg font-bold">${p}</div>`).join('')}</div></div>
+    `;
 
     renderizarTabelas();
-    renderizarGraficos();
+    renderizarGraficos(); // CHAMADA PRINCIPAL DOS GRÁFICOS
 }
 
 // ============================================
@@ -226,83 +262,193 @@ function getDadosFiltrados(tipo){
     else if(tipo==='absenteismo') dados=consultas.filter(c=>c.status==='faltou');
     else if(tipo==='apac') dados=consultas.filter(c=>c.status==='oci_fechada');
     const busca=document.getElementById('busca'+tipo.charAt(0).toUpperCase()+tipo.slice(1))?.value?.toLowerCase()||'';
-    if(busca) dados=dados.filter(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};return`SOL-${String(c.id).padStart(4,'0')}`.toLowerCase().includes(busca)||(p.nome||'').toLowerCase().includes(busca)||(p.cpf||'').includes(busca);});
-    if(tipo==='monitoramento'){const fe=document.getElementById('filtroEspecialidadeMonitoramento')?.value;const fs=document.getElementById('filtroStatusMonitoramento')?.value;if(fe)dados=dados.filter(c=>c.especialidade_id==parseInt(fe));if(fs)dados=dados.filter(c=>c.status===fs);}
+    if(busca) dados=dados.filter(c=>{
+        const p=pacientes.find(x=>x.id===c.paciente_id)||{};
+        return `SOL-${String(c.id).padStart(4,'0')}`.toLowerCase().includes(busca) || 
+               (p.nome||'').toLowerCase().includes(busca) || 
+               (p.cpf||'').includes(busca);
+    });
+    if(tipo==='monitoramento'){
+        const fe=document.getElementById('filtroEspecialidadeMonitoramento')?.value;
+        const fs=document.getElementById('filtroStatusMonitoramento')?.value;
+        if(fe) dados=dados.filter(c=>c.especialidade_id==parseInt(fe));
+        if(fs) dados=dados.filter(c=>c.status===fs);
+    }
     return dados;
 }
 
 function renderizarTabelas(){
     ['monitoramento','retornos','absenteismo','apac'].forEach(tipo=>{
-        const dados=getDadosFiltrados(tipo); const total=dados.length; const ipp=itensPorPagina[tipo]; const totalPag=Math.ceil(total/ipp)||1;
+        const dados=getDadosFiltrados(tipo); 
+        const total=dados.length; 
+        const ipp=itensPorPagina[tipo]; 
+        const totalPag=Math.ceil(total/ipp)||1;
         if(paginaAtual[tipo]>totalPag) paginaAtual[tipo]=totalPag;
-        const inicio=(paginaAtual[tipo]-1)*ipp; const paginados=dados.slice(inicio,inicio+ipp);
+        const inicio=(paginaAtual[tipo]-1)*ipp; 
+        const paginados=dados.slice(inicio,inicio+ipp);
+        
         if(tipo==='monitoramento'){
-            document.getElementById('tabelaMonitoramento').innerHTML=paginados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};const stMap={'em_andamento':{t:'Em Andamento',c:'text-blue-600'},'aguardando_exame':{t:'Ag. Exame',c:'text-amber-600'},'apto_retorno':{t:'Apto Retorno',c:'text-emerald-600'},'oci_fechada':{t:'Fechada',c:'text-purple-600'},'faltou':{t:'Faltou',c:'text-rose-600'}};const st=stMap[c.status]||{t:c.status,c:'text-slate-600'};const prog=c.status==='oci_fechada'?100:c.status==='apto_retorno'?75:c.status==='em_andamento'?40:10;let cp='bg-emerald-500';if(prog<30)cp='bg-rose-500';else if(prog<70)cp='bg-amber-500';else if(prog<100)cp='bg-blue-500';return`<tr><td class="px-6 py-4"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">SOL-${String(c.id).padStart(4,'0')}</span></td><td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">${(p.nome||'?')[0]}</div><div><p class="font-bold text-sm">${p.nome||'—'}</p><p class="text-xs text-slate-400">${formatarCPF(p.cpf||'')}</p></div></div></td><td class="px-6 py-4"><span class="px-3 py-1.5 bg-blue-50 rounded-full text-sm font-bold">${e.icone||''} ${e.nome||'—'}</span></td><td class="px-6 py-4"><div class="w-72"><div class="w-full bg-slate-100 h-5 rounded-full overflow-hidden progress-bar-grossa"><div class="${cp} h-full rounded-full flex items-center justify-center text-white text-xs font-bold" style="width:${prog}%">${prog}%</div></div></div></td><td class="px-6 py-4"><div class="flex gap-1.5">${(e.exames_obrigatorios||'').split(';').slice(0,3).map(ex=>`<span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-600 text-xs font-bold">${ex.trim()}</span>`).join('')}</div></td><td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-sm font-bold ${st.c}">${st.t}</span></td><td class="px-6 py-4 text-sm font-bold text-slate-500">${c.status==='oci_fechada'?'✅ Concluído':c.status==='faltou'?'❌ Falta':`⏳ ${e.prazo_retorno_dias||60}d`}</td></tr>`;}).join('');
-        }else if(tipo==='retornos'){document.getElementById('tabelaRetornos').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhum paciente</td></tr>':paginados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};return`<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3 text-emerald-600 font-bold text-xs">✅</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td></tr>`;}).join('');}
-        else if(tipo==='absenteismo'){document.getElementById('tabelaAbsenteismo').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhuma falta</td></tr>':paginados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};return`<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">Faltou</span></td></tr>`;}).join('');}
-        else if(tipo==='apac'){document.getElementById('tabelaAPAC').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhuma OCI fechada</td></tr>':paginados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};return`<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-bold">✅ Fechada</span></td></tr>`;}).join('');}
-        let pagHTML=''; for(let i=1;i<=totalPag;i++) pagHTML+=`<button onclick="paginaAtual['${tipo}']=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i===paginaAtual[tipo]?'bg-blue-600 text-white':'bg-slate-100'}">${i}</button>`;
-        document.getElementById('paginacao'+tipo.charAt(0).toUpperCase()+tipo.slice(1)).innerHTML=`<span class="text-xs text-slate-500">${total} registros | Pág ${paginaAtual[tipo]} de ${totalPag}</span><div class="flex gap-1">${pagHTML}</div>`;
+            document.getElementById('tabelaMonitoramento').innerHTML=paginados.map(c=>{
+                const p=pacientes.find(x=>x.id===c.paciente_id)||{};
+                const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
+                const stMap={'em_andamento':{t:'Em Andamento',c:'text-blue-600'},'aguardando_exame':{t:'Ag. Exame',c:'text-amber-600'},'apto_retorno':{t:'Apto Retorno',c:'text-emerald-600'},'oci_fechada':{t:'Fechada',c:'text-purple-600'},'faltou':{t:'Faltou',c:'text-rose-600'}};
+                const st=stMap[c.status]||{t:c.status,c:'text-slate-600'};
+                const prog=c.status==='oci_fechada'?100:c.status==='apto_retorno'?75:c.status==='em_andamento'?40:10;
+                let cp='bg-emerald-500';
+                if(prog<30) cp='bg-rose-500';
+                else if(prog<70) cp='bg-amber-500';
+                else if(prog<100) cp='bg-blue-500';
+                return `
+                    <tr>
+                        <td class="px-6 py-4"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">SOL-${String(c.id).padStart(4,'0')}</span></td>
+                        <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">${(p.nome||'?')[0]}</div><div><p class="font-bold text-sm">${p.nome||'—'}</p><p class="text-xs text-slate-400">${formatarCPF(p.cpf||'')}</p></div></div></td>
+                        <td class="px-6 py-4"><span class="px-3 py-1.5 bg-blue-50 rounded-full text-sm font-bold">${e.icone||''} ${e.nome||'—'}</span></td>
+                        <td class="px-6 py-4"><div class="w-72"><div class="w-full bg-slate-100 h-5 rounded-full overflow-hidden progress-bar-grossa"><div class="${cp} h-full rounded-full flex items-center justify-center text-white text-xs font-bold" style="width:${prog}%">${prog}%</div></div></div></td>
+                        <td class="px-6 py-4"><div class="flex gap-1.5">${(e.exames_obrigatorios||'').split(';').slice(0,3).map(ex=>`<span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-600 text-xs font-bold">${ex.trim()}</span>`).join('')}</div></td>
+                        <td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-sm font-bold ${st.c}">${st.t}</span></td>
+                        <td class="px-6 py-4 text-sm font-bold text-slate-500">${c.status==='oci_fechada'?'✅ Concluído':c.status==='faltou'?'❌ Falta':`⏳ ${e.prazo_retorno_dias||60}d`}</td>
+                    </tr>
+                `;
+            }).join('');
+        } else if(tipo==='retornos'){
+            document.getElementById('tabelaRetornos').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhum paciente</td></tr>':paginados.map(c=>{
+                const p=pacientes.find(x=>x.id===c.paciente_id)||{};
+                const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
+                return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3 text-emerald-600 font-bold text-xs">✅</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td></tr>`;
+            }).join('');
+        } else if(tipo==='absenteismo'){
+            document.getElementById('tabelaAbsenteismo').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhuma falta</td></tr>':paginados.map(c=>{
+                const p=pacientes.find(x=>x.id===c.paciente_id)||{};
+                const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
+                return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">Faltou</span></td></tr>`;
+            }).join('');
+        } else if(tipo==='apac'){
+            document.getElementById('tabelaAPAC').innerHTML=paginados.length===0?'<tr><td colspan="5" class="text-center py-8">Nenhuma OCI fechada</td></tr>':paginados.map(c=>{
+                const p=pacientes.find(x=>x.id===c.paciente_id)||{};
+                const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
+                return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-bold">✅ Fechada</span></td></tr>`;
+            }).join('');
+        }
+        
+        let pagHTML=''; 
+        for(let i=1;i<=totalPag;i++) pagHTML+=`<button onclick="paginaAtual['${tipo}']=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i===paginaAtual[tipo]?'bg-blue-600 text-white':'bg-slate-100'}">${i}</button>`;
+        const pagDiv = document.getElementById('paginacao'+tipo.charAt(0).toUpperCase()+tipo.slice(1));
+        if(pagDiv) pagDiv.innerHTML = `<span class="text-xs text-slate-500">${total} registros | Pág ${paginaAtual[tipo]} de ${totalPag}</span><div class="flex gap-1">${pagHTML}</div>`;
     });
-    document.getElementById('filtroEspecialidadeMonitoramento').innerHTML='<option value="">Todas</option>'+especialidades.map(e=>`<option value="${e.id}">${e.icone} ${e.nome}</option>`).join('');
+    const filtroSelect = document.getElementById('filtroEspecialidadeMonitoramento');
+    if(filtroSelect) filtroSelect.innerHTML='<option value="">Todas</option>'+especialidades.map(e=>`<option value="${e.id}">${e.icone} ${e.nome}</option>`).join('');
 }
 
 function filtrarTabela(tipo){ paginaAtual[tipo]=1; renderizarTabelas(); }
-function mudarItensPorPagina(tipo){ itensPorPagina[tipo]=parseInt(document.getElementById('itensPorPagina'+tipo.charAt(0).toUpperCase()+tipo.slice(1))?.value||100); paginaAtual[tipo]=1; renderizarTabelas(); }
+function mudarItensPorPagina(tipo){ 
+    itensPorPagina[tipo]=parseInt(document.getElementById('itensPorPagina'+tipo.charAt(0).toUpperCase()+tipo.slice(1))?.value||100); 
+    paginaAtual[tipo]=1; 
+    renderizarTabelas(); 
+}
 
 // ============================================
-// GRÁFICOS
+// GRÁFICOS CORRIGIDOS (com verificação e logs)
 // ============================================
 function renderizarGraficos(){
-    Object.values(charts).forEach(c=>c.destroy());
+    // Destroi gráficos antigos se existirem
+    if(charts.p) charts.p.destroy();
+    if(charts.s) charts.s.destroy();
+    if(charts.c) charts.c.destroy();
+    if(charts.t) charts.t.destroy();
     
-    // Verificar se os canvas existem antes de renderizar
-    const ctx1=document.getElementById('chartPerformance')?.getContext('2d');
-    const ctx2=document.getElementById('chartSpecialty')?.getContext('2d');
-    const ctx3=document.getElementById('chartComparecimento')?.getContext('2d');
-    const ctx4=document.getElementById('chartTempoMedio')?.getContext('2d');
+    // Verifica se os canvas existem no DOM
+    const canvasPerformance = document.getElementById('chartPerformance');
+    const canvasSpecialty = document.getElementById('chartSpecialty');
+    const canvasComparecimento = document.getElementById('chartComparecimento');
+    const canvasTempoMedio = document.getElementById('chartTempoMedio');
     
-    if(!ctx1 || !ctx2 || !ctx3 || !ctx4){
-        // Se os canvas não estão prontos, tenta de novo em 500ms
-        setTimeout(()=>renderizarGraficos(),500);
+    if(!canvasPerformance || !canvasSpecialty || !canvasComparecimento || !canvasTempoMedio){
+        console.warn("Aguardando elementos canvas...");
+        setTimeout(()=>renderizarGraficos(), 200);
         return;
     }
     
-    // GRÁFICO 1: Desempenho OCI
-    charts.p=new Chart(ctx1,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'OCIs Fechadas',data:[65,78,72,85,82,86],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff',pointBorderColor:'#3b82f6',pointBorderWidth:3},{label:'Comparecimento',data:[88,85,90,92,89,91],borderColor:'#10b981',borderWidth:3,borderDash:[5,5],tension:0.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:20}}},scales:{y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}}}});
-
-    // GRÁFICO 2: Pacientes por Especialidade
-    const por={};consultas.forEach(c=>{const e=especialidades.find(x=>x.id===c.especialidade_id);por[e?e.nome:'Outros']=(por[e?e.nome:'Outros']||0)+1;});
-    charts.s=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(por),datasets:[{data:Object.values(por),backgroundColor:['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#ec4899'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{padding:20,usePointStyle:true,generateLabels:function(c){return c.data.labels.map((l,i)=>({text:`${l}: ${c.data.datasets[0].data[i]} pac.`,fillStyle:c.data.datasets[0].backgroundColor[i],strokeStyle:c.data.datasets[0].backgroundColor[i],pointStyle:'circle',index:i}))}}}}}});
-
-    // GRÁFICO 3: Taxa de Comparecimento
-    charts.c=new Chart(ctx3,{type:'bar',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{data:[88,85,90,92,89,91],backgroundColor:'#10b981',borderRadius:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:80,max:100,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}},animation:{onComplete:function(){const ctx=this.ctx;this.data.datasets[0].data.forEach((v,i)=>{const m=this.getDatasetMeta(0);ctx.save();ctx.fillStyle='white';ctx.font='bold 14px Plus Jakarta Sans';ctx.textAlign='center';ctx.fillText(v+'%',m.data[i].x,m.data[i].y+20);ctx.restore();});}}});
-
-    // GRÁFICO 4: Tempo Médio OCI
-    charts.t=new Chart(ctx4,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'Dias',data:[18,16,14,12,11,10],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',borderWidth:3,fill:true,tension:0.4,pointRadius:6,pointBackgroundColor:'#fff',pointBorderColor:'#f59e0b',pointBorderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'d'}},x:{grid:{display:false}}}}});
+    const ctx1 = canvasPerformance.getContext('2d');
+    const ctx2 = canvasSpecialty.getContext('2d');
+    const ctx3 = canvasComparecimento.getContext('2d');
+    const ctx4 = canvasTempoMedio.getContext('2d');
     
-    console.log('✅ Gráficos renderizados com sucesso!');
+    // GRÁFICO 1: Desempenho OCI
+    charts.p = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: ['Jan','Fev','Mar','Abr','Mai','Jun'],
+            datasets: [
+                {label: 'OCIs Fechadas', data: [65,78,72,85,82,86], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: '#3b82f6', pointBorderWidth: 3},
+                {label: 'Comparecimento', data: [88,85,90,92,89,91], borderColor: '#10b981', borderWidth: 3, borderDash: [5,5], tension: 0.4, pointRadius: 0}
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } } }, scales: { y: { grid: { color: '#f1f5f9' }, ticks: { callback: v => v+'%' } }, x: { grid: { display: false } } } }
+    });
+    
+    // GRÁFICO 2: Pacientes por Especialidade
+    const por={};
+    consultas.forEach(c=>{
+        const e=especialidades.find(x=>x.id===c.especialidade_id);
+        por[e?e.nome:'Outros'] = (por[e?e.nome:'Outros']||0)+1;
+    });
+    charts.s = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(por),
+            datasets: [{ data: Object.values(por), backgroundColor: ['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#ec4899'], borderWidth: 0, hoverOffset: 8 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, generateLabels: function(c){ return c.data.labels.map((l,i)=>({ text: `${l}: ${c.data.datasets[0].data[i]} pac.`, fillStyle: c.data.datasets[0].backgroundColor[i], strokeStyle: c.data.datasets[0].backgroundColor[i], pointStyle: 'circle', index: i })); } } } } }
+    });
+    
+    // GRÁFICO 3: Taxa de Comparecimento
+    charts.c = new Chart(ctx3, {
+        type: 'bar',
+        data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ data: [88,85,90,92,89,91], backgroundColor: '#10b981', borderRadius: 10 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 80, max: 100, grid: { color: '#f1f5f9' }, ticks: { callback: v => v+'%' } }, x: { grid: { display: false } } } }
+    });
+    
+    // GRÁFICO 4: Tempo Médio OCI
+    charts.t = new Chart(ctx4, {
+        type: 'line',
+        data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'Dias', data: [18,16,14,12,11,10], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b', pointBorderWidth: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f1f5f9' }, ticks: { callback: v => v+'d' } }, x: { grid: { display: false } } } }
+    });
+    
+    console.log('✅ Todos os gráficos renderizados com sucesso!');
 }
 
 function switchTab(tabId){
     document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active','text-blue-600');b.classList.add('text-slate-400');});
-    document.getElementById('tab-'+tabId).classList.add('active','text-blue-600');
+    if(document.getElementById('tab-'+tabId)) document.getElementById('tab-'+tabId).classList.add('active','text-blue-600');
     document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-    document.getElementById('content-'+tabId).classList.add('active');
-    document.querySelectorAll('.sidebar-item').forEach(a=>a.classList.remove('active'));
-    document.getElementById('sidebar-'+tabId)?.classList.add('active');
-    document.getElementById('headerTitle').textContent=document.getElementById('tab-'+tabId)?.textContent.trim()||'Painel OCI';
-    setTimeout(renderizarTabelas,100);
+    if(document.getElementById('content-'+tabId)) document.getElementById('content-'+tabId).classList.add('active');
+    document.getElementById('headerTitle').textContent = document.getElementById('tab-'+tabId)?.textContent.trim() || 'Painel OCI';
+    setTimeout(renderizarTabelas, 100);
+    // Se a aba for "visao-geral" e os gráficos não existirem, recria
+    if(tabId === 'visao-geral') setTimeout(renderizarGraficos, 150);
 }
 
-function exportarExcel(tipo){ const dados=getDadosFiltrados(tipo); if(!dados.length)return alert('Nenhum dado.'); const ws=XLSX.utils.json_to_sheet(dados.map(c=>{const p=pacientes.find(x=>x.id===c.paciente_id)||{};const e=especialidades.find(x=>x.id===c.especialidade_id)||{};return{Paciente:p.nome,CPF:formatarCPF(p.cpf),Especialidade:e.nome,Data:formatarData(c.data_agendada),Status:c.status};})); XLSX.writeFile(XLSX.utils.book_new(),`relatorio_${tipo}_${new Date().toISOString().slice(0,10)}.xlsx`); }
+function exportarExcel(tipo){ 
+    const dados=getDadosFiltrados(tipo); 
+    if(!dados.length) return alert('Nenhum dado.');
+    const ws = XLSX.utils.json_to_sheet(dados.map(c=>{
+        const p=pacientes.find(x=>x.id===c.paciente_id)||{};
+        const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
+        return { Paciente:p.nome, CPF:formatarCPF(p.cpf), Especialidade:e.nome, Data:formatarData(c.data_agendada), Status:c.status };
+    }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, `Relatorio_${tipo}`);
+    XLSX.writeFile(wb, `relatorio_${tipo}_${new Date().toISOString().slice(0,10)}.xlsx`); 
+}
 function logout(){ usuarioLogado=null; document.getElementById('screenSistema').classList.remove('active'); document.getElementById('screenSistema').style.display='none'; showScreen('screenLogin'); }
 
 // ============================================
-// EVENTOS
+// EVENTOS E INICIALIZAÇÃO
 // ============================================
 document.addEventListener('DOMContentLoaded',()=>{
     gerarDadosMock();
+    
     document.getElementById('btnLogin').addEventListener('click',()=>{
         const cpf=document.getElementById('loginCPF').value.trim();
         const senha=document.getElementById('loginSenha').value.trim();
@@ -310,21 +456,28 @@ document.addEventListener('DOMContentLoaded',()=>{
             document.getElementById('screenLogin').style.display='none';
             document.getElementById('screenSistema').classList.add('active');
             document.getElementById('screenSistema').style.display='flex';
-            atualizarTudo();
-        }else{alert('❌ CPF ou Senha inválidos!');}
+            atualizarTudo(); // Chama a função que contém os gráficos
+        } else {
+            alert('❌ CPF ou Senha inválidos!');
+        }
     });
+    
     document.getElementById('btnResetAdmin').addEventListener('click',()=>{
         const codigo=document.getElementById('resetAdminCodigo').value.trim();
         const nova=document.getElementById('resetAdminNovaSenha').value;
         const confirma=document.getElementById('resetAdminConfirma').value;
-        if(codigo!==CODIGO_SEGURANCA)return alert('❌ Código incorreto! Use: '+CODIGO_SEGURANCA);
-        if(nova.length<4)return alert('Senha 4+ caracteres!');
-        if(nova!==confirma)return alert('Senhas não conferem!');
+        if(codigo!==CODIGO_SEGURANCA) return alert('❌ Código incorreto! Use: '+CODIGO_SEGURANCA);
+        if(nova.length<4) return alert('Senha 4+ caracteres!');
+        if(nova!==confirma) return alert('Senhas não conferem!');
         alert('✅ Senha redefinida com sucesso!');
         showScreen('screenLogin');
     });
-    ['loginNome','loginCPF','loginSenha'].forEach(id=>{document.getElementById(id)?.addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('btnLogin').click();});});
-    console.log('✅ SISTEMA OCI v5.0 COMPLETO! 🚀');
+    
+    ['loginNome','loginCPF','loginSenha'].forEach(id=>{
+        document.getElementById(id)?.addEventListener('keypress',e=>{if(e.key==='Enter') document.getElementById('btnLogin').click();});
+    });
+    
+    console.log('✅ SISTEMA OCI v5.0 COMPLETO E CORRIGIDO! 🚀');
 });
 </script>
 </body>
