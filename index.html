@@ -184,17 +184,17 @@
 const labelPlugin = {
     id: 'dataLabels',
     afterDraw(chart, args, options) {
-        const { ctx, data, chartArea: { top, bottom, left, right } } = chart;
+        const { ctx, data } = chart;
         
         ctx.save();
         ctx.font = 'bold 14px "Plus Jakarta Sans"';
-        ctx.fillStyle = '#000000';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        ctx.shadowBlur = 4;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
-        // Percorre todos os datasets
+        // Configuração padrão para gráficos de linha e barra (com sombra leve)
+        ctx.shadowColor = 'rgba(0,0,0,0.2)';
+        ctx.shadowBlur = 2;
+        
         chart.data.datasets.forEach((dataset, datasetIndex) => {
             const meta = chart.getDatasetMeta(datasetIndex);
             if (!meta.hidden) {
@@ -204,7 +204,6 @@ const labelPlugin = {
                         let displayValue = value;
                         let suffix = '';
                         
-                        // Adiciona sufixo baseado no tipo do gráfico e label
                         if (chart.config.type === 'line') {
                             if (dataset.label === 'Dias' || dataset.label === 'Tempo Médio') {
                                 suffix = 'd';
@@ -213,25 +212,23 @@ const labelPlugin = {
                             }
                             displayValue = value + suffix;
                             ctx.font = 'bold 13px "Plus Jakarta Sans"';
-                            ctx.fillStyle = '#000000';
-                            // Posiciona acima do ponto
+                            ctx.fillStyle = '#1e293b';
                             ctx.fillText(displayValue, element.x, element.y - 12);
                         } 
                         else if (chart.config.type === 'bar') {
-                            suffix = '%';
-                            displayValue = value + suffix;
+                            displayValue = value + '%';
                             ctx.font = 'bold 15px "Plus Jakarta Sans"';
-                            ctx.fillStyle = '#000000';
-                            // Posiciona dentro da barra (acima do centro)
+                            ctx.fillStyle = '#ffffff';  // Branco para contraste na barra verde
                             ctx.fillText(displayValue, element.x, element.y - 10);
                         }
                         else if (chart.config.type === 'doughnut') {
-                            // Calcula porcentagem para o gráfico de pizza
                             const total = dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((value / total) * 100).toFixed(1);
-                            if (percentage > 6) { // Só mostra se a fatia for grande o suficiente
-                                ctx.font = 'bold 13px "Plus Jakarta Sans"';
-                                ctx.fillStyle = '#000000';
+                            if (percentage > 6) {
+                                // SEM SOMBRA para o gráfico de pizza
+                                ctx.shadowColor = 'transparent';
+                                ctx.font = 'bold 12px "Plus Jakarta Sans"';
+                                ctx.fillStyle = '#1e293b';  // Preto suave, sem sombra
                                 ctx.fillText(percentage + '%', element.x, element.y);
                             }
                         }
