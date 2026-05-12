@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏥 SISTEMA OCI v5.0 - Gráficos com Labels</title>
+    <title>🏥 SISTEMA OCI v5.0 - Gráficos com Labels Brancas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -179,55 +179,6 @@
 
 <script>
 // ============================================
-// PLUGIN PARA LABELS BRANCAS E NEGRITO NOS GRÁFICOS
-// ============================================
-const labelPlugin = {
-    id: 'customLabels',
-    afterDatasetsDraw(chart, args, options) {
-        const { ctx, data, chartArea: { top, bottom, left, right } } = chart;
-        
-        chart.data.datasets.forEach((dataset, datasetIndex) => {
-            const meta = chart.getDatasetMeta(datasetIndex);
-            if (!meta.hidden) {
-                meta.data.forEach((element, index) => {
-                    const value = dataset.data[index];
-                    if (value !== undefined && element.x && element.y) {
-                        // Define o estilo do texto
-                        ctx.save();
-                        ctx.font = 'bold 13px "Plus Jakarta Sans"';
-                        ctx.fillStyle = '#ffffff';
-                        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-                        ctx.shadowBlur = 4;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'bottom';
-                        
-                        let suffix = '';
-                        if (chart.config.type === 'line') {
-                            suffix = (dataset.label === 'Dias' || dataset.label === 'Tempo Médio') ? 'd' : '%';
-                            ctx.fillText(value + suffix, element.x, element.y - 12);
-                        } else if (chart.config.type === 'bar') {
-                            suffix = '%';
-                            ctx.fillText(value + suffix, element.x, element.y - 8);
-                        } else if (chart.config.type === 'doughnut') {
-                            // Para doughnut, calcular porcentagem
-                            const total = dataset.data.reduce((a,b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            ctx.font = 'bold 12px "Plus Jakarta Sans"';
-                            ctx.fillStyle = '#ffffff';
-                            ctx.fillText(percentage + '%', element.x, element.y);
-                        }
-                        ctx.restore();
-                    }
-                });
-            }
-        });
-    }
-};
-
-// Registrar o plugin
-Chart.register(labelPlugin);
-
-// ============================================
 // CONFIGURAÇÃO
 // ============================================
 const db = window.supabase.createClient('https://hheuvkyhwujdrvjvtryg.supabase.co', 'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe');
@@ -269,6 +220,119 @@ function gerarDadosMock(){
             status:st[Math.floor(Math.random()*5)],
             data_agendada:`2025-${String(Math.floor(Math.random()*6)+1).padStart(2,'0')}-${String(Math.floor(Math.random()*28)+1).padStart(2,'0')}`
         }); 
+    }
+}
+
+// ============================================
+// FUNÇÃO PARA ADICIONAR LABELS NOS GRÁFICOS (BRANCO E NEGRITO)
+// ============================================
+function adicionarLabelsNosGraficos() {
+    // Gráfico de Barras - Taxa de Comparecimento
+    const canvasBarra = document.getElementById('chartComparecimento');
+    if(canvasBarra && charts.c) {
+        const ctx = canvasBarra.getContext('2d');
+        const meta = charts.c.getDatasetMeta(0);
+        const valores = [88, 85, 90, 92, 89, 91];
+        
+        ctx.save();
+        ctx.font = 'bold 16px "Plus Jakarta Sans"';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 4;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        
+        for(let i = 0; i < meta.data.length; i++) {
+            const point = meta.data[i];
+            if(point && point.x && point.y) {
+                ctx.fillText(valores[i] + '%', point.x, point.y - 8);
+            }
+        }
+        ctx.restore();
+    }
+    
+    // Gráfico de Linha - Desempenho OCI (2 datasets)
+    const canvasLinha1 = document.getElementById('chartPerformance');
+    if(canvasLinha1 && charts.p) {
+        const ctx = canvasLinha1.getContext('2d');
+        const meta1 = charts.p.getDatasetMeta(0);
+        const meta2 = charts.p.getDatasetMeta(1);
+        const valores1 = [65, 78, 72, 85, 82, 86];
+        const valores2 = [88, 85, 90, 92, 89, 91];
+        
+        ctx.save();
+        ctx.font = 'bold 13px "Plus Jakarta Sans"';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 4;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        
+        for(let i = 0; i < meta1.data.length; i++) {
+            const point1 = meta1.data[i];
+            const point2 = meta2.data[i];
+            if(point1 && point1.x && point1.y) {
+                ctx.fillText(valores1[i] + '%', point1.x, point1.y - 12);
+            }
+            if(point2 && point2.x && point2.y) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(valores2[i] + '%', point2.x, point2.y - 12);
+            }
+        }
+        ctx.restore();
+    }
+    
+    // Gráfico de Linha - Tempo Médio
+    const canvasLinha2 = document.getElementById('chartTempoMedio');
+    if(canvasLinha2 && charts.t) {
+        const ctx = canvasLinha2.getContext('2d');
+        const meta = charts.t.getDatasetMeta(0);
+        const valores = [18, 16, 14, 12, 11, 10];
+        
+        ctx.save();
+        ctx.font = 'bold 13px "Plus Jakarta Sans"';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 4;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        
+        for(let i = 0; i < meta.data.length; i++) {
+            const point = meta.data[i];
+            if(point && point.x && point.y) {
+                ctx.fillText(valores[i] + 'd', point.x, point.y - 12);
+            }
+        }
+        ctx.restore();
+    }
+    
+    // Gráfico Doughnut - Percentuais dentro das fatias
+    const canvasDoughnut = document.getElementById('chartSpecialty');
+    if(canvasDoughnut && charts.s) {
+        const ctx = canvasDoughnut.getContext('2d');
+        const meta = charts.s.getDatasetMeta(0);
+        const valores = charts.s.data.datasets[0].data;
+        const total = valores.reduce((a,b) => a + b, 0);
+        
+        ctx.save();
+        ctx.font = 'bold 14px "Plus Jakarta Sans"';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 4;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        for(let i = 0; i < meta.data.length; i++) {
+            const point = meta.data[i];
+            if(point && point.x && point.y && valores[i] > 0) {
+                const percentage = ((valores[i] / total) * 100).toFixed(1);
+                // Só mostra se a fatia for grande o suficiente
+                if(percentage > 8) {
+                    ctx.fillText(percentage + '%', point.x, point.y);
+                }
+            }
+        }
+        ctx.restore();
     }
 }
 
@@ -408,7 +472,7 @@ function mudarItensPorPagina(tipo){
 }
 
 // ============================================
-// GRÁFICOS ESTILIZADOS COM LABELS BRANCAS
+// GRÁFICOS
 // ============================================
 function renderizarGraficos(){
     // Destroi gráficos antigos se existirem
@@ -428,225 +492,53 @@ function renderizarGraficos(){
         return;
     }
     
-    const ctx1 = canvasPerformance.getContext('2d');
-    const ctx2 = canvasSpecialty.getContext('2d');
-    const ctx3 = canvasComparecimento.getContext('2d');
-    const ctx4 = canvasTempoMedio.getContext('2d');
-    
-    // GRÁFICO 1: Desempenho OCI (Linha)
-    charts.p = new Chart(ctx1, {
+    // GRÁFICO 1: Desempenho OCI
+    charts.p = new Chart(canvasPerformance, {
         type: 'line',
         data: {
             labels: ['Jan','Fev','Mar','Abr','Mai','Jun'],
             datasets: [
-                {
-                    label: 'OCIs Fechadas', 
-                    data: [65,78,72,85,82,86], 
-                    borderColor: '#3b82f6', 
-                    backgroundColor: 'rgba(59,130,246,0.05)', 
-                    borderWidth: 3, 
-                    fill: true, 
-                    tension: 0.3, 
-                    pointRadius: 5, 
-                    pointBackgroundColor: '#3b82f6', 
-                    pointBorderColor: '#fff', 
-                    pointBorderWidth: 2,
-                    pointHoverRadius: 7
-                },
-                {
-                    label: 'Comparecimento', 
-                    data: [88,85,90,92,89,91], 
-                    borderColor: '#10b981', 
-                    borderWidth: 2.5, 
-                    borderDash: [8,4], 
-                    tension: 0.3, 
-                    pointRadius: 4, 
-                    pointBackgroundColor: '#10b981', 
-                    pointBorderColor: '#fff', 
-                    pointBorderWidth: 2
-                }
+                { label: 'OCIs Fechadas', data: [65,78,72,85,82,86], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.05)', borderWidth: 3, fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#3b82f6', pointBorderColor: '#fff', pointBorderWidth: 2 },
+                { label: 'Comparecimento', data: [88,85,90,92,89,91], borderColor: '#10b981', borderWidth: 2.5, borderDash: [8,4], tension: 0.3, pointRadius: 4, pointBackgroundColor: '#10b981', pointBorderColor: '#fff', pointBorderWidth: 2 }
             ]
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            plugins: { 
-                legend: { 
-                    position: 'top', 
-                    align: 'end',
-                    labels: { 
-                        usePointStyle: true, 
-                        boxWidth: 10,
-                        font: { weight: 'bold', size: 12, family: 'Plus Jakarta Sans' },
-                        padding: 15,
-                        color: '#1e293b'
-                    } 
-                },
-                tooltip: { backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#cbd5e1', padding: 10, cornerRadius: 8 }
-            }, 
-            scales: { 
-                y: { 
-                    grid: { color: '#e2e8f0', drawBorder: false }, 
-                    ticks: { callback: v => v+'%', font: { weight: 'bold', size: 11, family: 'Plus Jakarta Sans' }, color: '#475569' },
-                    title: { display: true, text: 'Percentual (%)', color: '#64748b', font: { size: 11, family: 'Plus Jakarta Sans' } }
-                }, 
-                x: { 
-                    grid: { display: false }, 
-                    ticks: { font: { weight: 'bold', size: 11, family: 'Plus Jakarta Sans' }, color: '#475569' }
-                } 
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 10, font: { weight: 'bold', size: 12 }, padding: 15 } }, tooltip: { backgroundColor: '#1e293b', titleColor: '#fff' } }, scales: { y: { grid: { color: '#e2e8f0' }, ticks: { callback: v => v+'%', font: { weight: 'bold' } } }, x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } } }
     });
     
-    // GRÁFICO 2: Distribuição no Período (Doughnut)
+    // GRÁFICO 2: Distribuição (Doughnut)
     const por={};
-    consultas.forEach(c=>{
-        const e=especialidades.find(x=>x.id===c.especialidade_id);
-        por[e?e.nome:'Outros'] = (por[e?e.nome:'Outros']||0)+1;
-    });
-    
+    consultas.forEach(c=>{ const e=especialidades.find(x=>x.id===c.especialidade_id); por[e?e.nome:'Outros'] = (por[e?e.nome:'Outros']||0)+1; });
     const labelsDist = Object.keys(por);
     const dataDist = Object.values(por);
     const totalDist = dataDist.reduce((a,b)=>a+b,0);
     const colorsDist = ['#3b82f6', '#8b5cf6', '#ef4444', '#f59e0b', '#ec4899'];
     
-    charts.s = new Chart(ctx2, {
+    charts.s = new Chart(canvasSpecialty, {
         type: 'doughnut',
-        data: {
-            labels: labelsDist,
-            datasets: [{ 
-                data: dataDist, 
-                backgroundColor: colorsDist.slice(0, labelsDist.length),
-                borderWidth: 0,
-                hoverOffset: 10,
-                cutout: '65%'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: { weight: 'bold', size: 11, family: 'Plus Jakarta Sans' },
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        padding: 14,
-                        color: '#1e293b',
-                        generateLabels: function(chart) {
-                            const data = chart.data;
-                            if (data.labels.length && data.datasets.length) {
-                                return data.labels.map((label, i) => {
-                                    const value = data.datasets[0].data[i];
-                                    const percentage = ((value / totalDist) * 100).toFixed(1);
-                                    return {
-                                        text: `${label}: ${value} (${percentage}%)`,
-                                        fillStyle: data.datasets[0].backgroundColor[i],
-                                        strokeStyle: data.datasets[0].backgroundColor[i],
-                                        pointStyle: 'circle',
-                                        index: i
-                                    };
-                                });
-                            }
-                            return [];
-                        }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const value = context.raw;
-                            const percentage = ((value / totalDist) * 100).toFixed(1);
-                            return `${context.label}: ${value} pacientes (${percentage}%)`;
-                        }
-                    }
-                }
-            }
-        }
+        data: { labels: labelsDist, datasets: [{ data: dataDist, backgroundColor: colorsDist.slice(0, labelsDist.length), borderWidth: 0, cutout: '65%' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold', size: 11 }, usePointStyle: true, generateLabels: function(chart) { return chart.data.labels.map((label, i) => ({ text: `${label}: ${chart.data.datasets[0].data[i]} (${((chart.data.datasets[0].data[i]/totalDist)*100).toFixed(1)}%)`, fillStyle: chart.data.datasets[0].backgroundColor[i], strokeStyle: chart.data.datasets[0].backgroundColor[i], pointStyle: 'circle', index: i })); } } } } }
     });
     
     // GRÁFICO 3: Taxa de Comparecimento (Barras)
-    charts.c = new Chart(ctx3, {
+    charts.c = new Chart(canvasComparecimento, {
         type: 'bar',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-            datasets: [{ 
-                data: [88, 85, 90, 92, 89, 91], 
-                backgroundColor: '#10b981',
-                borderRadius: 8,
-                barPercentage: 0.65,
-                categoryPercentage: 0.8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { 
-                    callbacks: { label: (ctx) => `Taxa: ${ctx.raw}%` }
-                }
-            },
-            scales: {
-                y: { 
-                    min: 70, 
-                    max: 100, 
-                    grid: { color: '#e2e8f0' }, 
-                    ticks: { callback: v => v+'%', font: { weight: 'bold', family: 'Plus Jakarta Sans' }, stepSize: 5 },
-                    title: { display: true, text: 'Percentual (%)', color: '#64748b', font: { family: 'Plus Jakarta Sans' } }
-                },
-                x: { 
-                    grid: { display: false },
-                    ticks: { font: { weight: 'bold', family: 'Plus Jakarta Sans' } }
-                }
-            },
-            layout: { padding: { top: 25, bottom: 10 } }
-        }
+        data: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], datasets: [{ data: [88, 85, 90, 92, 89, 91], backgroundColor: '#10b981', borderRadius: 8, barPercentage: 0.65 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `Taxa: ${ctx.raw}%` } } }, scales: { y: { min: 70, max: 100, grid: { color: '#e2e8f0' }, ticks: { callback: v => v+'%', font: { weight: 'bold' } } }, x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } }, layout: { padding: { top: 25 } } }
     });
     
-    // GRÁFICO 4: Tempo Médio OCI (Linha)
-    charts.t = new Chart(ctx4, {
+    // GRÁFICO 4: Tempo Médio
+    charts.t = new Chart(canvasTempoMedio, {
         type: 'line',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-            datasets: [{ 
-                label: 'Dias', 
-                data: [18, 16, 14, 12, 11, 10], 
-                borderColor: '#f59e0b', 
-                backgroundColor: 'rgba(245,158,11,0.05)', 
-                borderWidth: 3, 
-                fill: true, 
-                tension: 0.3, 
-                pointRadius: 5, 
-                pointBackgroundColor: '#f59e0b', 
-                pointBorderColor: '#fff', 
-                pointBorderWidth: 2,
-                pointHoverRadius: 7
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { callbacks: { label: (ctx) => `Média: ${ctx.raw} dias` } }
-            },
-            scales: {
-                y: { 
-                    grid: { color: '#e2e8f0' }, 
-                    ticks: { callback: v => v+'d', font: { weight: 'bold', family: 'Plus Jakarta Sans' } },
-                    title: { display: true, text: 'Dias', color: '#64748b', font: { family: 'Plus Jakarta Sans' } }
-                },
-                x: { 
-                    grid: { display: false },
-                    ticks: { font: { weight: 'bold', family: 'Plus Jakarta Sans' } }
-                }
-            }
-        }
+        data: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], datasets: [{ label: 'Dias', data: [18, 16, 14, 12, 11, 10], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.05)', borderWidth: 3, fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#f59e0b', pointBorderColor: '#fff', pointBorderWidth: 2 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `Média: ${ctx.raw} dias` } } }, scales: { y: { grid: { color: '#e2e8f0' }, ticks: { callback: v => v+'d', font: { weight: 'bold' } } }, x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } } }
     });
     
-    console.log('✅ Gráficos com labels brancas e negrito renderizados!');
+    // IMPORTANTE: Aguardar os gráficos renderizarem e adicionar as labels
+    setTimeout(() => {
+        adicionarLabelsNosGraficos();
+    }, 300);
+    
+    console.log('✅ Gráficos renderizados!');
 }
 
 function switchTab(tabId){
@@ -656,7 +548,10 @@ function switchTab(tabId){
     if(document.getElementById('content-'+tabId)) document.getElementById('content-'+tabId).classList.add('active');
     document.getElementById('headerTitle').textContent = document.getElementById('tab-'+tabId)?.textContent.trim() || 'Painel OCI';
     setTimeout(renderizarTabelas, 100);
-    if(tabId === 'visao-geral') setTimeout(renderizarGraficos, 150);
+    if(tabId === 'visao-geral') { 
+        setTimeout(renderizarGraficos, 150);
+        setTimeout(adicionarLabelsNosGraficos, 500);
+    }
 }
 
 function exportarExcel(tipo){ 
@@ -687,6 +582,8 @@ document.addEventListener('DOMContentLoaded',()=>{
             document.getElementById('screenSistema').classList.add('active');
             document.getElementById('screenSistema').style.display='flex';
             atualizarTudo();
+            // Garantir que as labels apareçam após tudo carregar
+            setTimeout(() => adicionarLabelsNosGraficos(), 800);
         } else {
             alert('❌ CPF ou Senha inválidos!');
         }
@@ -707,7 +604,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         document.getElementById(id)?.addEventListener('keypress',e=>{if(e.key==='Enter') document.getElementById('btnLogin').click();});
     });
     
-    console.log('✅ SISTEMA OCI v5.0 - Plugin de labels registrado!');
+    console.log('✅ SISTEMA OCI v5.0 - Labels brancas e negrito dentro dos gráficos! 🚀');
 });
 </script>
 </body>
