@@ -213,7 +213,7 @@ const labelPlugin = {
                             }
                             displayValue = value + suffix;
                             ctx.font = 'bold 13px "Plus Jakarta Sans"';
-                            ctx.fillStyle = '#ffffff';
+                            ctx.fillStyle = '#000000';
                             // Posiciona acima do ponto
                             ctx.fillText(displayValue, element.x, element.y - 12);
                         } 
@@ -221,7 +221,7 @@ const labelPlugin = {
                             suffix = '%';
                             displayValue = value + suffix;
                             ctx.font = 'bold 15px "Plus Jakarta Sans"';
-                            ctx.fillStyle = '#ffffff';
+                            ctx.fillStyle = '#000000';
                             // Posiciona dentro da barra (acima do centro)
                             ctx.fillText(displayValue, element.x, element.y - 10);
                         }
@@ -231,7 +231,7 @@ const labelPlugin = {
                             const percentage = ((value / total) * 100).toFixed(1);
                             if (percentage > 6) { // Só mostra se a fatia for grande o suficiente
                                 ctx.font = 'bold 13px "Plus Jakarta Sans"';
-                                ctx.fillStyle = '#ffffff';
+                                ctx.fillStyle = '#000000';
                                 ctx.fillText(percentage + '%', element.x, element.y);
                             }
                         }
