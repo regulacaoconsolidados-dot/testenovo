@@ -250,11 +250,13 @@ document.addEventListener('DOMContentLoaded',()=>{
         const cpf=document.getElementById('loginCPF').value.trim();
         const senha=document.getElementById('loginSenha').value.trim();
         if(cpf==='12345678909'&&senha==='admin'){
-            document.getElementById('screenLogin').style.display='none';
-            document.getElementById('screenSistema').classList.add('active'); document.getElementById('screenSistema').style.display='flex';
-            atualizarTudo();
-        }else{alert('❌ CPF ou Senha inválidos!');}
-    });
+           document.getElementById('screenLogin').style.display='none';
+           document.getElementById('screenSistema').classList.add('active');
+           document.getElementById('screenSistema').style.display='flex';
+    atualizarTudo();
+} else {
+    alert('❌ CPF ou Senha inválidos!');
+}
     document.getElementById('btnResetAdmin').addEventListener('click',()=>{
         if(document.getElementById('resetAdminCodigo').value===CODIGO_SEGURANCA){alert('✅ Senha redefinida!');showScreen('screenLogin');}
         else{alert('❌ Código incorreto!');}
