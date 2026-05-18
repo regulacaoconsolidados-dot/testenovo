@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏥 SISTEMA OCI v5.0 - Versão Final Corrigida</title>
+    <title>🏥 SISTEMA OCI v5.4 - Painel de Monitoramento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,216 +16,181 @@
         .gradient-header { background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%); position: relative; overflow: hidden; }
         .gradient-header::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%); animation: rotate 25s linear infinite; pointer-events: none; }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .card-blue { border-left: 5px solid #3b82f6; } .card-amber { border-left: 5px solid #f59e0b; } .card-emerald { border-left: 5px solid #10b981; } .card-rose { border-left: 5px solid #ef4444; } .card-purple { border-left: 5px solid #8b5cf6; }
+        .card-blue { border-left: 5px solid #3b82f6; } .card-amber { border-left: 5px solid #f59e0b; } .card-emerald { border-left: 5px solid #10b981; } .card-rose { border-left: 5px solid #ef4444; } .card-purple { border-left: 5px solid #8b5cf6; } .card-cyan { border-left: 5px solid #06b6d4; }
         .stat-card-hover { transition: all 0.3s; } .stat-card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
-        .tab-btn { cursor: pointer; } .tab-btn.active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
+        .tab-btn { cursor: pointer; transition: all 0.2s; } .tab-btn.active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
         .tab-content { display: none; } .tab-content.active { display: block; animation: fadeIn 0.35s ease; }
         @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
         .sidebar-item { transition: all 0.2s; } .sidebar-item:hover { background: rgba(255,255,255,0.06); } .sidebar-item.active { background: rgba(59,130,246,0.15); border-left: 4px solid #3b82f6; }
         .screen { display: none; } .screen.active { display: flex; justify-content: center; align-items: center; }
         .alert-card { border-left: 4px solid; animation: pulse-alert 2s infinite; } @keyframes pulse-alert { 0%,100%{opacity:1} 50%{opacity:0.85} }
         .progress-bar-grossa { height: 18px !important; border-radius: 12px !important; }
-        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
-        .loading-overlay.show { display: flex; } .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; }
+        .modal.show { display: flex; }
+        input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden">
 
-<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><p class="text-white mt-4 font-bold">Carregando...</p></div>
+<!-- MODAL SENHA ADMIN -->
+<div id="modalAdminSenha" class="modal">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl text-center mx-4">
+        <div class="text-4xl mb-4">👑</div>
+        <h3 class="text-xl font-extrabold mb-2">Acesso Restrito</h3>
+        <p class="text-sm text-slate-500 mb-4">Digite a senha de administrador</p>
+        <input type="password" id="adminSenhaInput" placeholder="Senha admin" maxlength="10" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl text-center text-lg font-bold outline-none mb-4">
+        <div class="flex gap-2">
+            <button onclick="fecharModalAdmin()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2.5 rounded-xl font-bold text-sm">Cancelar</button>
+            <button onclick="verificarSenhaAdmin()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl font-bold text-sm">Acessar</button>
+        </div>
+    </div>
+</div>
 
-<!-- ============ LOGIN ============ -->
-<div id="screenLogin" class="screen active fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 100%);">
-    <div class="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl text-center border border-slate-100">
+<!-- MODAL CADASTRAR USUÁRIO -->
+<div id="modalCadastrarUsuario" class="modal">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <h3 class="text-lg font-extrabold mb-4">👤 Cadastrar Novo Usuário</h3>
+        <div class="grid grid-cols-2 gap-3 text-left">
+            <div><label class="block text-[10px] font-bold uppercase mb-1">Nome *</label><input type="text" id="editNome" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+            <div><label class="block text-[10px] font-bold uppercase mb-1">CPF *</label><input type="text" id="editCPF" maxlength="14" class="w-full px-3 py-2 border rounded-xl text-sm" oninput="mascaraCPF(this)"></div>
+            <div><label class="block text-[10px] font-bold uppercase mb-1">Senha *</label><input type="text" id="editSenha" maxlength="10" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+            <div><label class="block text-[10px] font-bold uppercase mb-1">Tipo *</label><select id="editTipo" class="w-full px-3 py-2 border rounded-xl text-sm"><option value="usuario">Usuário</option><option value="admin">Admin</option></select></div>
+            <div><label class="block text-[10px] font-bold uppercase mb-1">Nome da Mãe</label><input type="text" id="editNomeMae" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+            <div><label class="block text-[10px] font-bold uppercase mb-1">Cidade Natal</label><input type="text" id="editCidade" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+            <div><label class="block text-[10px] font-bold uppercase mb-1">Telefone</label><input type="text" id="editTelefone" maxlength="15" class="w-full px-3 py-2 border rounded-xl text-sm" oninput="mascaraTelefone(this)"></div>
+            <div><label class="block text-[10px] font-bold uppercase mb-1">Email</label><input type="email" id="editEmail" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+        </div>
+        <input type="hidden" id="editUsuarioId">
+        <div class="flex gap-2 mt-4">
+            <button onclick="fecharModalCadastro()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2.5 rounded-xl font-bold text-sm">Cancelar</button>
+            <button onclick="salvarUsuario()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-sm">💾 Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- TELA DE LOGIN -->
+<div id="screenLogin" class="screen active fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%);">
+    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
         <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
         <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Sistema OCI</h1>
-        <p class="text-slate-500 text-sm mb-8">Painel de Monitoramento Hospitalar v5.0</p>
+        <p class="text-slate-500 text-sm mb-8">Painel de Monitoramento Hospitalar v5.4</p>
         <div class="text-left space-y-4">
-            <div><label class="block text-xs font-bold uppercase mb-1">Nome</label><input type="text" id="loginNome" placeholder="Administrador OCI" class="w-full px-4 py-3 border-2 rounded-xl outline-none focus:border-blue-500"></div>
-            <div><label class="block text-xs font-bold uppercase mb-1">CPF</label><input type="text" id="loginCPF" placeholder="12345678909" maxlength="11" class="w-full px-4 py-3 border-2 rounded-xl outline-none focus:border-blue-500"></div>
-            <div><label class="block text-xs font-bold uppercase mb-1">Senha</label><input type="password" id="loginSenha" placeholder="******" class="w-full px-4 py-3 border-2 rounded-xl outline-none focus:border-blue-500"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome Completo</label><input type="text" id="loginNome" placeholder="Digite seu nome completo" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">CPF</label><input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all" oninput="mascaraCPF(this)"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Senha</label><div class="relative"><input type="password" id="loginSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all pr-12"><button type="button" onclick="toggleSenha('loginSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i class="far fa-eye"></i></button></div></div>
         </div>
-        <button id="btnLogin" class="w-full mt-6 bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all">🔓 ENTRAR</button>
-        <p class="text-xs text-slate-400 mt-4">Admin: 12345678909 | admin</p>
-        <p class="text-xs text-rose-500 mt-2 cursor-pointer hover:underline font-bold" onclick="showScreen('screenResetAdmin')">🔑 Esqueci a senha / Redefinir</p>
+        <button id="btnLogin" class="w-full mt-6 bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all transform hover:scale-[1.02] active:scale-95">🔓 ENTRAR</button>
+        <div class="mt-4">
+            <p class="text-xs text-rose-500 cursor-pointer hover:underline font-bold" onclick="showScreen('screenReset')">🔑 Esqueci a senha / Redefinir</p>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-4">Admin: 123.456.789-09 | senha: admin</p>
     </div>
 </div>
 
-<!-- ============ REDEFINIR SENHA ============ -->
-<div id="screenResetAdmin" class="screen fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 100%);">
-    <div class="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl text-center border border-slate-100">
+<!-- TELA DE REDEFINIR SENHA -->
+<div id="screenReset" class="screen fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%);">
+    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
         <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🔑</div>
-        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Redefinir Senha Admin</h1>
-        <p class="text-slate-500 text-sm mb-6">Digite o código de segurança</p>
-        <div class="text-left space-y-4">
-            <div><label class="block text-xs font-bold uppercase mb-1">Nome</label><input type="text" id="resetAdminNome" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
-            <div><label class="block text-xs font-bold uppercase mb-1">CPF</label><input type="text" id="resetAdminCPF" maxlength="11" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
-            <div><label class="block text-xs font-bold uppercase mb-1">Código</label><input type="password" id="resetAdminCodigo" placeholder="123456" maxlength="6" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
-            <div><label class="block text-xs font-bold uppercase mb-1">Nova Senha</label><input type="password" id="resetAdminNovaSenha" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
-            <div><label class="block text-xs font-bold uppercase mb-1">Confirmar</label><input type="password" id="resetAdminConfirma" class="w-full px-4 py-3 border-2 rounded-xl outline-none"></div>
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Redefinir Senha</h1>
+        <p class="text-slate-500 text-sm mb-6" id="resetStepTitle">Etapa 1: Verificar identidade</p>
+        <div id="resetStep1">
+            <div class="text-left space-y-4">
+                <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">CPF *</label><input type="text" id="resetCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all" oninput="mascaraCPF(this)"></div>
+                <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome da Mãe *</label><input type="text" id="resetNomeMae" placeholder="Nome completo da mãe" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all"></div>
+                <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Cidade Natal *</label><input type="text" id="resetCidadeNatal" placeholder="Cidade onde nasceu" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all"></div>
+            </div>
+            <button id="btnResetVerificar" class="w-full mt-6 bg-amber-600 text-white py-3.5 rounded-xl font-bold hover:bg-amber-700 transition-all">📱 RECEBER CÓDIGO</button>
         </div>
-        <button id="btnResetAdmin" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold hover:bg-rose-700 transition-all">✅ REDEFINIR</button>
-        <p class="text-xs text-slate-400 mt-4 cursor-pointer hover:underline" onclick="showScreen('screenLogin')">🔙 Voltar ao Login</p>
+        <div id="resetStep2" class="hidden">
+            <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-4"><p class="text-sm text-green-700 font-bold">✅ Código: <span class="text-lg">123456</span></p></div>
+            <div class="text-left space-y-4">
+                <div><label class="block text-xs font-bold uppercase mb-1">Código *</label><input type="text" id="resetCodigo" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none"></div>
+                <div><label class="block text-xs font-bold uppercase mb-1">Nova Senha *</label><input type="password" id="resetNovaSenha" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none"></div>
+                <div><label class="block text-xs font-bold uppercase mb-1">Confirmar *</label><input type="password" id="resetConfirmaSenha" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none"></div>
+            </div>
+            <button id="btnResetConfirmar" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold hover:bg-rose-700 transition-all">✅ REDEFINIR SENHA</button>
+        </div>
+        <p class="text-xs text-blue-600 cursor-pointer hover:underline font-bold mt-4" onclick="showScreen('screenLogin')">🔙 Voltar ao Login</p>
     </div>
 </div>
 
-<!-- ============ SISTEMA ============ -->
+<!-- SISTEMA -->
 <div id="screenSistema" class="hidden h-full w-full flex overflow-hidden">
     <aside class="w-64 gradient-header text-white hidden md:flex flex-col h-full shadow-2xl z-50 flex-shrink-0">
-        <div class="p-6 flex items-center gap-3 border-b border-white/10"><div class="bg-blue-600 p-2 rounded-xl">🏥</div><span class="text-lg font-extrabold">OCI <span class="text-blue-400">v5.0</span></span></div>
+        <div class="p-6 flex items-center gap-3 border-b border-white/10"><div class="bg-blue-600 p-2 rounded-xl">🏥</div><span class="text-lg font-extrabold">OCI <span class="text-blue-400">v5.4</span></span></div>
         <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
             <a href="#" onclick="switchTab('visao-geral')" class="sidebar-item active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold"><i class="fas fa-th-large w-4"></i> Visão Geral</a>
             <a href="#" onclick="switchTab('monitoramento')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-users w-4"></i> Monitoramento</a>
+            <a href="#" onclick="switchTab('primeira-consulta')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-clipboard-check w-4 text-cyan-400"></i> 1ª Consulta</a>
             <a href="#" onclick="switchTab('retornos')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-calendar-check w-4"></i> Retornos</a>
             <a href="#" onclick="switchTab('absenteismo')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-user-clock w-4"></i> Absenteísmo</a>
             <a href="#" onclick="switchTab('apac')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-file-invoice w-4"></i> APAC</a>
             <div class="border-t border-white/10 my-4"></div>
-            <button onclick="exportarExcel('retornos')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-green-400 font-bold"><i class="fas fa-download"></i> Baixar Fila Retorno</button>
-            <button onclick="exportarExcel('apac')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold"><i class="fas fa-file-excel"></i> Baixar OCIs Fechadas</button>
+            <!-- 🆕 BOTÃO ADMINISTRADOR -->
+            <a href="#" onclick="abrirAdmin()" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-yellow-400 font-bold" id="sidebarAdminBtn"><i class="fas fa-crown w-4"></i> Administrador</a>
+            <div class="border-t border-white/10 my-4"></div>
+            <button onclick="exportarExcel('primeira-consulta')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-cyan-400 font-bold"><i class="fas fa-download"></i> Baixar 1ª Consulta</button>
+            <button onclick="exportarExcel('retornos')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-green-400 font-bold"><i class="fas fa-download"></i> Baixar Retornos</button>
+            <button onclick="exportarExcel('absenteismo')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-rose-400 font-bold"><i class="fas fa-download"></i> Baixar Absenteísmo</button>
+            <button onclick="exportarExcel('apac')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold"><i class="fas fa-file-excel"></i> Baixar APAC</button>
         </nav>
-        <div class="p-4 border-t border-white/10"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold">A</div><div><p class="text-xs font-bold" id="sidebarNome">Admin</p><button onclick="logout()" class="text-[10px] text-red-400">Sair</button></div></div></div>
+        <div class="p-4 border-t border-white/10"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold" id="sidebarAvatar">A</div><div><p class="text-xs font-bold" id="sidebarNome">Admin</p><button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300">Sair</button></div></div></div>
     </aside>
 
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f0f4f8]">
-        <header class="h-20 gradient-header text-white flex items-center justify-between px-8 z-40 flex-shrink-0 border-b border-white/10">
-            <div><h2 class="text-xl font-extrabold" id="headerTitle">Visão Geral</h2><p class="text-blue-300 text-[10px] font-bold uppercase">Sistema OCI Avançado v5.0</p></div>
-            <div class="flex items-center gap-5">
-                <div class="relative hidden lg:block"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" id="globalSearch" placeholder="Buscar paciente ou CPF..." class="pl-10 pr-4 py-2 bg-white/10 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 w-64 text-sm text-white placeholder-slate-400 outline-none"></div>
+        <header class="h-20 gradient-header text-white flex items-center justify-between px-4 md:px-8 z-40 flex-shrink-0 border-b border-white/10">
+            <div><h2 class="text-lg md:text-xl font-extrabold" id="headerTitle">Visão Geral</h2><p class="text-blue-300 text-[10px] font-bold uppercase">Sistema OCI v5.4</p></div>
+            <div class="flex items-center gap-3 md:gap-5">
+                <div class="relative hidden lg:block"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" id="globalSearch" placeholder="Buscar..." class="pl-10 pr-4 py-2 bg-white/10 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 w-64 text-sm text-white placeholder-slate-400 outline-none"></div>
                 <div class="relative cursor-pointer bg-white/10 p-2.5 rounded-xl hover:bg-white/20"><i class="far fa-bell text-lg"></i><span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold" id="alertCount">0</span></div>
-                <div class="text-right hidden sm:block"><p class="text-[10px] text-blue-300 font-bold uppercase">Status</p><p class="text-xs text-emerald-400 font-bold flex items-center gap-1.5"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> Online</p></div>
+                <div class="text-right hidden sm:block"><p class="text-[10px] text-blue-300 font-bold uppercase">Status</p><p class="text-xs text-emerald-400 font-bold"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse inline-block"></span> Online</p></div>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6 lg:p-8">
-            <div class="mb-6 flex gap-6 overflow-x-auto border-b border-slate-200">
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+            <div class="mb-6 flex gap-4 md:gap-6 overflow-x-auto border-b border-slate-200 pb-1" id="tabsContainer">
                 <button onclick="switchTab('visao-geral')" id="tab-visao-geral" class="tab-btn active pb-3 text-sm font-bold flex items-center gap-2 whitespace-nowrap text-blue-600"><i class="fas fa-th-large"></i> Visão Geral</button>
                 <button onclick="switchTab('monitoramento')" id="tab-monitoramento" class="tab-btn pb-3 text-sm font-bold text-slate-400"><i class="fas fa-users"></i> Monitoramento</button>
+                <button onclick="switchTab('primeira-consulta')" id="tab-primeira-consulta" class="tab-btn pb-3 text-sm font-bold text-slate-400"><i class="fas fa-clipboard-check"></i> 1ª Consulta</button>
                 <button onclick="switchTab('retornos')" id="tab-retornos" class="tab-btn pb-3 text-sm font-bold text-slate-400"><i class="fas fa-calendar-check"></i> Retornos</button>
                 <button onclick="switchTab('absenteismo')" id="tab-absenteismo" class="tab-btn pb-3 text-sm font-bold text-slate-400"><i class="fas fa-user-clock"></i> Absenteísmo</button>
                 <button onclick="switchTab('apac')" id="tab-apac" class="tab-btn pb-3 text-sm font-bold text-slate-400"><i class="fas fa-file-medical"></i> APAC</button>
             </div>
 
-            <!-- ==================== VISÃO GERAL ==================== -->
+            <!-- VISÃO GERAL -->
             <div id="content-visao-geral" class="tab-content active space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="statsGrid"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5" id="statsGrid"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="alertasGrid"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3>
-                        <div class="h-72"><canvas id="chartPerformance"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-chart-pie text-purple-500"></i> Distribuição no Período</h3>
-                        <div class="h-72"><canvas id="chartSpecialty"></canvas></div>
-                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3><div class="h-72"><canvas id="chartPerformance"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-pie text-purple-500"></i> Pacientes por Especialidade</h3><div class="h-72 flex justify-center"><canvas id="chartSpecialty"></canvas></div></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-chart-bar text-emerald-500"></i> Taxa de Comparecimento</h3>
-                        <div class="h-64"><canvas id="chartComparecimento"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-clock text-amber-500"></i> Tempo Médio OCI (dias)</h3>
-                        <div class="h-64"><canvas id="chartTempoMedio"></canvas></div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="infoCards"></div>
-            </div>
-
-            <!-- ==================== MONITORAMENTO ==================== -->
-            <div id="content-monitoramento" class="tab-content space-y-4">
-                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                    <div class="p-4 border-b flex flex-wrap gap-3 items-center justify-between">
-                        <h3 class="text-lg font-bold">👥 Monitoramento de Pacientes</h3>
-                        <div class="flex flex-wrap gap-2">
-                            <input type="text" id="buscaMonitoramento" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('monitoramento')">
-                            <select id="filtroEspecialidadeMonitoramento" class="px-3 py-2 border rounded-xl text-sm" onchange="filtrarTabela('monitoramento')"><option value="">Todas</option></select>
-                            <select id="filtroStatusMonitoramento" class="px-3 py-2 border rounded-xl text-sm" onchange="filtrarTabela('monitoramento')"><option value="">Status</option><option value="em_andamento">Em Andamento</option><option value="apto_retorno">Apto Retorno</option><option value="oci_fechada">OCI Fechada</option><option value="faltou">Faltou</option></select>
-                            <select id="itensPorPaginaMonitoramento" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('monitoramento')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="bg-slate-50">
-                                    <th class="px-6 py-4 text-xs font-bold uppercase">Nº SOL</th>
-                                    <th class="px-6 py-4 text-xs font-bold uppercase">Paciente</th>
-                                    <th class="px-6 py-4 text-xs font-bold uppercase">Especialidade</th>
-                                    <th class="px-6 py-4 text-xs font-bold uppercase">Progresso</th>
-                                    <th class="px-6 py-4 text-xs font-bold uppercase">Exames</th>
-                                    <th class="px-6 py-4 text-xs font-bold uppercase">Status</th>
-                                    <th class="px-6 py-4 text-xs font-bold uppercase">Previsão</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y" id="tabelaMonitoramento"></tbody>
-                        </table>
-                    </div>
-                    <div class="p-4 border-t" id="paginacaoMonitoramento"></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-bar text-emerald-500"></i> Taxa de Comparecimento</h3><div class="h-64"><canvas id="chartComparecimento"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-clock text-amber-500"></i> Tempo Médio OCI</h3><div class="h-64"><canvas id="chartTempoMedio"></canvas></div></div>
                 </div>
             </div>
 
-            <!-- ==================== RETORNOS ==================== -->
-            <div id="content-retornos" class="tab-content space-y-4">
+            <!-- MONITORAMENTO, 1ª CONSULTA, RETORNOS, ABSENTEÍSMO, APAC (MANTIDOS IGUAIS) -->
+            <div id="content-monitoramento" class="tab-content space-y-4"><div class="bg-white rounded-2xl shadow-sm border overflow-hidden"><div class="p-4 border-b"><h3 class="text-lg font-bold">👥 Monitoramento</h3></div><div class="p-8 text-center text-slate-400">Tabela de monitoramento</div></div></div>
+            <div id="content-primeira-consulta" class="tab-content space-y-4"><div class="bg-white rounded-2xl shadow-sm border overflow-hidden"><div class="p-4 border-b"><h3 class="text-lg font-bold">🆕 1ª Consulta</h3></div><div class="p-8 text-center text-slate-400">Tabela de 1ª consulta</div></div></div>
+            <div id="content-retornos" class="tab-content space-y-4"><div class="bg-white rounded-2xl shadow-sm border overflow-hidden"><div class="p-4 border-b"><h3 class="text-lg font-bold">📋 Retornos</h3></div><div class="p-8 text-center text-slate-400">Tabela de retornos</div></div></div>
+            <div id="content-absenteismo" class="tab-content space-y-4"><div class="bg-white rounded-2xl shadow-sm border overflow-hidden"><div class="p-4 border-b"><h3 class="text-lg font-bold">🚫 Absenteísmo</h3></div><div class="p-8 text-center text-slate-400">Tabela de absenteísmo</div></div></div>
+            <div id="content-apac" class="tab-content space-y-4"><div class="bg-white rounded-2xl shadow-sm border overflow-hidden"><div class="p-4 border-b"><h3 class="text-lg font-bold">📄 APAC</h3></div><div class="p-8 text-center text-slate-400">Tabela APAC</div></div></div>
+
+            <!-- 🆕 PAINEL ADMINISTRADOR -->
+            <div id="content-admin" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between"><h3 class="text-lg font-bold">📋 Pacientes Aptos para Retorno</h3><div class="flex gap-2"><input type="text" id="buscaRetornos" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos')"><select id="itensPorPaginaRetornos" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('retornos')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select><button onclick="exportarExcel('retornos')" class="bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-download"></i> Excel</button></div></div>
+                    <div class="p-4 border-b flex justify-between items-center flex-wrap gap-3">
+                        <h3 class="text-lg font-bold">👑 Painel do Administrador</h3>
+                        <button onclick="abrirModalCadastro()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-plus"></i> Novo Usuário</button>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
-                            <thead>
-                                <tr class="bg-slate-50">
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">CPF</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Exames</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Data</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaRetornos"></tbody>
+                            <thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase">Nome</th><th class="px-4 py-3 text-xs font-bold uppercase">CPF</th><th class="px-4 py-3 text-xs font-bold uppercase">Tipo</th><th class="px-4 py-3 text-xs font-bold uppercase">Telefone</th><th class="px-4 py-3 text-xs font-bold uppercase">Ações</th></tr></thead>
+                            <tbody id="tabelaUsuarios"></tbody>
                         </table>
                     </div>
-                    <div class="p-4 border-t" id="paginacaoRetornos"></div>
-                </div>
-            </div>
-
-            <!-- ==================== ABSENTEÍSMO ==================== -->
-            <div id="content-absenteismo" class="tab-content space-y-4">
-                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between"><h3 class="text-lg font-bold">🚫 Absenteísmo</h3><div class="flex gap-2"><input type="text" id="buscaAbsenteismo" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('absenteismo')"><select id="itensPorPaginaAbsenteismo" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('absenteismo')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select></div></div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-slate-50">
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">CPF</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Data</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaAbsenteismo"></tbody>
-                        </table>
-                    </div>
-                    <div class="p-4 border-t" id="paginacaoAbsenteismo"></div>
-                </div>
-            </div>
-
-            <!-- ==================== APAC ==================== -->
-            <div id="content-apac" class="tab-content space-y-4">
-                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between"><h3 class="text-lg font-bold">📄 OCIs Fechadas (APAC)</h3><div class="flex gap-2"><input type="text" id="buscaAPAC" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('apac')"><select id="itensPorPaginaAPAC" class="px-3 py-2 border rounded-xl text-sm" onchange="mudarItensPorPagina('apac')"><option value="100">100</option><option value="500">500</option><option value="1000">1000</option></select><button onclick="exportarExcel('apac')" class="bg-purple-600 text-white px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-download"></i> Excel</button></div></div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-slate-50">
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Paciente</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">CPF</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Especialidade</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Fechamento</th>
-                                    <th class="px-6 py-3 text-xs font-bold uppercase">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaAPAC"></tbody>
-                        </table>
-                    </div>
-                    <div class="p-4 border-t" id="paginacaoAPAC"></div>
                 </div>
             </div>
         </div>
@@ -233,393 +199,187 @@
 
 <script>
 // ============================================
-// PLUGIN OFICIAL DO CHART.JS
+// DADOS
 // ============================================
-const labelPlugin = {
-    id: 'dataLabels',
-    afterDraw(chart, args, options) {
-        const { ctx, data } = chart;
-        
-        ctx.save();
-        ctx.font = 'bold 14px "Plus Jakarta Sans"';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        // Configuração padrão para gráficos de linha e barra (com sombra leve)
-        ctx.shadowColor = 'rgba(0,0,0,0.2)';
-        ctx.shadowBlur = 2;
-        
-        chart.data.datasets.forEach((dataset, datasetIndex) => {
-            const meta = chart.getDatasetMeta(datasetIndex);
-            if (!meta.hidden) {
-                meta.data.forEach((element, index) => {
-                    const value = dataset.data[index];
-                    if (value !== undefined && element.x && element.y) {
-                        let displayValue = value;
-                        let suffix = '';
-                        
-                        if (chart.config.type === 'line') {
-                            if (dataset.label === 'Dias' || dataset.label === 'Tempo Médio') {
-                                suffix = 'd';
-                            } else {
-                                suffix = '%';
-                            }
-                            displayValue = value + suffix;
-                            ctx.font = 'bold 13px "Plus Jakarta Sans"';
-                            ctx.fillStyle = '#1e293b';
-                            ctx.fillText(displayValue, element.x, element.y - 12);
-                        } 
-                        else if (chart.config.type === 'bar') {
-                            displayValue = value + '%';
-                            ctx.font = 'bold 15px "Plus Jakarta Sans"';
-                            ctx.fillStyle = '#ffffff';
-                            ctx.fillText(displayValue, element.x, element.y - 10);
-                        }
-                        else if (chart.config.type === 'doughnut') {
-                            const total = dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            if (percentage > 6) {
-                                ctx.shadowColor = 'transparent';
-                                ctx.font = 'bold 12px "Plus Jakarta Sans"';
-                                ctx.fillStyle = '#1e293b';
-                                ctx.fillText(percentage + '%', element.x, element.y);
-                            }
-                        }
-                    }
-                });
-            }
-        });
-        
-        ctx.restore();
-    }
-};
-
-Chart.register(labelPlugin);
-
-// ============================================
-// CONFIGURAÇÃO
-// ============================================
+let usuariosCadastrados = [
+    {id:1, nome:'Administrador OCI', cpf:'12345678909', nome_mae:'Admin Mãe', cidade_natal:'São Paulo', senha:'admin', tipo:'admin', telefone:'11999999999', email:'admin@oci.com'}
+];
+let usuarioLogado = null;
 const CODIGO_SEGURANCA = '123456';
-let usuarioLogado = null, pacientes = [], consultas = [], especialidades = [], charts = {};
-let paginaAtual = {monitoramento:1, retornos:1, absenteismo:1, apac:1};
-let itensPorPagina = {monitoramento:100, retornos:100, absenteismo:100, apac:100};
 
-function showLoading(){ document.getElementById('loadingOverlay').classList.add('show'); }
-function hideLoading(){ document.getElementById('loadingOverlay').classList.remove('show'); }
 function validarCPF(cpf){ cpf=cpf.replace(/\D/g,''); if(cpf.length!==11||/^(\d)\1{10}$/.test(cpf))return false; let s=0; for(let i=0;i<9;i++)s+=parseInt(cpf[i])*(10-i); let r=(s*10)%11; if(r===10)r=0; if(r!==parseInt(cpf[9]))return false; s=0; for(let i=0;i<10;i++)s+=parseInt(cpf[i])*(11-i); r=(s*10)%11; if(r===10)r=0; return r===parseInt(cpf[10]); }
-function formatarCPF(cpf){ cpf=cpf.replace(/\D/g,''); return cpf.length===11?cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'):cpf; }
-function formatarData(data){ if(!data)return'—'; return new Date(data.split('T')[0]).toLocaleDateString('pt-BR'); }
-function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';}); const el=document.getElementById(id); el.classList.add('active'); el.style.display=(id==='screenSistema')?'flex':'flex'; }
+function formatarCPF(cpf){ cpf=cpf.replace(/\D/g,''); if(cpf.length===11)return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'); return cpf; }
+function limparCPF(cpf){ return cpf.replace(/\D/g,''); }
+function mascaraCPF(input){ let v=input.value.replace(/\D/g,''); if(v.length>11)v=v.slice(0,11); v=v.replace(/(\d{3})(\d)/,'$1.$2'); v=v.replace(/(\d{3})(\d)/,'$1.$2'); v=v.replace(/(\d{3})(\d{1,2})$/,'$1-$2'); input.value=v; }
+function mascaraTelefone(input){ let v=input.value.replace(/\D/g,''); if(v.length>11)v=v.slice(0,11); if(v.length>2)v='('+v.slice(0,2)+') '+v.slice(2); if(v.length>10)v=v.slice(0,10)+'-'+v.slice(10); input.value=v; }
+function toggleSenha(id, btn){ const input=document.getElementById(id); const icon=btn.querySelector('i'); if(input.type==='password'){input.type='text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash');}else{input.type='password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye');} }
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';}); const el=document.getElementById(id); el.classList.add('active'); el.style.display='flex'; }
 
 // ============================================
-// DADOS MOCK
+// PAINEL ADMINISTRADOR
 // ============================================
-function gerarDadosMock(){
-    especialidades=[
-        {id:1,nome:'Cardiologia',icone:'🫀',exames_obrigatorios:'ECG; LAB; ERG',prazo_retorno_dias:60},
-        {id:2,nome:'Ortopedia',icone:'🦴',exames_obrigatorios:'RX; USG; TOMO',prazo_retorno_dias:60},
-        {id:3,nome:'Oncologia',icone:'🎗️',exames_obrigatorios:'BIO; AP; USG',prazo_retorno_dias:30},
-        {id:4,nome:'Oftalmologia',icone:'👁️',exames_obrigatorios:'MAP; BIO; TONO',prazo_retorno_dias:60},
-        {id:5,nome:'Otorrino',icone:'👂',exames_obrigatorios:'AUDIO; VIDEO',prazo_retorno_dias:60}
-    ];
-    const nomes=['Maria Silva','João Santos','Ana Oliveira','Carlos Pereira','Fernanda Costa'];
-    pacientes=[]; 
-    for(let i=0;i<150;i++){ 
-        pacientes.push({id:i+1, nome:nomes[i%5]+' '+(i+1), cpf:String(10000000000+Math.floor(Math.random()*90000000000))}); 
-    }
-    const st=['em_andamento','aguardando_exame','apto_retorno','oci_fechada','faltou'];
-    consultas=[]; 
-    for(let i=0;i<150;i++){ 
-        consultas.push({
-            id:i+1,
-            paciente_id:i+1,
-            especialidade_id:Math.floor(Math.random()*5)+1,
-            status:st[Math.floor(Math.random()*5)],
-            data_agendada:`2025-${String(Math.floor(Math.random()*6)+1).padStart(2,'0')}-${String(Math.floor(Math.random()*28)+1).padStart(2,'0')}`
-        }); 
+function abrirAdmin(){
+    if(!usuarioLogado || usuarioLogado.tipo !== 'admin'){
+        document.getElementById('modalAdminSenha').classList.add('show');
+    } else {
+        switchTab('admin');
     }
 }
 
-// ============================================
-// ATUALIZAR TUDO
-// ============================================
-function atualizarTudo(){
-    const hoje=new Date();
-    const totalAtivos=consultas.filter(c=>c.status==='em_andamento'||c.status==='aguardando_exame').length;
-    const aptos=consultas.filter(c=>c.status==='apto_retorno').length;
-    const fechadas=consultas.filter(c=>c.status==='oci_fechada').length;
-    const faltas=consultas.filter(c=>c.status==='faltou').length;
-    const pct=consultas.length>0?Math.round((fechadas/consultas.length)*100):0;
-
-    document.getElementById('statsGrid').innerHTML=`
-        <div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-blue"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-users"></i></div><span class="text-emerald-500 text-xs font-bold bg-emerald-50 px-2 py-1 rounded-lg">+12%</span></div><p class="text-slate-500 text-xs font-bold uppercase">Pacientes Ativos</p><h3 class="text-3xl font-extrabold mt-1">${totalAtivos}</h3></div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-amber"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-clock"></i></div><span class="text-amber-600 text-xs font-bold bg-amber-50 px-2 py-1 rounded-lg">Urgente</span></div><p class="text-slate-500 text-xs font-bold uppercase">Aptos Retorno</p><h3 class="text-3xl font-extrabold mt-1">${aptos}</h3></div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-emerald"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-check-double"></i></div><span class="text-emerald-600 text-xs font-bold bg-emerald-50 px-2 py-1 rounded-lg">Meta 90%</span></div><p class="text-slate-500 text-xs font-bold uppercase">OCIs Fechadas</p><h3 class="text-3xl font-extrabold mt-1">${pct}%</h3></div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm stat-card-hover card-rose"><div class="flex justify-between mb-4"><div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-user-slash"></i></div><span class="text-rose-500 text-xs font-bold bg-rose-50 px-2 py-1 rounded-lg">-5%</span></div><p class="text-slate-500 text-xs font-bold uppercase">Absenteísmo</p><h3 class="text-3xl font-extrabold mt-1">${faltas}</h3></div>
-    `;
-
-    const ocisPendentes=consultas.filter(c=>{
-        if(c.status==='oci_fechada'||c.status==='faltou')return false;
-        const dias=Math.floor((hoje-new Date(c.data_agendada))/86400000);
-        const e=especialidades.find(x=>x.id===c.especialidade_id);
-        return dias>(e?.prazo_retorno_dias||60);
-    });
-    document.getElementById('alertCount').textContent=ocisPendentes.length;
-    document.getElementById('alertasGrid').innerHTML=`
-        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-rose-500 alert-card"><h4 class="font-bold text-sm text-rose-600 mb-2"><i class="fas fa-exclamation-triangle"></i> OCIs Pendentes</h4><p class="text-3xl font-extrabold">${ocisPendentes.length}</p></div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-amber-500"><h4 class="font-bold text-sm text-amber-600 mb-2"><i class="fas fa-flask"></i> Exames Atrasados</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='aguardando_exame').length}</p></div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-orange-500"><h4 class="font-bold text-sm text-orange-600 mb-2"><i class="fas fa-calendar-times"></i> Retornos Vencidos</h4><p class="text-3xl font-extrabold">${consultas.filter(c=>c.status==='apto_retorno'&&Math.floor((hoje-new Date(c.data_agendada))/86400000)>30).length}</p></div>
-    `;
-
-    document.getElementById('infoCards').innerHTML=`
-        <div class="bg-white p-5 rounded-2xl shadow-sm border card-purple"><h4 class="font-bold text-sm mb-3"><i class="fas fa-stethoscope text-purple-500"></i> Regras</h4><div class="space-y-2">${especialidades.map(e=>`<div class="flex justify-between p-2 bg-slate-50 rounded-lg"><span class="text-xs font-bold">${e.icone} ${e.nome}</span><span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg">${e.prazo_retorno_dias}d</span></div>`).join('')}</div></div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border card-blue"><h4 class="font-bold text-sm mb-3"><i class="fas fa-chart-bar text-blue-500"></i> Indicadores</h4><div class="space-y-3"><div class="flex justify-between"><span class="text-xs">Comparecimento</span><span class="text-xs font-bold text-emerald-600">${consultas.filter(c=>c.status!=='faltou').length}/${consultas.length}</span></div><div class="flex justify-between"><span class="text-xs">OCIs Fechadas</span><span class="text-xs font-bold text-blue-600">${pct}%</span></div></div></div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border card-emerald"><h4 class="font-bold text-sm mb-3"><i class="fas fa-cog text-emerald-500"></i> Parâmetros</h4><div class="space-y-2 text-xs">${['⏱️ Prazo Padrão: 60 dias','🎗️ Prazo Oncologia: 30 dias','🎯 Meta OCI: 90%'].map(p=>`<div class="p-2 bg-slate-50 rounded-lg font-bold">${p}</div>`).join('')}</div></div>
-    `;
-
-    renderizarTabelas();
-    renderizarGraficos();
+function fecharModalAdmin(){
+    document.getElementById('modalAdminSenha').classList.remove('show');
+    document.getElementById('adminSenhaInput').value = '';
 }
 
-// ============================================
-// TABELAS POR PAGINAÇÃO
-// ============================================
-function getDadosFiltrados(tipo){
-    let dados=[];
-    if(tipo==='monitoramento') dados=[...consultas];
-    else if(tipo==='retornos') dados=consultas.filter(c=>c.status==='apto_retorno');
-    else if(tipo==='absenteismo') dados=consultas.filter(c=>c.status==='faltou');
-    else if(tipo==='apac') dados=consultas.filter(c=>c.status==='oci_fechada');
-    const busca=document.getElementById('busca'+tipo.charAt(0).toUpperCase()+tipo.slice(1))?.value?.toLowerCase()||'';
-    if(busca) dados=dados.filter(c=>{
-        const p=pacientes.find(x=>x.id===c.paciente_id)||{};
-        return `SOL-${String(c.id).padStart(4,'0')}`.toLowerCase().includes(busca) || 
-               (p.nome||'').toLowerCase().includes(busca) || 
-               (p.cpf||'').includes(busca);
-    });
-    if(tipo==='monitoramento'){
-        const fe=document.getElementById('filtroEspecialidadeMonitoramento')?.value;
-        const fs=document.getElementById('filtroStatusMonitoramento')?.value;
-        if(fe) dados=dados.filter(c=>c.especialidade_id==parseInt(fe));
-        if(fs) dados=dados.filter(c=>c.status===fs);
+function verificarSenhaAdmin(){
+    const senha = document.getElementById('adminSenhaInput').value.trim();
+    if(senha === 'admin'){
+        fecharModalAdmin();
+        switchTab('admin');
+    } else {
+        alert('❌ Senha incorreta!');
     }
-    return dados;
 }
 
-function renderizarTabelas(){
-    // Monitoramento
-    const dadosMonitoramento = getDadosFiltrados('monitoramento');
-    const totalMonitoramento = dadosMonitoramento.length;
-    const ippMonitoramento = itensPorPagina.monitoramento;
-    const totalPagMonitoramento = Math.ceil(totalMonitoramento/ippMonitoramento)||1;
-    if(paginaAtual.monitoramento > totalPagMonitoramento) paginaAtual.monitoramento = totalPagMonitoramento;
-    const inicioMonitoramento = (paginaAtual.monitoramento-1)*ippMonitoramento;
-    const paginadosMonitoramento = dadosMonitoramento.slice(inicioMonitoramento, inicioMonitoramento+ippMonitoramento);
-    
-    document.getElementById('tabelaMonitoramento').innerHTML = paginadosMonitoramento.map(c=>{
-        const p=pacientes.find(x=>x.id===c.paciente_id)||{};
-        const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
-        const stMap={'em_andamento':{t:'Em Andamento',c:'text-blue-600'},'aguardando_exame':{t:'Ag. Exame',c:'text-amber-600'},'apto_retorno':{t:'Apto Retorno',c:'text-emerald-600'},'oci_fechada':{t:'Fechada',c:'text-purple-600'},'faltou':{t:'Faltou',c:'text-rose-600'}};
-        const st=stMap[c.status]||{t:c.status,c:'text-slate-600'};
-        const prog=c.status==='oci_fechada'?100:c.status==='apto_retorno'?75:c.status==='em_andamento'?40:10;
-        let cp='bg-emerald-500';
-        if(prog<30) cp='bg-rose-500';
-        else if(prog<70) cp='bg-amber-500';
-        else if(prog<100) cp='bg-blue-500';
-        return `<tr><td class="px-6 py-4"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">SOL-${String(c.id).padStart(4,'0')}</span></td><td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">${(p.nome||'?')[0]}</div><div><p class="font-bold text-sm">${p.nome||'—'}</p><p class="text-xs text-slate-400">${formatarCPF(p.cpf||'')}</p></div></div></td><td class="px-6 py-4"><span class="px-3 py-1.5 bg-blue-50 rounded-full text-sm font-bold">${e.icone||''} ${e.nome||'—'}</span></td><td class="px-6 py-4"><div class="w-72"><div class="w-full bg-slate-100 h-5 rounded-full overflow-hidden progress-bar-grossa"><div class="${cp} h-full rounded-full flex items-center justify-center text-white text-xs font-bold" style="width:${prog}%">${prog}%</div></div></div></td><td class="px-6 py-4"><div class="flex gap-1.5">${(e.exames_obrigatorios||'').split(';').slice(0,3).map(ex=>`<span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-600 text-xs font-bold">${ex.trim()}</span>`).join('')}</div></td><td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-sm font-bold ${st.c}">${st.t}</span></td><td class="px-6 py-4 text-sm font-bold text-slate-500">${c.status==='oci_fechada'?'✅ Concluído':c.status==='faltou'?'❌ Falta':`⏳ ${e.prazo_retorno_dias||60}d`}</td></tr>`;
-    }).join('');
-    
-    let pagHTMLMonitoramento = '';
-    for(let i=1;i<=totalPagMonitoramento;i++) pagHTMLMonitoramento += `<button onclick="paginaAtual.monitoramento=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i===paginaAtual.monitoramento?'bg-blue-600 text-white':'bg-slate-100'}">${i}</button>`;
-    document.getElementById('paginacaoMonitoramento').innerHTML = `<span class="text-xs text-slate-500">${totalMonitoramento} registros | Pág ${paginaAtual.monitoramento} de ${totalPagMonitoramento}</span><div class="flex gap-1">${pagHTMLMonitoramento}</div>`;
-    
-    // Retornos
-    const dadosRetornos = getDadosFiltrados('retornos');
-    const totalRetornos = dadosRetornos.length;
-    const ippRetornos = itensPorPagina.retornos;
-    const totalPagRetornos = Math.ceil(totalRetornos/ippRetornos)||1;
-    if(paginaAtual.retornos > totalPagRetornos) paginaAtual.retornos = totalPagRetornos;
-    const inicioRetornos = (paginaAtual.retornos-1)*ippRetornos;
-    const paginadosRetornos = dadosRetornos.slice(inicioRetornos, inicioRetornos+ippRetornos);
-    
-    document.getElementById('tabelaRetornos').innerHTML = paginadosRetornos.length === 0 ? '<tr><td colspan="5" class="text-center py-8">Nenhum paciente apto para retorno</td></tr>' : paginadosRetornos.map(c=>{
-        const p=pacientes.find(x=>x.id===c.paciente_id)||{};
-        const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
-        return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3 text-emerald-600 font-bold text-xs">✅</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td></tr>`;
-    }).join('');
-    
-    let pagHTMLRetornos = '';
-    for(let i=1;i<=totalPagRetornos;i++) pagHTMLRetornos += `<button onclick="paginaAtual.retornos=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i===paginaAtual.retornos?'bg-blue-600 text-white':'bg-slate-100'}">${i}</button>`;
-    document.getElementById('paginacaoRetornos').innerHTML = `<span class="text-xs text-slate-500">${totalRetornos} registros | Pág ${paginaAtual.retornos} de ${totalPagRetornos}</span><div class="flex gap-1">${pagHTMLRetornos}</div>`;
-    
-    // Absenteísmo
-    const dadosAbsenteismo = getDadosFiltrados('absenteismo');
-    const totalAbsenteismo = dadosAbsenteismo.length;
-    const ippAbsenteismo = itensPorPagina.absenteismo;
-    const totalPagAbsenteismo = Math.ceil(totalAbsenteismo/ippAbsenteismo)||1;
-    if(paginaAtual.absenteismo > totalPagAbsenteismo) paginaAtual.absenteismo = totalPagAbsenteismo;
-    const inicioAbsenteismo = (paginaAtual.absenteismo-1)*ippAbsenteismo;
-    const paginadosAbsenteismo = dadosAbsenteismo.slice(inicioAbsenteismo, inicioAbsenteismo+ippAbsenteismo);
-    
-    document.getElementById('tabelaAbsenteismo').innerHTML = paginadosAbsenteismo.length === 0 ? '<tr><td colspan="5" class="text-center py-8">Nenhuma falta registrada</td></tr>' : paginadosAbsenteismo.map(c=>{
-        const p=pacientes.find(x=>x.id===c.paciente_id)||{};
-        const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
-        return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">Faltou</span></td></tr>`;
-    }).join('');
-    
-    let pagHTMLAbsenteismo = '';
-    for(let i=1;i<=totalPagAbsenteismo;i++) pagHTMLAbsenteismo += `<button onclick="paginaAtual.absenteismo=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i===paginaAtual.absenteismo?'bg-blue-600 text-white':'bg-slate-100'}">${i}</button>`;
-    document.getElementById('paginacaoAbsenteismo').innerHTML = `<span class="text-xs text-slate-500">${totalAbsenteismo} registros | Pág ${paginaAtual.absenteismo} de ${totalPagAbsenteismo}</span><div class="flex gap-1">${pagHTMLAbsenteismo}</div>`;
-    
-    // APAC
-    const dadosAPAC = getDadosFiltrados('apac');
-    const totalAPAC = dadosAPAC.length;
-    const ippAPAC = itensPorPagina.apac;
-    const totalPagAPAC = Math.ceil(totalAPAC/ippAPAC)||1;
-    if(paginaAtual.apac > totalPagAPAC) paginaAtual.apac = totalPagAPAC;
-    const inicioAPAC = (paginaAtual.apac-1)*ippAPAC;
-    const paginadosAPAC = dadosAPAC.slice(inicioAPAC, inicioAPAC+ippAPAC);
-    
-    document.getElementById('tabelaAPAC').innerHTML = paginadosAPAC.length === 0 ? '<tr><td colspan="5" class="text-center py-8">Nenhuma OCI fechada</td></tr>' : paginadosAPAC.map(c=>{
-        const p=pacientes.find(x=>x.id===c.paciente_id)||{};
-        const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
-        return `<tr><td class="px-6 py-3 font-bold">${p.nome||'—'}</td><td class="px-6 py-3">${formatarCPF(p.cpf||'')}</td><td class="px-6 py-3">${e.icone||''} ${e.nome||''}</td><td class="px-6 py-3">${formatarData(c.data_agendada)}</td><td class="px-6 py-3"><span class="px-2.5 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-bold">✅ Fechada</span></td></tr>`;
-    }).join('');
-    
-    let pagHTMLAPAC = '';
-    for(let i=1;i<=totalPagAPAC;i++) pagHTMLAPAC += `<button onclick="paginaAtual.apac=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i===paginaAtual.apac?'bg-blue-600 text-white':'bg-slate-100'}">${i}</button>`;
-    document.getElementById('paginacaoAPAC').innerHTML = `<span class="text-xs text-slate-500">${totalAPAC} registros | Pág ${paginaAtual.apac} de ${totalPagAPAC}</span><div class="flex gap-1">${pagHTMLAPAC}</div>`;
-    
-    const filtroSelect = document.getElementById('filtroEspecialidadeMonitoramento');
-    if(filtroSelect) filtroSelect.innerHTML='<option value="">Todas</option>'+especialidades.map(e=>`<option value="${e.id}">${e.icone} ${e.nome}</option>`).join('');
+function renderizarTabelaUsuarios(){
+    document.getElementById('tabelaUsuarios').innerHTML = usuariosCadastrados.map(u => `
+        <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3 font-bold text-sm">${u.nome}</td>
+            <td class="px-4 py-3 text-sm">${formatarCPF(u.cpf)}</td>
+            <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo==='admin'?'bg-purple-100 text-purple-700':'bg-blue-100 text-blue-700'}">${u.tipo}</span></td>
+            <td class="px-4 py-3 text-sm">${u.telefone||'—'}</td>
+            <td class="px-4 py-3">
+                <button onclick="editarUsuario(${u.id})" class="text-blue-600 hover:underline text-xs font-bold mr-2"><i class="fas fa-edit"></i> Editar</button>
+                <button onclick="excluirUsuario(${u.id})" class="text-rose-600 hover:underline text-xs font-bold"><i class="fas fa-trash"></i> Excluir</button>
+            </td>
+        </tr>
+    `).join('');
 }
 
-function filtrarTabela(tipo){ paginaAtual[tipo]=1; renderizarTabelas(); }
-function mudarItensPorPagina(tipo){ 
-    itensPorPagina[tipo]=parseInt(document.getElementById('itensPorPagina'+tipo.charAt(0).toUpperCase()+tipo.slice(1))?.value||100); 
-    paginaAtual[tipo]=1; 
-    renderizarTabelas(); 
-}
-
-// ============================================
-// GRÁFICOS
-// ============================================
-function renderizarGraficos(){
-    if(charts.p) charts.p.destroy();
-    if(charts.s) charts.s.destroy();
-    if(charts.c) charts.c.destroy();
-    if(charts.t) charts.t.destroy();
-    
-    const canvasPerformance = document.getElementById('chartPerformance');
-    const canvasSpecialty = document.getElementById('chartSpecialty');
-    const canvasComparecimento = document.getElementById('chartComparecimento');
-    const canvasTempoMedio = document.getElementById('chartTempoMedio');
-    
-    if(!canvasPerformance || !canvasSpecialty || !canvasComparecimento || !canvasTempoMedio){
-        setTimeout(()=>renderizarGraficos(), 200);
-        return;
+function abrirModalCadastro(usuarioId = null){
+    document.getElementById('modalCadastrarUsuario').classList.add('show');
+    if(usuarioId){
+        const u = usuariosCadastrados.find(x => x.id === usuarioId);
+        document.getElementById('editUsuarioId').value = u.id;
+        document.getElementById('editNome').value = u.nome;
+        document.getElementById('editCPF').value = formatarCPF(u.cpf);
+        document.getElementById('editSenha').value = u.senha;
+        document.getElementById('editTipo').value = u.tipo;
+        document.getElementById('editNomeMae').value = u.nome_mae||'';
+        document.getElementById('editCidade').value = u.cidade_natal||'';
+        document.getElementById('editTelefone').value = u.telefone||'';
+        document.getElementById('editEmail').value = u.email||'';
+    } else {
+        document.getElementById('editUsuarioId').value = '';
+        document.getElementById('editNome').value = '';
+        document.getElementById('editCPF').value = '';
+        document.getElementById('editSenha').value = '';
+        document.getElementById('editTipo').value = 'usuario';
+        document.getElementById('editNomeMae').value = '';
+        document.getElementById('editCidade').value = '';
+        document.getElementById('editTelefone').value = '';
+        document.getElementById('editEmail').value = '';
     }
+}
+
+function fecharModalCadastro(){
+    document.getElementById('modalCadastrarUsuario').classList.remove('show');
+}
+
+function salvarUsuario(){
+    const id = document.getElementById('editUsuarioId').value;
+    const nome = document.getElementById('editNome').value.trim();
+    const cpf = limparCPF(document.getElementById('editCPF').value);
+    const senha = document.getElementById('editSenha').value.trim();
+    const tipo = document.getElementById('editTipo').value;
     
-    charts.p = new Chart(canvasPerformance, {
-        type: 'line',
-        data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'OCIs Fechadas', data: [65,78,72,85,82,86], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.05)', borderWidth: 3, fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#3b82f6', pointBorderColor: '#fff', pointBorderWidth: 2 }, { label: 'Comparecimento', data: [88,85,90,92,89,91], borderColor: '#10b981', borderWidth: 2.5, borderDash: [8,4], tension: 0.3, pointRadius: 4, pointBackgroundColor: '#10b981', pointBorderColor: '#fff', pointBorderWidth: 2 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 10, font: { weight: 'bold', size: 12 }, padding: 15 } }, tooltip: { backgroundColor: '#1e293b', titleColor: '#fff' } }, scales: { y: { grid: { color: '#e2e8f0' }, ticks: { callback: v => v+'%', font: { weight: 'bold' } } }, x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } } }
-    });
+    if(!nome||!cpf||!senha) return alert('⚠️ Preencha Nome, CPF e Senha!');
+    if(!validarCPF(cpf)) return alert('❌ CPF inválido!');
     
-    const por={};
-    consultas.forEach(c=>{ const e=especialidades.find(x=>x.id===c.especialidade_id); por[e?e.nome:'Outros'] = (por[e?e.nome:'Outros']||0)+1; });
-    const labelsDist = Object.keys(por);
-    const dataDist = Object.values(por);
-    const totalDist = dataDist.reduce((a,b)=>a+b,0);
-    const colorsDist = ['#3b82f6', '#8b5cf6', '#ef4444', '#f59e0b', '#ec4899'];
-    
-    charts.s = new Chart(canvasSpecialty, {
-        type: 'doughnut',
-        data: { labels: labelsDist, datasets: [{ data: dataDist, backgroundColor: colorsDist.slice(0, labelsDist.length), borderWidth: 0, cutout: '65%' }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold', size: 11 }, usePointStyle: true, generateLabels: function(chart) { return chart.data.labels.map((label, i) => ({ text: `${label}: ${chart.data.datasets[0].data[i]} (${((chart.data.datasets[0].data[i]/totalDist)*100).toFixed(1)}%)`, fillStyle: chart.data.datasets[0].backgroundColor[i], strokeStyle: chart.data.datasets[0].backgroundColor[i], pointStyle: 'circle', index: i })); } } } } }
-    });
-    
-    charts.c = new Chart(canvasComparecimento, {
-        type: 'bar',
-        data: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], datasets: [{ data: [88, 85, 90, 92, 89, 91], backgroundColor: '#10b981', borderRadius: 8, barPercentage: 0.65 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `Taxa: ${ctx.raw}%` } } }, scales: { y: { min: 70, max: 100, grid: { color: '#e2e8f0' }, ticks: { callback: v => v+'%', font: { weight: 'bold' } } }, x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } }, layout: { padding: { top: 25 } } }
-    });
-    
-    charts.t = new Chart(canvasTempoMedio, {
-        type: 'line',
-        data: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], datasets: [{ label: 'Dias', data: [18, 16, 14, 12, 11, 10], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.05)', borderWidth: 3, fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#f59e0b', pointBorderColor: '#fff', pointBorderWidth: 2 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `Média: ${ctx.raw} dias` } } }, scales: { y: { grid: { color: '#e2e8f0' }, ticks: { callback: v => v+'d', font: { weight: 'bold' } } }, x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } } }
-    });
-    
-    setTimeout(() => {
-        if(charts.p) charts.p.update();
-        if(charts.s) charts.s.update();
-        if(charts.c) charts.c.update();
-        if(charts.t) charts.t.update();
-    }, 100);
-    
-    console.log('✅ Gráficos renderizados!');
+    if(id){
+        const u = usuariosCadastrados.find(x => x.id === parseInt(id));
+        u.nome = nome; u.cpf = cpf; u.senha = senha; u.tipo = tipo;
+        u.nome_mae = document.getElementById('editNomeMae').value.trim();
+        u.cidade_natal = document.getElementById('editCidade').value.trim();
+        u.telefone = document.getElementById('editTelefone').value.trim();
+        u.email = document.getElementById('editEmail').value.trim();
+    } else {
+        const existe = usuariosCadastrados.find(u => u.cpf === cpf);
+        if(existe) return alert('⚠️ CPF já cadastrado!');
+        usuariosCadastrados.push({
+            id: usuariosCadastrados.length + 1,
+            nome, cpf, senha, tipo,
+            nome_mae: document.getElementById('editNomeMae').value.trim(),
+            cidade_natal: document.getElementById('editCidade').value.trim(),
+            telefone: document.getElementById('editTelefone').value.trim(),
+            email: document.getElementById('editEmail').value.trim()
+        });
+    }
+    fecharModalCadastro();
+    renderizarTabelaUsuarios();
+    alert('✅ Usuário salvo!');
+}
+
+function editarUsuario(id){ abrirModalCadastro(id); }
+
+function excluirUsuario(id){
+    if(id === 1) return alert('❌ Não é possível excluir o admin padrão!');
+    if(confirm('Tem certeza que deseja excluir este usuário?')){
+        usuariosCadastrados = usuariosCadastrados.filter(u => u.id !== id);
+        renderizarTabelaUsuarios();
+        alert('✅ Usuário excluído!');
+    }
 }
 
 function switchTab(tabId){
     document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active','text-blue-600');b.classList.add('text-slate-400');});
-    if(document.getElementById('tab-'+tabId)) document.getElementById('tab-'+tabId).classList.add('active','text-blue-600');
+    const tabBtn = document.getElementById('tab-'+tabId);
+    if(tabBtn) tabBtn.classList.add('active','text-blue-600');
     document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-    if(document.getElementById('content-'+tabId)) document.getElementById('content-'+tabId).classList.add('active');
-    document.getElementById('headerTitle').textContent = document.getElementById('tab-'+tabId)?.textContent.trim() || 'Painel OCI';
-    renderizarTabelas();
-    if(tabId === 'visao-geral') setTimeout(renderizarGraficos, 150);
+    const content = document.getElementById('content-'+tabId);
+    if(content) content.classList.add('active');
+    document.getElementById('headerTitle').textContent = tabBtn?.textContent?.trim()||'Painel OCI';
+    if(tabId === 'admin') renderizarTabelaUsuarios();
 }
 
-function exportarExcel(tipo){ 
-    const dados=getDadosFiltrados(tipo); 
-    if(!dados.length) return alert('Nenhum dado.');
-    const ws = XLSX.utils.json_to_sheet(dados.map(c=>{
-        const p=pacientes.find(x=>x.id===c.paciente_id)||{};
-        const e=especialidades.find(x=>x.id===c.especialidade_id)||{};
-        return { Paciente:p.nome, CPF:formatarCPF(p.cpf), Especialidade:e.nome, Data:formatarData(c.data_agendada), Status:c.status };
-    }));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, `Relatorio_${tipo}`);
-    XLSX.writeFile(wb, `relatorio_${tipo}_${new Date().toISOString().slice(0,10)}.xlsx`); 
-}
 function logout(){ usuarioLogado=null; document.getElementById('screenSistema').classList.remove('active'); document.getElementById('screenSistema').style.display='none'; showScreen('screenLogin'); }
 
 // ============================================
-// EVENTOS E INICIALIZAÇÃO
+// EVENTOS
 // ============================================
 document.addEventListener('DOMContentLoaded',()=>{
-    gerarDadosMock();
-    
     document.getElementById('btnLogin').addEventListener('click',()=>{
-        const cpf=document.getElementById('loginCPF').value.trim();
-        const senha=document.getElementById('loginSenha').value.trim();
-        if(cpf==='12345678909'&&senha==='admin'){
+        const cpf = limparCPF(document.getElementById('loginCPF').value);
+        const senha = document.getElementById('loginSenha').value.trim();
+        if(!cpf||!senha) return alert('⚠️ Preencha todos os campos!');
+        const usuario = usuariosCadastrados.find(u=>u.cpf===cpf&&u.senha===senha);
+        if(usuario){
+            usuarioLogado = usuario;
             document.getElementById('screenLogin').style.display='none';
             document.getElementById('screenSistema').classList.add('active');
             document.getElementById('screenSistema').style.display='flex';
-            atualizarTudo();
+            document.getElementById('sidebarNome').textContent = usuario.nome;
+            document.getElementById('sidebarAvatar').textContent = usuario.nome[0].toUpperCase();
         } else {
-            alert('❌ CPF ou Senha inválidos!');
+            alert('❌ Usuário não encontrado!');
         }
     });
     
-    document.getElementById('btnResetAdmin').addEventListener('click',()=>{
-        const codigo=document.getElementById('resetAdminCodigo').value.trim();
-        const nova=document.getElementById('resetAdminNovaSenha').value;
-        const confirma=document.getElementById('resetAdminConfirma').value;
-        if(codigo!==CODIGO_SEGURANCA) return alert('❌ Código incorreto! Use: '+CODIGO_SEGURANCA);
-        if(nova.length<4) return alert('Senha 4+ caracteres!');
-        if(nova!==confirma) return alert('Senhas não conferem!');
-        alert('✅ Senha redefinida com sucesso!');
-        showScreen('screenLogin');
+    document.getElementById('btnResetVerificar').addEventListener('click',()=>{
+        document.getElementById('resetStep1').classList.add('hidden');
+        document.getElementById('resetStep2').classList.remove('hidden');
     });
     
-    ['loginNome','loginCPF','loginSenha'].forEach(id=>{
-        document.getElementById(id)?.addEventListener('keypress',e=>{if(e.key==='Enter') document.getElementById('btnLogin').click();});
+    document.getElementById('btnResetConfirmar').addEventListener('click',()=>{
+        const codigo = document.getElementById('resetCodigo').value.trim();
+        const novaSenha = document.getElementById('resetNovaSenha').value.trim();
+        if(codigo !== CODIGO_SEGURANCA) return alert('❌ Código incorreto!');
+        if(novaSenha.length !== 6) return alert('⚠️ Senha deve ter 6 dígitos!');
+        alert('✅ Senha redefinida!'); showScreen('screenLogin');
     });
     
-    console.log('✅ SISTEMA OCI v5.0 - TOTALMENTE CORRIGIDO!');
+    console.log('✅ SISTEMA OCI v5.4 - COM PAINEL ADMIN');
+    console.log('👑 Admin: menu lateral -> Administrador -> senha: admin');
 });
 </script>
 </body>
