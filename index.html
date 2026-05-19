@@ -732,43 +732,44 @@
                     <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoAptosRetorno"></div>
                 </div>
             </div>
-
+            
             <!-- 🆕 RETORNOS AGENDADOS -->
             <div id="content-retornos-agendados" class="tab-content space-y-4">
-                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
-                        <h3 class="text-lg font-bold">📅 Retornos Agendados (Vivver)</h3>
-                        <div class="flex gap-2">
-                            <input type="text" id="buscaRetornosAgendados" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos-agendados')">
-                            <button onclick="exportarExcel('retornos-agendados')" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700">
-                                <i class="fas fa-download"></i> Excel
-                            </button>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-slate-50">
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solicitação</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Exames</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data 1ª</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data Retorno</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaRetornosAgendados"></tbody>
-                        </table>
-                    </div>
-                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoRetornosAgendados"></div>
-                </div>
+               <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                 <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
+                    <h3 class="text-lg font-bold">📅 Retornos Agendados (Vivver)</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="buscaRetornosAgendados" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos-agendados')">
+                        <button onclick="exportarExcel('retornos-agendados')" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700">
+                          <i class="fas fa-download"></i> Excel
+                      </button>
+                  </div>
+               </div>
+              <div class="overflow-x-auto">
+                 <table class="w-full">
+                     <thead>
+                       <tr class="bg-slate-50">
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. 1ª Cons.</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. Retorno</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Exames</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Data 1ª</th>
+                           <th class="px-4 py-3 text-xs font-bold uppercase">Data Retorno</th>
+                       </tr>
+                    </thead>
+                   <tbody id="tabelaRetornosAgendados"></tbody>
+              </table>
             </div>
+           <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoRetornosAgendados"></div>
+        </div>
+      </div>
 
             <!-- RETORNOS -->
             <div id="content-retornos" class="tab-content space-y-4">
@@ -973,7 +974,6 @@ for(let i=0; i<150; i++){
     });
 }
 
-// 🆕 NOVOS STATUS - Linha de Produção
 // em_andamento → aguardando_exame → apto_retorno → retorno_agendado → retorno_recepcionado → oci_fechada
 //                                                         ↓                        ↓
 //                                                  retorno_faltou           retorno_faltou
@@ -1256,7 +1256,7 @@ function atualizarTudo(){
         <div class="bg-white p-5 rounded-2xl shadow-sm stat-card-hover card-rose"><p class="text-slate-500 text-xs font-bold uppercase">Faltas Total</p><h3 class="text-2xl font-extrabold mt-1">${faltou1 + faltouRetorno}</h3></div>
     `;
 
-    // 🆕 LINHA DE PRODUÇÃO
+    // SISTEMA
     document.getElementById('linhaProducao').innerHTML = `
         <div class="linha-producao-step bg-blue-100 text-blue-700">📋 OCI Aberta: <b>${emAndamento + aguardandoExame}</b></div>
         <span class="text-slate-300 font-bold">→</span>
@@ -1381,27 +1381,66 @@ function renderizarTabelas(){
         if(pag.length === 0){
             tabelaEl.innerHTML = '<tr><td colspan="15" class="text-center py-8 text-slate-400 font-bold">Nenhum registro encontrado</td></tr>';
         } else if(tipo === 'monitoramento'){
-            tabelaEl.innerHTML = pag.map(c => {
-                const p = pacientes.find(x => x.id === c.paciente_id) || {};
-                const e = especialidades.find(x => x.id === c.especialidade_id) || {};
-                const st = getStatusBadge(c.status);
-                const alerta = getAlertaOCI(c);
-                const progresso = c.status === 'oci_fechada' ? 100 : c.status === 'retorno_recepcionado' ? 85 : c.status === 'retorno_agendado' ? 65 : c.status === 'apto_retorno' ? 50 : c.status === 'aguardando_exame' ? 30 : c.status === 'em_andamento' ? 15 : 0;
-                return `<tr class="hover:bg-slate-50"><td class="px-4 py-3"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">SOL-${String(c.id).padStart(4,'0')}</span></td><td class="px-4 py-3"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">${p.prontuario||'PRONT'+String(c.id).padStart(5,'0')}</span></td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">${(p.nome||'?')[0]}</div><div><p class="font-bold text-sm">${p.nome||'—'}</p><p class="text-xs text-slate-400">${formatarCPF(p.cpf||'')}</p></div></div></td><td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold whitespace-nowrap">${e.icone||''} ${e.nome||'—'}</span></td><td class="px-4 py-3"><div class="w-32"><div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden"><div class="${st.cor} h-full rounded-full flex items-center justify-center text-white text-[10px] font-bold" style="width:${progresso}%">${progresso}%</div></div></div></td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${st.c} whitespace-nowrap">${st.t}</span></td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold border ${alerta.cor} whitespace-nowrap">${alerta.tipo} ${alerta.texto}</span></td></tr>`;
-            }).join('');
-        } else {
+                    } else {
             tabelaEl.innerHTML = pag.map(item => {
                 const p = pacientes.find(x => x.id === item.paciente_id) || {};
                 const e = especialidades.find(x => x.id === item.especialidade_id) || {};
-                return `<tr class="hover:bg-slate-50">${tipo==='retornos'?`<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">${item.numero_solicitacao_1consulta||'—'}</span></td><td class="px-3 py-2"><span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg whitespace-nowrap">${item.numero_solicitacao_retorno||'—'}</span></td>`:`<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">SOL-${String(item.id).padStart(4,'0')}</span></td>${tipo==='retornos-agendados'||tipo==='retornos'?`<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">${item.numero_solicitacao_retorno||'RET-'+String(item.id).padStart(4,'0')}</span></td>`:''}`}<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 whitespace-nowrap">${p.prontuario||'—'}</span></td><td class="px-3 py-2 font-bold text-xs">${p.nome||'—'}</td><td class="px-3 py-2 text-xs">${formatarCPF(p.cpf||'')}</td><td class="px-3 py-2 text-xs">${p.nome_mae||'—'}</td><td class="px-3 py-2 text-xs">${p.unidade_saude||'—'}</td><td class="px-3 py-2 text-xs font-bold whitespace-nowrap">${e.icone||''} ${e.nome||''}</td>${tipo==='absenteismo-1consulta'||tipo==='absenteismo-retorno'?'':`<td class="px-3 py-2 text-[10px]">${e.exames_obrigatorios||'—'}</td>`}<td class="px-3 py-2 text-xs">${item.medico_solicitante||'—'}</td><td class="px-3 py-2 text-xs">${item.local_consulta||'—'}</td><td class="px-3 py-2 text-xs whitespace-nowrap">${formatarData(item.data_agendada)}</td>${tipo==='retornos-agendados'||tipo==='retornos'?`<td class="px-3 py-2 text-xs font-bold text-blue-600 whitespace-nowrap">${formatarData(item.created_at||item.data_agendada)}</td>`:''}${tipo==='apac'?`<td class="px-3 py-2 text-xs font-bold text-purple-600 whitespace-nowrap">${formatarData(item.data_agendada)}</td>`:''}</tr>`;
+                
+                // Colunas base (comuns a quase todas as tabelas)
+                let cols = '';
+                
+                if(tipo === 'retornos'){
+                    // Retornos: tem Nº Solic. 1ª Cons. + Nº Solic. Retorno
+                    cols = `
+                        <td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">${item.numero_solicitacao_1consulta||'—'}</span></td>
+                        <td class="px-3 py-2"><span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg whitespace-nowrap">${item.numero_solicitacao_retorno||'—'}</span></td>
+                    `;
+                } else if(tipo === 'retornos-agendados'){
+                    // Retornos Agendados: Nº Solic. 1ª Cons. + Nº Solic. Retorno
+                    cols = `
+                        <td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">SOL-${String(item.id).padStart(4,'0')}</span></td>
+                        <td class="px-3 py-2"><span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg whitespace-nowrap">RET-${String(item.id).padStart(4,'0')}</span></td>
+                    `;
+                } else {
+                    // Demais tabelas: só Nº Solicitação
+                    cols = `<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">SOL-${String(item.id).padStart(4,'0')}</span></td>`;
+                }
+                
+                // Colunas comuns: Prontuário, Paciente, CPF, Mãe, Unidade, Especialidade
+                cols += `
+                    <td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 whitespace-nowrap">${p.prontuario||'—'}</span></td>
+                    <td class="px-3 py-2 font-bold text-xs">${p.nome||'—'}</td>
+                    <td class="px-3 py-2 text-xs">${formatarCPF(p.cpf||'')}</td>
+                    <td class="px-3 py-2 text-xs">${p.nome_mae||'—'}</td>
+                    <td class="px-3 py-2 text-xs">${p.unidade_saude||'—'}</td>
+                    <td class="px-3 py-2 text-xs font-bold whitespace-nowrap">${e.icone||''} ${e.nome||''}</td>
+                `;
+                
+                // Exames (não mostra para absenteísmo)
+                if(tipo !== 'absenteismo-1consulta' && tipo !== 'absenteismo-retorno'){
+                    cols += `<td class="px-3 py-2 text-[10px]">${e.exames_obrigatorios||'—'}</td>`;
+                }
+                
+                // Médico, Local, Data 1ª
+                cols += `
+                    <td class="px-3 py-2 text-xs">${item.medico_solicitante||'—'}</td>
+                    <td class="px-3 py-2 text-xs">${item.local_consulta||'—'}</td>
+                    <td class="px-3 py-2 text-xs whitespace-nowrap">${formatarData(item.data_agendada)}</td>
+                `;
+                
+                // Data Retorno (só para retornos-agendados e retornos)
+                if(tipo === 'retornos-agendados' || tipo === 'retornos'){
+                    cols += `<td class="px-3 py-2 text-xs font-bold text-blue-600 whitespace-nowrap">${formatarData(item.created_at || item.data_agendada)}</td>`;
+                }
+                
+                // Data Fechamento (só para APAC)
+                if(tipo === 'apac'){
+                    cols += `<td class="px-3 py-2 text-xs font-bold text-purple-600 whitespace-nowrap">${formatarData(item.data_agendada)}</td>`;
+                }
+                
+                return `<tr class="hover:bg-slate-50">${cols}</tr>`;
             }).join('');
         }
-        
-        let pagHTML = '';
-        for(let i=1; i<=totalPag; i++) pagHTML += `<button onclick="paginaAtual['${tipo}']=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i===paginaAtual[tipo]?'bg-blue-600 text-white':'bg-slate-100'}">${i}</button>`;
-        pagEl.innerHTML = `<span class="text-xs text-slate-500">${dados.length} registros | Pág ${paginaAtual[tipo]} de ${totalPag}</span><div class="flex gap-1 flex-wrap">${pagHTML}</div>`;
-    });
-}
 
 function filtrarTabela(tipo){ paginaAtual[tipo]=1; renderizarTabelas(); }
 
