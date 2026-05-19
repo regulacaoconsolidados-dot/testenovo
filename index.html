@@ -32,6 +32,12 @@
         .sidebar-item.active { background: rgba(16,185,129,0.15); border-left: 4px solid #10b981; }
         .campo-obrigatorio::after { content: ' *'; color: #ef4444; font-weight: bold; }
         .campo-opcional::after { content: ' (opcional)'; color: #94a3b8; font-size: 10px; font-weight: normal; }
+        .dropdown-ubs { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #e2e8f0; border-radius: 12px; max-height: 250px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .dropdown-ubs.show { display: block; }
+        .dropdown-ubs-item { padding: 10px 16px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; transition: all 0.15s; }
+        .dropdown-ubs-item:hover { background: #eff6ff; }
+        .dropdown-ubs-item:last-child { border-bottom: none; }
+        .dropdown-ubs-item .distrito-tag { font-size: 10px; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -41,6 +47,98 @@
     <div class="spinner"></div>
     <p class="text-white mt-4 font-bold">Processando...</p>
 </div>
+
+<!-- ============================================ -->
+<!-- LISTA DE UNIDADES DE SAÚDE -->
+<!-- ============================================ -->
+<script>
+const DISTRITO_MAP = {
+  'UNIDADE BASICA DE SAUDE JARDIM BANDEIRANTES': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE AGUA BRANCA': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE XV': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE CSU ELDORADO': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE PARQUE SAO JOAO': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE JARDIM ELDORADO': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE NOVO ELDORADO': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE SANTA CRUZ': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE PEROBAS': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE BELA VISTA': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE INDUSTRIAL III SECAO': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE JARDIM INDUSTRIAL': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE VILA SAO PAULO': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE SANDOVAL DE AZEVEDO': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE JOAO EVANGELISTA': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE BANDEIRANTES': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE AMAZONAS': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE VILA DINIZ': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE NACIONAL': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE ILDA EFIGENIA': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE JOAQUIM MURTINHO': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE XANGRILA': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE AMENDOEIRAS': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE ESTRELA DALVA': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE TIJUCA': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE PETROLANDIA': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE TROPICAL II': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE SAPUCAIAS': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE DUQUE DE CAXIAS': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE SAO LUIZ II': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE SAO LUIZ I': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE CAMPO ALTO': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE TROPICAL I': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE ESTANCIAS IMPERIAIS': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE NASCENTES IMPERIAIS': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE CAMPINA VERDE': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE LAGUNA': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE ARPOADOR': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE SAO JOAQUIM': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE PARQUE TURISTA': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE VILA PEROLA': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE NOVO PROGRESSO II': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE COLORADO': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE CANDIDA FERREIRA': 'RESSACA',
+  'UNIDADE DE SAUDE DA FAMILIA VILA PEROLA II USF 84': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE PRESIDENTE KENNEDY': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE OITIS': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE MORADA NOVA': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE INCONFIDENTES': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE RIACHO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE FLAMENGO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE NOVO RIACHO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE DURVAL DE BARROS': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE MONTE CASTELO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE CHACARAS': 'SEDE',
+  'UNIDADE BASICA DE SAUDE CANADA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE CENTRO (CAD)': 'SEDE',
+  'UBS BERNARDO MONTEIRO/MOACIR PINTO MOREIRA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE LINDA VISTA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE SANTA HELENA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE VILA ITALIA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE BEATRIZ USF 72': 'SEDE',
+  'UNIDADE BASICA DE SAUDE MARIA DA CONCEICAO': 'SEDE',
+  'UNIDADE BASICA DE SAUDE FUNCIONARIOS': 'SEDE',
+  'UNIDADE BASICA DE SAUDE PRAIA': 'SEDE',
+  'UBS UNIDADE XVI (SEDE)': 'SEDE',
+  'UNIDADE BASICA DE SAUDE VILA RENASCER': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE NOVA CONTAGEM': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE VILA SOLEDADE': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE ESTALEIRO': 'VARGEM DAS FLORES',
+  'CERESP CONTAGEM': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE RETIRO II': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE RETIRO': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE IPE AMARELO': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE SAO JUDAS TADEU': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE VILA ESPERANCA': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE DARCY RIBEIRO': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE ICAIVERA': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE NOVA CONTAGEM I': 'VARGEM DAS FLORES',
+  'CONTAGEM PENITENCIARIA NELSON HUNGRIA': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE TUPA': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE LIBERDADE II': 'VARGEM DAS FLORES'
+};
+
+const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
+</script>
 
 <!-- ============================================ -->
 <!-- MODAL DE CONFIRMAÇÃO DA 1ª CONSULTA -->
@@ -59,12 +157,16 @@
                 <span class="text-sm font-extrabold text-blue-600" id="modalNumSolicitacao">—</span>
             </div>
             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">Paciente</span>
+                <span class="text-xs font-bold text-slate-500 uppercase">Nome do Paciente</span>
                 <span class="text-sm font-bold text-slate-800" id="modalNomePaciente">—</span>
             </div>
             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                 <span class="text-xs font-bold text-slate-500 uppercase">CPF</span>
                 <span class="text-sm font-bold text-slate-800" id="modalCPF">—</span>
+            </div>
+            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                <span class="text-xs font-bold text-slate-500 uppercase">📱 Telefone</span>
+                <span class="text-sm font-bold text-slate-800" id="modalTelefone">—</span>
             </div>
             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                 <span class="text-xs font-bold text-slate-500 uppercase">Médico</span>
@@ -116,20 +218,20 @@
 
         <div class="flex gap-4 border-b mb-4 overflow-x-auto">
             <button onclick="switchAdminTab('usuarios')" id="adminPortalTab-usuarios" class="admin-portal-tab-btn pb-2 text-sm font-bold text-purple-600 border-b-2 border-purple-600 whitespace-nowrap">
-                👥 Pacientes
+                👥 Usuários
             </button>
             <button onclick="switchAdminTab('novo')" id="adminPortalTab-novo" class="admin-portal-tab-btn pb-2 text-sm font-bold text-slate-400 whitespace-nowrap">
-                ➕ Novo Paciente
+                ➕ Novo Usuário
             </button>
             <button onclick="switchAdminTab('importar')" id="adminPortalTab-importar" class="admin-portal-tab-btn pb-2 text-sm font-bold text-slate-400 whitespace-nowrap">
                 📥 Importar CSV
             </button>
         </div>
 
-        <!-- Lista de Pacientes -->
+        <!-- Lista de Usuários -->
         <div id="adminPortalContent-usuarios" class="admin-portal-content">
             <div class="mb-3">
-                <input type="text" id="adminPortalBusca" placeholder="🔍 Buscar paciente..." class="w-full px-4 py-2 border rounded-xl text-sm" oninput="renderizarListaPacientes()">
+                <input type="text" id="adminPortalBusca" placeholder="🔍 Buscar usuário..." class="w-full px-4 py-2 border rounded-xl text-sm" oninput="renderizarListaUsuarios()">
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -147,7 +249,7 @@
             </div>
         </div>
 
-        <!-- Novo Paciente -->
+        <!-- Novo Usuário -->
         <div id="adminPortalContent-novo" class="admin-portal-content hidden">
             <form class="space-y-3" onsubmit="return false;">
                 <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-2">
@@ -200,7 +302,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">Tipo *</label>
                         <select id="adminPortalTipo" class="w-full px-3 py-2 border rounded-xl text-sm">
-                            <option value="paciente">Paciente</option>
+                            <option value="usuario">Usuário</option>
                             <option value="admin">Administrador</option>
                         </select>
                     </div>
@@ -209,8 +311,8 @@
                         <input type="text" id="adminPortalUnidade" class="w-full px-3 py-2 border rounded-xl text-sm" placeholder="Ex: UBS Centro">
                     </div>
                 </div>
-                <button onclick="cadastrarPacienteAdmin()" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 transition-all">
-                    ✅ Cadastrar Paciente
+                <button onclick="cadastrarUsuarioAdmin()" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 transition-all">
+                    ✅ Cadastrar Usuário
                 </button>
             </form>
         </div>
@@ -223,7 +325,7 @@
             </div>
             <input type="file" id="adminPortalCSVFile" accept=".csv" class="w-full text-sm mb-3">
             <button onclick="importarCSVPortal()" class="w-full bg-amber-600 text-white py-3 rounded-xl font-bold hover:bg-amber-700 transition-all">
-                📥 Importar Pacientes
+                📥 Importar Usuários
             </button>
             <div id="adminPortalCSVResultado" class="mt-3"></div>
         </div>
@@ -231,61 +333,61 @@
 </div>
 
 <!-- ============================================ -->
-<!-- MODAL EDITAR PACIENTE -->
+<!-- MODAL EDITAR USUÁRIO -->
 <!-- ============================================ -->
-<div id="modalEditarPaciente" class="modal-overlay">
+<div id="modalEditarUsuario" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl mx-4">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-extrabold flex items-center gap-2">
                 <span class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">✏️</span>
-                Editar Paciente
+                Editar Usuário
             </h2>
-            <button onclick="document.getElementById('modalEditarPaciente').classList.remove('show')" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+            <button onclick="document.getElementById('modalEditarUsuario').classList.remove('show')" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
         </div>
         <form class="space-y-3" onsubmit="return false;">
-            <input type="hidden" id="editPacienteId">
+            <input type="hidden" id="editUsuarioId">
             <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">Nome Completo *</label>
-                <input type="text" id="editPacienteNome" class="w-full px-3 py-2 border rounded-xl text-sm" required>
+                <input type="text" id="editUsuarioNome" class="w-full px-3 py-2 border rounded-xl text-sm" required>
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">CPF</label>
-                <input type="text" id="editPacienteCPF" class="w-full px-3 py-2 border rounded-xl text-sm bg-slate-100" readonly>
+                <input type="text" id="editUsuarioCPF" class="w-full px-3 py-2 border rounded-xl text-sm bg-slate-100" readonly>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Nome da Mãe</label>
-                    <input type="text" id="editPacienteNomeMae" class="w-full px-3 py-2 border rounded-xl text-sm">
+                    <input type="text" id="editUsuarioNomeMae" class="w-full px-3 py-2 border rounded-xl text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Cidade Natal</label>
-                    <input type="text" id="editPacienteCidadeNatal" class="w-full px-3 py-2 border rounded-xl text-sm">
+                    <input type="text" id="editUsuarioCidadeNatal" class="w-full px-3 py-2 border rounded-xl text-sm">
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Telefone</label>
-                    <input type="text" id="editPacienteTelefone" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="15" oninput="mascaraTelefone(this)">
+                    <input type="text" id="editUsuarioTelefone" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="15" oninput="mascaraTelefone(this)">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Nova Senha</label>
-                    <input type="text" id="editPacienteSenha" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="6" placeholder="Deixe em branco">
+                    <input type="text" id="editUsuarioSenha" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="6" placeholder="Deixe em branco">
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Tipo *</label>
-                    <select id="editPacienteTipo" class="w-full px-3 py-2 border rounded-xl text-sm">
-                        <option value="paciente">Paciente</option>
+                    <select id="editUsuarioTipo" class="w-full px-3 py-2 border rounded-xl text-sm">
+                        <option value="usuario">Usuário</option>
                         <option value="admin">Administrador</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Unidade de Saúde</label>
-                    <input type="text" id="editPacienteUnidade" class="w-full px-3 py-2 border rounded-xl text-sm">
+                    <input type="text" id="editUsuarioUnidade" class="w-full px-3 py-2 border rounded-xl text-sm">
                 </div>
             </div>
-            <button onclick="salvarEdicaoPaciente()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">
+            <button onclick="salvarEdicaoUsuario()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">
                 💾 Salvar Alterações
             </button>
         </form>
@@ -345,7 +447,7 @@
             </p>
         </div>
         
-        <p class="text-[10px] text-slate-400 mt-4">Admin: 123.456.789-09 | senha: admin</p>
+        <p class="text-[10px] text-slate-400 mt-4">Admin: 123.456.789-09 | senha: admin1</p>
     </div>
 </div>
 
@@ -450,9 +552,9 @@
             </nav>
             <div class="p-4 border-t border-white/10">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center font-bold" id="sidebarAvatar">P</div>
+                    <div class="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center font-bold" id="sidebarAvatar">U</div>
                     <div>
-                        <p class="text-xs font-bold" id="sidebarNomePortal">Paciente</p>
+                        <p class="text-xs font-bold" id="sidebarNomePortal">Usuário</p>
                         <p class="text-[10px] text-emerald-400" id="sidebarTipoPortal"></p>
                         <button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300">Sair</button>
                     </div>
@@ -463,7 +565,7 @@
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
             
-            <!-- Header Mobile + Desktop -->
+            <!-- Header -->
             <header class="gradient-bg text-white p-4 md:p-6 shadow-lg flex-shrink-0">
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <div class="flex items-center gap-3">
@@ -514,31 +616,18 @@
                         </h3>
                         <p class="text-sm text-slate-500 mb-6">
                             ⚠️ O número da solicitação deve existir na tabela de <strong>1ª Consulta Recepcionados</strong>.
+                            Os dados do paciente (nome, CPF, telefone) serão preenchidos automaticamente após validação.
                         </p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- CAMPOS OBRIGATÓRIOS -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
-                                    Nome do Paciente
-                                </label>
-                                <input type="text" id="nomePaciente" placeholder="Nome completo do paciente" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
-                                    CPF do Paciente
-                                </label>
-                                <input type="text" id="cpfPaciente" placeholder="000.000.000-00" maxlength="14" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none"
-                                       oninput="mascaraCPF(this)">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
                                     Nº Solicitação 1ª Consulta
                                 </label>
-                                <input type="text" id="numeroSolicitacao" placeholder="Ex: SOL-0001" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-bold text-blue-600">
+                                <input type="text" id="numeroSolicitacao" placeholder="Somente números" 
+                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-bold text-blue-600"
+                                       oninput="this.value = this.value.replace(/\D/g,'')">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
@@ -557,17 +646,38 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
-                                    Unidade de Saúde
-                                </label>
-                                <input type="text" id="unidadeSaude" placeholder="Ex: UBS Jardim das Flores" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
                                     Prontuário Vivver
                                 </label>
-                                <input type="text" id="prontuarioVivver" placeholder="Ex: PRONT123" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-bold text-purple-600">
+                                <input type="text" id="prontuarioVivver" placeholder="Somente números" 
+                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-bold text-purple-600"
+                                       oninput="this.value = this.value.replace(/\D/g,'')">
+                            </div>
+                            
+                            <!-- UNIDADE DE SAÚDE COM DROPDOWN DE BUSCA -->
+                            <div class="relative">
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
+                                    Unidade de Saúde
+                                </label>
+                                <input type="text" id="unidadeSaude" placeholder="Digite para buscar a unidade..." autocomplete="off"
+                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none"
+                                       oninput="filtrarUBS()" onfocus="filtrarUBS()">
+                                <div id="dropdownUBS" class="dropdown-ubs"></div>
+                            </div>
+                            
+                            <!-- CAMPOS PREENCHIDOS AUTOMATICAMENTE (readonly) -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+                                    Nome do Paciente <span class="text-[10px] text-blue-500">(automático)</span>
+                                </label>
+                                <input type="text" id="nomePaciente" placeholder="Preenchido após validação" readonly
+                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700 font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+                                    CPF do Paciente <span class="text-[10px] text-blue-500">(automático)</span>
+                                </label>
+                                <input type="text" id="cpfPaciente" placeholder="Preenchido após validação" readonly
+                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700 font-bold">
                             </div>
                             
                             <!-- CAMPOS OPCIONAIS -->
@@ -579,32 +689,32 @@
                                        class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none bg-slate-50">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-opcional">
-                                    Médico Solicitante
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+                                    Médico Solicitante <span class="text-[10px] text-blue-500">(automático)</span>
                                 </label>
-                                <input type="text" id="medicoSolicitante" placeholder="Será preenchido da 1ª consulta" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none bg-slate-50" readonly>
+                                <input type="text" id="medicoSolicitante" placeholder="Preenchido da 1ª consulta" readonly
+                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-opcional">
-                                    Local da Consulta
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+                                    Local da Consulta <span class="text-[10px] text-blue-500">(automático)</span>
                                 </label>
-                                <input type="text" id="localConsulta" placeholder="Será preenchido da 1ª consulta" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none bg-slate-50" readonly>
+                                <input type="text" id="localConsulta" placeholder="Preenchido da 1ª consulta" readonly
+                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-opcional">
-                                    Especialidade
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+                                    Especialidade <span class="text-[10px] text-blue-500">(automático)</span>
                                 </label>
-                                <input type="text" id="especialidadeRetorno" placeholder="Será preenchido da 1ª consulta" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none bg-slate-50" readonly>
+                                <input type="text" id="especialidadeRetorno" placeholder="Preenchido da 1ª consulta" readonly
+                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-opcional">
-                                    Data da 1ª Consulta
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+                                    Data da 1ª Consulta <span class="text-[10px] text-blue-500">(automático)</span>
                                 </label>
-                                <input type="text" id="dataPrimeiraConsulta" placeholder="Será preenchido da 1ª consulta" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none bg-slate-50" readonly>
+                                <input type="text" id="dataPrimeiraConsulta" placeholder="Preenchido da 1ª consulta" readonly
+                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700">
                             </div>
                         </div>
                         
@@ -627,7 +737,7 @@
                             <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded-full">OPCIONAL</span>
                         </div>
                         <p class="text-sm text-slate-500 mb-6">
-                            📌 Esta etapa é <strong>opcional</strong>. Você pode solicitar o retorno primeiro e enviar os exames depois.
+                            📌 Esta etapa é <strong>opcional</strong>. Você pode solicitar o retorno primeiro e enviar os exames depois, quando tiver os resultados em mãos.
                         </p>
                         
                         <div class="mb-4">
@@ -708,7 +818,7 @@ let usuarioLogado = null;
 let retornosLista = [];
 let especialidadesLista = [];
 let codigoRedefinicao = null;
-let dadosPrimeiraConsulta = null; // Armazena dados da 1ª consulta validada
+let dadosPrimeiraConsulta = null;
 
 // ============================================
 // FUNÇÕES UTILITÁRIAS
@@ -824,6 +934,51 @@ function mostrarMsg(id, texto, cor){
 }
 
 // ============================================
+// DROPDOWN DE UNIDADES DE SAÚDE (UBS)
+// ============================================
+function filtrarUBS(){
+    const input = document.getElementById('unidadeSaude');
+    const dropdown = document.getElementById('dropdownUBS');
+    const termo = input.value.toLowerCase().trim();
+    
+    let listaFiltrada = LISTA_UBS;
+    
+    if(termo){
+        listaFiltrada = LISTA_UBS.filter(ubs => 
+            ubs.toLowerCase().includes(termo) || 
+            (DISTRITO_MAP[ubs] || '').toLowerCase().includes(termo)
+        );
+    }
+    
+    if(listaFiltrada.length === 0){
+        dropdown.innerHTML = '<div class="dropdown-ubs-item text-slate-400">Nenhuma unidade encontrada</div>';
+    } else {
+        dropdown.innerHTML = listaFiltrada.map(ubs => `
+            <div class="dropdown-ubs-item" onclick="selecionarUBS('${ubs.replace(/'/g,"\\'")}')">
+                ${ubs}
+                <span class="distrito-tag">${DISTRITO_MAP[ubs] || ''}</span>
+            </div>
+        `).join('');
+    }
+    
+    dropdown.classList.add('show');
+}
+
+function selecionarUBS(ubs){
+    document.getElementById('unidadeSaude').value = ubs;
+    document.getElementById('dropdownUBS').classList.remove('show');
+}
+
+// Fechar dropdown ao clicar fora
+document.addEventListener('click', function(e){
+    const dropdown = document.getElementById('dropdownUBS');
+    const input = document.getElementById('unidadeSaude');
+    if(dropdown && input && !input.contains(e.target) && !dropdown.contains(e.target)){
+        dropdown.classList.remove('show');
+    }
+});
+
+// ============================================
 // LOGIN
 // ============================================
 document.getElementById('btnLogin').addEventListener('click', async () => {
@@ -835,7 +990,6 @@ document.getElementById('btnLogin').addEventListener('click', async () => {
     
     showLoading();
     
-    // Buscar na tabela de pacientes do portal
     const { data, error } = await db.from('pacientes_portal').select('*').eq('cpf', cpf).single();
     
     hideLoading();
@@ -910,24 +1064,20 @@ document.getElementById('btnConfirmarRedefinir').addEventListener('click', async
 async function carregarPortal(){
     showLoading();
     
-    // Atualizar sidebar
     document.getElementById('portalNome').textContent = usuarioLogado.nome;
     document.getElementById('sidebarNomePortal').textContent = usuarioLogado.nome || 'Usuário';
-    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'P')[0].toUpperCase();
-    document.getElementById('sidebarTipoPortal').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Paciente';
+    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
+    document.getElementById('sidebarTipoPortal').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário';
     
-    // Mostrar/esconder seção admin
     if(usuarioLogado.tipo === 'admin'){
         document.getElementById('sidebarAdminPortalSection').classList.remove('hidden');
     } else {
         document.getElementById('sidebarAdminPortalSection').classList.add('hidden');
     }
     
-    // Buscar retornos
     const { data: rets } = await db.from('retornos_solicitados').select('*').eq('paciente_id', usuarioLogado.id).order('created_at', {ascending: false});
     retornosLista = rets || [];
     
-    // Buscar especialidades
     const { data: esps } = await db.from('especialidades_oci').select('*');
     especialidadesLista = esps || [
         {id:1, nome:'Cardiologia', icone:'🫀'},
@@ -939,7 +1089,6 @@ async function carregarPortal(){
     
     hideLoading();
     
-    // Cards informativos
     document.getElementById('infoCards').innerHTML = `
         <div class="bg-white p-4 rounded-2xl shadow-sm card-hover border-l-4 border-blue-500">
             <p class="text-[10px] text-slate-500 uppercase font-bold">CPF</p>
@@ -950,8 +1099,8 @@ async function carregarPortal(){
             <p class="text-sm font-extrabold text-slate-800">${retornosLista.length}</p>
         </div>
         <div class="bg-white p-4 rounded-2xl shadow-sm card-hover border-l-4 border-purple-500">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Prontuário</p>
-            <p class="text-sm font-extrabold text-slate-800">${usuarioLogado.prontuario || '—'}</p>
+            <p class="text-[10px] text-slate-500 uppercase font-bold">Prontuário Vivver</p>
+            <p class="text-sm font-extrabold text-slate-800 text-purple-600">${usuarioLogado.prontuario || '—'}</p>
         </div>
         <div class="bg-white p-4 rounded-2xl shadow-sm card-hover border-l-4 border-amber-500">
             <p class="text-[10px] text-slate-500 uppercase font-bold">📱 Telefone</p>
@@ -959,13 +1108,11 @@ async function carregarPortal(){
         </div>
     `;
     
-    // Preencher select de retornos
     document.getElementById('retornoSelect').innerHTML = 
         '<option value="">Selecione um retorno...</option>' + 
         retornosLista.filter(r => r.status === 'solicitado')
                 .map(r => `<option value="${r.id}">📝 Retorno #${r.id} - ${formatarData(r.created_at)}</option>`).join('');
     
-    // Histórico
     if(retornosLista.length === 0){
         document.getElementById('historicoLista').innerHTML = 
             '<p class="text-slate-400 text-center py-8"><i class="fas fa-inbox text-4xl mb-3 block"></i>Nenhum retorno solicitado ainda.</p>';
@@ -984,7 +1131,12 @@ async function carregarPortal(){
                             🔢 Nº SOL: ${r.numero_solicitacao || '—'} | 
                             🧪 Exame: ${r.nome_exame || '—'}
                         </p>
+                        <p class="text-xs text-slate-500">
+                            👤 Paciente: ${r.paciente_nome || '—'} | 
+                            CPF: ${(r.paciente_cpf || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}
+                        </p>
                         ${r.telefone_paciente ? `<p class="text-xs text-slate-500">📱 Tel: ${formatarTelefone(r.telefone_paciente)}</p>` : ''}
+                        ${r.prontuario_vivver ? `<p class="text-xs text-slate-500 text-purple-600 font-bold">📋 Prontuário Vivver: ${r.prontuario_vivver}</p>` : ''}
                     </div>
                     <span class="px-2 py-1 rounded-full text-xs font-bold ${
                         r.status === 'solicitado' ? 'bg-amber-100 text-amber-700' : 
@@ -1000,7 +1152,6 @@ async function carregarPortal(){
         `).join('');
     }
     
-    // Meus Dados
     document.getElementById('meusDadosConteudo').innerHTML = `
         <div class="bg-slate-50 p-4 rounded-xl">
             <p class="text-[10px] text-slate-500 uppercase font-bold">Nome Completo</p>
@@ -1041,10 +1192,8 @@ async function carregarPortal(){
 // SWITCH DE ABAS
 // ============================================
 function switchTab(tabId){
-    // Desktop tabs (sidebar)
     document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
     
-    // Mobile tabs
     document.querySelectorAll('.tab-btn').forEach(b => { 
         b.classList.remove('active', 'text-emerald-600'); 
         b.classList.add('text-slate-400'); 
@@ -1058,32 +1207,27 @@ function switchTab(tabId){
 }
 
 // ============================================
-// 🆕 VALIDAR Nº SOLICITAÇÃO E ABRIR MODAL
+// VALIDAR Nº SOLICITAÇÃO E ABRIR MODAL
 // ============================================
 document.getElementById('btnValidarRetorno').addEventListener('click', async () => {
-    const nomePaciente = document.getElementById('nomePaciente').value.trim();
-    const cpfPaciente = document.getElementById('cpfPaciente').value.replace(/\D/g,'');
     const numeroSolicitacao = document.getElementById('numeroSolicitacao').value.trim();
     const nomeExame = document.getElementById('nomeExame').value.trim();
     const telefone = document.getElementById('telefoneRetorno').value.replace(/\D/g,'');
     const unidade = document.getElementById('unidadeSaude').value.trim();
     const prontuarioVivver = document.getElementById('prontuarioVivver').value.trim();
     
-    // Validar campos obrigatórios
-    if(!nomePaciente) return alert('❌ Informe o nome do paciente!');
-    if(!cpfPaciente || !validarCPF(cpfPaciente)) return alert('❌ CPF inválido!');
-    if(!numeroSolicitacao) return alert('❌ Informe o Nº da Solicitação da 1ª Consulta!');
+    if(!numeroSolicitacao) return alert('❌ Informe o Nº da Solicitação da 1ª Consulta (somente números)!');
     if(!nomeExame) return alert('❌ Informe o nome do exame!');
     if(!telefone || telefone.length < 10) return alert('❌ Informe um telefone válido!');
-    if(!unidade) return alert('❌ Informe a unidade de saúde!');
-    if(!prontuarioVivver) return alert('❌ Informe o Prontuário Vivver!');
+    if(!unidade) return alert('❌ Selecione a unidade de saúde!');
+    if(!prontuarioVivver) return alert('❌ Informe o Prontuário Vivver (somente números)!');
     
     showLoading();
     
-    // Buscar na tabela de 1ª consulta recepcionados
+    // Buscar na tabela de 1ª consulta recepcionados pelo número da solicitação
     const { data: consulta, error } = await db.from('primeira_consulta_recepcionados')
         .select('*')
-        .eq('numero_solicitacao', numeroSolicitacao)
+        .or(`numero_solicitacao.eq.${numeroSolicitacao},id.eq.${numeroSolicitacao}`)
         .single();
     
     hideLoading();
@@ -1092,29 +1236,49 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
         return mostrarMsg('msgSolicitar', '❌ Nº Solicitação NÃO encontrado na tabela de 1ª Consulta Recepcionados. Verifique o número e tente novamente.', 'rose');
     }
     
-    // Guardar dados da 1ª consulta para usar depois
     dadosPrimeiraConsulta = consulta;
     
-    // Preencher campos opcionais com dados da 1ª consulta
+    // Buscar dados do paciente vinculado à consulta
+    const pacienteId = consulta.paciente_id;
+    let nomePaciente = '';
+    let cpfPaciente = '';
+    let telefonePaciente = '';
+    
+    if(pacienteId){
+        const { data: paciente } = await db.from('pacientes').select('*').eq('id', pacienteId).single();
+        if(paciente){
+            nomePaciente = paciente.nome || '';
+            cpfPaciente = paciente.cpf || '';
+            telefonePaciente = paciente.telefone || '';
+        }
+    }
+    
+    // Preencher campos automáticos
+    document.getElementById('nomePaciente').value = nomePaciente || consulta.nome_paciente || '—';
+    document.getElementById('cpfPaciente').value = cpfPaciente ? cpfPaciente.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4') : (consulta.cpf_paciente || '—');
     document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '—';
     document.getElementById('localConsulta').value = consulta.local_consulta || '—';
     const esp = especialidadesLista.find(e => e.id === consulta.especialidade_id);
-    document.getElementById('especialidadeRetorno').value = esp ? esp.nome : '—';
+    document.getElementById('especialidadeRetorno').value = esp ? (esp.icone || '') + ' ' + esp.nome : '—';
     document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
+    
+    // Se o telefone do retorno estiver vazio, preencher com o do paciente
+    if(!telefone && telefonePaciente){
+        document.getElementById('telefoneRetorno').value = formatarTelefone(telefonePaciente);
+    }
     
     // Preencher modal de confirmação
     document.getElementById('modalNumSolicitacao').textContent = numeroSolicitacao;
-    document.getElementById('modalNomePaciente').textContent = nomePaciente;
-    document.getElementById('modalCPF').textContent = cpfPaciente.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+    document.getElementById('modalNomePaciente').textContent = nomePaciente || consulta.nome_paciente || '—';
+    document.getElementById('modalCPF').textContent = cpfPaciente ? cpfPaciente.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4') : (consulta.cpf_paciente || '—');
+    document.getElementById('modalTelefone').textContent = telefone ? formatarTelefone(telefone) : formatarTelefone(telefonePaciente);
     document.getElementById('modalMedico').textContent = consulta.medico_solicitante || '—';
     document.getElementById('modalLocal').textContent = consulta.local_consulta || '—';
     document.getElementById('modalEspecialidade').textContent = esp ? (esp.icone || '') + ' ' + esp.nome : '—';
     document.getElementById('modalData').textContent = formatarData(consulta.data_agendada);
     
-    // Guardar referência do botão confirmar
     document.getElementById('btnConfirmarRetorno').onclick = confirmarRetorno;
     
-    // Abrir modal
     document.getElementById('modalConfirmacao').classList.add('show');
 });
 
@@ -1132,24 +1296,23 @@ function fecharModalConfirmacao(){
 async function confirmarRetorno(){
     if(!dadosPrimeiraConsulta) return alert('❌ Dados da 1ª consulta não encontrados!');
     
-    const nomePaciente = document.getElementById('nomePaciente').value.trim();
-    const cpfPaciente = document.getElementById('cpfPaciente').value.replace(/\D/g,'');
     const numeroSolicitacao = document.getElementById('numeroSolicitacao').value.trim();
     const nomeExame = document.getElementById('nomeExame').value.trim();
     const telefone = document.getElementById('telefoneRetorno').value.replace(/\D/g,'');
     const unidade = document.getElementById('unidadeSaude').value.trim();
     const prontuarioVivver = document.getElementById('prontuarioVivver').value.trim();
     const nomeMae = document.getElementById('validarNomeMae').value.trim();
+    const nomePaciente = document.getElementById('nomePaciente').value.trim();
+    const cpfPaciente = document.getElementById('cpfPaciente').value.replace(/\D/g,'');
     
     showLoading();
     
-    // Inserir retorno vinculado à 1ª consulta
     const { error } = await db.from('retornos_solicitados').insert([{
         paciente_id: usuarioLogado.id,
         paciente_nome: nomePaciente,
         paciente_cpf: cpfPaciente,
         numero_solicitacao: numeroSolicitacao,
-        consulta_id: dadosPrimeiraConsulta.id, // VÍNCULO COM A 1ª CONSULTA
+        consulta_id: dadosPrimeiraConsulta.id,
         nome_exame: nomeExame,
         telefone_paciente: telefone,
         unidade_saude: unidade,
@@ -1168,7 +1331,6 @@ async function confirmarRetorno(){
         return; 
     }
     
-    // Atualizar prontuário e telefone do paciente logado
     await db.from('pacientes_portal').update({ 
         prontuario: prontuarioVivver,
         telefone: telefone 
@@ -1176,27 +1338,24 @@ async function confirmarRetorno(){
     
     hideLoading();
     
-    // Fechar modal
     fecharModalConfirmacao();
     
-    // Mostrar sucesso
-    mostrarMsg('msgSolicitar', '✅ Pedido de retorno cadastrado com sucesso!\n🔗 Vinculado à 1ª Consulta: ' + numeroSolicitacao + '\n📱 Telefone: ' + formatarTelefone(telefone), 'emerald');
+    mostrarMsg('msgSolicitar', '✅ Pedido de retorno cadastrado com sucesso!\n🔗 Vinculado à 1ª Consulta: ' + numeroSolicitacao + '\n👤 Paciente: ' + nomePaciente + '\n📱 Telefone: ' + formatarTelefone(telefone) + '\n📋 Prontuário Vivver: ' + prontuarioVivver, 'emerald');
     
     // Limpar campos
-    document.getElementById('nomePaciente').value = '';
-    document.getElementById('cpfPaciente').value = '';
     document.getElementById('numeroSolicitacao').value = '';
     document.getElementById('nomeExame').value = '';
     document.getElementById('telefoneRetorno').value = '';
     document.getElementById('unidadeSaude').value = '';
     document.getElementById('prontuarioVivver').value = '';
     document.getElementById('validarNomeMae').value = '';
+    document.getElementById('nomePaciente').value = '';
+    document.getElementById('cpfPaciente').value = '';
     document.getElementById('medicoSolicitante').value = '';
     document.getElementById('localConsulta').value = '';
     document.getElementById('especialidadeRetorno').value = '';
     document.getElementById('dataPrimeiraConsulta').value = '';
     
-    // Recarregar portal
     carregarPortal();
 }
 
@@ -1229,7 +1388,6 @@ document.getElementById('btnEnviarExame').addEventListener('click', async () => 
     carregarPortal();
 });
 
-// Upload area
 document.getElementById('uploadArea').addEventListener('click', () => document.getElementById('arquivoExame').click());
 document.getElementById('arquivoExame').addEventListener('change', function(){
     if(this.files[0]){
@@ -1244,7 +1402,7 @@ document.getElementById('arquivoExame').addEventListener('change', function(){
 function abrirModalAdminPortal(){
     document.getElementById('modalAdminPortal').classList.add('show');
     switchAdminTab('usuarios');
-    renderizarListaPacientes();
+    renderizarListaUsuarios();
 }
 
 function fecharModalAdminPortal(){
@@ -1270,37 +1428,37 @@ function gerarCPFPortal(){
     document.getElementById('adminPortalCPF').value = gerarCPFValido();
 }
 
-async function renderizarListaPacientes(){
+async function renderizarListaUsuarios(){
     showLoading();
-    const { data: pacientes } = await db.from('pacientes_portal').select('*').order('nome');
+    const { data: usuarios } = await db.from('pacientes_portal').select('*').order('nome');
     hideLoading();
     
     const busca = document.getElementById('adminPortalBusca')?.value?.toLowerCase() || '';
-    let lista = (pacientes || []).filter(p => 
-        !busca || p.nome.toLowerCase().includes(busca) || (p.cpf||'').includes(busca)
+    let lista = (usuarios || []).filter(u => 
+        !busca || u.nome.toLowerCase().includes(busca) || (u.cpf||'').includes(busca)
     );
     
-    document.getElementById('adminPortalTabelaUsuarios').innerHTML = lista.map(p => `
+    document.getElementById('adminPortalTabelaUsuarios').innerHTML = lista.map(u => `
         <tr class="hover:bg-slate-50 border-t">
-            <td class="px-3 py-2 font-bold text-sm">${p.nome}</td>
-            <td class="px-3 py-2 text-sm">${(p.cpf||'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}</td>
-            <td class="px-3 py-2 text-sm">${formatarTelefone(p.telefone)}</td>
+            <td class="px-3 py-2 font-bold text-sm">${u.nome}</td>
+            <td class="px-3 py-2 text-sm">${(u.cpf||'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}</td>
+            <td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td>
             <td class="px-3 py-2">
-                <span class="px-2 py-1 rounded-full text-xs font-bold ${p.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">
-                    ${p.tipo === 'admin' ? '👑 Admin' : '👤 Paciente'}
+                <span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">
+                    ${u.tipo === 'admin' ? '👑 Admin' : '👤 Usuário'}
                 </span>
             </td>
             <td class="px-3 py-2">
                 <div class="flex gap-2">
-                    <button onclick='editarPaciente(${JSON.stringify(p).replace(/'/g,"&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button>
-                    <button onclick='excluirPaciente(${p.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button>
+                    <button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button>
+                    <button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button>
                 </div>
             </td>
         </tr>
-    `).join('') || '<tr><td colspan="5" class="text-center py-6 text-slate-400 font-bold">Nenhum paciente encontrado</td></tr>';
+    `).join('') || '<tr><td colspan="5" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
 }
 
-async function cadastrarPacienteAdmin(){
+async function cadastrarUsuarioAdmin(){
     const nome = document.getElementById('adminPortalNome').value.trim();
     const cpf = document.getElementById('adminPortalCPF').value.replace(/\D/g,'');
     const nomeMae = document.getElementById('adminPortalNomeMae').value.trim();
@@ -1329,7 +1487,7 @@ async function cadastrarPacienteAdmin(){
     hideLoading();
     if(error) return alert('❌ Erro: ' + error.message);
     
-    alert('✅ Paciente cadastrado com sucesso!');
+    alert('✅ Usuário cadastrado com sucesso!');
     document.getElementById('adminPortalNome').value = '';
     document.getElementById('adminPortalCPF').value = '';
     document.getElementById('adminPortalNomeMae').value = '';
@@ -1337,32 +1495,32 @@ async function cadastrarPacienteAdmin(){
     document.getElementById('adminPortalTelefone').value = '';
     document.getElementById('adminPortalSenha').value = '';
     switchAdminTab('usuarios');
-    renderizarListaPacientes();
+    renderizarListaUsuarios();
 }
 
-function editarPaciente(p){
-    document.getElementById('editPacienteId').value = p.id;
-    document.getElementById('editPacienteNome').value = p.nome;
-    document.getElementById('editPacienteCPF').value = (p.cpf||'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
-    document.getElementById('editPacienteNomeMae').value = p.nome_mae || '';
-    document.getElementById('editPacienteCidadeNatal').value = p.cidade_nascimento || '';
-    document.getElementById('editPacienteTelefone').value = formatarTelefone(p.telefone);
-    document.getElementById('editPacienteSenha').value = '';
-    document.getElementById('editPacienteTipo').value = p.tipo || 'paciente';
-    document.getElementById('editPacienteUnidade').value = p.unidade_saude || '';
+function editarUsuario(u){
+    document.getElementById('editUsuarioId').value = u.id;
+    document.getElementById('editUsuarioNome').value = u.nome;
+    document.getElementById('editUsuarioCPF').value = (u.cpf||'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+    document.getElementById('editUsuarioNomeMae').value = u.nome_mae || '';
+    document.getElementById('editUsuarioCidadeNatal').value = u.cidade_nascimento || '';
+    document.getElementById('editUsuarioTelefone').value = formatarTelefone(u.telefone);
+    document.getElementById('editUsuarioSenha').value = '';
+    document.getElementById('editUsuarioTipo').value = u.tipo || 'usuario';
+    document.getElementById('editUsuarioUnidade').value = u.unidade_saude || '';
     
-    document.getElementById('modalEditarPaciente').classList.add('show');
+    document.getElementById('modalEditarUsuario').classList.add('show');
 }
 
-async function salvarEdicaoPaciente(){
-    const id = parseInt(document.getElementById('editPacienteId').value);
-    const nome = document.getElementById('editPacienteNome').value.trim();
-    const nomeMae = document.getElementById('editPacienteNomeMae').value.trim();
-    const cidadeNatal = document.getElementById('editPacienteCidadeNatal').value.trim();
-    const telefone = document.getElementById('editPacienteTelefone').value.replace(/\D/g,'');
-    const senha = document.getElementById('editPacienteSenha').value.trim();
-    const tipo = document.getElementById('editPacienteTipo').value;
-    const unidade = document.getElementById('editPacienteUnidade').value.trim();
+async function salvarEdicaoUsuario(){
+    const id = parseInt(document.getElementById('editUsuarioId').value);
+    const nome = document.getElementById('editUsuarioNome').value.trim();
+    const nomeMae = document.getElementById('editUsuarioNomeMae').value.trim();
+    const cidadeNatal = document.getElementById('editUsuarioCidadeNatal').value.trim();
+    const telefone = document.getElementById('editUsuarioTelefone').value.replace(/\D/g,'');
+    const senha = document.getElementById('editUsuarioSenha').value.trim();
+    const tipo = document.getElementById('editUsuarioTipo').value;
+    const unidade = document.getElementById('editUsuarioUnidade').value.trim();
     
     if(!nome) return alert('❌ O nome é obrigatório!');
     
@@ -1378,21 +1536,21 @@ async function salvarEdicaoPaciente(){
         carregarPortal();
     }
     
-    alert('✅ Paciente atualizado com sucesso!');
-    document.getElementById('modalEditarPaciente').classList.remove('show');
-    renderizarListaPacientes();
+    alert('✅ Usuário atualizado com sucesso!');
+    document.getElementById('modalEditarUsuario').classList.remove('show');
+    renderizarListaUsuarios();
 }
 
-async function excluirPaciente(id){
+async function excluirUsuario(id){
     if(id === usuarioLogado?.id) return alert('❌ Você não pode excluir seu próprio usuário!');
-    if(!confirm('Tem certeza que deseja excluir este paciente?')) return;
+    if(!confirm('Tem certeza que deseja excluir este usuário?')) return;
     
     showLoading();
     await db.from('pacientes_portal').delete().eq('id', id);
     hideLoading();
     
-    alert('✅ Paciente excluído!');
-    renderizarListaPacientes();
+    alert('✅ Usuário excluído!');
+    renderizarListaUsuarios();
 }
 
 async function importarCSVPortal(){
@@ -1426,7 +1584,7 @@ async function importarCSVPortal(){
                             senha: cols[6]?.trim() || '123456',
                             email: cols[7]?.trim() || '',
                             unidade_saude: cols[8]?.trim() || '',
-                            tipo: cols[9]?.trim() || 'paciente'
+                            tipo: cols[9]?.trim() || 'usuario'
                         }]);
                         importados++;
                     } else { erros++; }
@@ -1436,11 +1594,11 @@ async function importarCSVPortal(){
         
         document.getElementById('adminPortalCSVResultado').innerHTML = `
             <div class="bg-green-50 border border-green-200 rounded-xl p-3">
-                <p class="text-sm text-green-700 font-bold">✅ ${importados} pacientes importados!</p>
+                <p class="text-sm text-green-700 font-bold">✅ ${importados} usuários importados!</p>
                 ${erros > 0 ? `<p class="text-xs text-rose-600 mt-1">⚠️ ${erros} linhas com erro ou duplicadas</p>` : ''}
             </div>
         `;
-        renderizarListaPacientes();
+        renderizarListaUsuarios();
     };
     reader.readAsText(file);
 }
@@ -1454,7 +1612,7 @@ document.getElementById('modalConfirmacao').addEventListener('click', function(e
 document.getElementById('modalAdminPortal').addEventListener('click', function(e){
     if(e.target === this) fecharModalAdminPortal();
 });
-document.getElementById('modalEditarPaciente').addEventListener('click', function(e){
+document.getElementById('modalEditarUsuario').addEventListener('click', function(e){
     if(e.target === this) this.classList.remove('show');
 });
 
@@ -1480,10 +1638,11 @@ document.getElementById('loginSenha').addEventListener('keydown', (e) => {
 console.log('✅ PORTAL - PEDIDOS DE RETORNO v5.3 CARREGADO!');
 console.log('🔒 Cadastro público REMOVIDO - Apenas admin cadastra');
 console.log('🔗 Validação de Nº Solicitação na tabela de 1ª Consulta');
-console.log('📋 Modal de confirmação antes de cadastrar retorno');
+console.log('📋 Modal de confirmação com nome, CPF e telefone automáticos');
+console.log('🏥 Dropdown de UBS com busca por nome e distrito');
+console.log('🔢 Prontuário Vivver e Nº Solicitação: somente números');
 console.log('📌 Envio de exames é OPCIONAL');
-console.log('👑 Painel Admin para gerenciar pacientes');
-console.log('📱 Campos obrigatórios: Nome, CPF, Nº Solicitação, Exame, Tel, Unidade, Prontuário Vivver');
+console.log('👑 Painel Admin para gerenciar USUÁRIOS');
 </script>
 </body>
 </html>
