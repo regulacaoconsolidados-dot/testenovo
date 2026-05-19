@@ -3,235 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📋 Portal - Pedidos de Retorno | Sistema OCI v5.3</title>
+    <title>🏥 SISTEMA OCI v6.0 - Painel de Monitoramento</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
-        .gradient-bg { background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%); }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
-        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
-        .loading-overlay.show { display: flex; }
-        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .tab-btn { cursor: pointer; transition: all 0.2s; }
-        .tab-btn.active { color: #10b981; border-bottom: 3px solid #10b981; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
-        .screen { display: none; min-height: 100vh; }
-        .screen.active { display: flex; justify-content: center; align-items: center; padding: 20px; }
-        input:focus, select:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 10000; }
-        .modal-overlay.show { display: flex; }
-        .sidebar-item { transition: all 0.2s; }
-        .sidebar-item:hover { background: rgba(255,255,255,0.06); }
-        .sidebar-item.active { background: rgba(16,185,129,0.15); border-left: 4px solid #10b981; }
-        .campo-obrigatorio::after { content: ' *'; color: #ef4444; font-weight: bold; }
-        .campo-opcional::after { content: ' (opcional)'; color: #94a3b8; font-size: 10px; font-weight: normal; }
-        .dropdown-ubs { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #e2e8f0; border-radius: 12px; max-height: 250px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        .dropdown-ubs.show { display: block; }
-        .dropdown-ubs-item { padding: 10px 16px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; transition: all 0.15s; }
-        .dropdown-ubs-item:hover { background: #eff6ff; }
-        .dropdown-ubs-item:last-child { border-bottom: none; }
-        .dropdown-ubs-item .distrito-tag { font-size: 10px; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #f0f4f8;
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .gradient-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%);
+            animation: rotate 25s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .card-blue { border-left: 5px solid #3b82f6; }
+        .card-amber { border-left: 5px solid #f59e0b; }
+        .card-emerald { border-left: 5px solid #10b981; }
+        .card-rose { border-left: 5px solid #ef4444; }
+        .card-purple { border-left: 5px solid #8b5cf6; }
+        .card-cyan { border-left: 5px solid #06b6d4; }
+        .stat-card-hover {
+            transition: all 0.3s;
+        }
+        .stat-card-hover:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+        }
+        .tab-btn {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            color: #3b82f6;
+            border-bottom: 3px solid #3b82f6;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.35s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity:0; transform: translateY(8px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+        .sidebar-item {
+            transition: all 0.2s;
+        }
+        .sidebar-item:hover {
+            background: rgba(255,255,255,0.06);
+        }
+        .sidebar-item.active {
+            background: rgba(59,130,246,0.15);
+            border-left: 4px solid #3b82f6;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .alert-card {
+            border-left: 4px solid;
+            animation: pulse-alert 2s infinite;
+        }
+        @keyframes pulse-alert {
+            0%,100%{opacity:1}
+            50%{opacity:0.85}
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        .loading-overlay.show {
+            display: flex;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .filter-select-custom {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        .linha-producao-step {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="h-screen flex overflow-hidden">
 
-<!-- LOADING -->
+<!-- Loading Overlay -->
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
-    <p class="text-white mt-4 font-bold">Processando...</p>
+    <p class="text-white mt-4 font-bold">Carregando...</p>
 </div>
 
-<!-- ============================================ -->
-<!-- LISTA DE UNIDADES DE SAÚDE -->
-<!-- ============================================ -->
-<script>
-const DISTRITO_MAP = {
-  'UNIDADE BASICA DE SAUDE JARDIM BANDEIRANTES': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE AGUA BRANCA': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE XV': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE CSU ELDORADO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE PARQUE SAO JOAO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE JARDIM ELDORADO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE NOVO ELDORADO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE SANTA CRUZ': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE PEROBAS': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE BELA VISTA': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE INDUSTRIAL III SECAO': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE JARDIM INDUSTRIAL': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE VILA SAO PAULO': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE SANDOVAL DE AZEVEDO': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE JOAO EVANGELISTA': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE BANDEIRANTES': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE AMAZONAS': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE VILA DINIZ': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE NACIONAL': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE ILDA EFIGENIA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE JOAQUIM MURTINHO': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE XANGRILA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE AMENDOEIRAS': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE ESTRELA DALVA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE TIJUCA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE PETROLANDIA': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE TROPICAL II': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE SAPUCAIAS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE DUQUE DE CAXIAS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE SAO LUIZ II': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE SAO LUIZ I': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE CAMPO ALTO': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE TROPICAL I': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE ESTANCIAS IMPERIAIS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE NASCENTES IMPERIAIS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE CAMPINA VERDE': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE LAGUNA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE ARPOADOR': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE SAO JOAQUIM': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE PARQUE TURISTA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE VILA PEROLA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE NOVO PROGRESSO II': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE COLORADO': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE CANDIDA FERREIRA': 'RESSACA',
-  'UNIDADE DE SAUDE DA FAMILIA VILA PEROLA II USF 84': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE PRESIDENTE KENNEDY': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE OITIS': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE MORADA NOVA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE INCONFIDENTES': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE RIACHO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE FLAMENGO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE NOVO RIACHO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE DURVAL DE BARROS': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE MONTE CASTELO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE CHACARAS': 'SEDE',
-  'UNIDADE BASICA DE SAUDE CANADA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE CENTRO (CAD)': 'SEDE',
-  'UBS BERNARDO MONTEIRO/MOACIR PINTO MOREIRA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE LINDA VISTA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE SANTA HELENA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE VILA ITALIA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE BEATRIZ USF 72': 'SEDE',
-  'UNIDADE BASICA DE SAUDE MARIA DA CONCEICAO': 'SEDE',
-  'UNIDADE BASICA DE SAUDE FUNCIONARIOS': 'SEDE',
-  'UNIDADE BASICA DE SAUDE PRAIA': 'SEDE',
-  'UBS UNIDADE XVI (SEDE)': 'SEDE',
-  'UNIDADE BASICA DE SAUDE VILA RENASCER': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE NOVA CONTAGEM': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE VILA SOLEDADE': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE ESTALEIRO': 'VARGEM DAS FLORES',
-  'CERESP CONTAGEM': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE RETIRO II': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE RETIRO': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE IPE AMARELO': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE SAO JUDAS TADEU': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE VILA ESPERANCA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE DARCY RIBEIRO': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE ICAIVERA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE NOVA CONTAGEM I': 'VARGEM DAS FLORES',
-  'CONTAGEM PENITENCIARIA NELSON HUNGRIA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE TUPA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE LIBERDADE II': 'VARGEM DAS FLORES'
-};
-
-const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
-</script>
-
-<!-- ============================================ -->
-<!-- MODAL DE CONFIRMAÇÃO DA 1ª CONSULTA -->
-<!-- ============================================ -->
-<div id="modalConfirmacao" class="modal-overlay">
-    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="text-center mb-6">
-            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3">🔍</div>
-            <h2 class="text-xl font-extrabold text-slate-800">Confirmação da 1ª Consulta</h2>
-            <p class="text-sm text-slate-500 mt-1">Verifique os dados antes de confirmar o pedido de retorno</p>
-        </div>
-        
-        <div class="bg-slate-50 rounded-2xl p-4 mb-4 space-y-3" id="modalDadosConsulta">
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">Nº Solicitação</span>
-                <span class="text-sm font-extrabold text-blue-600" id="modalNumSolicitacao">—</span>
+<!-- ============ TELA DE LOGIN ============ -->
+<div id="screenLogin" class="screen active fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%);">
+    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
+        <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Sistema OCI</h1>
+        <p class="text-slate-500 text-sm mb-8">Painel de Monitoramento Hospitalar v6.0</p>
+        <div class="text-left space-y-4">
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome Completo</label>
+                <input type="text" id="loginNome" placeholder="Digite seu nome completo" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all">
             </div>
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">Nome do Paciente</span>
-                <span class="text-sm font-bold text-slate-800" id="modalNomePaciente">—</span>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">CPF</label>
+                <input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all" oninput="mascaraCPF(this)">
             </div>
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">CPF</span>
-                <span class="text-sm font-bold text-slate-800" id="modalCPF">—</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">📱 Telefone</span>
-                <span class="text-sm font-bold text-slate-800" id="modalTelefone">—</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">Médico</span>
-                <span class="text-sm font-bold text-slate-800" id="modalMedico">—</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">Local</span>
-                <span class="text-sm font-bold text-slate-800" id="modalLocal">—</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">Especialidade</span>
-                <span class="text-sm font-bold text-slate-800" id="modalEspecialidade">—</span>
-            </div>
-            <div class="flex justify-between items-center">
-                <span class="text-xs font-bold text-slate-500 uppercase">Data da Consulta</span>
-                <span class="text-sm font-bold text-slate-800" id="modalData">—</span>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Senha</label>
+                <div class="relative">
+                    <input type="password" id="loginSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all pr-12">
+                    <button type="button" onclick="toggleSenha('loginSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                        <i class="far fa-eye"></i>
+                    </button>
+                </div>
             </div>
         </div>
-        
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
-            <p class="text-xs text-amber-700 font-bold">
-                ⚠️ Confira todos os dados acima. Eles NÃO podem ser alterados aqui.
+        <button id="btnLogin" class="w-full mt-6 bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all transform hover:scale-[1.02] active:scale-95">
+            🔓 ENTRAR
+        </button>
+        <div class="mt-4 space-y-2">
+            <p class="text-xs text-rose-500 cursor-pointer hover:underline font-bold" onclick="showScreen('screenReset')">
+                🔑 Esqueci a senha / Redefinir
             </p>
         </div>
-        
-        <div class="flex gap-3">
-            <button onclick="fecharModalConfirmacao()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-3 rounded-xl font-bold transition-all text-sm">
-                ❌ CANCELAR
-            </button>
-            <button id="btnConfirmarRetorno" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm">
-                ✅ CONFIRMAR PEDIDO
-            </button>
-        </div>
+        <p class="text-[10px] text-slate-400 mt-4">Admin: 123.456.789-09 | senha: admin</p>
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- MODAL ADMINISTRADOR -->
-<!-- ============================================ -->
-<div id="modalAdminPortal" class="modal-overlay">
-    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-2xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
+<!-- ============ TELA DE REDEFINIR SENHA ============ -->
+<div id="screenReset" class="screen fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%);">
+    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
+        <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🔑</div>
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Redefinir Senha</h1>
+        <p class="text-slate-500 text-sm mb-6" id="resetStepTitle">Etapa 1: Verificar identidade</p>
+        
+        <div id="resetStep1">
+            <div class="text-left space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">CPF *</label>
+                    <input type="text" id="resetCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all" oninput="mascaraCPF(this)">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome da Mãe *</label>
+                    <input type="text" id="resetNomeMae" placeholder="Nome completo da mãe" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Cidade Natal *</label>
+                    <input type="text" id="resetCidadeNatal" placeholder="Cidade onde nasceu" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all">
+                </div>
+            </div>
+            <button id="btnResetVerificar" class="w-full mt-6 bg-amber-600 text-white py-3.5 rounded-xl font-bold hover:bg-amber-700 transition-all">
+                📱 RECEBER CÓDIGO NO WHATSAPP
+            </button>
+        </div>
+        
+        <div id="resetStep2" class="hidden">
+            <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-4">
+                <p class="text-sm text-green-700 font-bold">✅ Código enviado! Use: <span class="text-lg">123456</span></p>
+            </div>
+            <div class="text-left space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Código Recebido *</label>
+                    <input type="text" id="resetCodigo" placeholder="123456" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nova Senha (6 dígitos) *</label>
+                    <div class="relative">
+                        <input type="password" id="resetNovaSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all pr-12">
+                        <button type="button" onclick="toggleSenha('resetNovaSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Confirmar Senha *</label>
+                    <div class="relative">
+                        <input type="password" id="resetConfirmaSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all pr-12">
+                        <button type="button" onclick="toggleSenha('resetConfirmaSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button id="btnResetConfirmar" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold hover:bg-rose-700 transition-all">
+                ✅ REDEFINIR SENHA
+            </button>
+        </div>
+        
+        <p class="text-xs text-blue-600 cursor-pointer hover:underline font-bold mt-4" onclick="showScreen('screenLogin')">
+            🔙 Voltar ao Login
+        </p>
+    </div>
+</div>
+
+<!-- ============ MODAL ADMINISTRADOR ============ -->
+<div id="modalAdmin" class="modal-overlay">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-2xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-extrabold flex items-center gap-2">
                 <span class="w-10 h-10 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center">⚙️</span>
                 Painel do Administrador
             </h2>
-            <button onclick="fecharModalAdminPortal()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+            <button onclick="fecharModalAdmin()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
         </div>
 
         <div class="flex gap-4 border-b mb-4 overflow-x-auto">
-            <button onclick="switchAdminTab('usuarios')" id="adminPortalTab-usuarios" class="admin-portal-tab-btn pb-2 text-sm font-bold text-purple-600 border-b-2 border-purple-600 whitespace-nowrap">
+            <button onclick="switchAdminTab('usuarios')" id="adminTab-usuarios" class="admin-tab-btn pb-2 text-sm font-bold text-purple-600 border-b-2 border-purple-600 whitespace-nowrap">
                 👥 Usuários
             </button>
-            <button onclick="switchAdminTab('novo')" id="adminPortalTab-novo" class="admin-portal-tab-btn pb-2 text-sm font-bold text-slate-400 whitespace-nowrap">
+            <button onclick="switchAdminTab('novo')" id="adminTab-novo" class="admin-tab-btn pb-2 text-sm font-bold text-slate-400 whitespace-nowrap">
                 ➕ Novo Usuário
             </button>
-            <button onclick="switchAdminTab('importar')" id="adminPortalTab-importar" class="admin-portal-tab-btn pb-2 text-sm font-bold text-slate-400 whitespace-nowrap">
+            <button onclick="switchAdminTab('importar')" id="adminTab-importar" class="admin-tab-btn pb-2 text-sm font-bold text-slate-400 whitespace-nowrap">
                 📥 Importar CSV
             </button>
         </div>
 
-        <!-- Lista de Usuários -->
-        <div id="adminPortalContent-usuarios" class="admin-portal-content">
+        <div id="adminContent-usuarios" class="admin-content">
             <div class="mb-3">
-                <input type="text" id="adminPortalBusca" placeholder="🔍 Buscar usuário..." class="w-full px-4 py-2 border rounded-xl text-sm" oninput="renderizarListaUsuarios()">
+                <input type="text" id="adminBuscaUsuario" placeholder="🔍 Buscar usuário..." class="w-full px-4 py-2 border rounded-xl text-sm" oninput="renderizarListaUsuarios()">
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -239,76 +307,56 @@ const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
                         <tr class="bg-slate-50">
                             <th class="px-3 py-2 text-left text-xs font-bold">Nome</th>
                             <th class="px-3 py-2 text-left text-xs font-bold">CPF</th>
-                            <th class="px-3 py-2 text-left text-xs font-bold">Telefone</th>
                             <th class="px-3 py-2 text-left text-xs font-bold">Tipo</th>
                             <th class="px-3 py-2 text-left text-xs font-bold">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="adminPortalTabelaUsuarios"></tbody>
+                    <tbody id="adminTabelaUsuarios"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Novo Usuário -->
-        <div id="adminPortalContent-novo" class="admin-portal-content hidden">
+        <div id="adminContent-novo" class="admin-content hidden">
             <form class="space-y-3" onsubmit="return false;">
                 <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-2">
                     <p class="text-xs text-blue-700 font-bold mb-2">💡 CPFs válidos para teste:</p>
                     <div class="flex flex-wrap gap-1">
-                        <span class="text-xs bg-white px-2 py-1 rounded cursor-pointer hover:bg-blue-100 font-mono" onclick="preencherCPFPortal('529.982.247-25')">529.982.247-25</span>
-                        <span class="text-xs bg-white px-2 py-1 rounded cursor-pointer hover:bg-blue-100 font-mono" onclick="preencherCPFPortal('111.444.777-35')">111.444.777-35</span>
-                        <span class="text-xs bg-white px-2 py-1 rounded cursor-pointer hover:bg-blue-100 font-bold" onclick="gerarCPFPortal()">🎲 Gerar CPF</span>
+                        <span class="text-xs bg-white px-2 py-1 rounded cursor-pointer hover:bg-blue-100 font-mono" onclick="preencherCPF('529.982.247-25')">529.982.247-25</span>
+                        <span class="text-xs bg-white px-2 py-1 rounded cursor-pointer hover:bg-blue-100 font-mono" onclick="preencherCPF('111.444.777-35')">111.444.777-35</span>
+                        <span class="text-xs bg-white px-2 py-1 rounded cursor-pointer hover:bg-blue-100 font-bold" onclick="gerarCPFAdmin()">🎲 Gerar CPF</span>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">Nome Completo *</label>
-                        <input type="text" id="adminPortalNome" class="w-full px-3 py-2 border rounded-xl text-sm" required>
+                        <input type="text" id="adminNovoNome" class="w-full px-3 py-2 border rounded-xl text-sm" required>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">CPF *</label>
-                        <input type="text" id="adminPortalCPF" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="14" oninput="mascaraCPF(this)" required>
+                        <input type="text" id="adminNovoCPF" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="14" oninput="mascaraCPF(this)" required>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Nome da Mãe *</label>
-                        <input type="text" id="adminPortalNomeMae" class="w-full px-3 py-2 border rounded-xl text-sm" required>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Nome da Mãe</label>
+                        <input type="text" id="adminNovoNomeMae" class="w-full px-3 py-2 border rounded-xl text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Cidade Natal *</label>
-                        <input type="text" id="adminPortalCidadeNatal" class="w-full px-3 py-2 border rounded-xl text-sm" required>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Cidade Natal</label>
+                        <input type="text" id="adminNovoCidadeNatal" class="w-full px-3 py-2 border rounded-xl text-sm">
                     </div>
                 </div>
-                <div class="grid grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Data Nascimento</label>
-                        <input type="date" id="adminPortalDataNasc" class="w-full px-3 py-2 border rounded-xl text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Telefone *</label>
-                        <input type="text" id="adminPortalTelefone" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="15" oninput="mascaraTelefone(this)" required>
-                    </div>
+                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">Senha (6 dígitos) *</label>
-                        <input type="text" id="adminPortalSenha" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="6" required>
+                        <input type="text" id="adminNovoSenha" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="6" required>
                     </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Email</label>
-                    <input type="email" id="adminPortalEmail" class="w-full px-3 py-2 border rounded-xl text-sm">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">Tipo *</label>
-                        <select id="adminPortalTipo" class="w-full px-3 py-2 border rounded-xl text-sm">
+                        <select id="adminNovoTipo" class="w-full px-3 py-2 border rounded-xl text-sm">
                             <option value="usuario">Usuário</option>
                             <option value="admin">Administrador</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Unidade de Saúde</label>
-                        <input type="text" id="adminPortalUnidade" class="w-full px-3 py-2 border rounded-xl text-sm" placeholder="Ex: UBS Centro">
                     </div>
                 </div>
                 <button onclick="cadastrarUsuarioAdmin()" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 transition-all">
@@ -317,26 +365,23 @@ const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
             </form>
         </div>
 
-        <!-- Importar CSV -->
-        <div id="adminPortalContent-importar" class="admin-portal-content hidden">
+        <div id="adminContent-importar" class="admin-content hidden">
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
                 <p class="text-sm font-bold text-amber-700 mb-2">📋 Formato do CSV:</p>
-                <code class="text-xs bg-white px-2 py-1 rounded block">nome,cpf,nome_mae,cidade_natal,data_nascimento,telefone,senha,email,unidade_saude,tipo</code>
+                <code class="text-xs bg-white px-2 py-1 rounded block">nome,cpf,nome_mae,cidade_natal,senha,tipo</code>
             </div>
-            <input type="file" id="adminPortalCSVFile" accept=".csv" class="w-full text-sm mb-3">
-            <button onclick="importarCSVPortal()" class="w-full bg-amber-600 text-white py-3 rounded-xl font-bold hover:bg-amber-700 transition-all">
+            <input type="file" id="adminCSVFile" accept=".csv" class="w-full text-sm mb-3">
+            <button onclick="importarCSV()" class="w-full bg-amber-600 text-white py-3 rounded-xl font-bold hover:bg-amber-700 transition-all">
                 📥 Importar Usuários
             </button>
-            <div id="adminPortalCSVResultado" class="mt-3"></div>
+            <div id="adminCSVResultado" class="mt-3"></div>
         </div>
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- MODAL EDITAR USUÁRIO -->
-<!-- ============================================ -->
+<!-- ============ MODAL EDITAR USUÁRIO ============ -->
 <div id="modalEditarUsuario" class="modal-overlay">
-    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl mx-4">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl mx-4">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-extrabold flex items-center gap-2">
                 <span class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">✏️</span>
@@ -366,25 +411,15 @@ const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Telefone</label>
-                    <input type="text" id="editUsuarioTelefone" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="15" oninput="mascaraTelefone(this)">
-                </div>
-                <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Nova Senha</label>
-                    <input type="text" id="editUsuarioSenha" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="6" placeholder="Deixe em branco">
+                    <input type="text" id="editUsuarioSenha" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="6" placeholder="Deixe em branco para manter">
                 </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Tipo *</label>
                     <select id="editUsuarioTipo" class="w-full px-3 py-2 border rounded-xl text-sm">
                         <option value="usuario">Usuário</option>
                         <option value="admin">Administrador</option>
                     </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Unidade de Saúde</label>
-                    <input type="text" id="editUsuarioUnidade" class="w-full px-3 py-2 border rounded-xl text-sm">
                 </div>
             </div>
             <button onclick="salvarEdicaoUsuario()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">
@@ -394,431 +429,607 @@ const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- TELA 1: LOGIN -->
-<!-- ============================================ -->
-<div id="screenLogin" class="screen active gradient-bg">
-    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
-        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">📋</div>
-        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Portal - Pedidos de Retorno</h1>
-        <p class="text-slate-500 text-sm mb-2">Sistema OCI v5.3</p>
-        <p class="text-slate-400 text-xs mb-6">Acesso restrito - Faça login para continuar</p>
-        
-        <div class="text-left space-y-4">
-            <div>
-                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                    <i class="fas fa-id-card text-emerald-500"></i> CPF *
-                </label>
-                <input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" 
-                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg"
-                       oninput="mascaraCPF(this)">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                    <i class="fas fa-lock text-emerald-500"></i> Senha (6 dígitos) *
-                </label>
-                <div class="relative">
-                    <input type="password" id="loginSenha" placeholder="******" maxlength="6" 
-                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg pr-12">
-                    <button type="button" onclick="toggleSenha('loginSenha', this)" 
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                        <i class="far fa-eye text-lg"></i>
-                    </button>
-                </div>
-            </div>
+<!-- ============ SISTEMA ============ -->
+<div id="screenSistema" class="hidden h-full w-full flex overflow-hidden">
+    <aside class="w-64 gradient-header text-white hidden md:flex flex-col h-full shadow-2xl z-50 flex-shrink-0">
+        <div class="p-6 flex items-center gap-3 border-b border-white/10">
+            <div class="bg-blue-600 p-2 rounded-xl">🏥</div>
+            <span class="text-lg font-extrabold">OCI <span class="text-blue-400">v6.0</span></span>
         </div>
-        
-        <button id="btnLogin" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-emerald-200 transition-all transform hover:scale-[1.02] active:scale-95">
-            <i class="fas fa-sign-in-alt"></i> ENTRAR
-        </button>
-        
-        <div class="mt-4 space-y-2">
-            <p class="text-sm text-slate-500">
-                <span onclick="showScreen('screenRedefinir')" class="text-rose-600 font-bold hover:underline cursor-pointer">
-                    <i class="fas fa-key"></i> Esqueci minha senha
-                </span>
-            </p>
-        </div>
-        
-        <div class="mt-6 bg-slate-50 rounded-xl p-3">
-            <p class="text-[10px] text-slate-500">
-                <i class="fas fa-info-circle text-blue-500"></i> 
-                <strong>Novo usuário?</strong> Solicite seu cadastro à administração da sua unidade de saúde.
-            </p>
-        </div>
-        
-        <p class="text-[10px] text-slate-400 mt-4">Admin: 123.456.789-09 | senha: admin1</p>
-    </div>
-</div>
-
-<!-- ============================================ -->
-<!-- TELA 2: REDEFINIR SENHA -->
-<!-- ============================================ -->
-<div id="screenRedefinir" class="screen gradient-bg">
-    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
-        <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🔑</div>
-        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Redefinir Senha</h1>
-        <p class="text-slate-500 text-sm mb-6" id="redefTitulo">Etapa 1: Verificar identidade</p>
-        
-        <!-- Etapa 1: Verificação -->
-        <div id="etapaSolicitar">
-            <div class="text-left space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">CPF *</label>
-                    <input type="text" id="redefCPF" placeholder="000.000.000-00" maxlength="14" 
-                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none"
-                           oninput="mascaraCPF(this)">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nome da sua Mãe *</label>
-                    <input type="text" id="redefNomeMae" placeholder="Nome completo da sua mãe" 
-                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Cidade onde Nasceu *</label>
-                    <input type="text" id="redefCidade" placeholder="Sua cidade natal" 
-                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none">
-                </div>
-            </div>
-            <button id="btnSolicitarCodigo" class="w-full mt-4 bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm">
-                <i class="fab fa-whatsapp"></i> RECEBER CÓDIGO NO WHATSAPP
-            </button>
-        </div>
-        
-        <!-- Etapa 2: Nova Senha -->
-        <div id="etapaVerificar" class="hidden">
-            <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-4">
-                <p class="text-sm text-green-700 font-bold">
-                    <i class="fas fa-check-circle"></i> Código enviado!
-                </p>
-            </div>
-            <div class="text-left space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Código Recebido *</label>
-                    <input type="text" id="redefCodigo" placeholder="000000" maxlength="6" 
-                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none text-center text-2xl font-bold tracking-widest">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nova Senha (6 dígitos) *</label>
-                    <input type="password" id="redefNovaSenha" placeholder="******" maxlength="6" 
-                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none">
-                </div>
-            </div>
-            <button id="btnConfirmarRedefinir" class="w-full mt-4 bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm">
-                <i class="fas fa-check"></i> REDEFINIR SENHA
-            </button>
-        </div>
-        
-        <p class="text-sm text-slate-500 mt-4">
-            <span onclick="showScreen('screenLogin')" class="text-emerald-600 font-bold hover:underline cursor-pointer">
-                <i class="fas fa-arrow-left"></i> Voltar ao Login
-            </span>
-        </p>
-    </div>
-</div>
-
-<!-- ============================================ -->
-<!-- TELA 3: PORTAL PRINCIPAL -->
-<!-- ============================================ -->
-<div id="screenPortal" class="screen" style="display:none; min-height:100vh; background:#f8fafc; padding:0;">
-    <div style="width:100%; display:flex; min-height:100vh;">
-        
-        <!-- SIDEBAR -->
-        <aside class="w-64 gradient-bg text-white hidden md:flex flex-col min-h-screen shadow-2xl z-50 flex-shrink-0">
-            <div class="p-6 flex items-center gap-3 border-b border-white/10">
-                <div class="bg-emerald-600 p-2 rounded-xl">📋</div>
-                <span class="text-lg font-extrabold">Portal <span class="text-emerald-400">Retornos</span></span>
-            </div>
-            <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
-                <a href="#" onclick="switchTab('solicitar')" class="sidebar-item active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold">
-                    <i class="fas fa-paper-plane w-4"></i> Solicitar Retorno
-                </a>
-                <a href="#" onclick="switchTab('exames')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
-                    <i class="fas fa-cloud-upload-alt w-4"></i> Enviar Exames
-                </a>
-                <a href="#" onclick="switchTab('historico')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
-                    <i class="fas fa-history w-4"></i> Histórico
-                </a>
-                <a href="#" onclick="switchTab('meusdados')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
-                    <i class="fas fa-user-circle w-4"></i> Meus Dados
-                </a>
-                <div class="border-t border-white/10 my-4"></div>
-                <!-- Seção Admin (visível apenas para administradores) -->
-                <div id="sidebarAdminPortalSection" class="hidden">
-                    <a href="#" onclick="abrirModalAdminPortal()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
-                        <i class="fas fa-user-shield"></i> Administrador
-                    </a>
-                </div>
-            </nav>
-            <div class="p-4 border-t border-white/10">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center font-bold" id="sidebarAvatar">U</div>
-                    <div>
-                        <p class="text-xs font-bold" id="sidebarNomePortal">Usuário</p>
-                        <p class="text-[10px] text-emerald-400" id="sidebarTipoPortal"></p>
-                        <button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300">Sair</button>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- CONTEÚDO PRINCIPAL -->
-        <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
+            <a href="#" onclick="switchTab('visao-geral')" class="sidebar-item active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold">
+                <i class="fas fa-th-large w-4"></i> Visão Geral
+            </a>
+            <a href="#" onclick="switchTab('monitoramento')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
+                <i class="fas fa-users w-4"></i> Monitoramento
+            </a>
+            <a href="#" onclick="switchTab('primeira-consulta')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
+                <i class="fas fa-clipboard-check w-4 text-cyan-400"></i> 1ª Consulta Recepcionados
+            </a>
             
-            <!-- Header -->
-            <header class="gradient-bg text-white p-4 md:p-6 shadow-lg flex-shrink-0">
-                <div class="flex items-center justify-between flex-wrap gap-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-lg md:hidden">📋</div>
-                        <div>
-                            <h2 class="text-lg font-extrabold">Portal - Pedidos de Retorno</h2>
-                            <p class="text-emerald-300 text-xs">Sistema OCI v5.3</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm font-bold hidden md:block" id="portalNome"></span>
-                        <button onclick="logout()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm font-bold transition-all">
-                            <i class="fas fa-sign-out-alt"></i> Sair
-                        </button>
-                    </div>
+            <!-- 🆕 APTOS PARA O RETORNO -->
+            <a href="#" onclick="switchTab('aptos-retorno')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
+                <i class="fas fa-check-circle w-4 text-emerald-400"></i> Aptos para o Retorno
+            </a>
+            
+            <!-- 🆕 RETORNOS AGENDADOS -->
+            <a href="#" onclick="switchTab('retornos-agendados')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
+                <i class="fas fa-calendar-plus w-4 text-blue-400"></i> Retornos Agendados
+            </a>
+            
+            <a href="#" onclick="switchTab('retornos')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
+                <i class="fas fa-calendar-check w-4"></i> Retornos
+            </a>
+            
+            <!-- 🆕 1ª CONSULTA ABSENTEÍSMO -->
+            <a href="#" onclick="switchTab('absenteismo-1consulta')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
+                <i class="fas fa-user-times w-4 text-orange-400"></i> 1ª Consulta Absenteísmo
+            </a>
+            
+            <!-- 🆕 RETORNO ABSENTEÍSMO -->
+            <a href="#" onclick="switchTab('absenteismo-retorno')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
+                <i class="fas fa-user-slash w-4 text-red-400"></i> Retorno Absenteísmo
+            </a>
+            
+            <a href="#" onclick="switchTab('apac')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
+                <i class="fas fa-file-invoice w-4"></i> APAC
+            </a>
+            
+            <div class="border-t border-white/10 my-4"></div>
+            
+            <!-- Painel Admin -->
+            <div id="sidebarAdminSection" class="hidden">
+                <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
+                    <i class="fas fa-user-shield"></i> Administrador
+                </a>
+            </div>
+            
+            <!-- Botões de Exportação -->
+            <button onclick="exportarExcel('primeira-consulta')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-cyan-400 font-bold">
+                <i class="fas fa-download"></i> Baixar 1ª Consulta
+            </button>
+            <button onclick="exportarExcel('aptos-retorno')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-emerald-400 font-bold">
+                <i class="fas fa-download"></i> Baixar Aptos Retorno
+            </button>
+            <button onclick="exportarExcel('retornos-agendados')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-blue-400 font-bold">
+                <i class="fas fa-download"></i> Baixar Ret. Agendados
+            </button>
+            <button onclick="exportarExcel('retornos')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-green-400 font-bold">
+                <i class="fas fa-download"></i> Baixar Retornos
+            </button>
+            <button onclick="exportarExcel('absenteismo-1consulta')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-orange-400 font-bold">
+                <i class="fas fa-download"></i> Baixar Abs. 1ª Cons.
+            </button>
+            <button onclick="exportarExcel('absenteismo-retorno')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-red-400 font-bold">
+                <i class="fas fa-download"></i> Baixar Abs. Retorno
+            </button>
+            <button onclick="exportarExcel('apac')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
+                <i class="fas fa-file-excel"></i> Baixar APAC
+            </button>
+        </nav>
+        <div class="p-4 border-t border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold" id="sidebarAvatar">A</div>
+                <div>
+                    <p class="text-xs font-bold" id="sidebarNome">Admin</p>
+                    <p class="text-[10px] text-blue-400" id="sidebarTipo"></p>
+                    <button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300">Sair</button>
                 </div>
-            </header>
+            </div>
+        </div>
+    </aside>
 
-            <!-- Área de Conteúdo -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-6">
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f0f4f8]">
+        <header class="h-20 gradient-header text-white flex items-center justify-between px-4 md:px-8 z-40 flex-shrink-0 border-b border-white/10">
+            <div>
+                <h2 class="text-lg md:text-xl font-extrabold" id="headerTitle">Visão Geral</h2>
+                <p class="text-blue-300 text-[10px] font-bold uppercase">Sistema OCI Avançado v6.0</p>
+            </div>
+            <div class="flex items-center gap-3 md:gap-5">
+                <div class="relative hidden lg:block">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="globalSearch" placeholder="Buscar paciente ou CPF..." class="pl-10 pr-4 py-2 bg-white/10 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 w-64 text-sm text-white placeholder-slate-400 outline-none">
+                </div>
+                <div class="relative cursor-pointer bg-white/10 p-2.5 rounded-xl hover:bg-white/20">
+                    <i class="far fa-bell text-lg"></i>
+                    <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold" id="alertCount">0</span>
+                </div>
+                <div class="text-right hidden sm:block">
+                    <p class="text-[10px] text-blue-300 font-bold uppercase">Status</p>
+                    <p class="text-xs text-emerald-400 font-bold flex items-center gap-1.5">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> Online
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+            <!-- Abas -->
+            <div class="mb-6 flex gap-4 md:gap-6 overflow-x-auto border-b border-slate-200 pb-1">
+                <button onclick="switchTab('visao-geral')" id="tab-visao-geral" class="tab-btn active pb-3 text-sm font-bold flex items-center gap-2 whitespace-nowrap text-blue-600">
+                    <i class="fas fa-th-large"></i> Visão Geral
+                </button>
+                <button onclick="switchTab('monitoramento')" id="tab-monitoramento" class="tab-btn pb-3 text-sm font-bold text-slate-400">
+                    <i class="fas fa-users"></i> Monitoramento
+                </button>
+                <button onclick="switchTab('primeira-consulta')" id="tab-primeira-consulta" class="tab-btn pb-3 text-sm font-bold text-slate-400">
+                    <i class="fas fa-clipboard-check"></i> 1ª Consulta
+                </button>
+                <button onclick="switchTab('aptos-retorno')" id="tab-aptos-retorno" class="tab-btn pb-3 text-sm font-bold text-slate-400">
+                    <i class="fas fa-check-circle"></i> Aptos Retorno
+                </button>
+                <button onclick="switchTab('retornos-agendados')" id="tab-retornos-agendados" class="tab-btn pb-3 text-sm font-bold text-slate-400">
+                    <i class="fas fa-calendar-plus"></i> Ret. Agendados
+                </button>
+                <button onclick="switchTab('retornos')" id="tab-retornos" class="tab-btn pb-3 text-sm font-bold text-slate-400">
+                    <i class="fas fa-calendar-check"></i> Retornos
+                </button>
+                <button onclick="switchTab('absenteismo-1consulta')" id="tab-absenteismo-1consulta" class="tab-btn pb-3 text-sm font-bold text-slate-400">
+                    <i class="fas fa-user-times"></i> Abs. 1ª Cons.
+                </button>
+                <button onclick="switchTab('absenteismo-retorno')" id="tab-absenteismo-retorno" class="tab-btn pb-3 text-sm font-bold text-slate-400">
+                    <i class="fas fa-user-slash"></i> Abs. Retorno
+                </button>
+                <button onclick="switchTab('apac')" id="tab-apac" class="tab-btn pb-3 text-sm font-bold text-slate-400">
+                    <i class="fas fa-file-medical"></i> APAC
+                </button>
+            </div>
+
+            <!-- VISÃO GERAL -->
+            <div id="content-visao-geral" class="tab-content active space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5" id="statsGrid"></div>
                 
-                <!-- Cards Informativos -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="infoCards"></div>
-
-                <!-- Abas Mobile -->
-                <div class="flex gap-4 md:gap-6 border-b border-slate-200 mb-6 overflow-x-auto md:hidden">
-                    <button onclick="switchTab('solicitar')" id="tabMobile-solicitar" class="tab-btn active pb-3 text-sm font-bold flex items-center gap-2 whitespace-nowrap">
-                        <i class="fas fa-paper-plane text-blue-500"></i> Solicitar
-                    </button>
-                    <button onclick="switchTab('exames')" id="tabMobile-exames" class="tab-btn pb-3 text-sm font-bold text-slate-400 flex items-center gap-2 whitespace-nowrap">
-                        <i class="fas fa-cloud-upload-alt text-emerald-500"></i> Exames
-                    </button>
-                    <button onclick="switchTab('historico')" id="tabMobile-historico" class="tab-btn pb-3 text-sm font-bold text-slate-400 flex items-center gap-2 whitespace-nowrap">
-                        <i class="fas fa-history text-purple-500"></i> Histórico
-                    </button>
-                    <button onclick="switchTab('meusdados')" id="tabMobile-meusdados" class="tab-btn pb-3 text-sm font-bold text-slate-400 flex items-center gap-2 whitespace-nowrap">
-                        <i class="fas fa-user-circle text-amber-500"></i> Dados
-                    </button>
+                <!-- 🆕 LINHA DE PRODUÇÃO -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                    <h3 class="font-bold text-sm mb-4"><i class="fas fa-industry text-slate-600"></i> Linha de Produção OCI</h3>
+                    <div class="flex flex-wrap gap-2 items-center" id="linhaProducao"></div>
                 </div>
-
-                <!-- ============================================ -->
-                <!-- ABA: SOLICITAR RETORNO -->
-                <!-- ============================================ -->
-                <div id="content-solicitar" class="tab-content active">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
-                        <h3 class="text-lg font-bold text-slate-800 mb-2">
-                            <i class="fas fa-paper-plane text-blue-500"></i> Solicitar Pedido de Retorno
-                        </h3>
-                        <p class="text-sm text-slate-500 mb-6">
-                            ⚠️ O número da solicitação deve existir na tabela de <strong>1ª Consulta Recepcionados</strong>.
-                            Os dados do paciente (nome, CPF, telefone) serão preenchidos automaticamente após validação.
-                        </p>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- CAMPOS OBRIGATÓRIOS -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
-                                    Nº Solicitação 1ª Consulta
-                                </label>
-                                <input type="text" id="numeroSolicitacao" placeholder="Somente números" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-bold text-blue-600"
-                                       oninput="this.value = this.value.replace(/\D/g,'')">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
-                                    Nome do Exame Solicitado
-                                </label>
-                                <input type="text" id="nomeExame" placeholder="Ex: ECG, Laboratoriais, RX..." 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
-                                    📱 Telefone
-                                </label>
-                                <input type="text" id="telefoneRetorno" placeholder="(00) 00000-0000" maxlength="15" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none"
-                                       oninput="mascaraTelefone(this)">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
-                                    Prontuário Vivver
-                                </label>
-                                <input type="text" id="prontuarioVivver" placeholder="Somente números" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-bold text-purple-600"
-                                       oninput="this.value = this.value.replace(/\D/g,'')">
-                            </div>
-                            
-                            <!-- UNIDADE DE SAÚDE COM DROPDOWN DE BUSCA -->
-                            <div class="relative">
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">
-                                    Unidade de Saúde
-                                </label>
-                                <input type="text" id="unidadeSaude" placeholder="Digite para buscar a unidade..." autocomplete="off"
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none"
-                                       oninput="filtrarUBS()" onfocus="filtrarUBS()">
-                                <div id="dropdownUBS" class="dropdown-ubs"></div>
-                            </div>
-                            
-                            <!-- CAMPOS PREENCHIDOS AUTOMATICAMENTE (readonly) -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                                    Nome do Paciente <span class="text-[10px] text-blue-500">(automático)</span>
-                                </label>
-                                <input type="text" id="nomePaciente" placeholder="Preenchido após validação" readonly
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700 font-bold">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                                    CPF do Paciente <span class="text-[10px] text-blue-500">(automático)</span>
-                                </label>
-                                <input type="text" id="cpfPaciente" placeholder="Preenchido após validação" readonly
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700 font-bold">
-                            </div>
-                            
-                            <!-- CAMPOS OPCIONAIS -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-opcional">
-                                    Nome da Mãe
-                                </label>
-                                <input type="text" id="validarNomeMae" placeholder="Confirme o nome da mãe" 
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                                    Médico Solicitante <span class="text-[10px] text-blue-500">(automático)</span>
-                                </label>
-                                <input type="text" id="medicoSolicitante" placeholder="Preenchido da 1ª consulta" readonly
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                                    Local da Consulta <span class="text-[10px] text-blue-500">(automático)</span>
-                                </label>
-                                <input type="text" id="localConsulta" placeholder="Preenchido da 1ª consulta" readonly
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                                    Especialidade <span class="text-[10px] text-blue-500">(automático)</span>
-                                </label>
-                                <input type="text" id="especialidadeRetorno" placeholder="Preenchido da 1ª consulta" readonly
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                                    Data da 1ª Consulta <span class="text-[10px] text-blue-500">(automático)</span>
-                                </label>
-                                <input type="text" id="dataPrimeiraConsulta" placeholder="Preenchido da 1ª consulta" readonly
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700">
-                            </div>
-                        </div>
-                        
-                        <button id="btnValidarRetorno" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2">
-                            <i class="fas fa-search"></i> VALIDAR Nº SOLICITAÇÃO
-                        </button>
-                        <div id="msgSolicitar" class="mt-4 hidden"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="alertasGrid"></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h3 class="font-bold mb-4"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3>
+                        <div class="h-72"><canvas id="chartPerformance"></canvas></div>
                     </div>
-                </div>
-
-                <!-- ============================================ -->
-                <!-- ABA: ENVIAR EXAMES (OPCIONAL) -->
-                <!-- ============================================ -->
-                <div id="content-exames" class="tab-content">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
-                        <div class="flex items-center gap-2 mb-2">
-                            <h3 class="text-lg font-bold text-slate-800">
-                                <i class="fas fa-cloud-upload-alt text-emerald-500"></i> Enviar Exames Realizados
-                            </h3>
-                            <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded-full">OPCIONAL</span>
-                        </div>
-                        <p class="text-sm text-slate-500 mb-6">
-                            📌 Esta etapa é <strong>opcional</strong>. Você pode solicitar o retorno primeiro e enviar os exames depois, quando tiver os resultados em mãos.
-                        </p>
-                        
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                                Selecione o Retorno
-                            </label>
-                            <select id="retornoSelect" 
-                                    class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none bg-white">
-                                <option value="">Selecione um retorno...</option>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold"><i class="fas fa-chart-pie text-purple-500"></i> Pacientes por Especialidade</h3>
+                            <select id="filtroGraficoEspecialidade" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 filter-select-custom" onchange="atualizarGraficoEspecialidade()">
+                                <option value="todos">📊 Todos</option>
+                                <option value="primeira_consulta">🆕 1ª Consulta</option>
+                                <option value="aptos_retorno">✅ Aptos Retorno</option>
+                                <option value="retornos_agendados">📅 Ret. Agendados</option>
+                                <option value="retornos">📋 Retornos</option>
+                                <option value="oci_fechada">✔️ OCIs Fechadas</option>
                             </select>
                         </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
-                                Arquivo do Exame (PDF, JPG, PNG)
-                            </label>
-                            <div class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-emerald-500 transition-all cursor-pointer bg-slate-50" id="uploadArea">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-slate-300 mb-3"></i>
-                                <p class="text-slate-500 font-bold">Clique para selecionar o arquivo</p>
-                                <p class="text-xs text-slate-400 mt-1">PDF, JPG ou PNG até 10MB</p>
-                                <input type="file" id="arquivoExame" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
-                            </div>
-                            <p id="nomeArquivo" class="text-sm text-emerald-600 font-bold mt-2 hidden">
-                                <i class="fas fa-check-circle"></i> <span id="nomeArquivoTexto"></span>
-                            </p>
-                        </div>
-                        
-                        <button id="btnEnviarExame" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2">
-                            <i class="fas fa-cloud-upload-alt"></i> ENVIAR EXAME
-                        </button>
-                        <div id="msgExames" class="mt-4 hidden"></div>
+                        <div class="h-72 flex justify-center"><canvas id="chartSpecialty"></canvas></div>
                     </div>
                 </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h3 class="font-bold mb-4"><i class="fas fa-chart-bar text-emerald-500"></i> Taxa de Comparecimento</h3>
+                        <div class="h-64"><canvas id="chartComparecimento"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h3 class="font-bold mb-4"><i class="fas fa-clock text-amber-500"></i> Tempo Médio OCI (dias)</h3>
+                        <div class="h-64"><canvas id="chartTempoMedio"></canvas></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="infoCards"></div>
+            </div>
 
-                <!-- ============================================ -->
-                <!-- ABA: HISTÓRICO -->
-                <!-- ============================================ -->
-                <div id="content-historico" class="tab-content">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
-                        <h3 class="text-lg font-bold text-slate-800 mb-6">
-                            <i class="fas fa-history text-purple-500"></i> Meus Retornos e Exames
-                        </h3>
-                        <div class="space-y-4" id="historicoLista">
-                            <p class="text-slate-400 text-center py-8">Carregando...</p>
+            <!-- MONITORAMENTO -->
+            <div id="content-monitoramento" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 items-center justify-between">
+                        <h3 class="text-lg font-bold">👥 Monitoramento de Pacientes</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <input type="text" id="buscaMonitoramento" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('monitoramento')">
+                            <select id="filtroEspecialidadeMonitoramento" class="px-3 py-2 border rounded-xl text-sm" onchange="filtrarTabela('monitoramento')">
+                                <option value="">Todas Especialidades</option>
+                            </select>
+                            <select id="filtroStatusMonitoramento" class="px-3 py-2 border rounded-xl text-sm" onchange="filtrarTabela('monitoramento')">
+                                <option value="">Todos Status</option>
+                                <option value="em_andamento">Em Andamento</option>
+                                <option value="aguardando_exame">Aguardando Exame</option>
+                                <option value="apto_retorno">Apto Retorno</option>
+                                <option value="retorno_agendado">Retorno Agendado</option>
+                                <option value="retorno_recepcionado">Retorno Recepcionado</option>
+                                <option value="oci_fechada">OCI Fechada</option>
+                                <option value="faltou">Faltou 1ª Consulta</option>
+                                <option value="retorno_faltou">Faltou Retorno</option>
+                            </select>
                         </div>
                     </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-slate-50">
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solicitação</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Linha de Produção</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Status</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Alerta</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y" id="tabelaMonitoramento"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoMonitoramento"></div>
                 </div>
-                
-                <!-- ============================================ -->
-                <!-- ABA: MEUS DADOS -->
-                <!-- ============================================ -->
-                <div id="content-meusdados" class="tab-content">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
-                        <h3 class="text-lg font-bold text-slate-800 mb-6">
-                            <i class="fas fa-user-circle text-amber-500"></i> Meus Dados Cadastrais
-                        </h3>
-                        <div id="meusDadosConteudo" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <p class="text-slate-400">Carregando...</p>
+            </div>
+
+            <!-- 1ª CONSULTA RECEPCIONADOS -->
+            <div id="content-primeira-consulta" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
+                        <h3 class="text-lg font-bold">🆕 1ª Consulta Recepcionados</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="buscaPrimeiraConsulta" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('primeira-consulta')">
+                            <button onclick="exportarExcel('primeira-consulta')" class="bg-cyan-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-cyan-700">
+                                <i class="fas fa-download"></i> Excel
+                            </button>
                         </div>
                     </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50">
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solicitação</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaPrimeiraConsulta"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoPrimeiraConsulta"></div>
                 </div>
-                
+            </div>
+
+            <!-- 🆕 APTOS PARA O RETORNO -->
+            <div id="content-aptos-retorno" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
+                        <h3 class="text-lg font-bold">✅ Aptos para o Retorno</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="buscaAptosRetorno" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('aptos-retorno')">
+                            <button onclick="exportarExcel('aptos-retorno')" class="bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700">
+                                <i class="fas fa-download"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50">
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solicitação</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Exames</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data 1ª</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaAptosRetorno"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoAptosRetorno"></div>
+                </div>
+            </div>
+
+            <!-- 🆕 RETORNOS AGENDADOS -->
+            <div id="content-retornos-agendados" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
+                        <h3 class="text-lg font-bold">📅 Retornos Agendados (Vivver)</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="buscaRetornosAgendados" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos-agendados')">
+                            <button onclick="exportarExcel('retornos-agendados')" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700">
+                                <i class="fas fa-download"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50">
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solicitação</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Exames</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data 1ª</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data Retorno</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaRetornosAgendados"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoRetornosAgendados"></div>
+                </div>
+            </div>
+
+            <!-- RETORNOS -->
+            <div id="content-retornos" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
+                        <h3 class="text-lg font-bold">📋 Retornos (Aptos para Lançamento)</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="buscaRetornos" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos')">
+                            <button onclick="exportarExcel('retornos')" class="bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700">
+                                <i class="fas fa-download"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50">
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. 1ª Cons.</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. Retorno</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Exames</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data 1ª</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data Retorno</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaRetornos"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoRetornos"></div>
+                </div>
+            </div>
+
+            <!-- 🆕 1ª CONSULTA ABSENTEÍSMO -->
+            <div id="content-absenteismo-1consulta" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
+                        <h3 class="text-lg font-bold">🚫 1ª Consulta - Absenteísmo</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="buscaAbsenteismo1Consulta" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('absenteismo-1consulta')">
+                            <button onclick="exportarExcel('absenteismo-1consulta')" class="bg-orange-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-orange-700">
+                                <i class="fas fa-download"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50">
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solicitação</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaAbsenteismo1Consulta"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoAbsenteismo1Consulta"></div>
+                </div>
+            </div>
+
+            <!-- 🆕 RETORNO ABSENTEÍSMO -->
+            <div id="content-absenteismo-retorno" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
+                        <h3 class="text-lg font-bold">🚫 Retorno - Absenteísmo</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="buscaAbsenteismoRetorno" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('absenteismo-retorno')">
+                            <button onclick="exportarExcel('absenteismo-retorno')" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-red-700">
+                                <i class="fas fa-download"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50">
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solicitação</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data Retorno</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaAbsenteismoRetorno"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoAbsenteismoRetorno"></div>
+                </div>
+            </div>
+
+            <!-- APAC -->
+            <div id="content-apac" class="tab-content space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
+                        <h3 class="text-lg font-bold">📄 OCIs Fechadas (APAC)</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="buscaAPAC" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('apac')">
+                            <button onclick="exportarExcel('apac')" class="bg-purple-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-purple-700">
+                                <i class="fas fa-download"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50">
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solicitação</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Exames</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data 1ª</th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase">Fechamento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaAPAC"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoAPAC"></div>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 </div>
 
 <script>
 // ============================================
 // CONFIGURAÇÃO SUPABASE
 // ============================================
-const db = window.supabase.createClient(
-    'https://hheuvkyhwujdrvjvtryg.supabase.co', 
-    'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe'
-);
+const SUPABASE_URL = 'https://hheuvkyhwujdrvjvtryg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe';
+let supabaseClient = null;
+
+try {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch(e) {
+    console.warn('⚠️ Supabase não conectado. Usando modo local.');
+}
+
+// ============================================
+// CÓDIGO DE SEGURANÇA
+// ============================================
+const CODIGO_SEGURANCA = '123456';
+
+// ============================================
+// DADOS
+// ============================================
+const especialidades = [
+    {id:1, nome:'Cardiologia', icone:'🫀', exames_obrigatorios:'ECG + Laboratoriais + Teste Ergométrico', prazo_retorno_dias:60},
+    {id:2, nome:'Ortopedia', icone:'🦴', exames_obrigatorios:'RX + USG + Tomografia', prazo_retorno_dias:60},
+    {id:3, nome:'Oncologia', icone:'🎗️', exames_obrigatorios:'Biópsia + AP + USG', prazo_retorno_dias:30},
+    {id:4, nome:'Oftalmologia', icone:'👁️', exames_obrigatorios:'Mapeamento + Biomicroscopia + Tonometria', prazo_retorno_dias:60},
+    {id:5, nome:'Otorrino', icone:'👂', exames_obrigatorios:'Audiometria + Videolaringoscopia', prazo_retorno_dias:60}
+];
+
+const nomesPacientes = ['Maria Silva', 'João Santos', 'Ana Oliveira', 'Carlos Pereira', 'Fernanda Costa', 'Rafael Souza', 'Juliana Lima', 'Marcos Almeida', 'Patrícia Rocha', 'Lucas Ferreira'];
+const nomesMaes = ['Carla Silva', 'Marta Santos', 'Lúcia Oliveira', 'Tereza Pereira', 'Sônia Costa', 'Helena Souza', 'Beatriz Lima', 'Rosa Almeida', 'Clara Rocha', 'Débora Ferreira'];
+const unidades = ['UBS Centro', 'UBS Jardim', 'UBS Norte', 'UBS Sul', 'Hospital Municipal', 'Policlínica Central', 'UPA Leste'];
+const locais = ['Ambulatório 1', 'Ambulatório 2', 'Centro Cirúrgico', 'Sala de Exames', 'Consultório A', 'Consultório B'];
+const medicos = ['Dr. Ricardo Alves', 'Dra. Camila Torres', 'Dr. Fernando Borges', 'Dra. Letícia Moura', 'Dr. Paulo Henrique'];
+
+const pacientes = [];
+const consultas = [];
+const retornos = [];
+
+// Gerar dados mock
+for(let i=0; i<150; i++){
+    const nomeIdx = i % 10;
+    const nome = nomesPacientes[nomeIdx] + ' ' + (Math.floor(i/10)+1);
+    pacientes.push({
+        id: i+1,
+        nome: nome,
+        cpf: String(10000000000 + Math.floor(Math.random()*90000000000)),
+        prontuario: 'PRONT' + String(i+1).padStart(5,'0'),
+        nome_mae: nomesMaes[nomeIdx],
+        cidade_natal: ['São Paulo','Rio de Janeiro','Belo Horizonte','Curitiba','Salvador'][Math.floor(Math.random()*5)],
+        unidade_saude: unidades[Math.floor(Math.random()*unidades.length)]
+    });
+}
+
+// 🆕 NOVOS STATUS - Linha de Produção
+// em_andamento → aguardando_exame → apto_retorno → retorno_agendado → retorno_recepcionado → oci_fechada
+//                                                         ↓                        ↓
+//                                                  retorno_faltou           retorno_faltou
+const statusList = [
+    'em_andamento', 'aguardando_exame', 'apto_retorno', 
+    'retorno_agendado', 'retorno_recepcionado', 'oci_fechada', 
+    'faltou', 'retorno_faltou'
+];
+
+for(let i=0; i<150; i++){
+    const mes = Math.floor(Math.random()*5)+1;
+    const dia = Math.floor(Math.random()*28)+1;
+    consultas.push({
+        id: i+1,
+        paciente_id: i+1,
+        especialidade_id: Math.floor(Math.random()*5)+1,
+        status: statusList[Math.floor(Math.random()*statusList.length)],
+        tipo: 'primeira_consulta',
+        data_agendada: `2025-${String(mes).padStart(2,'0')}-${String(dia).padStart(2,'0')}`,
+        medico_solicitante: medicos[Math.floor(Math.random()*medicos.length)],
+        local_consulta: locais[Math.floor(Math.random()*locais.length)]
+    });
+}
+
+let retCount = 0;
+consultas.forEach(c => {
+    if((c.status==='apto_retorno'||c.status==='retorno_agendado'||c.status==='retorno_recepcionado'||c.status==='oci_fechada') && retCount < 40){
+        retCount++;
+        const diaRetorno = Math.floor(Math.random()*28)+1;
+        const mesRetorno = Math.floor(Math.random()*5)+1;
+        retornos.push({
+            id: retCount,
+            paciente_id: c.paciente_id,
+            consulta_id: c.id,
+            numero_solicitacao_1consulta: 'SOL-' + String(c.id).padStart(4,'0'),
+            numero_solicitacao_retorno: 'RET-' + String(retCount).padStart(4,'0'),
+            nome_exame: especialidades.find(e=>e.id===c.especialidade_id)?.exames_obrigatorios || 'EXAMES',
+            status: 'solicitado',
+            created_at: `2025-${String(mesRetorno).padStart(2,'0')}-${String(diaRetorno).padStart(2,'0')}`
+        });
+    }
+});
+
+// Usuários cadastrados
+let usuariosCadastrados = [
+    {id:1, nome:'Administrador OCI', cpf:'12345678909', nome_mae:'Admin Mãe', cidade_natal:'São Paulo', senha:'admin', tipo:'admin'},
+    {id:2, nome:'Usuário Teste', cpf:'11111111111', nome_mae:'Mãe Teste', cidade_natal:'Rio de Janeiro', senha:'123456', tipo:'usuario'}
+];
 
 let usuarioLogado = null;
-let retornosLista = [];
-let especialidadesLista = [];
-let codigoRedefinicao = null;
-let dadosPrimeiraConsulta = null;
+let charts = {};
+let paginaAtual = {
+    monitoramento:1, 'primeira-consulta':1, 'aptos-retorno':1, 
+    'retornos-agendados':1, retornos:1, 
+    'absenteismo-1consulta':1, 'absenteismo-retorno':1, apac:1
+};
 
 // ============================================
 // FUNÇÕES UTILITÁRIAS
@@ -826,15 +1037,19 @@ let dadosPrimeiraConsulta = null;
 function showLoading(){ document.getElementById('loadingOverlay').classList.add('show'); }
 function hideLoading(){ document.getElementById('loadingOverlay').classList.remove('show'); }
 
-function validarCPF(cpf){ 
-    cpf=cpf.replace(/\D/g,''); 
-    if(cpf.length!==11||/^(\d)\1{10}$/.test(cpf)) return false; 
-    let s=0; for(let i=0;i<9;i++) s+=parseInt(cpf[i])*(10-i); 
-    let r=(s*10)%11; if(r===10) r=0; 
-    if(r!==parseInt(cpf[9])) return false; 
-    s=0; for(let i=0;i<10;i++) s+=parseInt(cpf[i])*(11-i); 
-    r=(s*10)%11; if(r===10) r=0; 
-    return r===parseInt(cpf[10]); 
+function validarCPF(cpf){
+    cpf = cpf.replace(/\D/g,'');
+    if(cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+    let s = 0;
+    for(let i=0; i<9; i++) s += parseInt(cpf[i]) * (10-i);
+    let r = (s*10) % 11;
+    if(r === 10) r = 0;
+    if(r !== parseInt(cpf[9])) return false;
+    s = 0;
+    for(let i=0; i<10; i++) s += parseInt(cpf[i]) * (11-i);
+    r = (s*10) % 11;
+    if(r === 10) r = 0;
+    return r === parseInt(cpf[10]);
 }
 
 function gerarCPFValido(){
@@ -843,26 +1058,27 @@ function gerarCPFValido(){
     d1 = d1 === 10 ? 0 : d1;
     let d2 = (n.reduce((s, v, i) => s + v * (11 - i), 0) + d1 * 2) * 10 % 11;
     d2 = d2 === 10 ? 0 : d2;
-    const cpf = [...n, d1, d2].join('');
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    return [...n, d1, d2].join('').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 }
 
-function formatarData(data){ 
-    if(!data) return '—'; 
+function formatarCPF(cpf){
+    cpf = cpf.replace(/\D/g,'');
+    if(cpf.length === 11) return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+    return cpf;
+}
+
+function limparCPF(cpf){ return cpf.replace(/\D/g,''); }
+
+function formatarData(data){
+    if(!data) return '—';
     const d = new Date(data.split('T')[0] + 'T12:00:00');
-    return d.toLocaleDateString('pt-BR'); 
+    return d.toLocaleDateString('pt-BR');
 }
 
-function formatarTelefone(tel){
-    if(!tel) return '—';
-    tel = tel.replace(/\D/g,'');
-    if(tel.length === 11) return '(' + tel.slice(0,2) + ') ' + tel.slice(2,7) + '-' + tel.slice(7);
-    if(tel.length === 10) return '(' + tel.slice(0,2) + ') ' + tel.slice(2,6) + '-' + tel.slice(6);
-    return tel;
-}
-
-function gerarCodigoAleatorio(){ 
-    return String(Math.floor(100000 + Math.random() * 900000)); 
+function formatarDataISO(data){
+    if(!data) return '';
+    const d = new Date(data.split('T')[0] + 'T12:00:00');
+    return d.toLocaleDateString('pt-BR');
 }
 
 function mascaraCPF(input){
@@ -871,14 +1087,6 @@ function mascaraCPF(input){
     v = v.replace(/(\d{3})(\d)/,'$1.$2');
     v = v.replace(/(\d{3})(\d)/,'$1.$2');
     v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
-    input.value = v;
-}
-
-function mascaraTelefone(input){
-    let v = input.value.replace(/\D/g,'');
-    if(v.length > 11) v = v.slice(0,11);
-    if(v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
-    if(v.length > 10) v = v.slice(0,10) + '-' + v.slice(10);
     input.value = v;
 }
 
@@ -897,752 +1105,473 @@ function toggleSenha(id, btn){
 }
 
 function showScreen(id){
-    document.querySelectorAll('.screen').forEach(s => { 
-        s.classList.remove('active'); 
-        s.style.display = 'none'; 
-    });
+    document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
     const el = document.getElementById(id);
-    if(el){
-        el.classList.add('active');
-        if(id === 'screenPortal'){
-            el.style.display = 'block';
-        } else {
-            el.style.display = 'flex';
-        }
-    }
-    
-    if(id === 'screenRedefinir'){
-        document.getElementById('etapaSolicitar').classList.remove('hidden');
-        document.getElementById('etapaVerificar').classList.add('hidden');
-        document.getElementById('redefTitulo').textContent = 'Etapa 1: Verificar identidade';
-        document.getElementById('redefCPF').value = '';
-        document.getElementById('redefNomeMae').value = '';
-        document.getElementById('redefCidade').value = '';
-        document.getElementById('redefCodigo').value = '';
-        document.getElementById('redefNovaSenha').value = '';
+    if(el){ el.classList.add('active'); el.style.display = 'flex'; }
+    if(id === 'screenReset'){
+        document.getElementById('resetStep1').classList.remove('hidden');
+        document.getElementById('resetStep2').classList.add('hidden');
+        document.getElementById('resetStepTitle').textContent = 'Etapa 1: Verificar identidade';
+        ['resetCPF','resetNomeMae','resetCidadeNatal','resetCodigo','resetNovaSenha','resetConfirmaSenha'].forEach(id => document.getElementById(id).value = '');
     }
 }
 
-function mostrarMsg(id, texto, cor){
-    const el = document.getElementById(id);
-    el.className = 'mt-4 p-3 rounded-xl text-sm font-bold border-l-4 ' + 
-        (cor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-500' : 
-         cor === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-500' :
-         'bg-rose-50 text-rose-700 border-rose-500');
-    el.textContent = texto;
-    el.classList.remove('hidden');
-}
-
 // ============================================
-// DROPDOWN DE UNIDADES DE SAÚDE (UBS)
+// ADMIN
 // ============================================
-function filtrarUBS(){
-    const input = document.getElementById('unidadeSaude');
-    const dropdown = document.getElementById('dropdownUBS');
-    const termo = input.value.toLowerCase().trim();
-    
-    let listaFiltrada = LISTA_UBS;
-    
-    if(termo){
-        listaFiltrada = LISTA_UBS.filter(ubs => 
-            ubs.toLowerCase().includes(termo) || 
-            (DISTRITO_MAP[ubs] || '').toLowerCase().includes(termo)
-        );
-    }
-    
-    if(listaFiltrada.length === 0){
-        dropdown.innerHTML = '<div class="dropdown-ubs-item text-slate-400">Nenhuma unidade encontrada</div>';
-    } else {
-        dropdown.innerHTML = listaFiltrada.map(ubs => `
-            <div class="dropdown-ubs-item" onclick="selecionarUBS('${ubs.replace(/'/g,"\\'")}')">
-                ${ubs}
-                <span class="distrito-tag">${DISTRITO_MAP[ubs] || ''}</span>
-            </div>
-        `).join('');
-    }
-    
-    dropdown.classList.add('show');
-}
-
-function selecionarUBS(ubs){
-    document.getElementById('unidadeSaude').value = ubs;
-    document.getElementById('dropdownUBS').classList.remove('show');
-}
-
-// Fechar dropdown ao clicar fora
-document.addEventListener('click', function(e){
-    const dropdown = document.getElementById('dropdownUBS');
-    const input = document.getElementById('unidadeSaude');
-    if(dropdown && input && !input.contains(e.target) && !dropdown.contains(e.target)){
-        dropdown.classList.remove('show');
-    }
-});
-
-// ============================================
-// LOGIN
-// ============================================
-document.getElementById('btnLogin').addEventListener('click', async () => {
-    const cpf = document.getElementById('loginCPF').value.replace(/\D/g,'');
-    const senha = document.getElementById('loginSenha').value.trim();
-    
-    if(!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
-    if(!senha || senha.length !== 6) return alert('❌ Senha deve ter 6 dígitos!');
-    
-    showLoading();
-    
-    const { data, error } = await db.from('pacientes_portal').select('*').eq('cpf', cpf).single();
-    
-    hideLoading();
-    
-    if(error || !data) return alert('❌ Usuário não encontrado.\nSolicite seu cadastro à administração.');
-    if(data.senha !== senha) return alert('❌ Senha incorreta!');
-    
-    usuarioLogado = data;
-    showScreen('screenPortal');
-    carregarPortal();
-});
-
-// ============================================
-// REDEFINIR SENHA
-// ============================================
-document.getElementById('btnSolicitarCodigo').addEventListener('click', async () => {
-    const cpf = document.getElementById('redefCPF').value.replace(/\D/g,'');
-    const nome_mae = document.getElementById('redefNomeMae').value.trim();
-    const cidade = document.getElementById('redefCidade').value.trim();
-    
-    if(!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
-    if(!nome_mae) return alert('❌ Informe o nome da sua mãe!');
-    if(!cidade) return alert('❌ Informe sua cidade natal!');
-    
-    showLoading();
-    const { data, error } = await db.from('pacientes_portal').select('*').eq('cpf', cpf).single();
-    hideLoading();
-    
-    if(error || !data) return alert('❌ Usuário não encontrado.');
-    if((data.nome_mae || '').toUpperCase() !== nome_mae.toUpperCase()) return alert('❌ Nome da mãe não confere!');
-    if((data.cidade_nascimento || '').toUpperCase() !== cidade.toUpperCase()) return alert('❌ Cidade natal não confere!');
-    
-    codigoRedefinicao = gerarCodigoAleatorio();
-    
-    await db.from('pacientes_portal').update({ codigo_redefinicao: codigoRedefinicao }).eq('cpf', cpf);
-    
-    document.getElementById('etapaSolicitar').classList.add('hidden');
-    document.getElementById('etapaVerificar').classList.remove('hidden');
-    document.getElementById('redefTitulo').textContent = 'Etapa 2: Verificar Código';
-    
-    if(data.telefone){
-        const msg = encodeURIComponent(
-            '*Portal - Pedidos de Retorno - Redefinição de Senha*\n\n' +
-            'Seu código de verificação é: *' + codigoRedefinicao + '*\n\n' +
-            '⚠️ Não compartilhe este código!'
-        );
-        window.open('https://wa.me/55' + data.telefone + '?text=' + msg, '_blank');
-    }
-    
-    alert('📱 Código enviado!\n\nUse o código: ' + codigoRedefinicao);
-});
-
-document.getElementById('btnConfirmarRedefinir').addEventListener('click', async () => {
-    const cpf = document.getElementById('redefCPF').value.replace(/\D/g,'');
-    const codigo = document.getElementById('redefCodigo').value.trim();
-    const novaSenha = document.getElementById('redefNovaSenha').value.trim();
-    
-    if(codigo !== codigoRedefinicao) return alert('❌ Código incorreto!');
-    if(!novaSenha || novaSenha.length !== 6) return alert('❌ Senha deve ter 6 dígitos!');
-    
-    showLoading();
-    await db.from('pacientes_portal').update({ senha: novaSenha, codigo_redefinicao: null }).eq('cpf', cpf);
-    hideLoading();
-    
-    alert('✅ Senha redefinida com sucesso! Faça login.');
-    showScreen('screenLogin');
-});
-
-// ============================================
-// CARREGAR PORTAL
-// ============================================
-async function carregarPortal(){
-    showLoading();
-    
-    document.getElementById('portalNome').textContent = usuarioLogado.nome;
-    document.getElementById('sidebarNomePortal').textContent = usuarioLogado.nome || 'Usuário';
-    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
-    document.getElementById('sidebarTipoPortal').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário';
-    
-    if(usuarioLogado.tipo === 'admin'){
-        document.getElementById('sidebarAdminPortalSection').classList.remove('hidden');
-    } else {
-        document.getElementById('sidebarAdminPortalSection').classList.add('hidden');
-    }
-    
-    const { data: rets } = await db.from('retornos_solicitados').select('*').eq('paciente_id', usuarioLogado.id).order('created_at', {ascending: false});
-    retornosLista = rets || [];
-    
-    const { data: esps } = await db.from('especialidades_oci').select('*');
-    especialidadesLista = esps || [
-        {id:1, nome:'Cardiologia', icone:'🫀'},
-        {id:2, nome:'Ortopedia', icone:'🦴'},
-        {id:3, nome:'Oncologia', icone:'🎗️'},
-        {id:4, nome:'Oftalmologia', icone:'👁️'},
-        {id:5, nome:'Otorrino', icone:'👂'}
-    ];
-    
-    hideLoading();
-    
-    document.getElementById('infoCards').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl shadow-sm card-hover border-l-4 border-blue-500">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">CPF</p>
-            <p class="text-sm font-extrabold text-slate-800">${(usuarioLogado.cpf || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}</p>
-        </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm card-hover border-l-4 border-emerald-500">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Retornos</p>
-            <p class="text-sm font-extrabold text-slate-800">${retornosLista.length}</p>
-        </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm card-hover border-l-4 border-purple-500">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Prontuário Vivver</p>
-            <p class="text-sm font-extrabold text-slate-800 text-purple-600">${usuarioLogado.prontuario || '—'}</p>
-        </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm card-hover border-l-4 border-amber-500">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">📱 Telefone</p>
-            <p class="text-sm font-extrabold text-slate-800">${formatarTelefone(usuarioLogado.telefone)}</p>
-        </div>
-    `;
-    
-    document.getElementById('retornoSelect').innerHTML = 
-        '<option value="">Selecione um retorno...</option>' + 
-        retornosLista.filter(r => r.status === 'solicitado')
-                .map(r => `<option value="${r.id}">📝 Retorno #${r.id} - ${formatarData(r.created_at)}</option>`).join('');
-    
-    if(retornosLista.length === 0){
-        document.getElementById('historicoLista').innerHTML = 
-            '<p class="text-slate-400 text-center py-8"><i class="fas fa-inbox text-4xl mb-3 block"></i>Nenhum retorno solicitado ainda.</p>';
-    } else {
-        document.getElementById('historicoLista').innerHTML = retornosLista.map(r => `
-            <div class="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-all">
-                <div class="flex justify-between items-start flex-wrap gap-2">
-                    <div>
-                        <p class="font-bold text-slate-800">📝 Retorno #${r.id}</p>
-                        <p class="text-xs text-slate-500 mt-1">
-                            📅 ${formatarData(r.created_at)} | 
-                            🏥 ${r.unidade_saude || '—'} | 
-                            👨‍⚕️ ${r.medico_solicitante || '—'}
-                        </p>
-                        <p class="text-xs text-slate-500">
-                            🔢 Nº SOL: ${r.numero_solicitacao || '—'} | 
-                            🧪 Exame: ${r.nome_exame || '—'}
-                        </p>
-                        <p class="text-xs text-slate-500">
-                            👤 Paciente: ${r.paciente_nome || '—'} | 
-                            CPF: ${(r.paciente_cpf || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}
-                        </p>
-                        ${r.telefone_paciente ? `<p class="text-xs text-slate-500">📱 Tel: ${formatarTelefone(r.telefone_paciente)}</p>` : ''}
-                        ${r.prontuario_vivver ? `<p class="text-xs text-slate-500 text-purple-600 font-bold">📋 Prontuário Vivver: ${r.prontuario_vivver}</p>` : ''}
-                    </div>
-                    <span class="px-2 py-1 rounded-full text-xs font-bold ${
-                        r.status === 'solicitado' ? 'bg-amber-100 text-amber-700' : 
-                        r.status === 'exame_enviado' ? 'bg-blue-100 text-blue-700' : 
-                        'bg-emerald-100 text-emerald-700'
-                    }">
-                        ${r.status === 'solicitado' ? '⏳ Aguardando' : 
-                          r.status === 'exame_enviado' ? '📤 Exame Enviado' : 
-                          '✅ Realizado'}
-                    </span>
-                </div>
-            </div>
-        `).join('');
-    }
-    
-    document.getElementById('meusDadosConteudo').innerHTML = `
-        <div class="bg-slate-50 p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Nome Completo</p>
-            <p class="font-bold text-slate-800">${usuarioLogado.nome || '—'}</p>
-        </div>
-        <div class="bg-slate-50 p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">CPF</p>
-            <p class="font-bold text-slate-800">${(usuarioLogado.cpf || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}</p>
-        </div>
-        <div class="bg-slate-50 p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">📱 Telefone</p>
-            <p class="font-bold text-slate-800">${formatarTelefone(usuarioLogado.telefone)}</p>
-        </div>
-        <div class="bg-slate-50 p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Data Nascimento</p>
-            <p class="font-bold text-slate-800">${formatarData(usuarioLogado.data_nascimento)}</p>
-        </div>
-        <div class="bg-slate-50 p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Nome da Mãe</p>
-            <p class="font-bold text-slate-800">${usuarioLogado.nome_mae || '—'}</p>
-        </div>
-        <div class="bg-slate-50 p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Cidade Natal</p>
-            <p class="font-bold text-slate-800">${usuarioLogado.cidade_nascimento || '—'}</p>
-        </div>
-        <div class="bg-slate-50 p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Prontuário Vivver</p>
-            <p class="font-bold text-slate-800 text-purple-600">${usuarioLogado.prontuario || '—'}</p>
-        </div>
-        <div class="bg-slate-50 p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Unidade de Saúde</p>
-            <p class="font-bold text-slate-800">${usuarioLogado.unidade_saude || '—'}</p>
-        </div>
-    `;
-}
-
-// ============================================
-// SWITCH DE ABAS
-// ============================================
-function switchTab(tabId){
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-    
-    document.querySelectorAll('.tab-btn').forEach(b => { 
-        b.classList.remove('active', 'text-emerald-600'); 
-        b.classList.add('text-slate-400'); 
-    });
-    
-    const tabMobile = document.getElementById('tabMobile-' + tabId);
-    if(tabMobile){ tabMobile.classList.add('active', 'text-emerald-600'); }
-    
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById('content-' + tabId).classList.add('active');
-}
-
-// ============================================
-// VALIDAR Nº SOLICITAÇÃO E ABRIR MODAL
-// ============================================
-document.getElementById('btnValidarRetorno').addEventListener('click', async () => {
-    const numeroSolicitacao = document.getElementById('numeroSolicitacao').value.trim();
-    const nomeExame = document.getElementById('nomeExame').value.trim();
-    const telefone = document.getElementById('telefoneRetorno').value.replace(/\D/g,'');
-    const unidade = document.getElementById('unidadeSaude').value.trim();
-    const prontuarioVivver = document.getElementById('prontuarioVivver').value.trim();
-    
-    if(!numeroSolicitacao) return alert('❌ Informe o Nº da Solicitação da 1ª Consulta (somente números)!');
-    if(!nomeExame) return alert('❌ Informe o nome do exame!');
-    if(!telefone || telefone.length < 10) return alert('❌ Informe um telefone válido!');
-    if(!unidade) return alert('❌ Selecione a unidade de saúde!');
-    if(!prontuarioVivver) return alert('❌ Informe o Prontuário Vivver (somente números)!');
-    
-    showLoading();
-    
-    // Buscar na tabela de 1ª consulta recepcionados pelo número da solicitação
-    const { data: consulta, error } = await db.from('primeira_consulta_recepcionados')
-        .select('*')
-        .or(`numero_solicitacao.eq.${numeroSolicitacao},id.eq.${numeroSolicitacao}`)
-        .single();
-    
-    hideLoading();
-    
-    if(error || !consulta){
-        return mostrarMsg('msgSolicitar', '❌ Nº Solicitação NÃO encontrado na tabela de 1ª Consulta Recepcionados. Verifique o número e tente novamente.', 'rose');
-    }
-    
-    dadosPrimeiraConsulta = consulta;
-    
-    // Buscar dados do paciente vinculado à consulta
-    const pacienteId = consulta.paciente_id;
-    let nomePaciente = '';
-    let cpfPaciente = '';
-    let telefonePaciente = '';
-    
-    if(pacienteId){
-        const { data: paciente } = await db.from('pacientes').select('*').eq('id', pacienteId).single();
-        if(paciente){
-            nomePaciente = paciente.nome || '';
-            cpfPaciente = paciente.cpf || '';
-            telefonePaciente = paciente.telefone || '';
-        }
-    }
-    
-    // Preencher campos automáticos
-    document.getElementById('nomePaciente').value = nomePaciente || consulta.nome_paciente || '—';
-    document.getElementById('cpfPaciente').value = cpfPaciente ? cpfPaciente.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4') : (consulta.cpf_paciente || '—');
-    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '—';
-    document.getElementById('localConsulta').value = consulta.local_consulta || '—';
-    const esp = especialidadesLista.find(e => e.id === consulta.especialidade_id);
-    document.getElementById('especialidadeRetorno').value = esp ? (esp.icone || '') + ' ' + esp.nome : '—';
-    document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
-    
-    // Se o telefone do retorno estiver vazio, preencher com o do paciente
-    if(!telefone && telefonePaciente){
-        document.getElementById('telefoneRetorno').value = formatarTelefone(telefonePaciente);
-    }
-    
-    // Preencher modal de confirmação
-    document.getElementById('modalNumSolicitacao').textContent = numeroSolicitacao;
-    document.getElementById('modalNomePaciente').textContent = nomePaciente || consulta.nome_paciente || '—';
-    document.getElementById('modalCPF').textContent = cpfPaciente ? cpfPaciente.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4') : (consulta.cpf_paciente || '—');
-    document.getElementById('modalTelefone').textContent = telefone ? formatarTelefone(telefone) : formatarTelefone(telefonePaciente);
-    document.getElementById('modalMedico').textContent = consulta.medico_solicitante || '—';
-    document.getElementById('modalLocal').textContent = consulta.local_consulta || '—';
-    document.getElementById('modalEspecialidade').textContent = esp ? (esp.icone || '') + ' ' + esp.nome : '—';
-    document.getElementById('modalData').textContent = formatarData(consulta.data_agendada);
-    
-    document.getElementById('btnConfirmarRetorno').onclick = confirmarRetorno;
-    
-    document.getElementById('modalConfirmacao').classList.add('show');
-});
-
-// ============================================
-// FECHAR MODAL DE CONFIRMAÇÃO
-// ============================================
-function fecharModalConfirmacao(){
-    document.getElementById('modalConfirmacao').classList.remove('show');
-    dadosPrimeiraConsulta = null;
-}
-
-// ============================================
-// CONFIRMAR RETORNO (após validação no modal)
-// ============================================
-async function confirmarRetorno(){
-    if(!dadosPrimeiraConsulta) return alert('❌ Dados da 1ª consulta não encontrados!');
-    
-    const numeroSolicitacao = document.getElementById('numeroSolicitacao').value.trim();
-    const nomeExame = document.getElementById('nomeExame').value.trim();
-    const telefone = document.getElementById('telefoneRetorno').value.replace(/\D/g,'');
-    const unidade = document.getElementById('unidadeSaude').value.trim();
-    const prontuarioVivver = document.getElementById('prontuarioVivver').value.trim();
-    const nomeMae = document.getElementById('validarNomeMae').value.trim();
-    const nomePaciente = document.getElementById('nomePaciente').value.trim();
-    const cpfPaciente = document.getElementById('cpfPaciente').value.replace(/\D/g,'');
-    
-    showLoading();
-    
-    const { error } = await db.from('retornos_solicitados').insert([{
-        paciente_id: usuarioLogado.id,
-        paciente_nome: nomePaciente,
-        paciente_cpf: cpfPaciente,
-        numero_solicitacao: numeroSolicitacao,
-        consulta_id: dadosPrimeiraConsulta.id,
-        nome_exame: nomeExame,
-        telefone_paciente: telefone,
-        unidade_saude: unidade,
-        prontuario_vivver: prontuarioVivver,
-        nome_mae: nomeMae || dadosPrimeiraConsulta.nome_mae || '',
-        medico_solicitante: dadosPrimeiraConsulta.medico_solicitante || '',
-        local_consulta: dadosPrimeiraConsulta.local_consulta || '',
-        especialidade_id: dadosPrimeiraConsulta.especialidade_id,
-        data_primeira_consulta: dadosPrimeiraConsulta.data_agendada,
-        status: 'solicitado'
-    }]);
-    
-    if(error){ 
-        hideLoading(); 
-        alert('❌ Erro ao cadastrar retorno: ' + error.message); 
-        return; 
-    }
-    
-    await db.from('pacientes_portal').update({ 
-        prontuario: prontuarioVivver,
-        telefone: telefone 
-    }).eq('id', usuarioLogado.id);
-    
-    hideLoading();
-    
-    fecharModalConfirmacao();
-    
-    mostrarMsg('msgSolicitar', '✅ Pedido de retorno cadastrado com sucesso!\n🔗 Vinculado à 1ª Consulta: ' + numeroSolicitacao + '\n👤 Paciente: ' + nomePaciente + '\n📱 Telefone: ' + formatarTelefone(telefone) + '\n📋 Prontuário Vivver: ' + prontuarioVivver, 'emerald');
-    
-    // Limpar campos
-    document.getElementById('numeroSolicitacao').value = '';
-    document.getElementById('nomeExame').value = '';
-    document.getElementById('telefoneRetorno').value = '';
-    document.getElementById('unidadeSaude').value = '';
-    document.getElementById('prontuarioVivver').value = '';
-    document.getElementById('validarNomeMae').value = '';
-    document.getElementById('nomePaciente').value = '';
-    document.getElementById('cpfPaciente').value = '';
-    document.getElementById('medicoSolicitante').value = '';
-    document.getElementById('localConsulta').value = '';
-    document.getElementById('especialidadeRetorno').value = '';
-    document.getElementById('dataPrimeiraConsulta').value = '';
-    
-    carregarPortal();
-}
-
-// ============================================
-// ENVIAR EXAMES (OPCIONAL)
-// ============================================
-document.getElementById('btnEnviarExame').addEventListener('click', async () => {
-    const retorno_id = document.getElementById('retornoSelect').value;
-    const arquivo = document.getElementById('arquivoExame').files[0];
-    
-    if(!retorno_id) return alert('❌ Selecione o retorno!');
-    if(!arquivo) return alert('❌ Selecione o arquivo!');
-    
-    showLoading();
-    
-    const { error } = await db.from('exames_enviados').insert([{
-        paciente_id: usuarioLogado.id,
-        retorno_id: parseInt(retorno_id),
-        arquivo_nome: arquivo.name,
-        arquivo_url: 'arquivo_' + Date.now(),
-        status: 'enviado'
-    }]);
-    
-    if(error){ hideLoading(); return alert('❌ Erro: ' + error.message); }
-    
-    await db.from('retornos_solicitados').update({ status: 'exame_enviado' }).eq('id', retorno_id);
-    
-    hideLoading();
-    mostrarMsg('msgExames', '✅ Exame enviado com sucesso!', 'emerald');
-    carregarPortal();
-});
-
-document.getElementById('uploadArea').addEventListener('click', () => document.getElementById('arquivoExame').click());
-document.getElementById('arquivoExame').addEventListener('change', function(){
-    if(this.files[0]){
-        document.getElementById('nomeArquivoTexto').textContent = '📎 ' + this.files[0].name;
-        document.getElementById('nomeArquivo').classList.remove('hidden');
-    }
-});
-
-// ============================================
-// PAINEL ADMINISTRADOR DO PORTAL
-// ============================================
-function abrirModalAdminPortal(){
-    document.getElementById('modalAdminPortal').classList.add('show');
-    switchAdminTab('usuarios');
-    renderizarListaUsuarios();
-}
-
-function fecharModalAdminPortal(){
-    document.getElementById('modalAdminPortal').classList.remove('show');
-}
+function abrirModalAdmin(){ document.getElementById('modalAdmin').classList.add('show'); switchAdminTab('usuarios'); renderizarListaUsuarios(); }
+function fecharModalAdmin(){ document.getElementById('modalAdmin').classList.remove('show'); }
 
 function switchAdminTab(tabId){
-    document.querySelectorAll('.admin-portal-tab-btn').forEach(b => {
-        b.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
-        b.classList.add('text-slate-400');
-    });
-    document.getElementById('adminPortalTab-' + tabId).classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
-    
-    document.querySelectorAll('.admin-portal-content').forEach(c => c.classList.add('hidden'));
-    document.getElementById('adminPortalContent-' + tabId).classList.remove('hidden');
+    document.querySelectorAll('.admin-tab-btn').forEach(b => { b.classList.remove('text-purple-600','border-b-2','border-purple-600'); b.classList.add('text-slate-400'); });
+    document.getElementById('adminTab-'+tabId).classList.add('text-purple-600','border-b-2','border-purple-600');
+    document.querySelectorAll('.admin-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById('adminContent-'+tabId).classList.remove('hidden');
 }
 
-function preencherCPFPortal(cpf){
-    document.getElementById('adminPortalCPF').value = cpf;
-}
-
-function gerarCPFPortal(){
-    document.getElementById('adminPortalCPF').value = gerarCPFValido();
-}
-
-async function renderizarListaUsuarios(){
-    showLoading();
-    const { data: usuarios } = await db.from('pacientes_portal').select('*').order('nome');
-    hideLoading();
-    
-    const busca = document.getElementById('adminPortalBusca')?.value?.toLowerCase() || '';
-    let lista = (usuarios || []).filter(u => 
-        !busca || u.nome.toLowerCase().includes(busca) || (u.cpf||'').includes(busca)
-    );
-    
-    document.getElementById('adminPortalTabelaUsuarios').innerHTML = lista.map(u => `
+function renderizarListaUsuarios(){
+    const busca = document.getElementById('adminBuscaUsuario')?.value?.toLowerCase() || '';
+    let usuarios = usuariosCadastrados.filter(u => !busca || u.nome.toLowerCase().includes(busca) || u.cpf.includes(busca));
+    document.getElementById('adminTabelaUsuarios').innerHTML = usuarios.map(u => `
         <tr class="hover:bg-slate-50 border-t">
             <td class="px-3 py-2 font-bold text-sm">${u.nome}</td>
-            <td class="px-3 py-2 text-sm">${(u.cpf||'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}</td>
-            <td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td>
-            <td class="px-3 py-2">
-                <span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">
-                    ${u.tipo === 'admin' ? '👑 Admin' : '👤 Usuário'}
-                </span>
-            </td>
-            <td class="px-3 py-2">
-                <div class="flex gap-2">
-                    <button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button>
-                    <button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button>
-                </div>
-            </td>
-        </tr>
-    `).join('') || '<tr><td colspan="5" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
+            <td class="px-3 py-2 text-sm">${formatarCPF(u.cpf)}</td>
+            <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo==='admin'?'bg-purple-100 text-purple-600':'bg-blue-100 text-blue-600'}">${u.tipo==='admin'?'👑 Admin':'👤 Usuário'}</span></td>
+            <td class="px-3 py-2"><div class="flex gap-2">
+                <button onclick='editarUsuario(${u.id})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button>
+                <button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button>
+            </div></td>
+        </tr>`).join('') || '<tr><td colspan="4" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
 }
 
-async function cadastrarUsuarioAdmin(){
-    const nome = document.getElementById('adminPortalNome').value.trim();
-    const cpf = document.getElementById('adminPortalCPF').value.replace(/\D/g,'');
-    const nomeMae = document.getElementById('adminPortalNomeMae').value.trim();
-    const cidadeNatal = document.getElementById('adminPortalCidadeNatal').value.trim();
-    const dataNasc = document.getElementById('adminPortalDataNasc').value;
-    const telefone = document.getElementById('adminPortalTelefone').value.replace(/\D/g,'');
-    const senha = document.getElementById('adminPortalSenha').value.trim();
-    const email = document.getElementById('adminPortalEmail').value.trim();
-    const tipo = document.getElementById('adminPortalTipo').value;
-    const unidade = document.getElementById('adminPortalUnidade').value.trim();
-    
-    if(!nome || !cpf || !nomeMae || !cidadeNatal || !telefone || !senha) return alert('❌ Preencha todos os campos obrigatórios!');
+function preencherCPF(cpf){ document.getElementById('adminNovoCPF').value = cpf; }
+function gerarCPFAdmin(){ document.getElementById('adminNovoCPF').value = gerarCPFValido(); }
+
+function cadastrarUsuarioAdmin(){
+    const nome = document.getElementById('adminNovoNome').value.trim();
+    const cpf = limparCPF(document.getElementById('adminNovoCPF').value);
+    const nomeMae = document.getElementById('adminNovoNomeMae').value.trim();
+    const cidadeNatal = document.getElementById('adminNovoCidadeNatal').value.trim();
+    const senha = document.getElementById('adminNovoSenha').value.trim();
+    const tipo = document.getElementById('adminNovoTipo').value;
+    if(!nome || !cpf || !senha) return alert('⚠️ Preencha Nome, CPF e Senha!');
     if(!validarCPF(cpf)) return alert('❌ CPF inválido!');
-    if(senha.length !== 6) return alert('❌ Senha deve ter 6 dígitos!');
-    
-    showLoading();
-    
-    const { data: existente } = await db.from('pacientes_portal').select('id').eq('cpf', cpf).single();
-    if(existente){ hideLoading(); return alert('❌ CPF já cadastrado!'); }
-    
-    const { error } = await db.from('pacientes_portal').insert([{
-        nome, cpf, nome_mae: nomeMae, cidade_nascimento: cidadeNatal,
-        data_nascimento: dataNasc || null, telefone, senha, email, tipo, unidade_saude: unidade
-    }]);
-    
-    hideLoading();
-    if(error) return alert('❌ Erro: ' + error.message);
-    
-    alert('✅ Usuário cadastrado com sucesso!');
-    document.getElementById('adminPortalNome').value = '';
-    document.getElementById('adminPortalCPF').value = '';
-    document.getElementById('adminPortalNomeMae').value = '';
-    document.getElementById('adminPortalCidadeNatal').value = '';
-    document.getElementById('adminPortalTelefone').value = '';
-    document.getElementById('adminPortalSenha').value = '';
-    switchAdminTab('usuarios');
-    renderizarListaUsuarios();
+    if(senha.length !== 6) return alert('⚠️ Senha deve ter 6 dígitos!');
+    if(usuariosCadastrados.find(u => u.cpf === cpf)) return alert('⚠️ CPF já cadastrado!');
+    usuariosCadastrados.push({id: usuariosCadastrados.length+1, nome, cpf, nome_mae: nomeMae||'', cidade_natal: cidadeNatal||'', senha, tipo});
+    alert('✅ Usuário cadastrado!');
+    ['adminNovoNome','adminNovoCPF','adminNovoNomeMae','adminNovoCidadeNatal','adminNovoSenha'].forEach(id => document.getElementById(id).value = '');
+    switchAdminTab('usuarios'); renderizarListaUsuarios();
 }
 
-function editarUsuario(u){
+function editarUsuario(id){
+    const u = usuariosCadastrados.find(u => u.id === id);
+    if(!u) return;
     document.getElementById('editUsuarioId').value = u.id;
     document.getElementById('editUsuarioNome').value = u.nome;
-    document.getElementById('editUsuarioCPF').value = (u.cpf||'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+    document.getElementById('editUsuarioCPF').value = formatarCPF(u.cpf);
     document.getElementById('editUsuarioNomeMae').value = u.nome_mae || '';
-    document.getElementById('editUsuarioCidadeNatal').value = u.cidade_nascimento || '';
-    document.getElementById('editUsuarioTelefone').value = formatarTelefone(u.telefone);
+    document.getElementById('editUsuarioCidadeNatal').value = u.cidade_natal || '';
     document.getElementById('editUsuarioSenha').value = '';
-    document.getElementById('editUsuarioTipo').value = u.tipo || 'usuario';
-    document.getElementById('editUsuarioUnidade').value = u.unidade_saude || '';
-    
+    document.getElementById('editUsuarioTipo').value = u.tipo;
     document.getElementById('modalEditarUsuario').classList.add('show');
 }
 
-async function salvarEdicaoUsuario(){
+function salvarEdicaoUsuario(){
     const id = parseInt(document.getElementById('editUsuarioId').value);
-    const nome = document.getElementById('editUsuarioNome').value.trim();
-    const nomeMae = document.getElementById('editUsuarioNomeMae').value.trim();
-    const cidadeNatal = document.getElementById('editUsuarioCidadeNatal').value.trim();
-    const telefone = document.getElementById('editUsuarioTelefone').value.replace(/\D/g,'');
+    const u = usuariosCadastrados.find(u => u.id === id);
+    if(!u) return;
+    u.nome = document.getElementById('editUsuarioNome').value.trim();
+    u.nome_mae = document.getElementById('editUsuarioNomeMae').value.trim();
+    u.cidade_natal = document.getElementById('editUsuarioCidadeNatal').value.trim();
+    u.tipo = document.getElementById('editUsuarioTipo').value;
     const senha = document.getElementById('editUsuarioSenha').value.trim();
-    const tipo = document.getElementById('editUsuarioTipo').value;
-    const unidade = document.getElementById('editUsuarioUnidade').value.trim();
-    
-    if(!nome) return alert('❌ O nome é obrigatório!');
-    
-    const updateData = { nome, nome_mae: nomeMae, cidade_nascimento: cidadeNatal, telefone, tipo, unidade_saude: unidade };
-    if(senha && senha.length === 6) updateData.senha = senha;
-    
-    showLoading();
-    await db.from('pacientes_portal').update(updateData).eq('id', id);
-    hideLoading();
-    
-    if(usuarioLogado && usuarioLogado.id === id){
-        usuarioLogado = {...usuarioLogado, ...updateData};
-        carregarPortal();
-    }
-    
-    alert('✅ Usuário atualizado com sucesso!');
+    if(senha && senha.length === 6) u.senha = senha;
+    if(usuarioLogado && usuarioLogado.id === id) usuarioLogado = u;
+    alert('✅ Usuário atualizado!');
     document.getElementById('modalEditarUsuario').classList.remove('show');
     renderizarListaUsuarios();
 }
 
-async function excluirUsuario(id){
-    if(id === usuarioLogado?.id) return alert('❌ Você não pode excluir seu próprio usuário!');
-    if(!confirm('Tem certeza que deseja excluir este usuário?')) return;
-    
-    showLoading();
-    await db.from('pacientes_portal').delete().eq('id', id);
-    hideLoading();
-    
+function excluirUsuario(id){
+    if(id === usuarioLogado?.id) return alert('❌ Não pode excluir seu próprio usuário!');
+    if(!confirm('Excluir este usuário?')) return;
+    usuariosCadastrados = usuariosCadastrados.filter(u => u.id !== id);
     alert('✅ Usuário excluído!');
     renderizarListaUsuarios();
 }
 
-async function importarCSVPortal(){
-    const fileInput = document.getElementById('adminPortalCSVFile');
-    const file = fileInput.files[0];
-    if(!file) return alert('⚠️ Selecione um arquivo CSV!');
-    
+function importarCSV(){
+    const file = document.getElementById('adminCSVFile').files[0];
+    if(!file) return alert('⚠️ Selecione um arquivo!');
     const reader = new FileReader();
-    reader.onload = async function(e){
-        const text = e.target.result;
-        const linhas = text.split('\n').filter(l => l.trim());
+    reader.onload = function(e){
+        const linhas = e.target.result.split('\n').filter(l => l.trim());
         if(linhas.length < 2) return alert('⚠️ Arquivo vazio!');
-        
-        const dados = linhas.slice(1);
         let importados = 0, erros = 0;
-        
-        for(const linha of dados){
+        linhas.slice(1).forEach(linha => {
             const cols = linha.split(',');
-            if(cols.length >= 7){
-                const nome = cols[0]?.trim();
-                const cpf = cols[1]?.replace(/\D/g,'').trim();
-                if(nome && cpf && validarCPF(cpf)){
-                    const { data: existe } = await db.from('pacientes_portal').select('id').eq('cpf', cpf).single();
-                    if(!existe){
-                        await db.from('pacientes_portal').insert([{
-                            nome, cpf,
-                            nome_mae: cols[2]?.trim() || '',
-                            cidade_nascimento: cols[3]?.trim() || '',
-                            data_nascimento: cols[4]?.trim() || null,
-                            telefone: cols[5]?.replace(/\D/g,'').trim() || '',
-                            senha: cols[6]?.trim() || '123456',
-                            email: cols[7]?.trim() || '',
-                            unidade_saude: cols[8]?.trim() || '',
-                            tipo: cols[9]?.trim() || 'usuario'
-                        }]);
-                        importados++;
-                    } else { erros++; }
+            if(cols.length >= 5){
+                const nome = cols[0]?.trim(), cpf = cols[1]?.replace(/\D/g,'').trim(), senha = cols[4]?.trim();
+                if(nome && cpf && senha && validarCPF(cpf) && !usuariosCadastrados.find(u => u.cpf === cpf)){
+                    usuariosCadastrados.push({id: usuariosCadastrados.length+1, nome, cpf, nome_mae: cols[2]?.trim()||'', cidade_natal: cols[3]?.trim()||'', senha, tipo: cols[5]?.trim()||'usuario'});
+                    importados++;
                 } else { erros++; }
             } else { erros++; }
-        }
-        
-        document.getElementById('adminPortalCSVResultado').innerHTML = `
-            <div class="bg-green-50 border border-green-200 rounded-xl p-3">
-                <p class="text-sm text-green-700 font-bold">✅ ${importados} usuários importados!</p>
-                ${erros > 0 ? `<p class="text-xs text-rose-600 mt-1">⚠️ ${erros} linhas com erro ou duplicadas</p>` : ''}
-            </div>
-        `;
+        });
+        document.getElementById('adminCSVResultado').innerHTML = `<div class="bg-green-50 border border-green-200 rounded-xl p-3"><p class="text-sm text-green-700 font-bold">✅ ${importados} importados!</p>${erros>0?`<p class="text-xs text-rose-600 mt-1">⚠️ ${erros} erros/duplicados</p>`:''}</div>`;
         renderizarListaUsuarios();
     };
     reader.readAsText(file);
 }
 
 // ============================================
-// FECHAR MODAIS AO CLICAR FORA
+// ATUALIZAR SISTEMA
 // ============================================
-document.getElementById('modalConfirmacao').addEventListener('click', function(e){
-    if(e.target === this) fecharModalConfirmacao();
-});
-document.getElementById('modalAdminPortal').addEventListener('click', function(e){
-    if(e.target === this) fecharModalAdminPortal();
-});
-document.getElementById('modalEditarUsuario').addEventListener('click', function(e){
-    if(e.target === this) this.classList.remove('show');
-});
+function atualizarTudo(){
+    const hoje = new Date();
+    const emAndamento = consultas.filter(c => c.status === 'em_andamento').length;
+    const aguardandoExame = consultas.filter(c => c.status === 'aguardando_exame').length;
+    const aptosRetorno = consultas.filter(c => c.status === 'apto_retorno').length;
+    const retornoAgendado = consultas.filter(c => c.status === 'retorno_agendado').length;
+    const retornoRecepcionado = consultas.filter(c => c.status === 'retorno_recepcionado').length;
+    const ociFechada = consultas.filter(c => c.status === 'oci_fechada').length;
+    const faltou1 = consultas.filter(c => c.status === 'faltou').length;
+    const faltouRetorno = consultas.filter(c => c.status === 'retorno_faltou').length;
+    const pct = consultas.length > 0 ? Math.round((ociFechada/consultas.length)*100) : 0;
+    
+    if(usuarioLogado){
+        document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Usuário';
+        document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
+        document.getElementById('sidebarTipo').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário';
+        document.getElementById('sidebarAdminSection').classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
+    }
 
-// ============================================
-// LOGOUT
-// ============================================
-function logout(){ 
-    usuarioLogado = null;
-    dadosPrimeiraConsulta = null;
-    showScreen('screenLogin'); 
+    // Stats Grid
+    document.getElementById('statsGrid').innerHTML = `
+        <div class="bg-white p-5 rounded-2xl shadow-sm stat-card-hover card-blue"><p class="text-slate-500 text-xs font-bold uppercase">OCI Aberta</p><h3 class="text-2xl font-extrabold mt-1">${emAndamento + aguardandoExame}</h3></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm stat-card-hover card-cyan" style="border-left:5px solid #06b6d4"><p class="text-slate-500 text-xs font-bold uppercase">Aptos Retorno</p><h3 class="text-2xl font-extrabold mt-1">${aptosRetorno}</h3></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm stat-card-hover card-blue" style="border-left:5px solid #3b82f6"><p class="text-slate-500 text-xs font-bold uppercase">Ret. Agendados</p><h3 class="text-2xl font-extrabold mt-1">${retornoAgendado}</h3></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm stat-card-hover card-emerald"><p class="text-slate-500 text-xs font-bold uppercase">OCIs Fechadas</p><h3 class="text-2xl font-extrabold mt-1">${pct}%</h3></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm stat-card-hover card-rose"><p class="text-slate-500 text-xs font-bold uppercase">Faltas Total</p><h3 class="text-2xl font-extrabold mt-1">${faltou1 + faltouRetorno}</h3></div>
+    `;
+
+    // 🆕 LINHA DE PRODUÇÃO
+    document.getElementById('linhaProducao').innerHTML = `
+        <div class="linha-producao-step bg-blue-100 text-blue-700">📋 OCI Aberta: <b>${emAndamento + aguardandoExame}</b></div>
+        <span class="text-slate-300 font-bold">→</span>
+        <div class="linha-producao-step bg-cyan-100 text-cyan-700">✅ Aptos Retorno: <b>${aptosRetorno}</b></div>
+        <span class="text-slate-300 font-bold">→</span>
+        <div class="linha-producao-step bg-indigo-100 text-indigo-700">📅 Ret. Agendados: <b>${retornoAgendado}</b></div>
+        <span class="text-slate-300 font-bold">→</span>
+        <div class="linha-producao-step bg-emerald-100 text-emerald-700">✔️ OCI Fechada: <b>${ociFechada}</b></div>
+        <span class="text-slate-400 mx-2">|</span>
+        <div class="linha-producao-step bg-orange-100 text-orange-700">🚫 Abs. 1ª: <b>${faltou1}</b></div>
+        <div class="linha-producao-step bg-red-100 text-red-700">🚫 Abs. Ret: <b>${faltouRetorno}</b></div>
+    `;
+
+    // Alertas
+    const ocisPendentes = consultas.filter(c => {
+        if(c.status === 'oci_fechada' || c.status === 'faltou' || c.status === 'retorno_faltou') return false;
+        const dias = Math.floor((hoje - new Date(c.data_agendada + 'T12:00:00')) / 86400000);
+        const e = especialidades.find(x => x.id === c.especialidade_id);
+        return dias > (e?.prazo_retorno_dias || 60);
+    });
+    const ocisAtencao = consultas.filter(c => {
+        if(c.status === 'oci_fechada' || c.status === 'faltou' || c.status === 'retorno_faltou') return false;
+        const dias = Math.floor((hoje - new Date(c.data_agendada + 'T12:00:00')) / 86400000);
+        const e = especialidades.find(x => x.id === c.especialidade_id);
+        const pctPrazo = (dias / (e?.prazo_retorno_dias || 60)) * 100;
+        return pctPrazo >= 80 && dias <= (e?.prazo_retorno_dias || 60);
+    });
+    
+    document.getElementById('alertCount').textContent = ocisPendentes.length;
+    document.getElementById('alertasGrid').innerHTML = `
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-rose-500 alert-card"><h4 class="font-bold text-sm text-rose-600 mb-2">🔴 OCI Pendente</h4><p class="text-3xl font-extrabold">${ocisPendentes.length}</p></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-amber-500"><h4 class="font-bold text-sm text-amber-600 mb-2">🟡 Atenção</h4><p class="text-3xl font-extrabold">${ocisAtencao.length}</p></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500"><h4 class="font-bold text-sm text-emerald-600 mb-2">🟢 Dentro do Prazo</h4><p class="text-3xl font-extrabold">${consultas.filter(c => {if(c.status==='oci_fechada'||c.status==='faltou'||c.status==='retorno_faltou') return false; const dias=Math.floor((hoje-new Date(c.data_agendada+'T12:00:00'))/86400000); const e=especialidades.find(x=>x.id===c.especialidade_id); return (dias/(e?.prazo_retorno_dias||60))*100<80;}).length}</p></div>
+    `;
+
+    document.getElementById('infoCards').innerHTML = `
+        <div class="bg-white p-5 rounded-2xl shadow-sm border card-purple"><h4 class="font-bold text-sm mb-3">Regras de Prazo</h4><div class="space-y-2">${especialidades.map(e=>`<div class="flex justify-between p-2 bg-slate-50 rounded-lg"><span class="text-xs font-bold">${e.icone} ${e.nome}</span><span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg">${e.prazo_retorno_dias}d</span></div>`).join('')}</div></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border card-blue"><h4 class="font-bold text-sm mb-3">Indicadores</h4><div class="space-y-3"><div class="flex justify-between"><span class="text-xs">Ret. Agendados</span><span class="text-xs font-bold text-blue-600">${retornoAgendado}</span></div><div class="flex justify-between"><span class="text-xs">OCIs Fechadas</span><span class="text-xs font-bold text-emerald-600">${pct}%</span></div></div></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border card-emerald"><h4 class="font-bold text-sm mb-3">Parâmetros</h4><div class="space-y-2 text-xs">${['⏱️ Prazo Padrão: 60 dias','🎗️ Prazo Oncologia: 30 dias','🎯 Meta OCI: 90%'].map(p=>`<div class="p-2 bg-slate-50 rounded-lg font-bold">${p}</div>`).join('')}</div></div>
+    `;
+
+    document.getElementById('filtroEspecialidadeMonitoramento').innerHTML = '<option value="">Todas</option>' + especialidades.map(e => `<option value="${e.id}">${e.icone} ${e.nome}</option>`).join('');
+    renderizarTabelas();
+    renderizarGraficos();
 }
 
+function getDadosFiltrados(tipo){
+    let dados = [];
+    if(tipo === 'monitoramento') dados = [...consultas];
+    else if(tipo === 'primeira-consulta') dados = consultas.filter(c => c.status !== 'faltou' && c.status !== 'retorno_faltou');
+    else if(tipo === 'aptos-retorno') dados = consultas.filter(c => c.status === 'apto_retorno');
+    else if(tipo === 'retornos-agendados') dados = consultas.filter(c => c.status === 'retorno_agendado');
+    else if(tipo === 'retornos') dados = [...retornos];
+    else if(tipo === 'absenteismo-1consulta') dados = consultas.filter(c => c.status === 'faltou');
+    else if(tipo === 'absenteismo-retorno') dados = consultas.filter(c => c.status === 'retorno_faltou');
+    else if(tipo === 'apac') dados = consultas.filter(c => c.status === 'oci_fechada');
+    
+    const buscaMap = {
+        'monitoramento':'buscaMonitoramento','primeira-consulta':'buscaPrimeiraConsulta',
+        'aptos-retorno':'buscaAptosRetorno','retornos-agendados':'buscaRetornosAgendados',
+        'retornos':'buscaRetornos','absenteismo-1consulta':'buscaAbsenteismo1Consulta',
+        'absenteismo-retorno':'buscaAbsenteismoRetorno','apac':'buscaAPAC'
+    };
+    const busca = document.getElementById(buscaMap[tipo])?.value?.toLowerCase() || '';
+    
+    if(busca) dados = dados.filter(item => {
+        const p = pacientes.find(x => x.id === item.paciente_id) || {};
+        return String(item.id).includes(busca) || (p.nome||'').toLowerCase().includes(busca) || (p.cpf||'').includes(busca) || (p.prontuario||'').toLowerCase().includes(busca);
+    });
+    
+    if(tipo === 'monitoramento'){
+        const fe = document.getElementById('filtroEspecialidadeMonitoramento')?.value;
+        const fs = document.getElementById('filtroStatusMonitoramento')?.value;
+        if(fe) dados = dados.filter(c => c.especialidade_id == parseInt(fe));
+        if(fs) dados = dados.filter(c => c.status === fs);
+    }
+    return dados;
+}
+
+function getStatusBadge(status){
+    const map = {
+        'em_andamento': {t:'Em Andamento', c:'text-blue-600 bg-blue-50', cor:'bg-blue-500'},
+        'aguardando_exame': {t:'Ag. Exame', c:'text-amber-600 bg-amber-50', cor:'bg-amber-500'},
+        'apto_retorno': {t:'Apto Retorno', c:'text-emerald-600 bg-emerald-50', cor:'bg-emerald-500'},
+        'retorno_agendado': {t:'Ret. Agendado', c:'text-indigo-600 bg-indigo-50', cor:'bg-indigo-500'},
+        'retorno_recepcionado': {t:'Ret. Recepcionado', c:'text-teal-600 bg-teal-50', cor:'bg-teal-500'},
+        'oci_fechada': {t:'OCI Fechada', c:'text-purple-600 bg-purple-50', cor:'bg-purple-500'},
+        'faltou': {t:'Faltou 1ª Cons.', c:'text-orange-600 bg-orange-50', cor:'bg-orange-500'},
+        'retorno_faltou': {t:'Faltou Retorno', c:'text-red-600 bg-red-50', cor:'bg-red-500'}
+    };
+    return map[status] || {t:status, c:'text-slate-600 bg-slate-50', cor:'bg-slate-500'};
+}
+
+function getAlertaOCI(consulta){
+    const hoje = new Date();
+    if(consulta.status === 'oci_fechada' || consulta.status === 'faltou' || consulta.status === 'retorno_faltou') return {tipo:'', cor:'', texto:'—'};
+    const dias = Math.floor((hoje - new Date(consulta.data_agendada + 'T12:00:00')) / 86400000);
+    const e = especialidades.find(x => x.id === consulta.especialidade_id);
+    const prazo = e?.prazo_retorno_dias || 60;
+    if(dias > prazo) return {tipo:'🔴', cor:'bg-rose-100 text-rose-700 border-rose-300', texto:'OCI Pendente'};
+    if((dias/prazo)*100 >= 80) return {tipo:'🟡', cor:'bg-amber-100 text-amber-700 border-amber-300', texto:'Atenção'};
+    return {tipo:'🟢', cor:'bg-emerald-100 text-emerald-700 border-emerald-300', texto:'Dentro do Prazo'};
+}
+
+function renderizarTabelas(){
+    const tiposTabela = ['monitoramento','primeira-consulta','aptos-retorno','retornos-agendados','retornos','absenteismo-1consulta','absenteismo-retorno','apac'];
+    
+    tiposTabela.forEach(tipo => {
+        const dados = getDadosFiltrados(tipo);
+        const totalPag = Math.ceil(dados.length / 100) || 1;
+        if(paginaAtual[tipo] > totalPag) paginaAtual[tipo] = totalPag;
+        const inicio = (paginaAtual[tipo] - 1) * 100;
+        const pag = dados.slice(inicio, inicio + 100);
+        
+        const tabelaId = tipo === 'monitoramento' ? 'tabelaMonitoramento' : tipo === 'primeira-consulta' ? 'tabelaPrimeiraConsulta' : tipo === 'aptos-retorno' ? 'tabelaAptosRetorno' : tipo === 'retornos-agendados' ? 'tabelaRetornosAgendados' : tipo === 'retornos' ? 'tabelaRetornos' : tipo === 'absenteismo-1consulta' ? 'tabelaAbsenteismo1Consulta' : tipo === 'absenteismo-retorno' ? 'tabelaAbsenteismoRetorno' : 'tabelaAPAC';
+        const pagId = tipo === 'monitoramento' ? 'paginacaoMonitoramento' : tipo === 'primeira-consulta' ? 'paginacaoPrimeiraConsulta' : tipo === 'aptos-retorno' ? 'paginacaoAptosRetorno' : tipo === 'retornos-agendados' ? 'paginacaoRetornosAgendados' : tipo === 'retornos' ? 'paginacaoRetornos' : tipo === 'absenteismo-1consulta' ? 'paginacaoAbsenteismo1Consulta' : tipo === 'absenteismo-retorno' ? 'paginacaoAbsenteismoRetorno' : 'paginacaoAPAC';
+        
+        const tabelaEl = document.getElementById(tabelaId);
+        const pagEl = document.getElementById(pagId);
+        if(!tabelaEl || !pagEl) return;
+        
+        if(pag.length === 0){
+            tabelaEl.innerHTML = '<tr><td colspan="15" class="text-center py-8 text-slate-400 font-bold">Nenhum registro encontrado</td></tr>';
+        } else if(tipo === 'monitoramento'){
+            tabelaEl.innerHTML = pag.map(c => {
+                const p = pacientes.find(x => x.id === c.paciente_id) || {};
+                const e = especialidades.find(x => x.id === c.especialidade_id) || {};
+                const st = getStatusBadge(c.status);
+                const alerta = getAlertaOCI(c);
+                const progresso = c.status === 'oci_fechada' ? 100 : c.status === 'retorno_recepcionado' ? 85 : c.status === 'retorno_agendado' ? 65 : c.status === 'apto_retorno' ? 50 : c.status === 'aguardando_exame' ? 30 : c.status === 'em_andamento' ? 15 : 0;
+                return `<tr class="hover:bg-slate-50"><td class="px-4 py-3"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">SOL-${String(c.id).padStart(4,'0')}</span></td><td class="px-4 py-3"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">${p.prontuario||'PRONT'+String(c.id).padStart(5,'0')}</span></td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">${(p.nome||'?')[0]}</div><div><p class="font-bold text-sm">${p.nome||'—'}</p><p class="text-xs text-slate-400">${formatarCPF(p.cpf||'')}</p></div></div></td><td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold whitespace-nowrap">${e.icone||''} ${e.nome||'—'}</span></td><td class="px-4 py-3"><div class="w-32"><div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden"><div class="${st.cor} h-full rounded-full flex items-center justify-center text-white text-[10px] font-bold" style="width:${progresso}%">${progresso}%</div></div></div></td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${st.c} whitespace-nowrap">${st.t}</span></td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold border ${alerta.cor} whitespace-nowrap">${alerta.tipo} ${alerta.texto}</span></td></tr>`;
+            }).join('');
+        } else {
+            tabelaEl.innerHTML = pag.map(item => {
+                const p = pacientes.find(x => x.id === item.paciente_id) || {};
+                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+                return `<tr class="hover:bg-slate-50">${tipo==='retornos'?`<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">${item.numero_solicitacao_1consulta||'—'}</span></td><td class="px-3 py-2"><span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg whitespace-nowrap">${item.numero_solicitacao_retorno||'—'}</span></td>`:`<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">SOL-${String(item.id).padStart(4,'0')}</span></td>${tipo==='retornos-agendados'||tipo==='retornos'?`<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg whitespace-nowrap">${item.numero_solicitacao_retorno||'RET-'+String(item.id).padStart(4,'0')}</span></td>`:''}`}<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 whitespace-nowrap">${p.prontuario||'—'}</span></td><td class="px-3 py-2 font-bold text-xs">${p.nome||'—'}</td><td class="px-3 py-2 text-xs">${formatarCPF(p.cpf||'')}</td><td class="px-3 py-2 text-xs">${p.nome_mae||'—'}</td><td class="px-3 py-2 text-xs">${p.unidade_saude||'—'}</td><td class="px-3 py-2 text-xs font-bold whitespace-nowrap">${e.icone||''} ${e.nome||''}</td>${tipo==='absenteismo-1consulta'||tipo==='absenteismo-retorno'?'':`<td class="px-3 py-2 text-[10px]">${e.exames_obrigatorios||'—'}</td>`}<td class="px-3 py-2 text-xs">${item.medico_solicitante||'—'}</td><td class="px-3 py-2 text-xs">${item.local_consulta||'—'}</td><td class="px-3 py-2 text-xs whitespace-nowrap">${formatarData(item.data_agendada)}</td>${tipo==='retornos-agendados'||tipo==='retornos'?`<td class="px-3 py-2 text-xs font-bold text-blue-600 whitespace-nowrap">${formatarData(item.created_at||item.data_agendada)}</td>`:''}${tipo==='apac'?`<td class="px-3 py-2 text-xs font-bold text-purple-600 whitespace-nowrap">${formatarData(item.data_agendada)}</td>`:''}</tr>`;
+            }).join('');
+        }
+        
+        let pagHTML = '';
+        for(let i=1; i<=totalPag; i++) pagHTML += `<button onclick="paginaAtual['${tipo}']=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i===paginaAtual[tipo]?'bg-blue-600 text-white':'bg-slate-100'}">${i}</button>`;
+        pagEl.innerHTML = `<span class="text-xs text-slate-500">${dados.length} registros | Pág ${paginaAtual[tipo]} de ${totalPag}</span><div class="flex gap-1 flex-wrap">${pagHTML}</div>`;
+    });
+}
+
+function filtrarTabela(tipo){ paginaAtual[tipo]=1; renderizarTabelas(); }
+
 // ============================================
-// ENTER NO LOGIN
+// GRÁFICOS
 // ============================================
-document.getElementById('loginSenha').addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') document.getElementById('btnLogin').click();
-});
+function atualizarGraficoEspecialidade(){
+    const filtro = document.getElementById('filtroGraficoEspecialidade')?.value || 'todos';
+    if(charts.s) charts.s.destroy();
+    const c2 = document.getElementById('chartSpecialty');
+    if(!c2) return;
+    
+    let dadosFiltrados = [];
+    if(filtro === 'todos') dadosFiltrados = [...consultas];
+    else if(filtro === 'primeira_consulta') dadosFiltrados = consultas.filter(c => c.status !== 'faltou' && c.status !== 'retorno_faltou');
+    else if(filtro === 'aptos_retorno') dadosFiltrados = consultas.filter(c => c.status === 'apto_retorno');
+    else if(filtro === 'retornos_agendados') dadosFiltrados = consultas.filter(c => c.status === 'retorno_agendado');
+    else if(filtro === 'retornos') dadosFiltrados = consultas.filter(c => c.status === 'apto_retorno');
+    else if(filtro === 'oci_fechada') dadosFiltrados = consultas.filter(c => c.status === 'oci_fechada');
+    
+    const por = {};
+    dadosFiltrados.forEach(c => {
+        const e = especialidades.find(x => x.id === c.especialidade_id);
+        por[e ? e.nome : 'Outros'] = (por[e ? e.nome : 'Outros'] || 0) + 1;
+    });
+    
+    const labels = Object.keys(por).length > 0 ? Object.keys(por) : ['Sem dados'];
+    const values = Object.keys(por).length > 0 ? Object.values(por) : [1];
+    const colors = Object.keys(por).length > 0 ? ['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#ec4899'] : ['#e2e8f0'];
+    
+    charts.s = new Chart(c2.getContext('2d'), {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 3, borderColor: '#fff' }] },
+        options: {
+            responsive: true, maintainAspectRatio: false, cutout: '70%',
+            plugins: {
+                legend: { display: true, position: 'bottom', labels: { usePointStyle: true, font: { size: 11, weight: 'bold' }, padding: 15 } },
+                datalabels: { color: '#fff', font: { weight: 'bold', size: 14 }, formatter: (v, ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); return total === 0 ? '0%' : Math.round((v/total)*100) + '%'; } }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
+
+function renderizarGraficos(){
+    Object.values(charts).forEach(c => { try{c.destroy()}catch(e){} });
+    const c1 = document.getElementById('chartPerformance'), c3 = document.getElementById('chartComparecimento'), c4 = document.getElementById('chartTempoMedio');
+    if(!c1||!c3||!c4){ setTimeout(renderizarGraficos,300); return; }
+    Chart.register(ChartDataLabels);
+    
+    charts.p = new Chart(c1.getContext('2d'), {
+        type: 'line', data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'OCIs Fechadas', data: [65,78,72,85,82,86], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: '#3b82f6', pointBorderWidth: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 12, weight: 'bold' } } }, datalabels: { anchor: 'end', align: 'top', offset: 4, color: '#1e40af', font: { weight: 'bold', size: 12 }, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 4, padding: 4, formatter: (v) => v } }, scales: { y: { beginAtZero: false, min: 50, max: 100 } } },
+        plugins: [ChartDataLabels]
+    });
+    
+    atualizarGraficoEspecialidade();
+    
+    charts.c = new Chart(c3.getContext('2d'), {
+        type: 'bar', data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'Comparecimento %', data: [88,85,90,92,89,91], backgroundColor: '#10b981', borderRadius: 8, borderSkipped: false }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 12, weight: 'bold' } } }, datalabels: { anchor: 'center', align: 'center', color: '#FFFFFF', font: { weight: 'bold', size: 16 }, formatter: (v) => v + '%' } }, scales: { y: { beginAtZero: false, min: 70, max: 100, ticks: { callback: (v)=>v+'%' } } } },
+        plugins: [ChartDataLabels]
+    });
+    
+    charts.t = new Chart(c4.getContext('2d'), {
+        type: 'line', data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'Dias', data: [18,16,14,12,11,10], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b', pointBorderWidth: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 12, weight: 'bold' } } }, datalabels: { anchor: 'end', align: 'top', offset: 4, color: '#92400e', font: { weight: 'bold', size: 12 }, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 4, padding: 4, formatter: (v) => v + 'd' } }, scales: { y: { beginAtZero: false, min: 5, max: 22, ticks: { callback: (v)=>v+'d' } } } },
+        plugins: [ChartDataLabels]
+    });
+}
+
+function switchTab(tabId){
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active','text-blue-600'); b.classList.add('text-slate-400'); });
+    const tabBtn = document.getElementById('tab-'+tabId);
+    if(tabBtn){ tabBtn.classList.add('active','text-blue-600'); }
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('content-'+tabId)?.classList.add('active');
+    document.getElementById('headerTitle').textContent = tabBtn?.textContent?.trim() || 'Painel OCI';
+    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(link => { if((link.getAttribute('onclick')||'').includes(`'${tabId}'`)) link.classList.add('active'); });
+    setTimeout(renderizarTabelas, 100);
+    if(tabId === 'visao-geral') setTimeout(renderizarGraficos, 200);
+}
+
+function exportarExcel(tipo){
+    const dados = getDadosFiltrados(tipo);
+    if(!dados.length) return alert('⚠️ Nenhum dado disponível.');
+    let exportData = dados.map(item => {
+        const p = pacientes.find(x => x.id === item.paciente_id) || {};
+        const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+        return {
+            'Nº Solicitação': tipo==='retornos'?item.numero_solicitacao_1consulta:'SOL-'+String(item.id).padStart(4,'0'),
+            'Prontuário': p.prontuario||'',
+            'Nome Paciente': p.nome||'',
+            'CPF': formatarCPF(p.cpf||''),
+            'Nome da Mãe': p.nome_mae||'',
+            'Unidade': p.unidade_saude||'',
+            'Especialidade': e.nome||'',
+            'Exames': e.exames_obrigatorios||'',
+            'Médico': item.medico_solicitante||'',
+            'Local': item.local_consulta||'',
+            'Data 1ª Consulta': formatarDataISO(item.data_agendada),
+            'Status': item.status,
+            ...(tipo==='retornos'?{'Data Retorno': formatarDataISO(item.created_at)}:{})
+        };
+    });
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, tipo.replace('-','_'));
+    XLSX.writeFile(wb, `relatorio_${tipo.replace('-','_')}_${new Date().toISOString().slice(0,10)}.xlsx`);
+    alert('✅ Exportado: ' + exportData.length + ' registros');
+}
+
+function logout(){ usuarioLogado = null; document.getElementById('screenSistema').classList.remove('active'); document.getElementById('screenSistema').style.display = 'none'; ['loginCPF','loginSenha','loginNome'].forEach(id => document.getElementById(id).value = ''); showScreen('screenLogin'); }
 
 // ============================================
 // INICIALIZAÇÃO
 // ============================================
-console.log('✅ PORTAL - PEDIDOS DE RETORNO v5.3 CARREGADO!');
-console.log('🔒 Cadastro público REMOVIDO - Apenas admin cadastra');
-console.log('🔗 Validação de Nº Solicitação na tabela de 1ª Consulta');
-console.log('📋 Modal de confirmação com nome, CPF e telefone automáticos');
-console.log('🏥 Dropdown de UBS com busca por nome e distrito');
-console.log('🔢 Prontuário Vivver e Nº Solicitação: somente números');
-console.log('📌 Envio de exames é OPCIONAL');
-console.log('👑 Painel Admin para gerenciar USUÁRIOS');
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('btnLogin').addEventListener('click', () => {
+        const nome = document.getElementById('loginNome').value.trim();
+        const cpf = limparCPF(document.getElementById('loginCPF').value);
+        const senha = document.getElementById('loginSenha').value.trim();
+        if(!nome || !cpf || !senha) return alert('⚠️ Preencha todos os campos!');
+        if(!validarCPF(cpf)) return alert('❌ CPF inválido!');
+        const usuario = usuariosCadastrados.find(u => u.cpf === cpf && u.senha === senha);
+        if(usuario){
+            usuarioLogado = usuario;
+            document.getElementById('screenLogin').style.display = 'none';
+            document.getElementById('screenLogin').classList.remove('active');
+            document.getElementById('screenSistema').classList.add('active');
+            document.getElementById('screenSistema').style.display = 'flex';
+            atualizarTudo();
+        } else { alert('❌ Usuário não encontrado!'); }
+    });
+    
+    document.getElementById('btnResetVerificar').addEventListener('click', () => {
+        const cpf = limparCPF(document.getElementById('resetCPF').value);
+        const nomeMae = document.getElementById('resetNomeMae').value.trim().toLowerCase();
+        const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim().toLowerCase();
+        if(!cpf||!nomeMae||!cidadeNatal) return alert('⚠️ Preencha todos os campos!');
+        const usuario = usuariosCadastrados.find(u => u.cpf===cpf && u.nome_mae.toLowerCase()===nomeMae && u.cidade_natal.toLowerCase()===cidadeNatal);
+        if(!usuario) return alert('❌ Dados não encontrados!');
+        document.getElementById('resetStep1').classList.add('hidden');
+        document.getElementById('resetStep2').classList.remove('hidden');
+        document.getElementById('resetStepTitle').textContent = 'Etapa 2: Redefinir senha';
+        document.getElementById('resetStep2').dataset.usuarioId = usuario.id;
+    });
+    
+    document.getElementById('btnResetConfirmar').addEventListener('click', () => {
+        const codigo = document.getElementById('resetCodigo').value.trim();
+        const novaSenha = document.getElementById('resetNovaSenha').value.trim();
+        const confirmaSenha = document.getElementById('resetConfirmaSenha').value.trim();
+        const usuarioId = parseInt(document.getElementById('resetStep2').dataset.usuarioId);
+        if(codigo !== CODIGO_SEGURANCA) return alert('❌ Código incorreto!');
+        if(novaSenha.length !== 6) return alert('⚠️ Senha deve ter 6 dígitos!');
+        if(novaSenha !== confirmaSenha) return alert('❌ Senhas não conferem!');
+        const usuario = usuariosCadastrados.find(u => u.id === usuarioId);
+        if(usuario){ usuario.senha = novaSenha; alert('✅ Senha redefinida!'); showScreen('screenLogin'); }
+    });
+    
+    document.getElementById('loginSenha').addEventListener('keydown', (e) => { if(e.key === 'Enter') document.getElementById('btnLogin').click(); });
+    document.getElementById('modalAdmin').addEventListener('click', function(e){ if(e.target === this) fecharModalAdmin(); });
+    document.getElementById('modalEditarUsuario').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('show'); });
+    
+    console.log('✅ SISTEMA OCI v6.0 - LINHA DE PRODUÇÃO ATIVADA!');
+    console.log('📋 Status: em_andamento → aguardando_exame → apto_retorno → retorno_agendado → retorno_recepcionado → oci_fechada');
+    console.log('🚫 Absenteísmo: faltou (1ª consulta) | retorno_faltou (retorno)');
+    console.log('📊 Filtro do gráfico com Aptos Retorno e Ret. Agendados');
+});
 </script>
 </body>
 </html>
