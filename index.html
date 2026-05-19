@@ -457,10 +457,6 @@
                 <i class="fas fa-calendar-plus w-4 text-blue-400"></i> Retornos Agendados
             </a>
             
-            <a href="#" onclick="switchTab('retornos')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
-                <i class="fas fa-calendar-check w-4"></i> Retornos
-            </a>
-            
             <!-- 🆕 1ª CONSULTA ABSENTEÍSMO -->
             <a href="#" onclick="switchTab('absenteismo-1consulta')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
                 <i class="fas fa-user-times w-4 text-orange-400"></i> 1ª Consulta Absenteísmo
@@ -493,9 +489,6 @@
             </button>
             <button onclick="exportarExcel('retornos-agendados')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-blue-400 font-bold">
                 <i class="fas fa-download"></i> Baixar Ret. Agendados
-            </button>
-            <button onclick="exportarExcel('retornos')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-green-400 font-bold">
-                <i class="fas fa-download"></i> Baixar Retornos
             </button>
             <button onclick="exportarExcel('absenteismo-1consulta')" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-orange-400 font-bold">
                 <i class="fas fa-download"></i> Baixar Abs. 1ª Cons.
@@ -560,9 +553,6 @@
                 </button>
                 <button onclick="switchTab('retornos-agendados')" id="tab-retornos-agendados" class="tab-btn pb-3 text-sm font-bold text-slate-400">
                     <i class="fas fa-calendar-plus"></i> Ret. Agendados
-                </button>
-                <button onclick="switchTab('retornos')" id="tab-retornos" class="tab-btn pb-3 text-sm font-bold text-slate-400">
-                    <i class="fas fa-calendar-check"></i> Retornos
                 </button>
                 <button onclick="switchTab('absenteismo-1consulta')" id="tab-absenteismo-1consulta" class="tab-btn pb-3 text-sm font-bold text-slate-400">
                     <i class="fas fa-user-times"></i> Abs. 1ª Cons.
@@ -770,44 +760,6 @@
            <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoRetornosAgendados"></div>
         </div>
       </div>
-
-            <!-- RETORNOS -->
-            <div id="content-retornos" class="tab-content space-y-4">
-                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                    <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
-                        <h3 class="text-lg font-bold">📋 Retornos (Aptos para Lançamento)</h3>
-                        <div class="flex gap-2">
-                            <input type="text" id="buscaRetornos" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos')">
-                            <button onclick="exportarExcel('retornos')" class="bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700">
-                                <i class="fas fa-download"></i> Excel
-                            </button>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-slate-50">
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. 1ª Cons.</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. Retorno</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Prontuário</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Paciente</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">CPF</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Mãe</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Unidade</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Especialidade</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Exames</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Médico</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Local</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data 1ª</th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase">Data Retorno</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaRetornos"></tbody>
-                        </table>
-                    </div>
-                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoRetornos"></div>
-                </div>
-            </div>
 
             <!-- 🆕 1ª CONSULTA ABSENTEÍSMO -->
             <div id="content-absenteismo-1consulta" class="tab-content space-y-4">
@@ -1024,7 +976,7 @@ let usuarioLogado = null;
 let charts = {};
 let paginaAtual = {
     monitoramento:1, 'primeira-consulta':1, 'aptos-retorno':1, 
-    'retornos-agendados':1, retornos:1, 
+    'retornos-agendados':1, 
     'absenteismo-1consulta':1, 'absenteismo-retorno':1, apac:1
 };
 
@@ -1306,7 +1258,6 @@ function getDadosFiltrados(tipo){
     else if(tipo === 'primeira-consulta') dados = consultas.filter(c => c.status !== 'faltou' && c.status !== 'retorno_faltou');
     else if(tipo === 'aptos-retorno') dados = consultas.filter(c => c.status === 'apto_retorno');
     else if(tipo === 'retornos-agendados') dados = consultas.filter(c => c.status === 'retorno_agendado');
-    else if(tipo === 'retornos') dados = [...retornos];
     else if(tipo === 'absenteismo-1consulta') dados = consultas.filter(c => c.status === 'faltou');
     else if(tipo === 'absenteismo-retorno') dados = consultas.filter(c => c.status === 'retorno_faltou');
     else if(tipo === 'apac') dados = consultas.filter(c => c.status === 'oci_fechada');
@@ -1359,7 +1310,7 @@ function getAlertaOCI(consulta){
 }
 
 function renderizarTabelas(){
-    const tiposTabela = ['monitoramento','primeira-consulta','aptos-retorno','retornos-agendados','retornos','absenteismo-1consulta','absenteismo-retorno','apac'];
+    const tiposTabela = ['monitoramento','primeira-consulta','aptos-retorno','retornos-agendados','absenteismo-1consulta','absenteismo-retorno','apac'];
     
     tiposTabela.forEach(tipo => {
         const dados = getDadosFiltrados(tipo);
@@ -1368,8 +1319,8 @@ function renderizarTabelas(){
         const inicio = (paginaAtual[tipo] - 1) * 100;
         const pag = dados.slice(inicio, inicio + 100);
         
-        const tabelaId = tipo === 'monitoramento' ? 'tabelaMonitoramento' : tipo === 'primeira-consulta' ? 'tabelaPrimeiraConsulta' : tipo === 'aptos-retorno' ? 'tabelaAptosRetorno' : tipo === 'retornos-agendados' ? 'tabelaRetornosAgendados' : tipo === 'retornos' ? 'tabelaRetornos' : tipo === 'absenteismo-1consulta' ? 'tabelaAbsenteismo1Consulta' : tipo === 'absenteismo-retorno' ? 'tabelaAbsenteismoRetorno' : 'tabelaAPAC';
-        const pagId = tipo === 'monitoramento' ? 'paginacaoMonitoramento' : tipo === 'primeira-consulta' ? 'paginacaoPrimeiraConsulta' : tipo === 'aptos-retorno' ? 'paginacaoAptosRetorno' : tipo === 'retornos-agendados' ? 'paginacaoRetornosAgendados' : tipo === 'retornos' ? 'paginacaoRetornos' : tipo === 'absenteismo-1consulta' ? 'paginacaoAbsenteismo1Consulta' : tipo === 'absenteismo-retorno' ? 'paginacaoAbsenteismoRetorno' : 'paginacaoAPAC';
+        const tabelaId = tipo === 'monitoramento' ? 'tabelaMonitoramento' : tipo === 'primeira-consulta' ? 'tabelaPrimeiraConsulta' : tipo === 'aptos-retorno' ? 'tabelaAptosRetorno' : tipo === 'retornos-agendados' ? 'tabelaRetornosAgendados' : tipo === 'absenteismo-1consulta' ? 'tabelaAbsenteismo1Consulta' : tipo === 'absenteismo-retorno' ? 'tabelaAbsenteismoRetorno' : 'tabelaAPAC';
+        const pagId = tipo === 'monitoramento' ? 'paginacaoMonitoramento' : tipo === 'primeira-consulta' ? 'paginacaoPrimeiraConsulta' : tipo === 'aptos-retorno' ? 'paginacaoAptosRetorno' : tipo === 'retornos-agendados' ? 'paginacaoRetornosAgendados' : tipo === 'absenteismo-1consulta' ? 'paginacaoAbsenteismo1Consulta' : tipo === 'absenteismo-retorno' ? 'paginacaoAbsenteismoRetorno' : 'paginacaoAPAC';
         
         const tabelaEl = document.getElementById(tabelaId);
         const pagEl = document.getElementById(pagId);
@@ -1469,7 +1420,6 @@ function atualizarGraficoEspecialidade(){
     else if(filtro === 'primeira_consulta') dadosFiltrados = consultas.filter(c => c.status !== 'faltou' && c.status !== 'retorno_faltou');
     else if(filtro === 'aptos_retorno') dadosFiltrados = consultas.filter(c => c.status === 'apto_retorno');
     else if(filtro === 'retornos_agendados') dadosFiltrados = consultas.filter(c => c.status === 'retorno_agendado');
-    else if(filtro === 'retornos') dadosFiltrados = consultas.filter(c => c.status === 'apto_retorno');
     else if(filtro === 'oci_fechada') dadosFiltrados = consultas.filter(c => c.status === 'oci_fechada');
     
     const por = {};
