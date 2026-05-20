@@ -1390,16 +1390,108 @@ function renderizarGraficos(){
     atualizarGraficoAbsenteismo();
     
     // Gráfico 3: Taxa de Comparecimento - NÚMEROS BRANCOS FIXOS NO MEIO
-    charts.c = new Chart(c3.getContext('2d'), {
-        type: 'bar', data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'Comparecimento %', data: [88,85,90,92,89,91], backgroundColor: '#10b981', borderRadius: 10, borderSkipped: false, barPercentage: 0.7 }] },
-        options: { responsive: true, maintainAspectRatio: false,
-            layout: { padding: { top: 20 } },
-            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 13, weight: 'bold' }, padding: 20 } },
-                datalabels: { anchor: 'center', align: 'center', offset: 0, color: '#FFFFFF', font: { weight: 'bold', size: 18, family: "'Plus Jakarta Sans', sans-serif" }, textStrokeColor: 'rgba(0,0,0,0.3)', textStrokeWidth: 2, formatter: (v) => v + '%', display: true },
-                tooltip: { enabled: false } },
-            scales: { y: { beginAtZero: false, min: 70, max: 100, ticks: { callback: (v)=>v+'%', font: { size: 12 } }, grid: { display: false } }, x: { grid: { display: false }, ticks: { font: { size: 12 } } } } },
-        plugins: [ChartDataLabels]
+const ctxComparecimento = c3.getContext('2d');
+if(charts.c) charts.c.destroy();
+
+charts.c = new Chart(ctxComparecimento, {
+    type: 'bar',
+    data: { 
+        labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], 
+        datasets: [{ 
+            label: 'Comparecimento %', 
+            data: [88,85,90,92,89,91], 
+            backgroundColor: '#10b981', 
+            borderRadius: 10, 
+            borderSkipped: false,
+            barPercentage: 0.7,
+            datalabels: {
+                anchor: 'center',
+                align: 'center',
+                color: '#FFFFFF',
+                font: {
+                    weight: 'bold',
+                    size: 18,
+                    family: "'Plus Jakarta Sans', sans-serif"
+                },
+                formatter: function(value) {
+                    return value + '%';
+                },
+                display: true
+            }
+        }] 
+    },
+    options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        layout: {
+            padding: { top: 30 }
+        },
+        plugins: { 
+            legend: { 
+                display: true, 
+                position: 'top', 
+                labels: { 
+                    usePointStyle: true, 
+                    font: { size: 13, weight: 'bold' },
+                    padding: 20
+                } 
+            },
+            datalabels: {
+                anchor: 'center',
+                align: 'center',
+                color: '#FFFFFF',
+                font: {
+                    weight: 'bold',
+                    size: 18,
+                    family: "'Plus Jakarta Sans', sans-serif"
+                },
+                formatter: function(value) {
+                    return value + '%';
+                },
+                display: true,
+                clamp: true
+            },
+            tooltip: { enabled: false }
+        }, 
+        scales: { 
+            y: { 
+                beginAtZero: false, 
+                min: 70, 
+                max: 100, 
+                ticks: { 
+                    callback: function(v){ return v + '%'; }, 
+                    font: { size: 12 } 
+                }, 
+                grid: { display: false } 
+            }, 
+            x: { 
+                grid: { display: false }, 
+                ticks: { font: { size: 12 } } 
+            } 
+        } 
+    },
+    plugins: [ChartDataLabels]
+});
+
+// Forçar a exibição dos datalabels
+if(charts.c && charts.c.data && charts.c.data.datasets) {
+    charts.c.data.datasets.forEach(function(dataset) {
+        dataset.datalabels = {
+            anchor: 'center',
+            align: 'center',
+            color: '#FFFFFF',
+            font: {
+                weight: 'bold',
+                size: 18
+            },
+            formatter: function(value) {
+                return value + '%';
+            },
+            display: true
+        };
     });
+    charts.c.update();
+}
     
     // Gráfico 4: Tempo Médio OCI - MESES DINÂMICOS
     charts.t = new Chart(c4.getContext('2d'), {
