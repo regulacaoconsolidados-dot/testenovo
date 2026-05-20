@@ -451,7 +451,7 @@ function getGrupoSubgrupo(especialidadeId){
                 </div>
             </div>
 
-            <!-- 1ª CONSULTA RECEPCIONADOS -->
+                        <!-- 1ª CONSULTA RECEPCIONADOS -->
             <div id="content-primeira-consulta" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -465,26 +465,29 @@ function getGrupoSubgrupo(especialidadeId){
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-    <table class="w-full">
-        <thead>
-            <tr class="bg-slate-50">
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','id')">Nº Solicitação <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','nome')">Paciente <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','cpf')">CPF <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','mae')">Nome da Mãe <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','unidade')">Unidade de Saúde <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','exames')">Exames <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','grupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','medico')">Médico Solicitante <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','local')">Local da Consulta <i class="fas fa-sort"></i></th>
-                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','data')">Data 1ª Consulta <i class="fas fa-sort"></i></th>
-            </tr>
-        </thead>
-        <tbody id="tabelaPrimeiraConsulta"></tbody>
-    </table>
-</div>
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50">
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','id')">Nº Solicitação <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','mae')">Nome da Mãe <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','unidade')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','exames')">Exames <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','grupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','medico')">Médico Solicitante <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','local')">Local da Consulta <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','data')">Data 1ª Consulta <i class="fas fa-sort"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaPrimeiraConsulta"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoPrimeiraConsulta"></div>
+                </div>
+            </div>
 
             <!-- APTOS PARA O RETORNO -->
             <div id="content-aptos-retorno" class="tab-content space-y-4">
@@ -524,7 +527,7 @@ function getGrupoSubgrupo(especialidadeId){
                 </div>
             </div>
 
-            <!-- RETORNOS AGENDADOS -->
+                        <!-- RETORNOS AGENDADOS -->
             <div id="content-retornos-agendados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -604,7 +607,7 @@ function getGrupoSubgrupo(especialidadeId){
                 </div>
             </div>
 
-            <!-- 1ª CONSULTA ABSENTEÍSMO -->
+                        <!-- 1ª CONSULTA ABSENTEÍSMO -->
             <div id="content-absenteismo-1consulta" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
