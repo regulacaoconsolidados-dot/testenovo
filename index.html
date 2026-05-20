@@ -788,7 +788,7 @@ for(let i=0; i<150; i++){
         especialidade_id: Math.floor(Math.random()*5)+1,
         status: statusList[Math.floor(Math.random()*statusList.length)],
         tipo: 'primeira_consulta',
-        data_agendada: `2025-${String(mes).padStart(2,'0')}-${String(dia).padStart(2,'0')}`,
+        data_agendada: `${new Date().getFullYear()}-${String(mes).padStart(2,'0')}-${String(dia).padStart(2,'0')}`,
         medico_solicitante: medicos[Math.floor(Math.random()*medicos.length)],
         local_consulta: locais[Math.floor(Math.random()*locais.length)]
     });
@@ -806,7 +806,7 @@ consultas.forEach(c => {
             numero_solicitacao_retorno: 'RET-' + String(retCount).padStart(4,'0'),
             nome_exame: especialidades.find(e=>e.id===c.especialidade_id)?.exames_obrigatorios || 'EXAMES',
             status: 'solicitado',
-            created_at: `2025-${String(mesRetorno).padStart(2,'0')}-${String(diaRetorno).padStart(2,'0')}`
+            created_at: `${new Date().getFullYear()}-${String(mesRetorno).padStart(2,'0')}-${String(diaRetorno).padStart(2,'0')}`
         });
     }
 });
