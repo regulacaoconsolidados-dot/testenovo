@@ -255,7 +255,7 @@ function getGrupoSubgrupo(especialidadeId){
                 <i class="fas fa-user-slash w-4 text-red-400"></i> Retorno Absenteísmo
             </a>
             <a href="#" onclick="switchTab('apac')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
-                <i class="fas fa-file-invoice w-4"></i> APAC
+                <i class="fas fa-file-invoice w-4"></i> GERAR APAC
             </a>
             
             <div class="border-t border-white/10 my-4"></div>
@@ -330,13 +330,13 @@ function getGrupoSubgrupo(especialidadeId){
             <div class="mb-6 flex gap-4 md:gap-6 overflow-x-auto border-b border-slate-200 pb-1">
                 <button onclick="switchTab('visao-geral')" id="tab-visao-geral" class="tab-btn active pb-3 text-sm font-bold flex items-center gap-2 whitespace-nowrap text-blue-600"><i class="fas fa-th-large"></i> Visão Geral</button>
                 <button onclick="switchTab('monitoramento')" id="tab-monitoramento" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-users"></i> Monitoramento</button>
-                <button onclick="switchTab('primeira-consulta')" id="tab-primeira-consulta" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-clipboard-check"></i> 1ª Consulta</button>
+                <button onclick="switchTab('primeira-consulta')" id="tab-primeira-consulta" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-clipboard-check"></i> 1ª Consulta Recepcionados</button>
                 <button onclick="switchTab('aptos-retorno')" id="tab-aptos-retorno" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-check-circle"></i> Aptos Retorno</button>
                 <button onclick="switchTab('retornos-agendados')" id="tab-retornos-agendados" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-calendar-plus"></i> Ret. Agendados</button>
                 <button onclick="switchTab('retornos-recepcionados')" id="tab-retornos-recepcionados" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-calendar-check"></i> Ret. Recepcionados</button>
                 <button onclick="switchTab('absenteismo-1consulta')" id="tab-absenteismo-1consulta" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-user-times"></i> Abs. 1ª Cons.</button>
                 <button onclick="switchTab('absenteismo-retorno')" id="tab-absenteismo-retorno" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-user-slash"></i> Abs. Retorno</button>
-                <button onclick="switchTab('apac')" id="tab-apac" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-file-medical"></i> APAC</button>
+                <button onclick="switchTab('apac')" id="tab-apac" class="tab-btn pb-3 text-sm font-bold text-slate-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-file-medical"></i> GERAR APAC</button>
             </div>
 
             <!-- VISÃO GERAL -->
@@ -465,28 +465,26 @@ function getGrupoSubgrupo(especialidadeId){
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-slate-50">
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','id')">Nº Solicitação <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','nome')">Paciente <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','cpf')">CPF <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','mae')">Nome da Mãe <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','unidade')">Unidade de Saúde <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','grupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','medico')">Médico Solicitante <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','local')">Local da Consulta <i class="fas fa-sort"></i></th>
-                                    <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','data')">Data 1ª Consulta <i class="fas fa-sort"></i></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaPrimeiraConsulta"></tbody>
-                        </table>
-                    </div>
-                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoPrimeiraConsulta"></div>
-                </div>
-            </div>
+    <table class="w-full">
+        <thead>
+            <tr class="bg-slate-50">
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','id')">Nº Solicitação <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','nome')">Paciente <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','cpf')">CPF <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','mae')">Nome da Mãe <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','unidade')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','exames')">Exames <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','grupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','medico')">Médico Solicitante <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','local')">Local da Consulta <i class="fas fa-sort"></i></th>
+                <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','data')">Data 1ª Consulta <i class="fas fa-sort"></i></th>
+            </tr>
+        </thead>
+        <tbody id="tabelaPrimeiraConsulta"></tbody>
+    </table>
+</div>
 
             <!-- APTOS PARA O RETORNO -->
             <div id="content-aptos-retorno" class="tab-content space-y-4">
@@ -896,10 +894,26 @@ function toggleExportMenu(){
 // 🆕 PAGINAÇÃO E ORDENAÇÃO
 // ============================================
 function mudarPagina(tipo){
-    const selectId = 'pagina' + tipo.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
-    itensPorPagina[tipo] = parseInt(document.getElementById(selectId).value);
-    paginaAtual[tipo] = 1;
-    renderizarTabelas();
+    // Mapeamento correto dos IDs dos selects
+    const selectMap = {
+        'monitoramento': 'paginaMonitoramento',
+        'primeira-consulta': 'paginaPrimeiraConsulta',
+        'aptos-retorno': 'paginaAptosRetorno',
+        'retornos-agendados': 'paginaRetornosAgendados',
+        'retornos-recepcionados': 'paginaRetornosRecepcionados',
+        'absenteismo-1consulta': 'paginaAbsenteismo1Consulta',
+        'absenteismo-retorno': 'paginaAbsenteismoRetorno',
+        'apac': 'paginaAPAC'
+    };
+    
+    const selectId = selectMap[tipo];
+    const selectEl = document.getElementById(selectId);
+    
+    if(selectEl){
+        itensPorPagina[tipo] = parseInt(selectEl.value);
+        paginaAtual[tipo] = 1;
+        renderizarTabelas();
+    }
 }
 
 function ordenarTabela(tipo, campo){
@@ -1190,15 +1204,29 @@ function getAlertaOCI(consulta){
 // 🆕 DIAS RESTANTES COM CÁLCULO REAL
 function getDiasRestantes(consulta){
     const hoje = new Date();
-    if(consulta.status === 'oci_fechada' || consulta.status === 'faltou' || consulta.status === 'retorno_faltou') return {dias: '—', cor: 'text-slate-400'};
+    
+    // Se já finalizou, não mostra
+    if(consulta.status === 'oci_fechada' || consulta.status === 'faltou' || consulta.status === 'retorno_faltou') 
+        return {dias: '—', cor: 'text-slate-400'};
+    
+    // Calcular dias passados desde a 1ª consulta
     const dataConsulta = new Date(consulta.data_agendada + 'T12:00:00');
     const diasPassados = Math.floor((hoje - dataConsulta) / 86400000);
+    
+    // Pegar o prazo da especialidade
     const e = especialidades.find(x => x.id === consulta.especialidade_id);
     const prazo = e?.prazo_retorno_dias || 60;
+    
+    // Calcular dias restantes
     const diasRestantes = prazo - diasPassados;
-    if(diasRestantes < 0) return {dias: 'Vencido', cor: 'text-rose-600 font-bold'};
-    if(diasRestantes <= 10) return {dias: diasRestantes + 'd', cor: 'text-amber-600 font-bold'};
-    return {dias: diasRestantes + 'd', cor: 'text-emerald-600'};
+    
+    if(diasRestantes < 0){
+        return {dias: `Vencido há ${Math.abs(diasRestantes)}d`, cor: 'text-rose-600 font-bold'};
+    }
+    if(diasRestantes <= 10){
+        return {dias: `${diasRestantes} dias`, cor: 'text-amber-600 font-bold'};
+    }
+    return {dias: `${diasRestantes} dias`, cor: 'text-emerald-600'};
 }
 
 function renderizarTabelas(){
@@ -1270,6 +1298,18 @@ function renderizarTabelas(){
 
 function filtrarTabela(tipo){ paginaAtual[tipo]=1; renderizarTabelas(); }
 
+    // 🆕 FUNÇÃO PARA GERAR ÚLTIMOS 6 MESES DINAMICAMENTE
+function getUltimos6Meses(){
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const hoje = new Date();
+    const resultado = [];
+    for(let i = 5; i >= 0; i--){
+        const mes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+        resultado.push(meses[mes.getMonth()]);
+    }
+    return resultado;
+}
+
 // ============================================
 // GRÁFICOS
 // ============================================
@@ -1305,6 +1345,7 @@ function atualizarGraficoAbsenteismo(){
     const filtro = document.getElementById('filtroGraficoAbsenteismo')?.value || '1consulta';
     if(charts.ab) charts.ab.destroy();
     const c5 = document.getElementById('chartAbsenteismo'); if(!c5) return;
+    
     let dadosFiltrados = [];
     if(filtro === '1consulta') dadosFiltrados = consultas.filter(c => c.status === 'faltou');
     else dadosFiltrados = consultas.filter(c => c.status === 'retorno_faltou');
@@ -1317,8 +1358,10 @@ function atualizarGraficoAbsenteismo(){
     charts.ab = new Chart(c5.getContext('2d'), {
         type: 'bar', data: { labels, datasets: [{ label: filtro==='1consulta'?'Abs. 1ª Consulta':'Abs. Retorno', data: values, backgroundColor: filtro==='1consulta'?'#f97316':'#ef4444', borderRadius: 8, borderSkipped: false, barPercentage: 0.7 }] },
         options: { responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 12, weight: 'bold' } } },
-                datalabels: { anchor: 'center', align: 'center', color: '#FFFFFF', font: { weight: 'bold', size: 16 }, formatter: (v) => v } },
+            layout: { padding: { top: 20 } },
+            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 12, weight: 'bold' }, padding: 20 } },
+                datalabels: { anchor: 'center', align: 'center', offset: 0, color: '#FFFFFF', font: { weight: 'bold', size: 16, family: "'Plus Jakarta Sans', sans-serif" }, textStrokeColor: 'rgba(0,0,0,0.3)', textStrokeWidth: 2, formatter: (v) => v, display: true },
+                tooltip: { enabled: false } },
             scales: { y: { beginAtZero: true, grid: { display: false }, ticks: { font: { size: 12 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } } },
         plugins: [ChartDataLabels]
     });
@@ -1330,8 +1373,9 @@ function renderizarGraficos(){
     if(!c1||!c3||!c4||!c6){ setTimeout(renderizarGraficos,300); return; }
     Chart.register(ChartDataLabels);
     
+    // Gráfico 1: Desempenho OCI - MESES DINÂMICOS
     charts.p = new Chart(c1.getContext('2d'), {
-        type: 'line', data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'OCIs Fechadas', data: [65,78,72,85,82,86], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 7, pointBackgroundColor: '#fff', pointBorderColor: '#3b82f6', pointBorderWidth: 3 }] },
+        type: 'line', data: { labels: getUltimos6Meses(), datasets: [{ label: 'OCIs Fechadas', data: [65,78,72,85,82,86], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 7, pointBackgroundColor: '#fff', pointBorderColor: '#3b82f6', pointBorderWidth: 3 }] },
         options: { responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 13, weight: 'bold' } } },
                 datalabels: { anchor: 'end', align: 'top', offset: 6, color: '#1e40af', font: { weight: 'bold', size: 13 }, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: 6, formatter: (v) => v } },
@@ -1342,17 +1386,21 @@ function renderizarGraficos(){
     atualizarGraficoEspecialidade();
     atualizarGraficoAbsenteismo();
     
+    // Gráfico 3: Taxa de Comparecimento - NÚMEROS BRANCOS FIXOS NO MEIO
     charts.c = new Chart(c3.getContext('2d'), {
         type: 'bar', data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'Comparecimento %', data: [88,85,90,92,89,91], backgroundColor: '#10b981', borderRadius: 10, borderSkipped: false, barPercentage: 0.7 }] },
         options: { responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 13, weight: 'bold' } } },
-                datalabels: { anchor: 'center', align: 'center', color: '#FFFFFF', font: { weight: 'bold', size: 18 }, formatter: (v) => v + '%' } },
+            layout: { padding: { top: 20 } },
+            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 13, weight: 'bold' }, padding: 20 } },
+                datalabels: { anchor: 'center', align: 'center', offset: 0, color: '#FFFFFF', font: { weight: 'bold', size: 18, family: "'Plus Jakarta Sans', sans-serif" }, textStrokeColor: 'rgba(0,0,0,0.3)', textStrokeWidth: 2, formatter: (v) => v + '%', display: true },
+                tooltip: { enabled: false } },
             scales: { y: { beginAtZero: false, min: 70, max: 100, ticks: { callback: (v)=>v+'%', font: { size: 12 } }, grid: { display: false } }, x: { grid: { display: false }, ticks: { font: { size: 12 } } } } },
         plugins: [ChartDataLabels]
     });
     
+    // Gráfico 4: Tempo Médio OCI - MESES DINÂMICOS
     charts.t = new Chart(c4.getContext('2d'), {
-        type: 'line', data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], datasets: [{ label: 'Dias', data: [18,16,14,12,11,10], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 7, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b', pointBorderWidth: 3 }] },
+        type: 'line', data: { labels: getUltimos6Meses(), datasets: [{ label: 'Dias', data: [18,16,14,12,11,10], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 7, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b', pointBorderWidth: 3 }] },
         options: { responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 13, weight: 'bold' } } },
                 datalabels: { anchor: 'end', align: 'top', offset: 6, color: '#92400e', font: { weight: 'bold', size: 13 }, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: 6, formatter: (v) => v + 'd' } },
@@ -1360,6 +1408,7 @@ function renderizarGraficos(){
         plugins: [ChartDataLabels]
     });
     
+    // Gráfico 6: Distribuição de Status
     const statusCount = {};
     consultas.forEach(c => { const st = getStatusBadge(c.status).t; statusCount[st] = (statusCount[st] || 0) + 1; });
     charts.st = new Chart(c6.getContext('2d'), {
@@ -1455,7 +1504,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📊 6 Gráficos com números BRANCOS em NEGRITO');
     console.log('📋 Grupos/Subgrupos em TODAS as tabelas');
     console.log('⏳ Dias Restantes com cálculo REAL');
-    console.log('🔗 Portal de Retorno integrado');
+    console.log('🔗 Portal do Retorno integrado');
     console.log('👑 Idealizadora: Ana Paula Araújo da Silva');
 });
 </script>
