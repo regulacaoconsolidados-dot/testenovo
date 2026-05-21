@@ -246,8 +246,8 @@
 <!-- Loading Overlay -->
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
-    <p class="text-white mt-4 font-bold">Carregando Sistema OCI v8.0...</p>
-    <p class="text-blue-300 text-sm mt-2">Idealizadora: Ana Paula Araújo da Silva | Mat: 201704</p>
+    <p class="text-white mt-4 font-bold">Carregando Sistema OCI v7.0...</p>
+    <p class="text-blue-300 text-sm mt-2">Criado Por: Ana Paula Araújo da Silva | Mat: 201704</p>
 </div>
 
 <!-- ============ TELA DE LOGIN ============ -->
@@ -256,7 +256,6 @@
         <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
         <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Sistema OCI</h1>
         <p class="text-slate-500 text-sm mb-2">Painel Linha do Cuidado do Paciente v7.0</p>
-        <p class="text-purple-600 text-xs font-bold mb-6">👑 Idealizadora: Ana Paula Araújo da Silva | Mat: 201704</p>
         
         <div class="text-left space-y-4">
             <div>
@@ -290,7 +289,7 @@
         
         <div class="mt-4 p-3 bg-slate-50 rounded-xl">
             <p class="text-[10px] text-slate-500 font-bold">Acessos:</p>
-            <p class="text-[10px] text-slate-400">Admin: 123.456.789-09 | Senha: 201704</p>
+            <p class="text-[10px] text-slate-400">Admin: CPF | Senha: Cadastrada</p>
         </div>
     </div>
 </div>
@@ -639,7 +638,7 @@
         <header class="h-20 gradient-header text-white flex items-center justify-between px-4 md:px-8 z-40 flex-shrink-0 border-b border-white/10">
             <div>
                 <h2 class="text-lg md:text-xl font-extrabold" id="headerTitle">Visão Geral</h2>
-                <p class="text-blue-400 text-[10px] font-bold uppercase">Sistema OCI v8.0 | 👑 Ana Paula Araújo da Silva | Mat: 201704</p>
+                <p class="text-blue-400 text-[10px] font-bold uppercase">Sistema OCI v7.0 | 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
             </div>
             <div class="flex items-center gap-3 md:gap-5">
                 <div class="relative hidden lg:block">
@@ -1196,8 +1195,8 @@
 
 <script>
 // ============================================
-// 🏥 SISTEMA OCI v8.0 - JAVASCRIPT CORE
-// 👑 Idealizadora: Ana Paula Araújo da Silva | Mat: 201704
+// 🏥 SISTEMA OCI v7.0 - JAVASCRIPT CORE
+// 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704
 // ============================================
 
 // ============================================
@@ -1310,7 +1309,7 @@ const apacsGeradas = []; // 🆕 Array para APAC´s Geradas
 // USUÁRIOS CADASTRADOS (APENAS ADMINS)
 // ============================================
 let usuariosCadastrados = [
-    {id:1, nome:'Ana Paula Araújo da Silva', cpf:'12345678909', nome_mae:'Admin Mãe', cidade_natal:'São Paulo', senha:'201704', tipo:'admin'}
+    {id:1, nome:'Teste', cpf:'12345678909', nome_mae:'Admin Mãe', cidade_natal:'São Paulo', senha:'201704', tipo:'admin'}
 ];
 
 let usuarioLogado = null;
@@ -2163,37 +2162,27 @@ function getUltimos6Meses(){
 function atualizarGraficoEspecialidade(){
     const filtro = document.getElementById('filtroGraficoEspecialidade')?.value || 'todos';
     if(charts.s) charts.s.destroy();
-    const c2 = document.getElementById('chartSpecialty'); 
-    if(!c2) return;
-    
+    const c2 = document.getElementById('chartSpecialty'); if(!c2) return;
     let dadosFiltrados = [];
     if(filtro === 'todos') dadosFiltrados = [...consultas];
-    else if(filtro === 'primeira_consulta') dadosFiltrados = consultas.filter(c => c.status !== 'faltou' && c.status !== 'retorno_faltou' && c.status !== 'apacs_geradas');
+    else if(filtro === 'primeira_consulta') dadosFiltrados = consultas.filter(c => c.status !== 'faltou' && c.status !== 'retorno_faltou');
     else if(filtro === 'aptos_retorno') dadosFiltrados = consultas.filter(c => c.status === 'apto_retorno');
     else if(filtro === 'retornos_agendados') dadosFiltrados = consultas.filter(c => c.status === 'retorno_agendado');
     else if(filtro === 'retornos_recepcionados') dadosFiltrados = consultas.filter(c => c.status === 'retorno_recepcionado');
     else if(filtro === 'oci_fechada') dadosFiltrados = consultas.filter(c => c.status === 'oci_fechada');
     
     const por = {};
-    dadosFiltrados.forEach(c => { 
-        const e = especialidades.find(x => x.id === c.especialidade_id); 
-        por[e ? e.nome : 'Outros'] = (por[e ? e.nome : 'Outros'] || 0) + 1; 
-    });
+    dadosFiltrados.forEach(c => { const e = especialidades.find(x => x.id === c.especialidade_id); por[e ? e.nome : 'Outros'] = (por[e ? e.nome : 'Outros'] || 0) + 1; });
     
     const labels = Object.keys(por).length > 0 ? Object.keys(por).map(k => `${k} (${por[k]})`) : ['Sem dados'];
     const values = Object.keys(por).length > 0 ? Object.values(por) : [1];
     const colors = Object.keys(por).length > 0 ? ['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#ec4899'] : ['#e2e8f0'];
     
     charts.s = new Chart(c2.getContext('2d'), {
-        type: 'doughnut', 
-        data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 3, borderColor: '#fff' }] },
-        options: { 
-            responsive: true, maintainAspectRatio: false, cutout: '70%',
-            plugins: { 
-                legend: { display: true, position: 'bottom', labels: { usePointStyle: true, font: { size: 11, weight: 'bold' }, padding: 15 } },
-                datalabels: { color: '#fff', font: { weight: 'bold', size: 14 }, formatter: (v, ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); return total === 0 ? '0%' : Math.round((v/total)*100) + '%'; } } 
-            } 
-        },
+        type: 'doughnut', data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 3, borderColor: '#fff' }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%',
+            plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, font: { size: 11, weight: 'bold' }, padding: 15 } },
+                datalabels: { color: '#fff', font: { weight: 'bold', size: 14 }, formatter: (v, ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); return total === 0 ? '0%' : Math.round((v/total)*100) + '%'; } } } },
         plugins: [ChartDataLabels]
     });
 }
@@ -2201,95 +2190,151 @@ function atualizarGraficoEspecialidade(){
 function atualizarGraficoAbsenteismo(){
     const filtro = document.getElementById('filtroGraficoAbsenteismo')?.value || '1consulta';
     if(charts.ab) charts.ab.destroy();
-    const c5 = document.getElementById('chartAbsenteismo'); 
-    if(!c5) return;
+    const c5 = document.getElementById('chartAbsenteismo'); if(!c5) return;
     
     let dadosFiltrados = [];
     if(filtro === '1consulta') dadosFiltrados = consultas.filter(c => c.status === 'faltou');
     else dadosFiltrados = consultas.filter(c => c.status === 'retorno_faltou');
     
     const por = {};
-    dadosFiltrados.forEach(c => { 
-        const e = especialidades.find(x => x.id === c.especialidade_id); 
-        por[e ? e.nome : 'Outros'] = (por[e ? e.nome : 'Outros'] || 0) + 1; 
-    });
-    
+    dadosFiltrados.forEach(c => { const e = especialidades.find(x => x.id === c.especialidade_id); por[e ? e.nome : 'Outros'] = (por[e ? e.nome : 'Outros'] || 0) + 1; });
     const labels = Object.keys(por).length > 0 ? Object.keys(por) : ['Sem dados'];
     const values = Object.keys(por).length > 0 ? Object.values(por) : [0];
     
     charts.ab = new Chart(c5.getContext('2d'), {
-        type: 'bar', 
-        data: { labels, datasets: [{ label: filtro==='1consulta'?'Abs. 1ª Consulta':'Abs. Retorno', data: values, backgroundColor: filtro==='1consulta'?'#f97316':'#ef4444', borderRadius: 8, borderSkipped: false, barPercentage: 0.7 }] },
-        options: { 
-            responsive: true, maintainAspectRatio: false,
+        type: 'bar', data: { labels, datasets: [{ label: filtro==='1consulta'?'Abs. 1ª Consulta':'Abs. Retorno', data: values, backgroundColor: filtro==='1consulta'?'#f97316':'#ef4444', borderRadius: 8, borderSkipped: false, barPercentage: 0.7 }] },
+        options: { responsive: true, maintainAspectRatio: false,
             layout: { padding: { top: 20 } },
-            plugins: { 
-                legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 12, weight: 'bold' }, padding: 20 } },
-                datalabels: { anchor: 'center', align: 'center', offset: 0, color: '#FFFFFF', font: { weight: 'bold', size: 16 }, formatter: (v) => v, display: true },
-                tooltip: { enabled: false } 
-            },
-            scales: { 
-                y: { beginAtZero: true, grid: { display: false }, ticks: { font: { size: 12 } } }, 
-                x: { grid: { display: false }, ticks: { font: { size: 11 } } } 
-            } 
-        },
+            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 12, weight: 'bold' }, padding: 20 } },
+                datalabels: { anchor: 'center', align: 'center', offset: 0, color: '#FFFFFF', font: { weight: 'bold', size: 16, family: "'Plus Jakarta Sans', sans-serif" }, textStrokeColor: 'rgba(0,0,0,0.3)', textStrokeWidth: 2, formatter: (v) => v, display: true },
+                tooltip: { enabled: false } },
+            scales: { y: { beginAtZero: true, grid: { display: false }, ticks: { font: { size: 12 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } } },
         plugins: [ChartDataLabels]
     });
 }
 
 function renderizarGraficos(){
     Object.values(charts).forEach(c => { try{c.destroy()}catch(e){} });
-    
+    const c1 = document.getElementById('chartPerformance'), c3 = document.getElementById('chartComparecimento'), c4 = document.getElementById('chartTempoMedio'), c6 = document.getElementById('chartStatus');
+    if(!c1||!c3||!c4||!c6){ setTimeout(renderizarGraficos,300); return; }
     Chart.register(ChartDataLabels);
     
-    const mesesLabels = getUltimos6Meses();
-    
-    // Gráfico Desempenho OCI
-    const c1 = document.getElementById('chartPerformance');
-    if(c1){
-        charts.p = new Chart(c1.getContext('2d'), {
-            type: 'line', 
-            data: { labels: mesesLabels, datasets: [{ label: 'OCIs Fechadas', data: [65,78,72,85,82,86], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 7, pointBackgroundColor: '#fff', pointBorderColor: '#3b82f6', pointBorderWidth: 3 }] },
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                plugins: { 
-                    legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 13, weight: 'bold' } } },
-                    datalabels: { anchor: 'end', align: 'top', offset: 6, color: '#1e40af', font: { weight: 'bold', size: 13 }, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: 6, formatter: (v) => v } 
-                },
-                scales: { 
-                    y: { beginAtZero: false, min: 50, max: 100, grid: { display: false }, ticks: { font: { size: 12 } } }, 
-                    x: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 12 } } } 
-                } 
-            },
-            plugins: [ChartDataLabels]
-        });
-    }
+    // Gráfico 1: Desempenho OCI - MESES DINÂMICOS
+    charts.p = new Chart(c1.getContext('2d'), {
+        type: 'line', data: { labels: getUltimos6Meses(), datasets: [{ label: 'OCIs Fechadas', data: [65,78,72,85,82,86], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 7, pointBackgroundColor: '#fff', pointBorderColor: '#3b82f6', pointBorderWidth: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 13, weight: 'bold' } } },
+                datalabels: { anchor: 'end', align: 'top', offset: 6, color: '#1e40af', font: { weight: 'bold', size: 13 }, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: 6, formatter: (v) => v } },
+            scales: { y: { beginAtZero: false, min: 50, max: 100, grid: { display: false }, ticks: { font: { size: 12 } } }, x: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 12 } } } } },
+        plugins: [ChartDataLabels]
+    });
     
     atualizarGraficoEspecialidade();
     atualizarGraficoAbsenteismo();
     
-    // Gráfico Comparecimento
-    const c3 = document.getElementById('chartComparecimento');
-    if(c3){
-        charts.c = new Chart(c3.getContext('2d'), {
-            type: 'bar', 
-            data: { labels: mesesLabels, datasets: [{ label: 'Comparecimento %', data: [88,85,90,92,89,91], backgroundColor: '#10b981', borderRadius: 10, borderSkipped: false, barPercentage: 0.7 }] },
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                layout: { padding: { top: 30 } },
-                plugins: { 
-                    legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { size: 13, weight: 'bold' }, padding: 20 } },
-                    datalabels: { anchor: 'center', align: 'center', color: '#FFFFFF', font: { weight: 'bold', size: 18 }, formatter: (v) => v + '%', display: true },
-                    tooltip: { enabled: false } 
+    // Gráfico 3: Taxa de Comparecimento - NÚMEROS BRANCOS FIXOS NO MEIO
+const ctxComparecimento = c3.getContext('2d');
+if(charts.c) charts.c.destroy();
+
+charts.c = new Chart(ctxComparecimento, {
+    type: 'bar',
+    data: { 
+        labels: ['Jan','Fev','Mar','Abr','Mai','Jun'], 
+        datasets: [{ 
+            label: 'Comparecimento %', 
+            data: [88,85,90,92,89,91], 
+            backgroundColor: '#10b981', 
+            borderRadius: 10, 
+            borderSkipped: false,
+            barPercentage: 0.7,
+            datalabels: {
+                anchor: 'center',
+                align: 'center',
+                color: '#FFFFFF',
+                font: {
+                    weight: 'bold',
+                    size: 18,
+                    family: "'Plus Jakarta Sans', sans-serif"
                 },
-                scales: { 
-                    y: { beginAtZero: false, min: 70, max: 100, ticks: { callback: (v)=>v+'%', font: { size: 12 } }, grid: { display: false } }, 
-                    x: { grid: { display: false }, ticks: { font: { size: 12 } } } 
+                formatter: function(value) {
+                    return value + '%';
+                },
+                display: true
+            }
+        }] 
+    },
+    options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        layout: {
+            padding: { top: 30 }
+        },
+        plugins: { 
+            legend: { 
+                display: true, 
+                position: 'top', 
+                labels: { 
+                    usePointStyle: true, 
+                    font: { size: 13, weight: 'bold' },
+                    padding: 20
                 } 
             },
-            plugins: [ChartDataLabels]
-        });
-    }
+            datalabels: {
+                anchor: 'center',
+                align: 'center',
+                color: '#FFFFFF',
+                font: {
+                    weight: 'bold',
+                    size: 18,
+                    family: "'Plus Jakarta Sans', sans-serif"
+                },
+                formatter: function(value) {
+                    return value + '%';
+                },
+                display: true,
+                clamp: true
+            },
+            tooltip: { enabled: false }
+        }, 
+        scales: { 
+            y: { 
+                beginAtZero: false, 
+                min: 70, 
+                max: 100, 
+                ticks: { 
+                    callback: function(v){ return v + '%'; }, 
+                    font: { size: 12 } 
+                }, 
+                grid: { display: false } 
+            }, 
+            x: { 
+                grid: { display: false }, 
+                ticks: { font: { size: 12 } } 
+            } 
+        } 
+    },
+    plugins: [ChartDataLabels]
+});
+
+// Forçar a exibição dos datalabels
+if(charts.c && charts.c.data && charts.c.data.datasets) {
+    charts.c.data.datasets.forEach(function(dataset) {
+        dataset.datalabels = {
+            anchor: 'center',
+            align: 'center',
+            color: '#FFFFFF',
+            font: {
+                weight: 'bold',
+                size: 18
+            },
+            formatter: function(value) {
+                return value + '%';
+            },
+            display: true
+        };
+    });
+    charts.c.update();
+}
     
     // Gráfico Tempo Médio
     const c4 = document.getElementById('chartTempoMedio');
@@ -2312,28 +2357,17 @@ function renderizarGraficos(){
         });
     }
     
-    // Gráfico Status
-    const c6 = document.getElementById('chartStatus');
-    if(c6){
-        const statusCount = {};
-        consultas.forEach(c => { 
-            const st = getStatusBadge(c.status).t; 
-            statusCount[st] = (statusCount[st] || 0) + 1; 
-        });
-        
-        charts.st = new Chart(c6.getContext('2d'), {
-            type: 'doughnut', 
-            data: { labels: Object.keys(statusCount), datasets: [{ data: Object.values(statusCount), backgroundColor: ['#3b82f6','#f59e0b','#10b981','#6366f1','#14b8a6','#8b5cf6','#f97316','#ef4444','#6366f1'], borderWidth: 2, borderColor: '#fff' }] },
-            options: { 
-                responsive: true, maintainAspectRatio: false, cutout: '60%',
-                plugins: { 
-                    legend: { display: true, position: 'bottom', labels: { usePointStyle: true, font: { size: 10, weight: 'bold' }, padding: 12 } },
-                    datalabels: { color: '#fff', font: { weight: 'bold', size: 12 }, formatter: (v, ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); return total === 0 ? '0%' : Math.round((v/total)*100) + '%'; } } 
-                } 
-            },
-            plugins: [ChartDataLabels]
-        });
-    }
+        // Gráfico 6: Distribuição de Status
+    const statusCount = {};
+    consultas.forEach(c => { const st = getStatusBadge(c.status).t; statusCount[st] = (statusCount[st] || 0) + 1; });
+    charts.st = new Chart(c6.getContext('2d'), {
+        type: 'doughnut', data: { labels: Object.keys(statusCount), datasets: [{ data: Object.values(statusCount), backgroundColor: ['#3b82f6','#f59e0b','#10b981','#6366f1','#14b8a6','#8b5cf6','#f97316','#ef4444'], borderWidth: 2, borderColor: '#fff' }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '60%',
+            plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, font: { size: 10, weight: 'bold' }, padding: 12 } },
+                datalabels: { color: '#fff', font: { weight: 'bold', size: 12 }, formatter: (v, ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); return total === 0 ? '0%' : Math.round((v/total)*100) + '%'; } } } },
+        plugins: [ChartDataLabels]
+    });
+}
     
     // 🆕 Gráfico OCI´s Fechadas por Mês
     const c7 = document.getElementById('chartOCIsFechadasMes');
@@ -2475,8 +2509,8 @@ function logout(){
 // INICIALIZAÇÃO
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🏥 SISTEMA OCI v8.0 - INICIANDO...');
-    console.log('👑 Idealizadora: Ana Paula Araújo da Silva | Mat: 201704');
+    console.log('🏥 SISTEMA OCI v7.0 - INICIANDO...');
+    console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
     console.log('✅ Funcionalidades:');
     console.log('  - 🔄 Migração automática (4 chaves)');
     console.log('  - 👁️ Oftalmologia fecha OCI na 1ª consulta');
@@ -2572,8 +2606,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 5000);
     
-    console.log('✅ SISTEMA OCI v8.0 PRONTO!');
-    console.log('👑 Idealizadora: Ana Paula Araújo da Silva | Mat: 201704');
+    console.log('✅ SISTEMA OCI v7.0 PRONTO!');
+    console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
 });
 </script>
 </body>
