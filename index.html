@@ -39,6 +39,11 @@
         .dropdown-ubs-item:last-child { border-bottom: none; }
         .dropdown-ubs-item .distrito-tag { font-size: 10px; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
         .aviso-regras { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 8px 14px; font-size: 11px; color: #92400e; margin-bottom: 16px; }
+        /* 🆕 Campo bloqueado automático */
+        .campo-automatico { background: #f1f5f9 !important; color: #475569 !important; cursor: not-allowed; }
+        /* 🆕 Botão limpar */
+        .btn-limpar { background: #fef2f2; color: #dc2626; border: 2px solid #fecaca; }
+        .btn-limpar:hover { background: #fee2e2; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -65,6 +70,8 @@
             <div class="flex justify-between items-center border-b border-slate-200 pb-2"><span class="text-xs font-bold text-slate-500 uppercase">Médico</span><span class="text-sm font-bold text-slate-800" id="modalMedico">—</span></div>
             <div class="flex justify-between items-center border-b border-slate-200 pb-2"><span class="text-xs font-bold text-slate-500 uppercase">Local</span><span class="text-sm font-bold text-slate-800" id="modalLocal">—</span></div>
             <div class="flex justify-between items-center border-b border-slate-200 pb-2"><span class="text-xs font-bold text-slate-500 uppercase">Especialidade</span><span class="text-sm font-bold text-slate-800" id="modalEspecialidade">—</span></div>
+            <div class="flex justify-between items-center border-b border-slate-200 pb-2"><span class="text-xs font-bold text-slate-500 uppercase">Exame Realizado</span><span class="text-sm font-bold text-slate-800" id="modalExameRealizado">—</span></div>
+            <div class="flex justify-between items-center border-b border-slate-200 pb-2"><span class="text-xs font-bold text-slate-500 uppercase">Data do Exame</span><span class="text-sm font-bold text-slate-800" id="modalDataExame">—</span></div>
             <div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-500 uppercase">Data da Consulta</span><span class="text-sm font-bold text-slate-800" id="modalData">—</span></div>
         </div>
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4"><p class="text-xs text-amber-700 font-bold">⚠️ Confira todos os dados acima. Eles NÃO podem ser alterados aqui.</p></div>
@@ -85,12 +92,15 @@
         <form class="space-y-3" onsubmit="return false;">
             <input type="hidden" id="editRetornoId">
             <div><label class="block text-xs font-bold text-slate-600 mb-1">Nº Solicitação 1ª Consulta</label><input type="text" id="editRetornoNumSol" class="w-full px-3 py-2 border rounded-xl text-sm bg-slate-100" readonly></div>
-            <div><label class="block text-xs font-bold text-slate-600 mb-1">Nome do Exame *</label><input type="text" id="editRetornoExame" class="w-full px-3 py-2 border rounded-xl text-sm" required></div>
+            <div><label class="block text-xs font-bold text-slate-600 mb-1">Exame Realizado *</label><input type="text" id="editRetornoExame" class="w-full px-3 py-2 border rounded-xl text-sm" required></div>
             <div class="grid grid-cols-2 gap-3">
                 <div><label class="block text-xs font-bold text-slate-600 mb-1">📱 Telefone *</label><input type="text" id="editRetornoTelefone" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="15" oninput="mascaraTelefone(this)"></div>
                 <div><label class="block text-xs font-bold text-slate-600 mb-1">Prontuário Vivver *</label><input type="text" id="editRetornoProntuario" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
             </div>
-            <div><label class="block text-xs font-bold text-slate-600 mb-1">Unidade de Saúde *</label><input type="text" id="editRetornoUnidade" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="block text-xs font-bold text-slate-600 mb-1">Data do Exame</label><input type="date" id="editRetornoDataExame" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+                <div><label class="block text-xs font-bold text-slate-600 mb-1">Unidade de Saúde *</label><input type="text" id="editRetornoUnidade" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+            </div>
             <button onclick="salvarEdicaoRetorno()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">💾 Salvar Alterações</button>
         </form>
     </div>
@@ -365,27 +375,36 @@ function toggleSenha(id, btn){
 
                 <div class="aviso-regras" id="avisoRegras">
                     <p class="font-bold mb-1">📋 Regras do Portal:</p>
-                    <p>✏️ <b>Editar:</b> apenas retornos com status <b>"Aguardando"</b> | 🔄 <b>Extornar:</b> volta de <b>"Apto Retorno"</b> para <b>"Aguardando"</b> | 🗑️ <b>Excluir (Painel do Retorno):</b> remove só da lista | 🗑️ <b>Excluir (Sistema OCI):</b> remove do Painel e do OCI</p>
+                    <p>✏️ <b>Editar:</b> apenas retornos com status <b>"Aguardando"</b> | 🔄 <b>Extornar:</b> volta de <b>"Apto Retorno"</b> para <b>"Aguardando"</b> | 🗑️ <b>Excluir (Painel do Retorno):</b> remove só da lista | 🔄 <b>Excluir (Sistema OCI):</b> remove do Painel e volta status no OCI</p>
                 </div>
 
                 <!-- ABA: SOLICITAR RETORNO -->
                 <div id="content-solicitar" class="tab-content active">
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
-                        <h3 class="text-lg font-bold text-slate-800 mb-2"><i class="fas fa-paper-plane text-blue-500"></i> Solicitar Pedido de Retorno</h3>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-paper-plane text-blue-500"></i> Solicitar Pedido de Retorno</h3>
+                            <!-- 🆕 BOTÃO LIMPAR PREENCHIMENTO -->
+                            <button onclick="limparFormularioSolicitar()" class="btn-limpar px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                                <i class="fas fa-broom"></i> Limpar Preenchimento
+                            </button>
+                        </div>
                         <p class="text-sm text-slate-500 mb-6">⚠️ O número da solicitação deve existir na tabela de <strong>1ª Consulta Recepcionados</strong>.</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">Nº Solicitação 1ª Consulta</label><input type="text" id="numeroSolicitacao" placeholder="Somente números" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-bold text-blue-600" oninput="this.value = this.value.replace(/\D/g,'')"></div>
-                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">Nome do Exame Solicitado</label><input type="text" id="nomeExame" placeholder="Ex: ECG, Laboratoriais, RX..." class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none"></div>
+                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">Exame Realizado</label><input type="text" id="nomeExame" placeholder="Ex: ECG, Laboratoriais, RX..." class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none"></div>
                             <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">📱 Telefone</label><input type="text" id="telefoneRetorno" placeholder="(00) 00000-0000" maxlength="15" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none" oninput="mascaraTelefone(this)"></div>
-                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">Prontuário Vivver</label><input type="text" id="prontuarioVivver" placeholder="Preenchido automaticamente" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-bold text-purple-600 bg-purple-50"></div>
+                            <!-- 🆕 PRONTUÁRIO VIVVER BLOQUEADO (AUTOMÁTICO) -->
+                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Prontuário Vivver <span class="text-[10px] text-purple-500">(automático)</span></label><input type="text" id="prontuarioVivver" placeholder="Preenchido automaticamente" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl campo-automatico font-bold text-purple-600"></div>
                             <div class="relative"><label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">Unidade de Saúde</label><input type="text" id="unidadeSaude" placeholder="Digite para buscar a unidade..." autocomplete="off" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none" oninput="filtrarUBS()" onfocus="filtrarUBS()"><div id="dropdownUBS" class="dropdown-ubs"></div></div>
-                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nome do Paciente <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="nomePaciente" placeholder="Preenchido após validação" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700 font-bold"></div>
-                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">CPF do Paciente <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="cpfPaciente" placeholder="Preenchido após validação" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700 font-bold"></div>
+                            <!-- 🆕 DATA DA REALIZAÇÃO DO EXAME -->
+                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-obrigatorio">📅 Data da Realização do Exame</label><input type="date" id="dataRealizacaoExame" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none"></div>
+                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nome do Paciente <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="nomePaciente" placeholder="Preenchido após validação" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl campo-automatico text-slate-700 font-bold"></div>
+                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">CPF do Paciente <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="cpfPaciente" placeholder="Preenchido após validação" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl campo-automatico text-slate-700 font-bold"></div>
                             <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1 campo-opcional">Nome da Mãe</label><input type="text" id="validarNomeMae" placeholder="Confirme o nome da mãe" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none bg-slate-50"></div>
-                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Médico <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="medicoSolicitante" placeholder="Preenchido da 1ª consulta" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700"></div>
-                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Local <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="localConsulta" placeholder="Preenchido da 1ª consulta" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700"></div>
-                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Especialidade <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="especialidadeRetorno" placeholder="Preenchido da 1ª consulta" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700"></div>
-                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Data 1ª Consulta <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="dataPrimeiraConsulta" placeholder="Preenchido da 1ª consulta" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-700"></div>
+                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Médico <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="medicoSolicitante" placeholder="Preenchido da 1ª consulta" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl campo-automatico text-slate-700"></div>
+                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Local <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="localConsulta" placeholder="Preenchido da 1ª consulta" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl campo-automatico text-slate-700"></div>
+                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Especialidade <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="especialidadeRetorno" placeholder="Preenchido da 1ª consulta" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl campo-automatico text-slate-700"></div>
+                            <div><label class="block text-xs font-bold text-slate-600 uppercase mb-1">Data 1ª Consulta <span class="text-[10px] text-blue-500">(automático)</span></label><input type="text" id="dataPrimeiraConsulta" placeholder="Preenchido da 1ª consulta" readonly class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl campo-automatico text-slate-700"></div>
                         </div>
                         <button id="btnValidarRetorno" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2"><i class="fas fa-search"></i> VALIDAR Nº SOLICITAÇÃO</button>
                         <div id="msgSolicitar" class="mt-4 hidden"></div>
@@ -636,6 +655,22 @@ document.addEventListener('click', function(e){
 });
 
 // ============================================
+// 🆕 LIMPAR FORMULÁRIO DE SOLICITAÇÃO
+// ============================================
+function limparFormularioSolicitar(){
+    const campos = ['numeroSolicitacao','nomeExame','telefoneRetorno','prontuarioVivver','unidadeSaude',
+                    'dataRealizacaoExame','nomePaciente','cpfPaciente','validarNomeMae','medicoSolicitante',
+                    'localConsulta','especialidadeRetorno','dataPrimeiraConsulta'];
+    campos.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = '';
+    });
+    document.getElementById('msgSolicitar').classList.add('hidden');
+    dadosPrimeiraConsulta = null;
+    console.log('🧹 Formulário limpo!');
+}
+
+// ============================================
 // LOGIN
 // ============================================
 document.getElementById('btnLogin').addEventListener('click', async () => {
@@ -775,7 +810,6 @@ function renderizarHistoricoHTML(lista = null){
         if(r.status === 'apto_retorno'){
             botoesAcao += `<button onclick="extornarRetorno(${r.id})" class="bg-amber-100 hover:bg-amber-200 text-amber-700 px-3 py-1 rounded-lg text-xs font-bold transition-all"><i class="fas fa-undo"></i> Extornar</button>`;
         }
-        // 🆕 DOIS BOTÕES DE EXCLUSÃO PARA ADMIN
         if(usuarioLogado && usuarioLogado.tipo === 'admin'){
             botoesAcao += `
                 <button onclick="excluirRetornoPainel(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg text-xs font-bold transition-all" title="Remove apenas da lista do Portal"><i class="fas fa-trash"></i> Excluir (Painel do Retorno)</button>
@@ -790,9 +824,11 @@ function renderizarHistoricoHTML(lista = null){
                     <p class="font-bold text-slate-800">📝 Retorno #${r.id} ${usuarioLogado && usuarioLogado.tipo === 'admin' ? `<span class="text-[10px] text-purple-500">(Paciente: ${r.paciente_nome || '—'})</span>` : ''}</p>
                     <p class="text-xs text-slate-500 mt-1">📅 ${formatarData(r.created_at)} | 🏥 ${r.unidade_saude || '—'} | 👨‍⚕️ ${r.medico_solicitante || '—'}</p>
                     <p class="text-xs text-slate-500">🔢 Nº SOL: ${r.numero_solicitacao || '—'} | 🧪 Exame: ${r.nome_exame || '—'}</p>
+                    ${r.data_realizacao_exame ? `<p class="text-xs text-slate-500">📅 Data Exame: ${formatarData(r.data_realizacao_exame)}</p>` : ''}
                     <p class="text-xs text-slate-500">👤 Paciente: ${r.paciente_nome || '—'} | CPF: ${(r.paciente_cpf || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}</p>
                     ${r.telefone_paciente ? `<p class="text-xs text-slate-500">📱 Tel: ${formatarTelefone(r.telefone_paciente)}</p>` : ''}
                     ${r.prontuario_vivver ? `<p class="text-xs text-slate-500 text-purple-600 font-bold">📋 Prontuário Vivver: ${r.prontuario_vivver}</p>` : ''}
+                    ${r.usuario_cadastrou ? `<p class="text-xs text-slate-500 text-blue-600 font-bold">👤 Cadastrado por: ${r.usuario_cadastrou}</p>` : ''}
                 </div>
                 <div class="flex flex-col items-end gap-2">
                     <span class="px-2 py-1 rounded-full text-xs font-bold ${statusBadge}">${statusTexto}</span>
@@ -883,12 +919,14 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
     const telefone = document.getElementById('telefoneRetorno').value.replace(/\D/g,'');
     const unidade = document.getElementById('unidadeSaude').value.trim();
     const prontuarioVivver = document.getElementById('prontuarioVivver').value.trim();
+    const dataExame = document.getElementById('dataRealizacaoExame').value;
     
     if(!numeroSolicitacao) return alert('❌ Informe o Nº da Solicitação (somente números)!');
-    if(!nomeExame) return alert('❌ Informe o nome do exame!');
+    if(!nomeExame) return alert('❌ Informe o exame realizado!');
     if(!telefone || telefone.length < 10) return alert('❌ Informe um telefone válido!');
     if(!unidade) return alert('❌ Selecione a unidade de saúde!');
-    if(!prontuarioVivver) return alert('❌ Informe o Prontuário Vivver (somente números)!');
+    if(!prontuarioVivver) return alert('❌ O Prontuário Vivver é preenchido automaticamente!');
+    if(!dataExame) return alert('❌ Informe a data da realização do exame!');
     
     showLoading();
     const { data: consulta, error } = await db.from('primeira_consulta_recepcionados').select('*').or(`numero_solicitacao.eq.${numeroSolicitacao},id.eq.${numeroSolicitacao}`).single();
@@ -917,7 +955,7 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
     document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
     if(!telefone && telefonePaciente) document.getElementById('telefoneRetorno').value = formatarTelefone(telefonePaciente);
     
-    // 🆕 PREENCHER PRONTUÁRIO VIVVER AUTOMÁTICO
+    // Preencher Prontuário Vivver automático
     if (consulta.prontuario_vivver || consulta.prontuario) {
         document.getElementById('prontuarioVivver').value = consulta.prontuario_vivver || consulta.prontuario || '';
     }
@@ -929,6 +967,8 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
     document.getElementById('modalMedico').textContent = consulta.medico_solicitante || '—';
     document.getElementById('modalLocal').textContent = consulta.local_consulta || '—';
     document.getElementById('modalEspecialidade').textContent = esp ? (esp.icone || '') + ' ' + esp.nome : '—';
+    document.getElementById('modalExameRealizado').textContent = nomeExame;
+    document.getElementById('modalDataExame').textContent = formatarData(dataExame);
     document.getElementById('modalData').textContent = formatarData(consulta.data_agendada);
     document.getElementById('btnConfirmarRetorno').onclick = confirmarRetorno;
     document.getElementById('modalConfirmacao').classList.add('show');
@@ -946,9 +986,28 @@ async function confirmarRetorno(){
     const nomeMae = document.getElementById('validarNomeMae').value.trim();
     const nomePaciente = document.getElementById('nomePaciente').value.trim();
     const cpfPaciente = document.getElementById('cpfPaciente').value.replace(/\D/g,'');
+    const dataExame = document.getElementById('dataRealizacaoExame').value;
     
     showLoading();
-    const { error } = await db.from('retornos_solicitados').insert([{paciente_id: usuarioLogado.id, paciente_nome: nomePaciente, paciente_cpf: cpfPaciente, numero_solicitacao: numeroSolicitacao, consulta_id: dadosPrimeiraConsulta.id, nome_exame: nomeExame, telefone_paciente: telefone, unidade_saude: unidade, prontuario_vivver: prontuarioVivver, nome_mae: nomeMae || dadosPrimeiraConsulta.nome_mae || '', medico_solicitante: dadosPrimeiraConsulta.medico_solicitante || '', local_consulta: dadosPrimeiraConsulta.local_consulta || '', especialidade_id: dadosPrimeiraConsulta.especialidade_id, data_primeira_consulta: dadosPrimeiraConsulta.data_agendada, status: 'solicitado'}]);
+    const { error } = await db.from('retornos_solicitados').insert([{
+        paciente_id: usuarioLogado.id, 
+        paciente_nome: nomePaciente, 
+        paciente_cpf: cpfPaciente, 
+        numero_solicitacao: numeroSolicitacao, 
+        consulta_id: dadosPrimeiraConsulta.id, 
+        nome_exame: nomeExame, 
+        telefone_paciente: telefone, 
+        unidade_saude: unidade, 
+        prontuario_vivver: prontuarioVivver, 
+        nome_mae: nomeMae || dadosPrimeiraConsulta.nome_mae || '', 
+        medico_solicitante: dadosPrimeiraConsulta.medico_solicitante || '', 
+        local_consulta: dadosPrimeiraConsulta.local_consulta || '', 
+        especialidade_id: dadosPrimeiraConsulta.especialidade_id, 
+        data_primeira_consulta: dadosPrimeiraConsulta.data_agendada,
+        data_realizacao_exame: dataExame,
+        usuario_cadastrou: usuarioLogado.nome,
+        status: 'solicitado'
+    }]);
     if(error){ hideLoading(); alert('❌ Erro: ' + error.message); return; }
     
     await atualizarStatusOCI(dadosPrimeiraConsulta.id);
@@ -956,7 +1015,7 @@ async function confirmarRetorno(){
     hideLoading();
     fecharModalConfirmacao();
     mostrarMsg('msgSolicitar', '✅ Pedido de retorno cadastrado com sucesso!\n🔗 Vinculado à 1ª Consulta: ' + numeroSolicitacao + '\n🔄 Status OCI atualizado!', 'emerald');
-    ['numeroSolicitacao','nomeExame','telefoneRetorno','unidadeSaude','prontuarioVivver','validarNomeMae','nomePaciente','cpfPaciente','medicoSolicitante','localConsulta','especialidadeRetorno','dataPrimeiraConsulta'].forEach(id => document.getElementById(id).value = '');
+    limparFormularioSolicitar();
     carregarPortal();
 }
 
@@ -964,7 +1023,12 @@ async function atualizarStatusOCI(consultaId){
     try {
         const { data: consultaOCI } = await db.from('consultas_oci').select('*').eq('id', consultaId).single();
         if(consultaOCI){
-            await db.from('consultas_oci').update({ status: 'apto_retorno' }).eq('id', consultaId);
+            await db.from('consultas_oci').update({ 
+                status: 'apto_retorno',
+                nome_exame: document.getElementById('nomeExame').value.trim(),
+                data_realizacao_exame: document.getElementById('dataRealizacaoExame').value,
+                usuario_cadastrou: usuarioLogado.nome
+            }).eq('id', consultaId);
             console.log('✅ Status OCI atualizado para: apto_retorno');
         }
     } catch(e) { console.warn('⚠️ Integração OCI:', e.message); }
@@ -1012,7 +1076,7 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
                     document.getElementById('especialidadeRetorno').value = esp ? (esp.icone || '') + ' ' + esp.nome : '';
                     document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
                     
-                    // 🆕 PREENCHER PRONTUÁRIO VIVVER AUTOMÁTICO
+                    // Preencher Prontuário Vivver automático
                     if (consulta.prontuario_vivver || consulta.prontuario || (paciente && paciente.prontuario)) {
                         document.getElementById('prontuarioVivver').value = consulta.prontuario_vivver || consulta.prontuario || (paciente ? paciente.prontuario : '') || '';
                         console.log('📋 Prontuário Vivver preenchido automaticamente:', document.getElementById('prontuarioVivver').value);
@@ -1038,6 +1102,7 @@ function editarRetorno(id){
     document.getElementById('editRetornoTelefone').value = formatarTelefone(retorno.telefone_paciente);
     document.getElementById('editRetornoProntuario').value = retorno.prontuario_vivver || '';
     document.getElementById('editRetornoUnidade').value = retorno.unidade_saude || '';
+    document.getElementById('editRetornoDataExame').value = retorno.data_realizacao_exame || '';
     document.getElementById('modalEditarRetorno').classList.add('show');
 }
 
@@ -1047,12 +1112,19 @@ async function salvarEdicaoRetorno(){
     const telefone = document.getElementById('editRetornoTelefone').value.replace(/\D/g,'');
     const prontuario = document.getElementById('editRetornoProntuario').value.trim();
     const unidade = document.getElementById('editRetornoUnidade').value.trim();
-    if(!nomeExame) return alert('❌ Informe o nome do exame!');
+    const dataExame = document.getElementById('editRetornoDataExame').value;
+    if(!nomeExame) return alert('❌ Informe o exame realizado!');
     if(!telefone || telefone.length < 10) return alert('❌ Telefone inválido!');
     if(!prontuario) return alert('❌ Informe o Prontuário Vivver!');
     if(!unidade) return alert('❌ Informe a unidade de saúde!');
     showLoading();
-    await db.from('retornos_solicitados').update({ nome_exame: nomeExame, telefone_paciente: telefone, prontuario_vivver: prontuario, unidade_saude: unidade }).eq('id', id);
+    await db.from('retornos_solicitados').update({ 
+        nome_exame: nomeExame, 
+        telefone_paciente: telefone, 
+        prontuario_vivver: prontuario, 
+        unidade_saude: unidade,
+        data_realizacao_exame: dataExame || null
+    }).eq('id', id);
     hideLoading();
     alert('✅ Retorno atualizado com sucesso!');
     document.getElementById('modalEditarRetorno').classList.remove('show');
@@ -1072,7 +1144,7 @@ async function extornarRetorno(id){
     carregarPortal();
 }
 
-// 🆕 EXCLUIR APENAS DO PAINEL DO RETORNO
+// EXCLUIR APENAS DO PAINEL DO RETORNO
 async function excluirRetornoPainel(id){
     if(usuarioLogado.tipo !== 'admin') return alert('❌ Apenas o Administrador pode excluir retornos.');
     if(!confirm('⚠️ Tem certeza que deseja EXCLUIR este retorno do Painel do Retorno?\n\n📌 O paciente CONTINUARÁ aparecendo no Sistema OCI.\n📌 Esta ação NÃO pode ser desfeita!')) return;
@@ -1083,7 +1155,7 @@ async function excluirRetornoPainel(id){
     carregarPortal();
 }
 
-// 🆕 EXCLUIR DO SISTEMA OCI (VOLTA STATUS)
+// EXCLUIR DO SISTEMA OCI (VOLTA STATUS)
 async function excluirRetornoOCI(id){
     if(usuarioLogado.tipo !== 'admin') return alert('❌ Apenas o Administrador pode excluir retornos.');
     const retorno = retornosLista.find(r => r.id === id);
@@ -1282,6 +1354,9 @@ console.log('🔗 Integração com Sistema OCI ativa');
 console.log('📋 Prontuário Vivver preenchido automaticamente');
 console.log('🗑️ Excluir (Painel do Retorno) - Remove só da lista');
 console.log('🔄 Excluir (Sistema OCI) - Remove e volta status');
+console.log('🧹 Botão Limpar Preenchimento');
+console.log('📅 Data da Realização do Exame');
+console.log('🔒 Prontuário Vivver bloqueado (automático)');
 </script>
 </body>
 </html>
