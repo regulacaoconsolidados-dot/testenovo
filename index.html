@@ -45,15 +45,36 @@
         .aviso-regras { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 8px 14px; font-size: 11px; color: #92400e; margin-bottom: 16px; }
         .btn-limpar { background: #fef2f2; color: #dc2626; border: 2px solid #fecaca; }
         .btn-limpar:hover { background: #fee2e2; }
-        .exame-selecionado-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; padding: 8px; background: #fef2f2; border-radius: 8px; animation: fadeIn 0.3s ease; }
-        .btn-remove-exame { background: #fee2e2; color: #dc2626; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
         .dropdown-sigtap { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #e2e8f0; border-radius: 12px; max-height: 300px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
         .dropdown-sigtap.show { display: block; }
         .dropdown-sigtap-item { padding: 10px 14px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #f1f5f9; transition: all 0.15s; }
         .dropdown-sigtap-item:hover { background: #eff6ff; }
+        
+        /* 🆕 ESTILOS DA TABELA DE EXAMES */
+        .tabela-exames { width: 100%; border-collapse: collapse; }
+        .tabela-exames th { background: #dbeafe; color: #1e40af; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 10px 8px; border: 1px solid #bfdbfe; white-space: nowrap; letter-spacing: 0.5px; }
+        .tabela-exames td { padding: 8px; border: 1px solid #e2e8f0; vertical-align: middle; }
+        .tabela-exames tr:hover td { background: #f0f9ff; }
+        .tabela-exames .checkbox-exame { width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444; }
+        .tabela-exames input[type="date"] { width: 100%; min-width: 120px; padding: 6px 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .tabela-exames input[type="date"]:focus { border-color: #3b82f6; outline: none; }
+        .exame-checked { background: #fef2f2 !important; }
+        .exame-realizado { background: #f0fdf4 !important; }
+        .exame-realizado td { color: #166534; }
+        
         /* Modal moderno */
         .modal-moderno { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-moderno .modal-content { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #93c5fd; }
+        .modal-moderno .modal-content { background: #ffffff; border: 2px solid #93c5fd; }
+        
+        /* 🆕 Cards de exames fora do modal */
+        .exame-card { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; border: 2px solid #e2e8f0; margin-bottom: 6px; font-size: 12px; }
+        .exame-card.realizado { border-color: #86efac; background: #f0fdf4; }
+        .exame-card.pendente { border-color: #fcd34d; background: #fffbeb; }
+        .btn-remover-exame { background: #fee2e2; color: #dc2626; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 12px; flex-shrink: 0; }
+        .btn-remover-exame:hover { background: #fecaca; }
+        
+        /* Scroll da tabela */
+        .tabela-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -80,52 +101,60 @@
     </div>
 </div>
 
-<!-- ============ 🆕 MODAL DE SELEÇÃO DE EXAMES (INTELIGENTE) ============ -->
+<!-- ============ 🆕 MODAL DE SELEÇÃO DE EXAMES (TABELA) ============ -->
 <div id="modalSelecaoExames" class="modal-overlay modal-moderno">
-    <div class="modal-content rounded-3xl p-4 md:p-6 w-full max-w-3xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="modal-content rounded-3xl p-4 md:p-6 w-full max-w-4xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg md:text-xl font-extrabold flex items-center gap-2 text-blue-800">
                 <span class="w-10 h-10 bg-blue-200 text-blue-600 rounded-xl flex items-center justify-center text-lg">🧪</span>
-                <span>Selecionar Exames</span>
+                <span>Selecionar Exames do SubGrupo</span>
             </h2>
             <button onclick="fecharModalExames()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
         </div>
         
         <!-- Info do Subgrupo -->
-        <div class="bg-white rounded-xl p-3 mb-4 border-2 border-blue-200">
+        <div class="bg-blue-50 rounded-xl p-3 mb-4 border-2 border-blue-200">
             <p class="text-sm font-bold text-blue-700" id="modalSubgrupoNome">Subgrupo</p>
             <p class="text-xs text-blue-500" id="modalSubgrupoCodigo"></p>
         </div>
         
-        <!-- Lista de Exames do Subgrupo -->
-        <div class="space-y-3 mb-4 max-h-96 overflow-y-auto" id="modalListaExames">
-            <p class="text-slate-400 text-sm text-center py-4">Nenhum exame pré-listado.<br>Use a opção <b>"Outro"</b> abaixo.</p>
+        <!-- 🆕 TABELA DE EXAMES -->
+        <div class="tabela-scroll mb-4">
+            <table class="tabela-exames" id="tabelaExamesModal">
+                <thead>
+                    <tr>
+                        <th style="width:40px; text-align:center;">☑</th>
+                        <th>Código</th>
+                        <th>Nome do Exame</th>
+                        <th style="width:140px;">📅 Data Solicitação</th>
+                        <th style="width:140px;">📅 Data Realização</th>
+                    </tr>
+                </thead>
+                <tbody id="modalExamesTbody">
+                    <tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold">Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo.</td></tr>
+                </tbody>
+            </table>
         </div>
         
-        <!-- 🆕 Opção Outro (SEMPRE VISÍVEL) -->
-        <div class="border-2 border-dashed border-amber-300 rounded-xl p-4 mb-4 bg-amber-50">
-            <p class="text-sm font-bold text-amber-700 mb-3">📝 Outro exame (não listado no subgrupo)</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                <input type="text" id="modalOutroCodigo" placeholder="Código do exame" class="w-full px-3 py-2.5 border-2 border-amber-200 rounded-xl text-sm">
-                <input type="text" id="modalOutroNome" placeholder="Nome do exame" class="w-full px-3 py-2.5 border-2 border-amber-200 rounded-xl text-sm">
+        <!-- Contador -->
+        <div class="text-xs text-slate-500 mb-3" id="contadorExamesSelecionados">0 exames selecionados</div>
+        
+        <!-- 🆕 Opção Outro (dentro da mesma linha) -->
+        <div class="border-2 border-dashed border-amber-300 rounded-xl p-4 bg-amber-50">
+            <p class="text-sm font-bold text-amber-700 mb-3">📝 Adicionar Outro Exame (não listado)</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
+                <input type="text" id="modalOutroCodigo" placeholder="Código" class="w-full px-2 py-2 border-2 border-amber-200 rounded-lg text-xs">
+                <input type="text" id="modalOutroNome" placeholder="Nome do exame" class="w-full px-2 py-2 border-2 border-amber-200 rounded-lg text-xs">
+                <input type="date" id="modalOutroDataSolicitacao" class="w-full px-2 py-2 border-2 border-amber-200 rounded-lg text-xs">
+                <input type="date" id="modalOutroDataRealizacao" class="w-full px-2 py-2 border-2 border-amber-200 rounded-lg text-xs">
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                    <label class="text-[10px] font-bold text-amber-600 uppercase">📅 Data da Solicitação</label>
-                    <input type="date" id="modalOutroDataSolicitacao" class="w-full px-3 py-2 border-2 border-amber-200 rounded-xl text-sm mt-1">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-amber-600 uppercase">📅 Data da Realização</label>
-                    <input type="date" id="modalOutroDataRealizacao" class="w-full px-3 py-2 border-2 border-amber-200 rounded-xl text-sm mt-1">
-                </div>
-            </div>
-            <button onclick="adicionarOutroExame()" class="mt-3 bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold w-full md:w-auto">
-                ➕ Adicionar Outro Exame
+            <button onclick="adicionarOutroExame()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-xs font-bold">
+                ➕ Adicionar Outro
             </button>
         </div>
         
-        <button onclick="fecharModalExames()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">
-            ✅ CONCLUIR SELEÇÃO
+        <button onclick="fecharModalExames()" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">
+            ✅ CONCLUIR E SALVAR SELEÇÃO
         </button>
     </div>
 </div>
@@ -419,7 +448,7 @@ function toggleSenha(id, btn){
                                 </button>
                             </div>
                             
-                            <!-- Exames selecionados -->
+                            <!-- Exames selecionados (cards) -->
                             <div id="examesSelecionadosContainer" class="space-y-2">
                                 <p class="text-xs text-slate-400" id="examesVazioMsg">Nenhum exame selecionado. Escolha um SubGrupo SIGTAP acima.</p>
                             </div>
@@ -706,12 +735,20 @@ document.addEventListener('click',function(e){
 });
 
 // ============================================
-// 🆕 DROPDOWN SIGTAP
+// 🆕 DROPDOWN SIGTAP (PERMITE TROCAR)
 // ============================================
 function toggleDropdownSIGTAP(show){
     const dropdown = document.getElementById('dropdownSIGTAP');
-    if(show){ dropdown.classList.add('show'); filtrarSIGTAP(); }
-    else { dropdown.classList.remove('show'); }
+    if(show){ 
+        dropdown.classList.add('show'); 
+        filtrarSIGTAP(); 
+        // Limpa valor pra pesquisa se já tinha selecionado
+        if(subgrupoSelecionado){
+            document.getElementById('sigtapSearch').value = '';
+        }
+    } else { 
+        dropdown.classList.remove('show'); 
+    }
 }
 
 function filtrarSIGTAP(){
@@ -734,29 +771,14 @@ function filtrarSIGTAP(){
 function selecionarSIGTAP(codigo, nome, exames){
     document.getElementById('sigtapSearch').value = codigo + ' - ' + nome;
     document.getElementById('sigtapSelecionado').value = codigo;
-    document.getElementById('btnAbrirModalExames').disabled = false;
     document.getElementById('dropdownSIGTAP').classList.remove('show');
     subgrupoSelecionado = { codigo, nome, exames: JSON.parse(exames.replace(/&quot;/g,'"')) };
     examesSelecionados = [];
     atualizarExamesSelecionados();
-    // 🆕 Permite trocar de subgrupo - limpa pesquisa ao clicar
-    document.getElementById('sigtapSearch').value = codigo + ' - ' + nome;
 }
 
-// 🆕 Permitir limpar SIGTAP ao clicar no campo
-document.getElementById('sigtapSearch').addEventListener('click', function(){
-    if(subgrupoSelecionado){
-        this.value = '';
-        document.getElementById('sigtapSelecionado').value = '';
-        subgrupoSelecionado = null;
-        examesSelecionados = [];
-        atualizarExamesSelecionados();
-        toggleDropdownSIGTAP(true);
-    }
-});
-
 // ============================================
-// 🆕 MODAL DE SELEÇÃO DE EXAMES (INTELIGENTE)
+// 🆕 MODAL DE SELEÇÃO DE EXAMES (TABELA COM CHECKBOX)
 // ============================================
 function abrirModalSelecaoExames(){
     if(!subgrupoSelecionado) {
@@ -764,75 +786,88 @@ function abrirModalSelecaoExames(){
         return;
     }
     
-    document.getElementById('modalSubgrupoNome').textContent = subgrupoSelecionado.nome;
+    document.getElementById('modalSubgrupoNome').textContent = '📂 ' + subgrupoSelecionado.nome;
     document.getElementById('modalSubgrupoCodigo').textContent = 'Código: ' + subgrupoSelecionado.codigo;
     
-    const listaEl = document.getElementById('modalListaExames');
+    const tbody = document.getElementById('modalExamesTbody');
     const exames = subgrupoSelecionado.exames || [];
     
     if(exames.length === 0){
-        listaEl.innerHTML = '<p class="text-slate-400 text-sm text-center py-4">📋 Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo para cadastrar.</p>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold">📋 Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo para cadastrar.</td></tr>';
     } else {
-        listaEl.innerHTML = exames.map((e, idx) => `
-            <div class="bg-white border-2 border-blue-100 rounded-xl p-3 hover:border-blue-300 transition-all">
-                <div class="flex items-start justify-between gap-3 mb-2">
-                    <div class="flex-1">
-                        <p class="text-sm font-bold text-slate-700">🧪 ${e.codigo}</p>
-                        <p class="text-xs text-slate-500">${e.nome}</p>
-                    </div>
-                    <button onclick="adicionarExameLista('${e.codigo}','${e.nome.replace(/'/g,"\\'")}',${idx})" 
-                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">
-                        ➕ Adicionar
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-2 mt-2">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">📅 Data Solicitação</label>
-                        <input type="date" id="modalDataSol_${idx}" class="w-full px-2 py-1.5 border-2 border-blue-100 rounded-lg text-xs mt-0.5">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">📅 Data Realização</label>
-                        <input type="date" id="modalDataReal_${idx}" class="w-full px-2 py-1.5 border-2 border-blue-100 rounded-lg text-xs mt-0.5">
-                    </div>
-                </div>
-            </div>
-        `).join('');
+        tbody.innerHTML = exames.map((e, idx) => {
+            // Verifica se já está selecionado
+            const jaSelecionado = examesSelecionados.find(x => x.codigo === e.codigo);
+            const checked = jaSelecionado ? 'checked' : '';
+            const dataSol = jaSelecionado?.data_solicitacao || '';
+            const dataReal = jaSelecionado?.data_realizacao || '';
+            const rowClass = jaSelecionado ? (jaSelecionado.data_realizacao ? 'exame-realizado' : 'exame-checked') : '';
+            return `
+            <tr class="${rowClass}" id="rowExame_${idx}">
+                <td style="text-align:center;">
+                    <input type="checkbox" class="checkbox-exame" id="checkExame_${idx}" ${checked} 
+                           onchange="toggleExameTabela(${idx}, '${e.codigo}', '${e.nome.replace(/'/g,"\\'")}')">
+                </td>
+                <td class="font-mono font-bold text-xs">${e.codigo}</td>
+                <td class="font-bold text-xs">${e.nome}</td>
+                <td><input type="date" id="dataSol_${idx}" class="w-full" value="${dataSol}" onchange="atualizarDataExame(${idx})"></td>
+                <td><input type="date" id="dataReal_${idx}" class="w-full" value="${dataReal}" onchange="atualizarDataExame(${idx})"></td>
+            </tr>`;
+        }).join('');
     }
     
+    atualizarContadorModal();
     document.getElementById('modalSelecaoExames').classList.add('show');
 }
+
+function toggleExameTabela(idx, codigo, nome){
+    const check = document.getElementById('checkExame_' + idx);
+    const dataSol = document.getElementById('dataSol_' + idx)?.value || '';
+    const dataReal = document.getElementById('dataReal_' + idx)?.value || '';
+    const row = document.getElementById('rowExame_' + idx);
     
-function adicionarExameLista(codigo, nome, idx){
-    const dataSol = document.getElementById('modalDataSol_' + idx)?.value || '';
-    const dataReal = document.getElementById('modalDataReal_' + idx)?.value || '';
-    
-    if(examesSelecionados.find(e => e.codigo === codigo)){
-        alert('⚠️ Este exame já foi adicionado!');
-        return;
-    }
-    
-    examesSelecionados.push({ 
-        codigo, 
-        nome, 
-        data_solicitacao: dataSol || null, 
-        data_realizacao: dataReal || null 
-    });
-    atualizarExamesSelecionados();
-    
-    // Feedback visual no botão
-    const btns = document.querySelectorAll('.btn-add-exame-modal');
-    btns.forEach(b => {
-        if(b.textContent.includes('Adicionar') && b.onclick.toString().includes("'"+codigo+"'")){
-            b.textContent = '✅ Adicionado';
-            b.classList.remove('bg-blue-500','hover:bg-blue-600');
-            b.classList.add('bg-green-500');
-            setTimeout(() => {
-                b.textContent = '➕ Adicionar';
-                b.classList.remove('bg-green-500');
-                b.classList.add('bg-blue-500','hover:bg-blue-600');
-            }, 1500);
+    if(check.checked){
+        // Adiciona
+        if(!examesSelecionados.find(e => e.codigo === codigo)){
+            examesSelecionados.push({ codigo, nome, data_solicitacao: dataSol || null, data_realizacao: dataReal || null });
         }
-    });
+        if(row){ row.classList.remove('exame-realizado'); row.classList.add('exame-checked'); }
+    } else {
+        // Remove
+        examesSelecionados = examesSelecionados.filter(e => e.codigo !== codigo);
+        if(row){ row.classList.remove('exame-checked', 'exame-realizado'); }
+    }
+    atualizarContadorModal();
+}
+
+function atualizarDataExame(idx){
+    const check = document.getElementById('checkExame_' + idx);
+    if(!check || !check.checked) return;
+    
+    const codigo = subgrupoSelecionado?.exames[idx]?.codigo;
+    if(!codigo) return;
+    
+    const dataSol = document.getElementById('dataSol_' + idx)?.value || '';
+    const dataReal = document.getElementById('dataReal_' + idx)?.value || '';
+    const row = document.getElementById('rowExame_' + idx);
+    
+    const exame = examesSelecionados.find(e => e.codigo === codigo);
+    if(exame){
+        exame.data_solicitacao = dataSol || null;
+        exame.data_realizacao = dataReal || null;
+        // Atualiza cor da linha
+        if(row){
+            if(dataReal){ row.classList.remove('exame-checked'); row.classList.add('exame-realizado'); }
+            else { row.classList.remove('exame-realizado'); row.classList.add('exame-checked'); }
+        }
+    }
+}
+
+function atualizarContadorModal(){
+    const total = examesSelecionados.length;
+    const realizados = examesSelecionados.filter(e => e.data_realizacao).length;
+    document.getElementById('contadorExamesSelecionados').textContent = 
+        `${total} exames selecionados | ${realizados} com data de realização ✅`;
 }
 
 function adicionarOutroExame(){
@@ -847,51 +882,50 @@ function adicionarOutroExame(){
         return;
     }
     
-    examesSelecionados.push({ 
-        codigo, 
-        nome, 
-        data_solicitacao: dataSol || null, 
-        data_realizacao: dataReal || null 
-    });
+    examesSelecionados.push({ codigo, nome, data_solicitacao: dataSol || null, data_realizacao: dataReal || null });
     atualizarExamesSelecionados();
+    atualizarContadorModal();
+    
+    // Limpar campos
     document.getElementById('modalOutroCodigo').value = '';
     document.getElementById('modalOutroNome').value = '';
     document.getElementById('modalOutroDataSolicitacao').value = '';
     document.getElementById('modalOutroDataRealizacao').value = '';
-    alert('✅ Exame adicionado!');
+    
+    // Feedback
+    const btn = document.querySelector('#modalSelecaoExames .bg-amber-600');
+    if(btn){ btn.textContent = '✅ Adicionado!'; btn.classList.add('bg-green-600'); 
+        setTimeout(() => { btn.textContent = '➕ Adicionar Outro'; btn.classList.remove('bg-green-600'); }, 1500); }
 }
 
-    function fecharModalExames(){ 
-    const modal = document.getElementById('modalSelecaoExames');
-    modal.classList.remove('show');
-    modal.style.display = 'none';
+function fecharModalExames(){ 
+    document.getElementById('modalSelecaoExames').classList.remove('show');
+    atualizarExamesSelecionados(); // Atualiza os cards fora do modal
 }
 
 function atualizarExamesSelecionados(){
     const container = document.getElementById('examesSelecionadosContainer');
     
     if(examesSelecionados.length === 0){
-        container.innerHTML = '<p class="text-xs text-slate-400 text-center py-3">Nenhum exame selecionado. Escolha um SubGrupo SIGTAP acima.</p>';
+        container.innerHTML = '<p class="text-xs text-slate-400 text-center py-3" id="examesVazioMsg">Nenhum exame selecionado. Escolha um SubGrupo SIGTAP acima.</p>';
     } else {
         container.innerHTML = examesSelecionados.map((e, i) => {
-            const temRealizacao = e.data_realizacao ? true : false;
-            const cor = temRealizacao ? 'border-green-300 bg-green-50' : 'border-amber-300 bg-amber-50';
-            const icone = temRealizacao ? '✅' : '⏳';
+            const realizado = e.data_realizacao ? true : false;
+            const classe = realizado ? 'realizado' : 'pendente';
+            const icone = realizado ? '🟢' : '🟡';
+            const statusTexto = realizado ? 'Realizado' : 'Pendente';
             return `
-            <div class="exame-selecionado-row border-2 ${cor} rounded-xl p-3 mb-2">
-                <div class="flex-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg">${icone}</span>
-                        <div>
-                            <p class="text-sm font-bold text-slate-700">${e.codigo} - ${e.nome}</p>
-                            <div class="flex gap-4 mt-1">
-                                <span class="text-xs text-slate-500">📅 Solicitação: ${e.data_solicitacao ? formatarData(e.data_solicitacao) : '—'}</span>
-                                <span class="text-xs text-slate-500">📅 Realização: ${e.data_realizacao ? formatarData(e.data_realizacao) : '—'}</span>
-                            </div>
-                        </div>
+            <div class="exame-card ${classe}">
+                <span style="font-size:20px;">${icone}</span>
+                <div style="flex:1;">
+                    <p class="font-bold text-slate-700" style="font-size:12px;">${e.codigo} - ${e.nome}</p>
+                    <div style="display:flex; gap:16px; margin-top:4px;">
+                        <span style="font-size:10px; color:#64748b;">📅 Solicitação: ${e.data_solicitacao ? formatarData(e.data_solicitacao) : '—'}</span>
+                        <span style="font-size:10px; color:#64748b;">📅 Realização: ${e.data_realizacao ? formatarData(e.data_realizacao) : '—'}</span>
+                        <span style="font-size:10px; font-weight:700; color:${realizado ? '#166534' : '#92400e'};">${statusTexto}</span>
                     </div>
                 </div>
-                <button onclick="removerExameSelecionado(${i})" class="btn-remove-exame" title="Remover">✕</button>
+                <button onclick="removerExameSelecionado(${i})" class="btn-remover-exame" title="Remover">✕</button>
             </div>`;
         }).join('');
     }
@@ -914,7 +948,6 @@ function limparFormularioSolicitar(){
     document.getElementById('sexo').value = '';
     document.getElementById('racaCor').value = '';
     document.getElementById('sigtapSelecionado').value = '';
-    document.getElementById('btnAbrirModalExames').disabled = false;
     examesSelecionados = [];
     subgrupoSelecionado = null;
     atualizarExamesSelecionados();
@@ -1067,7 +1100,7 @@ function switchTab(tabId){
 }
 
 // ============================================
-// VALIDAR E SOLICITAR RETORNO
+// VALIDAR E SOLICITAR RETORNO (COM LÓGICA CORRETA)
 // ============================================
 document.getElementById('btnValidarRetorno').addEventListener('click', async () => {
     const ns = document.getElementById('numeroSolicitacao').value.trim();
@@ -1081,38 +1114,90 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
     if(examesSelecionados.length===0) return alert('❌ Selecione pelo menos 1 exame!');
     
     showLoading();
+    
+    // Verificar duplicidade
     const { data: existentes } = await db.from('retornos_solicitados').select('*').eq('numero_solicitacao',ns).eq('prontuario_vivver',pv);
     if(existentes&&existentes.length>0){ hideLoading(); return alert('❌ Esta solicitação já existe!'); }
     
+    // Buscar consulta
     const { data: consulta, error } = await db.from('primeira_consulta_recepcionados').select('*').or(`numero_solicitacao.eq.${ns},id.eq.${ns}`).single();
     if(error||!consulta){ hideLoading(); return mostrarMsg('msgSolicitar','❌ Nº Solicitação NÃO encontrado!','rose'); }
     
     dadosPrimeiraConsulta = consulta;
+    
+    // 🆕 LÓGICA: Verificar se TODOS os exames têm data de realização
+    const todosRealizados = examesSelecionados.every(e => e.data_realizacao);
+    const statusInicial = todosRealizados ? 'apto_retorno' : 'solicitado';
+    const statusOCI = todosRealizados ? 'apto_retorno' : 'aguardando_exame';
+    
+    // Preparar dados para confirmação
+    const modalDados = document.getElementById('modalDadosConfirmacao');
+    modalDados.innerHTML = `
+        <div class="flex justify-between"><span class="text-xs text-slate-500">Nº Solicitação:</span><span class="text-sm font-bold">${ns}</span></div>
+        <div class="flex justify-between"><span class="text-xs text-slate-500">Paciente:</span><span class="text-sm font-bold">${consulta.nome_paciente||'—'}</span></div>
+        <div class="flex justify-between"><span class="text-xs text-slate-500">Especialidade:</span><span class="text-sm font-bold">${document.getElementById('especialidadeRetorno').value||'—'}</span></div>
+        <div class="flex justify-between"><span class="text-xs text-slate-500">Unidade:</span><span class="text-sm font-bold">${un}</span></div>
+        <div class="flex justify-between"><span class="text-xs text-slate-500">Exames:</span><span class="text-sm font-bold">${examesSelecionados.length} selecionados</span></div>
+        <div class="flex justify-between"><span class="text-xs text-slate-500">Status:</span><span class="text-sm font-bold ${todosRealizados?'text-emerald-600':'text-amber-600'}">${todosRealizados?'✅ APTO PARA RETORNO':'⏳ AGUARDANDO EXAMES'}</span></div>
+        ${examesSelecionados.map(e => `
+        <div class="text-[10px] text-slate-500 border-t pt-2 mt-1">
+            🧪 ${e.codigo} - ${e.nome} | Solicitação: ${e.data_solicitacao||'—'} | Realização: ${e.data_realizacao||'—'} 
+            ${e.data_realizacao?'🟢':'🟡'}
+        </div>`).join('')}
+    `;
+    
     document.getElementById('btnConfirmarRetorno').onclick = async () => {
         showLoading();
+        
+        // Inserir na tabela retornos_solicitados
         await db.from('retornos_solicitados').insert([{
-            paciente_id: usuarioLogado.id, paciente_nome: consulta.nome_paciente, paciente_cpf: consulta.cpf_paciente,
-            numero_solicitacao: ns, consulta_id: consulta.id,
+            paciente_id: usuarioLogado.id, 
+            paciente_nome: consulta.nome_paciente, 
+            paciente_cpf: consulta.cpf_paciente,
+            numero_solicitacao: ns, 
+            consulta_id: consulta.id,
             telefone_paciente: document.getElementById('telefoneRetorno').value,
-            unidade_saude: un, prontuario_vivver: pv, nome_mae: consulta.nome_mae,
-            medico_solicitante: consulta.medico_solicitante, local_consulta: consulta.local_consulta,
-            especialidade_id: consulta.especialidade_id, data_primeira_consulta: consulta.data_agendada,
-            cep: document.getElementById('cep').value, endereco: document.getElementById('endereco').value,
+            unidade_saude: un, 
+            prontuario_vivver: pv, 
+            nome_mae: consulta.nome_mae,
+            medico_solicitante: consulta.medico_solicitante, 
+            local_consulta: consulta.local_consulta,
+            especialidade_id: consulta.especialidade_id, 
+            data_primeira_consulta: consulta.data_agendada,
+            cep: document.getElementById('cep').value, 
+            endereco: document.getElementById('endereco').value,
             numero_residencia: document.getElementById('numeroResidencia').value,
-            bairro: document.getElementById('bairro').value, municipio: document.getElementById('municipio').value,
-            sexo: document.getElementById('sexo').value, raca_cor: document.getElementById('racaCor').value,
-            codigo_sigtap: cs, cid: document.getElementById('cid').value,
+            bairro: document.getElementById('bairro').value, 
+            municipio: document.getElementById('municipio').value,
+            sexo: document.getElementById('sexo').value, 
+            raca_cor: document.getElementById('racaCor').value,
+            codigo_sigtap: cs, 
+            cid: document.getElementById('cid').value,
             exames_realizados: JSON.stringify(examesSelecionados),
-            usuario_cadastrou: usuarioLogado.nome, status: 'solicitado'
+            usuario_cadastrou: usuarioLogado.nome, 
+            status: statusInicial
         }]);
-        await db.from('consultas_oci').update({ status: 'apto_retorno' }).eq('id', consulta.id);
-        hideLoading(); fecharModalConfirmacao();
-        mostrarMsg('msgSolicitar','✅ Solicitação cadastrada!','emerald');
-        limparFormularioSolicitar(); carregarPortal();
+        
+        // 🆕 Atualizar status na consultas_oci conforme lógica
+        await db.from('consultas_oci').update({ 
+            status: statusOCI,
+            nome_exame: examesSelecionados.map(e => e.nome).join(', '),
+            data_solicitacao_exame: examesSelecionados[0]?.data_solicitacao || null,
+            data_realizacao_exame: todosRealizados ? examesSelecionados[0]?.data_realizacao : null,
+            usuario_cadastrou: usuarioLogado.nome
+        }).eq('id', consulta.id);
+        
+        hideLoading(); 
+        fecharModalConfirmacao();
+        mostrarMsg('msgSolicitar', todosRealizados ? '✅ Solicitação cadastrada! Paciente APTO PARA RETORNO!' : '✅ Solicitação cadastrada! Aguardando realização de exames.', 'emerald');
+        limparFormularioSolicitar(); 
+        carregarPortal();
     };
+    
     document.getElementById('modalConfirmacao').classList.add('show');
     hideLoading();
 });
+
 function fecharModalConfirmacao(){ document.getElementById('modalConfirmacao').classList.remove('show'); }
 
 // ============================================
@@ -1236,9 +1321,8 @@ document.getElementById('loginSenha').addEventListener('keydown',(e)=>{if(e.key=
 
 console.log('✅ PORTAL DO PACIENTE v7.0 CARREGADO!');
 console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
-console.log('❤️ EXAMES - PREENCHER (vermelho)');
-console.log('🔴 Modal moderno com fundo azul');
-console.log('🔄 SIGTAP permite trocar de subgrupo');
+console.log('🧪 NOVO: Modal com tabela de exames e checkboxes');
+console.log('🔄 Lógica: Todos realizados → APTO | Pendentes → AGUARDANDO');
 </script>
 </body>
 </html>
