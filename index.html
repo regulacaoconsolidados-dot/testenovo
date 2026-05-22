@@ -382,50 +382,88 @@ function toggleSenha(id, btn){
                         </div>
                         <p class="text-sm text-slate-500 mb-6">⚠️ O número da solicitação deve existir na tabela de <strong>1ª Consulta Recepcionados</strong>.</p>
                         
-                        <!-- ============================================ -->
-                        <!-- 🔍 DADOS DA 1ª CONSULTA (AUTOMÁTICO) -->
-                        <!-- ============================================ -->
+                <!-- ABA: SOLICITAR RETORNO -->
+                <div id="content-solicitar" class="tab-content active">
+                    <div class="bg-white rounded-2xl shadow-sm border-2 border-slate-100 p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-paper-plane text-blue-500"></i> Solicitar Retorno</h3>
+                            <button onclick="limparFormularioSolicitar()" class="btn-limpar px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                                <i class="fas fa-broom"></i> Limpar Preenchimento
+                            </button>
+                        </div>
+                        <p class="text-sm text-slate-500 mb-6">⚠️ O número da solicitação deve existir na tabela de <strong>1ª Consulta Recepcionados</strong>.</p>
+                        
+                        <!-- 🔍 DADOS DA 1ª CONSULTA -->
                         <div class="bg-blue-50 rounded-2xl p-4 mb-6 border-2 border-blue-200 section-card">
                             <h4 class="text-sm font-bold text-blue-700 mb-3"><i class="fas fa-search"></i> Dados da 1ª Consulta</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="form-label text-blue-600 mb-1 campo-obrigatorio">Nº Solicitação 1ª Consulta</label>
-                                    <input type="text" id="numeroSolicitacao" placeholder="Somente números" class="w-full px-3 py-2.5 border-2 border-blue-200 rounded-xl focus:border-blue-500 outline-none font-bold text-blue-600 text-sm input-field" oninput="this.value = this.value.replace(/\D/g,'')">
-                                </div>
-                                <div>
-                                    <label class="form-label text-blue-600 mb-1">Prontuário <span class="text-[10px] text-blue-400">(automático)</span></label>
-                                    <input type="text" id="prontuarioVivver" placeholder="Preenchido automaticamente" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico font-bold text-purple-600 text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-blue-600 mb-1">Nome do Paciente <span class="text-[10px] text-blue-400">(automático)</span></label>
-                                    <input type="text" id="nomePaciente" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 font-bold text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-blue-600 mb-1">Nome da Mãe <span class="text-[10px] text-blue-400">(automático)</span></label>
-                                    <input type="text" id="validarNomeMae" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-blue-600 mb-1">📱 Telefone <span class="text-[10px] text-blue-400">(automático)</span></label>
-                                    <input type="text" id="telefoneRetorno" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-blue-600 mb-1">Especialidade <span class="text-[10px] text-blue-400">(automático)</span></label>
-                                    <input type="text" id="especialidadeRetorno" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-blue-600 mb-1">Médico <span class="text-[10px] text-blue-400">(automático)</span></label>
-                                    <input type="text" id="medicoSolicitante" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-blue-600 mb-1">Local do Atendimento <span class="text-[10px] text-blue-400">(automático)</span></label>
-                                    <input type="text" id="localConsulta" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-blue-600 mb-1">Data da 1ª Consulta <span class="text-[10px] text-blue-400">(automático)</span></label>
-                                    <input type="text" id="dataPrimeiraConsulta" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field">
-                                </div>
+                                <div><label class="form-label text-blue-600 mb-1 campo-obrigatorio">Nº Solicitação 1ª Consulta</label><input type="text" id="numeroSolicitacao" placeholder="Somente números" class="w-full px-3 py-2.5 border-2 border-blue-200 rounded-xl focus:border-blue-500 outline-none font-bold text-blue-600 text-sm input-field" oninput="this.value = this.value.replace(/\D/g,'')"></div>
+                                <div><label class="form-label text-blue-600 mb-1">Prontuário <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="prontuarioVivver" placeholder="Preenchido automaticamente" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico font-bold text-purple-600 text-sm input-field"></div>
+                                <div><label class="form-label text-blue-600 mb-1">Nome do Paciente <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="nomePaciente" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 font-bold text-sm input-field"></div>
+                                <div><label class="form-label text-blue-600 mb-1">Nome da Mãe <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="validarNomeMae" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
+                                <div><label class="form-label text-blue-600 mb-1">📱 Telefone <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="telefoneRetorno" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
+                                <div><label class="form-label text-blue-600 mb-1">Especialidade <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="especialidadeRetorno" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
+                                <div><label class="form-label text-blue-600 mb-1">Médico <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="medicoSolicitante" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
+                                <div><label class="form-label text-blue-600 mb-1">Local do Atendimento <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="localConsulta" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
+                                <div><label class="form-label text-blue-600 mb-1">Data da 1ª Consulta <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="dataPrimeiraConsulta" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
                             </div>
                         </div>
+
+                        <!-- 📝 DADOS CADASTRAIS -->
+                        <div class="bg-purple-50 rounded-2xl p-4 mb-6 border-2 border-purple-200 section-card">
+                            <h4 class="text-sm font-bold text-purple-700 mb-3"><i class="fas fa-address-card"></i> Dados Cadastrais</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="relative"><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Unidade de Saúde</label><input type="text" id="unidadeSaude" placeholder="Digite para buscar..." autocomplete="off" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field" oninput="filtrarUBS()" onfocus="filtrarUBS()"><div id="dropdownUBS" class="dropdown-ubs"></div></div>
+                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">CEP</label><input type="text" id="cep" placeholder="00000-000" maxlength="9" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field" oninput="mascaraCEP(this)"></div>
+                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Endereço Completo</label><input type="text" id="endereco" placeholder="Rua, Avenida..." class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"></div>
+                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Número da Residência</label><input type="text" id="numeroResidencia" placeholder="Nº" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"></div>
+                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Bairro</label><input type="text" id="bairro" placeholder="Bairro" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"></div>
+                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Município</label><input type="text" id="municipio" placeholder="Município" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"></div>
+                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Sexo</label><select id="sexo" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"><option value="">Selecione...</option><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option></select></div>
+                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Raça/Cor</label><select id="racaCor" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"><option value="">Selecione...</option><option value="Branca">Branca</option><option value="Preta">Preta</option><option value="Parda">Parda</option><option value="Amarela">Amarela</option><option value="Indígena">Indígena</option></select></div>
+                            </div>
+                        </div>
+
+                        <!-- 🧪 EXAMES - PREENCHER (VERMELHO) -->
+                        <div class="bg-red-50 rounded-2xl p-4 mb-6 border-2 border-red-200 section-card">
+                            <h4 class="text-sm font-bold text-red-700 mb-3"><i class="fas fa-flask"></i> EXAMES - PREENCHER</h4>
+                            
+                            <!-- Dropdown SIGTAP -->
+                            <div class="relative mb-4">
+                                <label class="form-label text-red-600 mb-1 campo-obrigatorio">Selecione o SubGrupo Sigtap para descrever os exames.</label>
+                                <input type="text" id="sigtapSearch" placeholder="Digite para buscar o SubGrupo SIGTAP..." autocomplete="off" 
+                                       class="w-full px-3 py-2.5 border-2 border-red-200 rounded-xl focus:border-red-500 outline-none text-sm input-field bg-white cursor-pointer"
+                                       onfocus="toggleDropdownSIGTAP(true)" oninput="filtrarSIGTAP()">
+                                <input type="hidden" id="sigtapSelecionado">
+                                <div id="dropdownSIGTAP" class="dropdown-sigtap"></div>
+                            </div>
+                            
+                            <!-- Botão para abrir modal -->
+                            <div class="mb-3">
+                                <button onclick="abrirModalSelecaoExames()" id="btnAbrirModalExames" 
+                                        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all">
+                                    🔴 Clique aqui após selecionar o subgrupo
+                                </button>
+                            </div>
+                            
+                            <!-- Exames selecionados -->
+                            <div id="examesSelecionadosContainer" class="space-y-2">
+                                <p class="text-xs text-slate-400" id="examesVazioMsg">Nenhum exame selecionado. Escolha um SubGrupo SIGTAP acima.</p>
+                            </div>
+                            
+                            <!-- CID -->
+                            <div class="mt-4">
+                                <label class="form-label text-red-600 mb-1 campo-opcional">CID</label>
+                                <input type="text" id="cid" placeholder="CID (opcional)" class="w-full px-3 py-2.5 border-2 border-red-200 rounded-xl focus:border-red-500 outline-none text-sm input-field">
+                            </div>
+                        </div>
+
+                        <button id="btnValidarRetorno" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-search"></i> VALIDAR E SOLICITAR RETORNO
+                        </button>
+                        <div id="msgSolicitar" class="mt-4 hidden"></div>
+                    </div>
+                </div>
 
                         <!-- ============================================ -->
                         <!-- 📝 DADOS CADASTRAIS -->
@@ -916,7 +954,10 @@ function selecionarSIGTAP(codigo, nome, exames){
 // 🆕 MODAL DE SELEÇÃO DE EXAMES
 // ============================================
 function abrirModalSelecaoExames(){
-    if(!subgrupoSelecionado) return alert('❌ Selecione um SubGrupo SIGTAP primeiro!');
+    if(!subgrupoSelecionado) {
+        // Se não tiver subgrupo, cria um vazio
+        subgrupoSelecionado = { codigo: 'OUTRO', nome: 'SubGrupo não especificado', exames: [] };
+    }
     document.getElementById('modalSubgrupoNome').textContent = subgrupoSelecionado.nome;
     document.getElementById('modalSubgrupoCodigo').textContent = subgrupoSelecionado.codigo;
     
