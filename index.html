@@ -944,7 +944,7 @@ async function atualizarHistoricoSilencioso(){
         if(rets && JSON.stringify(rets) !== JSON.stringify(retornosLista)){
             retornosLista = rets;
             if(usuarioLogado.tipo === 'admin') todosRetornos = rets;
-            atualizarHistoricoHTML();
+            renderizarHistoricoHTML();
             const badge = document.getElementById('syncBadge');
             if(badge){ badge.style.display = 'inline'; setTimeout(() => { badge.style.display = 'none'; }, 3000); }
         }
@@ -1299,7 +1299,7 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
                         if(paciente){
                             document.getElementById('nomePaciente').value = paciente.nome || consulta.nome_paciente || '';
                             document.getElementById('cpfPaciente').value = paciente.cpf || '';
-                            document.getElementById('dataNascimento').value = paciente.data_nascimento || '';
+                            document.getElementById('dataNascimento').value = paciente.data_nascimento ? formatarData(paciente.data_nascimento) : '';
                             document.getElementById('validarNomeMae').value = paciente.nome_mae || consulta.nome_mae || '';
                             document.getElementById('telefoneRetorno').value = formatarTelefone(paciente.telefone || '');
                         }
