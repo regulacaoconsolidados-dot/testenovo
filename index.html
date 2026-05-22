@@ -1290,41 +1290,34 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
                     .single();
                 
                 if(consulta && !error){
-    dadosPrimeiraConsulta = consulta;
-    const pacienteId = consulta.paciente_id;
-    let paciente = null;
-    if(pacienteId){
-        const { data: pac } = await db.from('pacientes').select('*').eq('id', pacienteId).single();
-        paciente = pac;
-    }
-    
-    // Dados do paciente (da tabela pacientes ou da 1ª consulta)
-    document.getElementById('nomePaciente').value = (paciente ? paciente.nome : '') || consulta.nome_paciente || '';
-    document.getElementById('cpfPaciente').value = (paciente ? paciente.cpf : '') || consulta.cpf_paciente || '';
-    document.getElementById('prontuarioVivver').value = (paciente ? paciente.prontuario : '') || consulta.prontuario || '';
-    
-    // Nome da mãe e telefone (da 1ª consulta, que é onde estão)
-    document.getElementById('validarNomeMae').value = consulta.nome_mae || (paciente ? paciente.nome_mae : '') || '';
-    document.getElementById('telefoneRetorno').value = formatarTelefone((paciente ? paciente.telefone : '') || '');
-    
-    // Data de nascimento (tentar do paciente, senão deixar vazio)
-    document.getElementById('dataNascimento').value = (paciente && paciente.data_nascimento) ? formatarData(paciente.data_nascimento) : '';
-    
-    // Dados da consulta
-    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
-    document.getElementById('localConsulta').value = consulta.local_consulta || '';
-    const esp = especialidadesLista.find(e => e.id === consulta.especialidade_id);
-    document.getElementById('especialidadeRetorno').value = esp ? (esp.icone || '') + ' ' + esp.nome : '';
-    document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
-    
-    mostrarMsg('msgSolicitar', '✅ Dados preenchidos automaticamente! Preencha os campos restantes.', 'emerald');
-                } 
+                    dadosPrimeiraConsulta = consulta;
+                    
+                    document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
+                    document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
+                    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
+                    document.getElementById('localConsulta').value = consulta.local_consulta || '';
+                    document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
+                    document.getElementById('cpfPaciente').value = (consulta.cpf_paciente || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+                    
+                    const esp = especialidadesLista.find(e => e.id === consulta.especialidade_id);
+                    document.getElementById('especialidadeRetorno').value = esp ? (esp.icone || '') + ' ' + esp.nome : '';
+                    
+                    if(consulta.paciente_id){
+                        const { data: pac } = await db.from('pacientes').select('prontuario, telefone').eq('id', consulta.paciente_id).single();
+                        if(pac){
+                            document.getElementById('prontuarioVivver').value = pac.prontuario || '';
+                            document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
+                        }
+                    }
+                    
+                    mostrarMsg('msgSolicitar', '✅ Dados preenchidos!', 'emerald');
+                }
             } catch(e) {}
         }, 800);
     }
 });
 
-    // 🆕 BUSCAR ENDEREÇO PELO CEP
+// 🆕 BUSCAR ENDEREÇO PELO CEP
 async function buscarCEP(cep){
     cep = cep.replace(/\D/g,'');
     if(cep.length !== 8) return;
