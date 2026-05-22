@@ -1299,8 +1299,13 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
                     document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
                     document.getElementById('cpfPaciente').value = (consulta.cpf_paciente || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
                     
-                    const nomesEspecialidades = {1:'🫀 Cardiologia', 2:'🦴 Ortopedia', 3:'🎗️ Oncologia', 4:'👁️ Oftalmologia', 5:'👂 Otorrino'};
-                    document.getElementById('especialidadeRetorno').value = nomesEspecialidades[consulta.especialidade_id] || consulta.especialidade_id;
+                   if(especialidadesLista && especialidadesLista.length > 0){
+                       const esp = especialidadesLista.find(e => e.id === consulta.especialidade_id);
+                       document.getElementById('especialidadeRetorno').value = esp ? (esp.icone || '') + ' ' + esp.nome : 'Especialidade ' + consulta.especialidade_id;
+                   } else {
+                   const nomes = {1:'🫀 Cardiologia', 2:'🦴 Ortopedia', 3:'🎗️ Oncologia', 4:'👁️ Oftalmologia', 5:'👂 Otorrino'};
+                   document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || consulta.especialidade_id;
+}
                     
                     if(consulta.paciente_id){
                         const { data: pac } = await db.from('pacientes').select('prontuario, telefone').eq('id', consulta.paciente_id).single();
