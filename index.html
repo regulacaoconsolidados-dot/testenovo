@@ -760,8 +760,10 @@ document.getElementById('sigtapSearch').addEventListener('click', function(){
 // ============================================
 function abrirModalSelecaoExames(){
     if(!subgrupoSelecionado) {
-        subgrupoSelecionado = { codigo: 'OUTRO', nome: 'SubGrupo não especificado', exames: [] };
+        alert('⚠️ Selecione um SubGrupo SIGTAP primeiro!');
+        return;
     }
+    
     document.getElementById('modalSubgrupoNome').textContent = subgrupoSelecionado.nome;
     document.getElementById('modalSubgrupoCodigo').textContent = 'Código: ' + subgrupoSelecionado.codigo;
     
@@ -779,7 +781,7 @@ function abrirModalSelecaoExames(){
                         <p class="text-xs text-slate-500">${e.nome}</p>
                     </div>
                     <button onclick="adicionarExameLista('${e.codigo}','${e.nome.replace(/'/g,"\\'")}',${idx})" 
-                            class="btn-add-exame-modal bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">
                         ➕ Adicionar
                     </button>
                 </div>
@@ -799,7 +801,7 @@ function abrirModalSelecaoExames(){
     
     document.getElementById('modalSelecaoExames').classList.add('show');
 }
-
+    
 function adicionarExameLista(codigo, nome, idx){
     const dataSol = document.getElementById('modalDataSol_' + idx)?.value || '';
     const dataReal = document.getElementById('modalDataReal_' + idx)?.value || '';
@@ -857,6 +859,12 @@ function adicionarOutroExame(){
     document.getElementById('modalOutroDataSolicitacao').value = '';
     document.getElementById('modalOutroDataRealizacao').value = '';
     alert('✅ Exame adicionado!');
+}
+
+    function fecharModalExames(){ 
+    const modal = document.getElementById('modalSelecaoExames');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
 }
 
 function atualizarExamesSelecionados(){
