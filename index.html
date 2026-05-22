@@ -1318,8 +1318,11 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
     document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
     
     mostrarMsg('msgSolicitar', '✅ Dados preenchidos automaticamente! Preencha os campos restantes.', 'emerald');
-}
-
+            } catch(e) {}
+        }, 800);
+    }
+});
+    
 // ============================================
 // EDITAR / EXCLUIR / EXTORNAR
 // ============================================
