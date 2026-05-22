@@ -1232,47 +1232,45 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
         return;
     }
     
-    if(valor.length >= 2){
-    timeoutBusca = setTimeout(async () => {
-        try {
-            // Busca pelo número (ex: "101" encontra "SOL-0101")
-            const { data: consulta } = await db
-                .from('primeira_consulta_recepcionados')
-                .select('*')
-                .or(`numero_solicitacao.ilike.%${valor}%,id.eq.${valor}`)
-                .limit(1)
-                .single();
-            
-            if(consulta){
-                dadosPrimeiraConsulta = consulta;
-                document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
-                document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
-                document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
-                document.getElementById('localConsulta').value = consulta.local_consulta || '';
-                document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
+     if(valor.length >= 2){
+        timeoutBusca = setTimeout(async () => {
+            try {
+                const { data: consulta } = await db
+                    .from('primeira_consulta_recepcionados')
+                    .select('*')
+                    .or(`numero_solicitacao.ilike.%${valor}%,id.eq.${valor}`)
+                    .limit(1)
+                    .single();
                 
-                const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
-                document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
-                
-                // Busca telefone e prontuário
-                if(consulta.cpf_paciente){
-                    const { data: pac } = await db.from('pacientes').select('prontuario,telefone').eq('cpf', consulta.cpf_paciente).single();
-                    if(pac){
-                        document.getElementById('prontuarioVivver').value = pac.prontuario || '';
-                        document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
+                if(consulta){
+                    dadosPrimeiraConsulta = consulta;
+                    document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
+                    document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
+                    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
+                    document.getElementById('localConsulta').value = consulta.local_consulta || '';
+                    document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
+                    
+                    const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
+                    document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
+                    
+                    if(consulta.cpf_paciente){
+                        const { data: pac } = await db.from('pacientes').select('prontuario,telefone').eq('cpf', consulta.cpf_paciente).single();
+                        if(pac){
+                            document.getElementById('prontuarioVivver').value = pac.prontuario || '';
+                            document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
+                        }
                     }
+                    mostrarMsg('msgSolicitar','✅ Dados preenchidos!','emerald');
+                } else {
+                    document.getElementById('msgSolicitar').classList.add('hidden');
                 }
-                mostrarMsg('msgSolicitar','✅ Dados preenchidos!','emerald');
-            } else {
+            } catch(e) {
                 document.getElementById('msgSolicitar').classList.add('hidden');
             }
-        } catch(e) {
-            document.getElementById('msgSolicitar').classList.add('hidden');
-        }
-    }, 600);
-}
+        }, 600);
+    }
+});
     
-
 // 🆕 BUSCAR CEP
 async function buscarCEP(cep){
     cep=cep.replace(/\D/g,''); if(cep.length!==8)return;
