@@ -33,9 +33,7 @@
         .campo-obrigatorio::after { content: ' *'; color: #ef4444; font-weight: bold; }
         .campo-opcional::after { content: ' (opcional)'; color: #94a3b8; font-size: 11px; font-weight: normal; }
         .campo-automatico { background: #f1f5f9 !important; color: #475569 !important; cursor: not-allowed; }
-        /* 🆕 Labels maiores */
         .form-label { font-size: 12px !important; font-weight: 700 !important; text-transform: uppercase; letter-spacing: 0.5px; }
-        /* 🆕 Bordas mais fortes */
         .input-field { border-width: 2px !important; }
         .section-card { border-width: 2px !important; }
         .dropdown-ubs { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #e2e8f0; border-radius: 12px; max-height: 250px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
@@ -47,24 +45,25 @@
         .aviso-regras { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 8px 14px; font-size: 11px; color: #92400e; margin-bottom: 16px; }
         .btn-limpar { background: #fef2f2; color: #dc2626; border: 2px solid #fecaca; }
         .btn-limpar:hover { background: #fee2e2; }
-        /* 🆕 Exames */
-        .exame-selecionado-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; padding: 8px; background: #f0fdf4; border-radius: 8px; animation: fadeIn 0.3s ease; }
-        .btn-remove-exame { background: #fef2f2; color: #dc2626; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+        .exame-selecionado-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; padding: 8px; background: #fef2f2; border-radius: 8px; animation: fadeIn 0.3s ease; }
+        .btn-remove-exame { background: #fee2e2; color: #dc2626; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
         .dropdown-sigtap { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #e2e8f0; border-radius: 12px; max-height: 300px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
         .dropdown-sigtap.show { display: block; }
         .dropdown-sigtap-item { padding: 10px 14px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #f1f5f9; transition: all 0.15s; }
         .dropdown-sigtap-item:hover { background: #eff6ff; }
+        /* Modal moderno */
+        .modal-moderno { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        .modal-moderno .modal-content { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #93c5fd; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
 
-<!-- LOADING -->
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
     <p class="text-white mt-4 font-bold">Processando...</p>
 </div>
 
-<!-- ============ MODAL DE CONFIRMAÇÃO ============ -->
+<!-- MODAL DE CONFIRMAÇÃO -->
 <div id="modalConfirmacao" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="text-center mb-6">
@@ -73,29 +72,31 @@
             <p class="text-sm text-slate-500 mt-1">Verifique os dados antes de confirmar</p>
         </div>
         <div class="bg-slate-50 rounded-2xl p-4 mb-4 space-y-3" id="modalDadosConfirmacao"></div>
-        <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-3 mb-4"><p class="text-xs text-amber-700 font-bold">⚠️ Confira todos os dados acima. Eles NÃO podem ser alterados aqui.</p></div>
+        <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-3 mb-4"><p class="text-xs text-amber-700 font-bold">⚠️ Confira todos os dados acima.</p></div>
         <div class="flex gap-3">
-            <button onclick="fecharModalConfirmacao()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-3 rounded-xl font-bold transition-all text-sm">❌ CANCELAR</button>
-            <button id="btnConfirmarRetorno" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm">✅ CONFIRMAR SOLICITAÇÃO</button>
+            <button onclick="fecharModalConfirmacao()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-3 rounded-xl font-bold text-sm">❌ CANCELAR</button>
+            <button id="btnConfirmarRetorno" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold shadow-lg text-sm">✅ CONFIRMAR</button>
         </div>
     </div>
 </div>
 
-<!-- ============ 🆕 MODAL DE SELEÇÃO DE EXAMES ============ -->
-<div id="modalSelecaoExames" class="modal-overlay">
-    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-2xl shadow-2xl mx-4 max-h-[85vh] overflow-y-auto">
+<!-- ============ 🆕 MODAL DE SELEÇÃO DE EXAMES (MODERNO - FUNDO AZUL) ============ -->
+<div id="modalSelecaoExames" class="modal-overlay modal-moderno">
+    <div class="modal-content rounded-3xl p-6 md:p-8 w-full max-w-2xl shadow-2xl mx-4 max-h-[85vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-extrabold flex items-center gap-2"><span class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">🧪</span>Selecionar Exames</h2>
+            <h2 class="text-xl font-extrabold flex items-center gap-2 text-blue-800">
+                <span class="w-10 h-10 bg-blue-200 text-blue-600 rounded-xl flex items-center justify-center">🧪</span>Selecionar Exames
+            </h2>
             <button onclick="fecharModalExames()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
         </div>
-        <div class="bg-blue-50 rounded-xl p-3 mb-4">
+        <div class="bg-white rounded-xl p-4 mb-4 border-2 border-blue-200">
             <p class="text-sm font-bold text-blue-700" id="modalSubgrupoNome">Subgrupo selecionado</p>
             <p class="text-xs text-blue-500" id="modalSubgrupoCodigo"></p>
         </div>
-        <div class="space-y-2 mb-4 max-h-96 overflow-y-auto" id="modalListaExames">
-            <!-- Exames serão listados aqui -->
+        <div class="space-y-2 mb-4 max-h-80 overflow-y-auto" id="modalListaExames">
+            <p class="text-slate-400 text-sm text-center py-4">Carregando exames...</p>
         </div>
-        <!-- 🆕 Opção Outro -->
+        <!-- Opção Outro -->
         <div class="border-2 border-dashed border-amber-300 rounded-xl p-4 mb-4 bg-amber-50">
             <p class="text-sm font-bold text-amber-700 mb-2">📝 Outro exame (não listado)</p>
             <div class="grid grid-cols-2 gap-3">
@@ -107,11 +108,11 @@
             </div>
             <button onclick="adicionarOutroExame()" class="mt-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-sm font-bold">➕ Adicionar Outro</button>
         </div>
-        <button onclick="fecharModalExames()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold">✅ CONCLUIR SELEÇÃO</button>
+        <button onclick="fecharModalExames()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold">✅ CONCLUIR SELEÇÃO</button>
     </div>
 </div>
 
-<!-- ============ MODAL EDITAR RETORNO ============ -->
+<!-- MODAL EDITAR RETORNO -->
 <div id="modalEditarRetorno" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
@@ -131,7 +132,7 @@
     </div>
 </div>
 
-<!-- ============ MODAL ADMINISTRADOR ============ -->
+<!-- MODAL ADMINISTRADOR -->
 <div id="modalAdminPortal" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-2xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
@@ -165,7 +166,7 @@
     </div>
 </div>
 
-<!-- ============ MODAL EDITAR USUÁRIO ============ -->
+<!-- MODAL EDITAR USUÁRIO -->
 <div id="modalEditarUsuario" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl mx-4">
         <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-extrabold flex items-center gap-2"><span class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">✏️</span>Editar Usuário</h2><button onclick="document.getElementById('modalEditarUsuario').classList.remove('show')" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div>
@@ -181,18 +182,12 @@
 </div>
 
 <script>
-// ============================================
-// FUNÇÕES DE MÁSCARA
-// ============================================
 function mascaraCPF(input){
     let v = input.value.replace(/\D/g,'');
     if(v.length > 11) v = v.slice(0,11);
-    v = v.replace(/(\d{3})(\d)/,'$1.$2');
-    v = v.replace(/(\d{3})(\d)/,'$1.$2');
-    v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    v = v.replace(/(\d{3})(\d)/,'$1.$2'); v = v.replace(/(\d{3})(\d)/,'$1.$2'); v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
     input.value = v;
 }
-
 function mascaraTelefone(input){
     let v = input.value.replace(/\D/g,'');
     if(v.length > 11) v = v.slice(0,11);
@@ -200,26 +195,17 @@ function mascaraTelefone(input){
     if(v.length > 10) v = v.slice(0,10) + '-' + v.slice(10);
     input.value = v;
 }
-
 function mascaraCEP(input){
     let v = input.value.replace(/\D/g,'');
     if(v.length > 8) v = v.slice(0,8);
     if(v.length > 5) v = v.slice(0,5) + '-' + v.slice(5);
     input.value = v;
 }
-
 function toggleSenha(id, btn){
     const input = document.getElementById(id);
     const icon = btn.querySelector('i');
-    if(input.type === 'password'){
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
+    if(input.type === 'password'){ input.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+    else { input.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
 }
 </script>
 
@@ -235,40 +221,23 @@ function toggleSenha(id, btn){
         
         <div class="text-left space-y-4">
             <div>
-                <label class="form-label text-slate-600 mb-1">
-                    <i class="fas fa-id-card text-emerald-500"></i> CPF *
-                </label>
-                <input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" 
-                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg input-field"
-                       oninput="mascaraCPF(this)">
+                <label class="form-label text-slate-600 mb-1"><i class="fas fa-id-card text-emerald-500"></i> CPF *</label>
+                <input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg input-field" oninput="mascaraCPF(this)">
             </div>
             <div>
-                <label class="form-label text-slate-600 mb-1">
-                    <i class="fas fa-lock text-emerald-500"></i> Senha (6 dígitos) *
-                </label>
+                <label class="form-label text-slate-600 mb-1"><i class="fas fa-lock text-emerald-500"></i> Senha (6 dígitos) *</label>
                 <div class="relative">
-                    <input type="password" id="loginSenha" placeholder="******" maxlength="6" 
-                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg pr-12 input-field">
-                    <button type="button" onclick="toggleSenha('loginSenha', this)" 
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                        <i class="far fa-eye text-lg"></i>
-                    </button>
+                    <input type="password" id="loginSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg pr-12 input-field">
+                    <button type="button" onclick="toggleSenha('loginSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i class="far fa-eye text-lg"></i></button>
                 </div>
             </div>
         </div>
         
-        <button id="btnLogin" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-emerald-200 transition-all transform hover:scale-[1.02] active:scale-95">
-            <i class="fas fa-sign-in-alt"></i> ENTRAR
-        </button>
+        <button id="btnLogin" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-emerald-200 transition-all transform hover:scale-[1.02] active:scale-95"><i class="fas fa-sign-in-alt"></i> ENTRAR</button>
         
         <div class="mt-4 space-y-2">
-            <p class="text-sm text-slate-500">
-                <span onclick="showScreen('screenRedefinir')" class="text-rose-600 font-bold hover:underline cursor-pointer">
-                    <i class="fas fa-key"></i> Esqueci minha senha
-                </span>
-            </p>
+            <p class="text-sm text-slate-500"><span onclick="showScreen('screenRedefinir')" class="text-rose-600 font-bold hover:underline cursor-pointer"><i class="fas fa-key"></i> Esqueci minha senha</span></p>
         </div>
-        
         <p class="text-[10px] text-slate-400 mt-4">Admin: 123.456.789-09 | senha: admin1</p>
     </div>
 </div>
@@ -314,10 +283,7 @@ function toggleSenha(id, btn){
         <aside class="w-64 gradient-bg text-white hidden md:flex flex-col min-h-screen shadow-2xl z-50 flex-shrink-0">
             <div class="p-6 flex items-center gap-3 border-b border-white/10">
                 <div class="bg-emerald-600 p-2 rounded-xl">🏥</div>
-                <div>
-                    <span class="text-lg font-extrabold">Portal do</span>
-                    <span class="text-emerald-400 text-lg font-extrabold">Paciente</span>
-                </div>
+                <div><span class="text-lg font-extrabold">Portal do</span><span class="text-emerald-400 text-lg font-extrabold">Paciente</span></div>
             </div>
             <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
                 <a href="#" onclick="switchTab('solicitar')" class="sidebar-item active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold"><i class="fas fa-paper-plane w-4"></i> Solicitar Retorno</a>
@@ -356,7 +322,7 @@ function toggleSenha(id, btn){
             </header>
 
             <div class="flex-1 overflow-y-auto p-4 md:p-6">
-                <!-- 🆕 CARDS SIMPLIFICADOS -->
+                <!-- CARDS SIMPLIFICADOS -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="infoCards"></div>
                 
                 <!-- Abas Mobile -->
@@ -382,23 +348,12 @@ function toggleSenha(id, btn){
                         </div>
                         <p class="text-sm text-slate-500 mb-6">⚠️ O número da solicitação deve existir na tabela de <strong>1ª Consulta Recepcionados</strong>.</p>
                         
-                <!-- ABA: SOLICITAR RETORNO -->
-                <div id="content-solicitar" class="tab-content active">
-                    <div class="bg-white rounded-2xl shadow-sm border-2 border-slate-100 p-6 md:p-8">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-paper-plane text-blue-500"></i> Solicitar Retorno</h3>
-                            <button onclick="limparFormularioSolicitar()" class="btn-limpar px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-broom"></i> Limpar Preenchimento
-                            </button>
-                        </div>
-                        <p class="text-sm text-slate-500 mb-6">⚠️ O número da solicitação deve existir na tabela de <strong>1ª Consulta Recepcionados</strong>.</p>
-                        
-                        <!-- 🔍 DADOS DA 1ª CONSULTA -->
+                        <!-- 🔍 DADOS DA 1ª CONSULTA (AZUL) -->
                         <div class="bg-blue-50 rounded-2xl p-4 mb-6 border-2 border-blue-200 section-card">
                             <h4 class="text-sm font-bold text-blue-700 mb-3"><i class="fas fa-search"></i> Dados da 1ª Consulta</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div><label class="form-label text-blue-600 mb-1 campo-obrigatorio">Nº Solicitação 1ª Consulta</label><input type="text" id="numeroSolicitacao" placeholder="Somente números" class="w-full px-3 py-2.5 border-2 border-blue-200 rounded-xl focus:border-blue-500 outline-none font-bold text-blue-600 text-sm input-field" oninput="this.value = this.value.replace(/\D/g,'')"></div>
-                                <div><label class="form-label text-blue-600 mb-1">Prontuário <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="prontuarioVivver" placeholder="Preenchido automaticamente" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico font-bold text-purple-600 text-sm input-field"></div>
+                                <div><label class="form-label text-blue-600 mb-1">Prontuário <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="prontuarioVivver" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico font-bold text-purple-600 text-sm input-field"></div>
                                 <div><label class="form-label text-blue-600 mb-1">Nome do Paciente <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="nomePaciente" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 font-bold text-sm input-field"></div>
                                 <div><label class="form-label text-blue-600 mb-1">Nome da Mãe <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="validarNomeMae" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
                                 <div><label class="form-label text-blue-600 mb-1">📱 Telefone <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="telefoneRetorno" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
@@ -409,7 +364,7 @@ function toggleSenha(id, btn){
                             </div>
                         </div>
 
-                        <!-- 📝 DADOS CADASTRAIS -->
+                        <!-- 📝 DADOS CADASTRAIS (ROXO) -->
                         <div class="bg-purple-50 rounded-2xl p-4 mb-6 border-2 border-purple-200 section-card">
                             <h4 class="text-sm font-bold text-purple-700 mb-3"><i class="fas fa-address-card"></i> Dados Cadastrais</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -465,102 +420,6 @@ function toggleSenha(id, btn){
                     </div>
                 </div>
 
-                        <!-- ============================================ -->
-                        <!-- 📝 DADOS CADASTRAIS -->
-                        <!-- ============================================ -->
-                        <div class="bg-purple-50 rounded-2xl p-4 mb-6 border-2 border-purple-200 section-card">
-                            <h4 class="text-sm font-bold text-purple-700 mb-3"><i class="fas fa-address-card"></i> Dados Cadastrais</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div class="relative">
-                                    <label class="form-label text-purple-600 mb-1 campo-obrigatorio">Unidade de Saúde</label>
-                                    <input type="text" id="unidadeSaude" placeholder="Digite para buscar..." autocomplete="off" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field" oninput="filtrarUBS()" onfocus="filtrarUBS()">
-                                    <div id="dropdownUBS" class="dropdown-ubs"></div>
-                                </div>
-                                <div>
-                                    <label class="form-label text-purple-600 mb-1 campo-obrigatorio">CEP</label>
-                                    <input type="text" id="cep" placeholder="00000-000" maxlength="9" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field" oninput="mascaraCEP(this)">
-                                </div>
-                                <div>
-                                    <label class="form-label text-purple-600 mb-1 campo-obrigatorio">Endereço Completo</label>
-                                    <input type="text" id="endereco" placeholder="Rua, Avenida..." class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-purple-600 mb-1 campo-obrigatorio">Número da Residência</label>
-                                    <input type="text" id="numeroResidencia" placeholder="Nº" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-purple-600 mb-1 campo-obrigatorio">Bairro</label>
-                                    <input type="text" id="bairro" placeholder="Bairro" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-purple-600 mb-1 campo-obrigatorio">Município</label>
-                                    <input type="text" id="municipio" placeholder="Município" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field">
-                                </div>
-                                <div>
-                                    <label class="form-label text-purple-600 mb-1 campo-obrigatorio">Sexo</label>
-                                    <select id="sexo" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field">
-                                        <option value="">Selecione...</option>
-                                        <option value="Masculino">Masculino</option>
-                                        <option value="Feminino">Feminino</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="form-label text-purple-600 mb-1 campo-obrigatorio">Raça/Cor</label>
-                                    <select id="racaCor" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field">
-                                        <option value="">Selecione...</option>
-                                        <option value="Branca">Branca</option>
-                                        <option value="Preta">Preta</option>
-                                        <option value="Parda">Parda</option>
-                                        <option value="Amarela">Amarela</option>
-                                        <option value="Indígena">Indígena</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ============================================ -->
-                        <!-- 🧪 EXAMES REALIZADOS + SIGTAP -->
-                        <!-- ============================================ -->
-                        <div class="bg-emerald-50 rounded-2xl p-4 mb-6 border-2 border-emerald-200 section-card">
-                            <h4 class="text-sm font-bold text-emerald-700 mb-3"><i class="fas fa-flask"></i> Exames Realizados</h4>
-                            
-                            <!-- 🆕 Dropdown SIGTAP -->
-                            <div class="relative mb-4">
-                                <label class="form-label text-emerald-600 mb-1 campo-obrigatorio">SubGrupo SIGTAP</label>
-                                <input type="text" id="sigtapSearch" placeholder="Selecione o SubGrupo SIGTAP..." autocomplete="off" 
-                                       class="w-full px-3 py-2.5 border-2 border-emerald-200 rounded-xl focus:border-emerald-500 outline-none text-sm input-field bg-white cursor-pointer"
-                                       onfocus="toggleDropdownSIGTAP(true)" oninput="filtrarSIGTAP()">
-                                <input type="hidden" id="sigtapSelecionado">
-                                <div id="dropdownSIGTAP" class="dropdown-sigtap"></div>
-                            </div>
-                            
-                            <!-- Exames pré-listados do subgrupo + botão abrir modal -->
-                            <div class="mb-3">
-                                <button onclick="abrirModalSelecaoExames()" id="btnAbrirModalExames" 
-                                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                    🧪 Selecionar Exames do SubGrupo
-                                </button>
-                            </div>
-                            
-                            <!-- Exames selecionados -->
-                            <div id="examesSelecionadosContainer" class="space-y-2">
-                                <p class="text-xs text-slate-400" id="examesVazioMsg">Nenhum exame selecionado. Escolha um SubGrupo SIGTAP acima.</p>
-                            </div>
-                            
-                            <!-- Campo CID -->
-                            <div class="mt-4">
-                                <label class="form-label text-emerald-600 mb-1 campo-opcional">CID</label>
-                                <input type="text" id="cid" placeholder="CID (opcional)" class="w-full px-3 py-2.5 border-2 border-emerald-200 rounded-xl focus:border-emerald-500 outline-none text-sm input-field">
-                            </div>
-                        </div>
-
-                        <button id="btnValidarRetorno" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-search"></i> VALIDAR E SOLICITAR RETORNO
-                        </button>
-                        <div id="msgSolicitar" class="mt-4 hidden"></div>
-                    </div>
-                </div>
-
                 <!-- ABA: HISTÓRICO -->
                 <div id="content-historico" class="tab-content">
                     <div class="bg-white rounded-2xl shadow-sm border-2 border-slate-100 p-6 md:p-8">
@@ -594,9 +453,7 @@ function toggleSenha(id, btn){
 // 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704
 // ============================================
 
-// ============================================
 // CONFIGURAÇÃO SUPABASE
-// ============================================
 const db = window.supabase.createClient(
     'https://hheuvkyhwujdrvjvtryg.supabase.co', 
     'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe'
@@ -609,121 +466,83 @@ let especialidadesLista = [];
 let codigoRedefinicao = null;
 let dadosPrimeiraConsulta = null;
 let intervaloAtualizacao = null;
-let examesSelecionados = []; // 🆕 Array de exames selecionados
+let examesSelecionados = [];
+let subgrupoSelecionado = null;
 
 // ============================================
 // 🆕 GRUPOS SIGTAP COM EXAMES
 // ============================================
 const GRUPOS_SIGTAP = {
   "01": { nome: "01 - Atenção em Oncologia", subgrupos: [
-    { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama", exames: [
-      {codigo: "02.04.03.003-0", nome: "MAMOGRAFIA"}
-    ]},
+    { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama", exames: [{codigo: "02.04.03.003-0", nome: "MAMOGRAFIA"}]},
     { codigo: "09.01.01.002-2", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama", exames: []},
     { codigo: "09.01.01.003-0", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Próstata", exames: []},
     { codigo: "09.01.01.004-9", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Próstata", exames: []},
     { codigo: "09.01.01.005-7", nome: "OCI Investigação Diagnóstica de Câncer de Colo do Útero", exames: [
-      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"},
-      {codigo: "02.01.01.066-6", nome: "BIÓPSIA DO COLO DO ÚTERO"},
-      {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
+      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.066-6", nome: "BIÓPSIA DO COLO DO ÚTERO"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
     ]},
     { codigo: "09.01.01.006-5", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero", exames: []},
     { codigo: "09.01.01.007-3", nome: "OCI Avaliação Diagnóstica de Câncer Gástrico", exames: []},
     { codigo: "09.01.01.008-1", nome: "OCI Avaliação Diagnóstica de Câncer Colorretal", exames: []},
     { codigo: "09.01.01.009-0", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - I", exames: [
-      {codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"},
-      {codigo: "02.03.01.004-3", nome: "CITOPATOLOGICO"}
+      {codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"}, {codigo: "02.03.01.004-3", nome: "CITOPATOLOGICO"}
     ]},
     { codigo: "09.01.01.010-3", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - II", exames: [
-      {codigo: "02.03.02.006-5", nome: "ANATOMOPATOLOGICO"},
-      {codigo: "02.01.01.060-7", nome: "CORE BIOPSY"},
-      {codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"}
+      {codigo: "02.03.02.006-5", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.060-7", nome: "CORE BIOPSY"}, {codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"}
     ]},
     { codigo: "09.01.01.011-1", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - I", exames: [
-      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"},
-      {codigo: "04.09.06.008-9", nome: "EXCISÃO TIPO 1"},
-      {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
+      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "04.09.06.008-9", nome: "EXCISÃO TIPO 1"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
     ]},
     { codigo: "09.01.01.012-0", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - II", exames: [
-      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"},
-      {codigo: "04.09.06.008-9", nome: "EXCISÃO TIPO 2"},
-      {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
+      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "04.09.06.008-9", nome: "EXCISÃO TIPO 2"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
     ]}
   ]},
   "02": { nome: "02 - Atenção em Cardiologia", subgrupos: [
     { codigo: "09.02.01.001-8", nome: "OCI Avaliação de Risco Cirúrgico", exames: []},
     { codigo: "09.02.01.002-6", nome: "OCI Avaliação Cardiológica", exames: []},
     { codigo: "09.02.01.003-4", nome: "OCI Avaliação Diagnóstica Inicial - Síndrome Coronariana Crônica", exames: [
-      {codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"},
-      {codigo: "02.11.02.006-0", nome: "TESTE ERGOMÉTRICO"}
+      {codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"}, {codigo: "02.11.02.006-0", nome: "TESTE ERGOMÉTRICO"}
     ]},
-    { codigo: "09.02.01.004-2", nome: "OCI Progressão da Avaliação Diagnóstica I - Síndrome Coronariana Crônica", exames: []},
-    { codigo: "09.02.01.005-0", nome: "OCI Progressão da Avaliação Diagnóstica II - Síndrome Coronariana Crônica", exames: [
-      {codigo: "02.08.01.003-3", nome: "CINTILOGRAFIA REPOUSO"},
-      {codigo: "02.08.01.002-5", nome: "CINTILOGRAFIA ESTRESSE"}
+    { codigo: "09.02.01.004-2", nome: "OCI Progressão da Avaliação Diagnóstica I", exames: []},
+    { codigo: "09.02.01.005-0", nome: "OCI Progressão da Avaliação Diagnóstica II", exames: [
+      {codigo: "02.08.01.003-3", nome: "CINTILOGRAFIA REPOUSO"}, {codigo: "02.08.01.002-5", nome: "CINTILOGRAFIA ESTRESSE"}
     ]},
     { codigo: "09.02.01.006-9", nome: "OCI Avaliação Diagnóstica - Insuficiência Cardíaca", exames: [
-      {codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"},
-      {codigo: "02.11.02.006-0", nome: "TESTE ERGOMÉTRICO"},
-      {codigo: "02.02.01.079-1", nome: "DOSEGEM DE PEPTÍDEOS"},
-      {codigo: "02.11.02.004-4", nome: "HOLTER 24H"}
+      {codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"}, {codigo: "02.11.02.006-0", nome: "TESTE ERGOMÉTRICO"}, {codigo: "02.02.01.079-1", nome: "DOSEGEM DE PEPTÍDEOS"}, {codigo: "02.11.02.004-4", nome: "HOLTER 24H"}
     ]}
   ]},
   "03": { nome: "03 - Atenção em Ortopedia", subgrupos: [
-    { codigo: "09.03.01.001-1", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia", exames: [
-      {codigo: "02.07.01.004-8", nome: "RX LOMBAR"},
-      {codigo: "02.07.02.002-7", nome: "RX OMBRO D"},
-      {codigo: "02.07.02.002-7", nome: "RX OMBRO E"},
-      {codigo: "02.07.03.003-0", nome: "RX JOELHO D"},
-      {codigo: "02.07.03.003-0", nome: "RX JOELHO E"}
+    { codigo: "09.03.01.001-1", nome: "OCI com Recursos de Radiologia", exames: [
+      {codigo: "02.07.01.004-8", nome: "RX LOMBAR"}, {codigo: "02.07.02.002-7", nome: "RX OMBRO D"}, {codigo: "02.07.02.002-7", nome: "RX OMBRO E"}, {codigo: "02.07.03.003-0", nome: "RX JOELHO D"}, {codigo: "02.07.03.003-0", nome: "RX JOELHO E"}
     ]},
-    { codigo: "09.03.01.002-0", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia e Ultrassonografia", exames: [
-      {codigo: "02.05.02.006-2", nome: "USG DE ARTICULAÇÃO"}
-    ]},
-    { codigo: "09.03.01.003-8", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia e Tomografia Computadorizada", exames: [
-      {codigo: "02.06.01.003-6", nome: "TC COLUNA TORACICA"},
-      {codigo: "02.06.01.002-8", nome: "TC COLUNA LOMBOSSACRA"}
-    ]},
-    { codigo: "09.03.01.004-6", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia e Ressonância Magnética", exames: [
-      {codigo: "02.07.01.004-8", nome: "RX LOMBAR"},
-      {codigo: "02.07.02.002-7", nome: "MÃO E PUNHO E"},
-      {codigo: "02.07.02.002-7", nome: "MÃO E PUNHO D"},
-      {codigo: "02.07.03.002-2", nome: "RNM DE QUADRIL"}
+    { codigo: "09.03.01.002-0", nome: "OCI com Radiologia e Ultrassonografia", exames: [{codigo: "02.05.02.006-2", nome: "USG DE ARTICULAÇÃO"}]},
+    { codigo: "09.03.01.003-8", nome: "OCI com Radiologia e Tomografia", exames: [{codigo: "02.06.01.003-6", nome: "TC COLUNA TORACICA"}, {codigo: "02.06.01.002-8", nome: "TC COLUNA LOMBOSSACRA"}]},
+    { codigo: "09.03.01.004-6", nome: "OCI com Radiologia e Ressonância Magnética", exames: [
+      {codigo: "02.07.01.004-8", nome: "RX LOMBAR"}, {codigo: "02.07.02.002-7", nome: "MÃO E PUNHO E"}, {codigo: "02.07.02.002-7", nome: "MÃO E PUNHO D"}, {codigo: "02.07.03.002-2", nome: "RNM DE QUADRIL"}
     ]}
   ]},
   "04": { nome: "04 - Atenção em Otorrinolaringologia", subgrupos: [
-    { codigo: "09.04.01.001-5", nome: "OCI Avaliação Inicial Diagnóstica de Déficit Auditivo", exames: []},
-    { codigo: "09.04.01.002-3", nome: "OCI Progressão da Avaliação Diagnóstica de Déficit Auditivo", exames: []},
-    { codigo: "09.04.01.003-1", nome: "OCI Avaliação Diagnóstica de Nasofaringe e de Orofaringe", exames: []}
+    { codigo: "09.04.01.001-5", nome: "OCI Avaliação Inicial de Déficit Auditivo", exames: []},
+    { codigo: "09.04.01.002-3", nome: "OCI Progressão de Déficit Auditivo", exames: []},
+    { codigo: "09.04.01.003-1", nome: "OCI Avaliação de Nasofaringe e Orofaringe", exames: []}
   ]},
   "05": { nome: "05 - Atenção em Oftalmologia", subgrupos: [
-    { codigo: "09.05.01.001-9", nome: "OCI Avaliação Inicial em Oftalmologia - 0 a 8 Anos", exames: []},
-    { codigo: "09.05.01.002-7", nome: "OCI Avaliação de Estrabismo", exames: []},
-    { codigo: "09.05.01.003-5", nome: "OCI Avaliação Inicial em Oftalmologia - a Partir de 9 Anos", exames: []},
-    { codigo: "09.05.01.004-3", nome: "OCI Avaliação de Retinopatia Diabética", exames: []},
-    { codigo: "09.05.01.005-1", nome: "OCI Avaliação Inicial para Oncologia Oftalmológica", exames: []},
-    { codigo: "09.05.01.006-0", nome: "OCI Avaliação Diagnóstica em Neuro Oftalmologia", exames: []},
-    { codigo: "09.05.01.007-8", nome: "OCI Exames Oftalmológicos Sob Sedação", exames: []}
+    { codigo: "09.05.01.001-9", nome: "OCI Inicial 0 a 8 Anos", exames: []}, { codigo: "09.05.01.002-7", nome: "OCI Estrabismo", exames: []},
+    { codigo: "09.05.01.003-5", nome: "OCI Inicial a Partir de 9 Anos", exames: []}, { codigo: "09.05.01.004-3", nome: "OCI Retinopatia Diabética", exames: []},
+    { codigo: "09.05.01.005-1", nome: "OCI Oncologia Oftalmológica", exames: []}, { codigo: "09.05.01.006-0", nome: "OCI Neuro Oftalmologia", exames: []},
+    { codigo: "09.05.01.007-8", nome: "OCI Exames Sob Sedação", exames: []}
   ]},
   "06": { nome: "06 - Atenção em Saúde da Mulher", subgrupos: [
-    { codigo: "09.06.01.001-2", nome: "GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) I", exames: []},
-    { codigo: "09.06.01.002-0", nome: "OCI - GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) II", exames: []},
-    { codigo: "09.06.01.003-9", nome: "OCI - GIN2 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Sangramento Uterino Anormal I", exames: []},
-    { codigo: "09.06.01.004-7", nome: "OCI - GIN2 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Sangramento Uterino Anormal II", exames: []},
-    { codigo: "09.06.01.005-5", nome: "OCI - GIN3 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Endometriose Profunda - Casos Complexos e Programação Cirúrgica", exames: []}
+    { codigo: "09.06.01.001-2", nome: "GIN1 - Avaliação Inicial I", exames: []}, { codigo: "09.06.01.002-0", nome: "GIN1 - Avaliação Inicial II", exames: []},
+    { codigo: "09.06.01.003-9", nome: "GIN2 - Sangramento Uterino Anormal I", exames: []}, { codigo: "09.06.01.004-7", nome: "GIN2 - Sangramento Uterino Anormal II", exames: []},
+    { codigo: "09.06.01.005-5", nome: "GIN3 - Endometriose Profunda", exames: []}
   ]}
 };
 
-// 🆕 Lista plana de todos subgrupos para busca
 const TODOS_SUBGRUPOS = [];
-Object.keys(GRUPOS_SIGTAP).forEach(grupoKey => {
-    GRUPOS_SIGTAP[grupoKey].subgrupos.forEach(sub => {
-        TODOS_SUBGRUPOS.push({
-            grupo: GRUPOS_SIGTAP[grupoKey].nome,
-            codigo: sub.codigo,
-            nome: sub.nome,
-            exames: sub.exames
-        });
+Object.keys(GRUPOS_SIGTAP).forEach(gk => {
+    GRUPOS_SIGTAP[gk].subgrupos.forEach(sub => {
+        TODOS_SUBGRUPOS.push({ grupo: GRUPOS_SIGTAP[gk].nome, codigo: sub.codigo, nome: sub.nome, exames: sub.exames });
     });
 });
 
@@ -731,88 +550,17 @@ Object.keys(GRUPOS_SIGTAP).forEach(grupoKey => {
 // LISTA DE UNIDADES DE SAÚDE (UBS)
 // ============================================
 const DISTRITO_MAP = {
-  'UNIDADE BASICA DE SAUDE JARDIM BANDEIRANTES': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE AGUA BRANCA': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE XV': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE CSU ELDORADO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE PARQUE SAO JOAO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE JARDIM ELDORADO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE NOVO ELDORADO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE SANTA CRUZ': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE PEROBAS': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE BELA VISTA': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE INDUSTRIAL III SECAO': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE JARDIM INDUSTRIAL': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE VILA SAO PAULO': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE SANDOVAL DE AZEVEDO': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE JOAO EVANGELISTA': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE BANDEIRANTES': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE AMAZONAS': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE VILA DINIZ': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE NACIONAL': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE ILDA EFIGENIA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE JOAQUIM MURTINHO': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE XANGRILA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE AMENDOEIRAS': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE ESTRELA DALVA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE TIJUCA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE PETROLANDIA': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE TROPICAL II': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE SAPUCAIAS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE DUQUE DE CAXIAS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE SAO LUIZ II': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE SAO LUIZ I': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE CAMPO ALTO': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE TROPICAL I': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE ESTANCIAS IMPERIAIS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE NASCENTES IMPERIAIS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE CAMPINA VERDE': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE LAGUNA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE ARPOADOR': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE SAO JOAQUIM': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE PARQUE TURISTA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE VILA PEROLA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE NOVO PROGRESSO II': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE COLORADO': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE CANDIDA FERREIRA': 'RESSACA',
-  'UNIDADE DE SAUDE DA FAMILIA VILA PEROLA II USF 84': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE PRESIDENTE KENNEDY': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE OITIS': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE MORADA NOVA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE INCONFIDENTES': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE RIACHO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE FLAMENGO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE NOVO RIACHO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE DURVAL DE BARROS': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE MONTE CASTELO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE CHACARAS': 'SEDE',
-  'UNIDADE BASICA DE SAUDE CANADA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE CENTRO (CAD)': 'SEDE',
-  'UBS BERNARDO MONTEIRO/MOACIR PINTO MOREIRA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE LINDA VISTA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE SANTA HELENA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE VILA ITALIA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE BEATRIZ USF 72': 'SEDE',
-  'UNIDADE BASICA DE SAUDE MARIA DA CONCEICAO': 'SEDE',
-  'UNIDADE BASICA DE SAUDE FUNCIONARIOS': 'SEDE',
-  'UNIDADE BASICA DE SAUDE PRAIA': 'SEDE',
-  'UBS UNIDADE XVI (SEDE)': 'SEDE',
-  'UNIDADE BASICA DE SAUDE VILA RENASCER': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE NOVA CONTAGEM': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE VILA SOLEDADE': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE ESTALEIRO': 'VARGEM DAS FLORES',
-  'CERESP CONTAGEM': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE RETIRO II': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE RETIRO': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE IPE AMARELO': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE SAO JUDAS TADEU': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE VILA ESPERANCA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE DARCY RIBEIRO': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE ICAIVERA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE NOVA CONTAGEM I': 'VARGEM DAS FLORES',
-  'CONTAGEM PENITENCIARIA NELSON HUNGRIA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE TUPA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE LIBERDADE II': 'VARGEM DAS FLORES'
+  'UNIDADE BASICA DE SAUDE JARDIM BANDEIRANTES': 'ELDORADO', 'UNIDADE BASICA DE SAUDE AGUA BRANCA': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE XV': 'ELDORADO', 'UNIDADE BASICA DE SAUDE CSU ELDORADO': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE INDUSTRIAL III SECAO': 'INDUSTRIAL', 'UNIDADE BASICA DE SAUDE JARDIM INDUSTRIAL': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE NACIONAL': 'NACIONAL', 'UNIDADE BASICA DE SAUDE ILDA EFIGENIA': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE PETROLANDIA': 'PETROLANDIA', 'UNIDADE BASICA DE SAUDE TROPICAL II': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE CAMPINA VERDE': 'RESSACA', 'UNIDADE BASICA DE SAUDE LAGUNA': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE INCONFIDENTES': 'RIACHO', 'UNIDADE BASICA DE SAUDE RIACHO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE CHACARAS': 'SEDE', 'UNIDADE BASICA DE SAUDE CANADA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE CENTRO (CAD)': 'SEDE', 'UBS BERNARDO MONTEIRO/MOACIR PINTO MOREIRA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE VILA RENASCER': 'VARGEM DAS FLORES', 'UNIDADE BASICA DE SAUDE NOVA CONTAGEM': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE TUPA': 'VARGEM DAS FLORES', 'UNIDADE BASICA DE SAUDE LIBERDADE II': 'VARGEM DAS FLORES'
 };
 const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
 
@@ -823,93 +571,49 @@ function showLoading(){ document.getElementById('loadingOverlay').classList.add(
 function hideLoading(){ document.getElementById('loadingOverlay').classList.remove('show'); }
 
 function validarCPF(cpf){ 
-    cpf=cpf.replace(/\D/g,''); 
-    if(cpf.length!==11||/^(\d)\1{10}$/.test(cpf)) return false; 
-    let s=0; for(let i=0;i<9;i++) s+=parseInt(cpf[i])*(10-i); 
-    let r=(s*10)%11; if(r===10) r=0; 
-    if(r!==parseInt(cpf[9])) return false; 
-    s=0; for(let i=0;i<10;i++) s+=parseInt(cpf[i])*(11-i); 
-    r=(s*10)%11; if(r===10) r=0; 
-    return r===parseInt(cpf[10]); 
+    cpf=cpf.replace(/\D/g,''); if(cpf.length!==11||/^(\d)\1{10}$/.test(cpf)) return false; 
+    let s=0; for(let i=0;i<9;i++) s+=parseInt(cpf[i])*(10-i); let r=(s*10)%11; if(r===10) r=0; if(r!==parseInt(cpf[9])) return false;
+    s=0; for(let i=0;i<10;i++) s+=parseInt(cpf[i])*(11-i); r=(s*10)%11; if(r===10) r=0; return r===parseInt(cpf[10]); 
 }
-
 function gerarCPFValido(){
-    const n = Array.from({length: 9}, () => Math.floor(Math.random() * 9));
-    let d1 = n.reduce((s, v, i) => s + v * (10 - i), 0) * 10 % 11;
-    d1 = d1 === 10 ? 0 : d1;
-    let d2 = (n.reduce((s, v, i) => s + v * (11 - i), 0) + d1 * 2) * 10 % 11;
-    d2 = d2 === 10 ? 0 : d2;
-    return [...n, d1, d2].join('').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    const n=Array.from({length:9},()=>Math.floor(Math.random()*9));
+    let d1=n.reduce((s,v,i)=>s+v*(10-i),0)*10%11; d1=d1===10?0:d1;
+    let d2=(n.reduce((s,v,i)=>s+v*(11-i),0)+d1*2)*10%11; d2=d2===10?0:d2;
+    return [...n,d1,d2].join('').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
 }
-
-function formatarData(data){ 
-    if(!data) return '—'; 
-    const d = new Date(data.split('T')[0] + 'T12:00:00');
-    return d.toLocaleDateString('pt-BR'); 
-}
-
+function formatarData(data){ if(!data) return '—'; const d=new Date(data.split('T')[0]+'T12:00:00'); return d.toLocaleDateString('pt-BR'); }
 function formatarTelefone(tel){
-    if(!tel) return '—';
-    tel = tel.replace(/\D/g,'');
-    if(tel.length === 11) return '(' + tel.slice(0,2) + ') ' + tel.slice(2,7) + '-' + tel.slice(7);
-    if(tel.length === 10) return '(' + tel.slice(0,2) + ') ' + tel.slice(2,6) + '-' + tel.slice(6);
-    return tel;
+    if(!tel) return '—'; tel=tel.replace(/\D/g,'');
+    if(tel.length===11) return '('+tel.slice(0,2)+') '+tel.slice(2,7)+'-'+tel.slice(7);
+    if(tel.length===10) return '('+tel.slice(0,2)+') '+tel.slice(2,6)+'-'+tel.slice(6); return tel;
 }
-
-function gerarCodigoAleatorio(){ return String(Math.floor(100000 + Math.random() * 900000)); }
+function gerarCodigoAleatorio(){ return String(Math.floor(100000+Math.random()*900000)); }
 
 function showScreen(id){
-    document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
-    const el = document.getElementById(id);
-    if(el){ 
-        el.classList.add('active'); 
-        if(id === 'screenPortal'){ 
-            el.style.display = 'block'; 
-            iniciarAtualizacaoAutomatica();
-        } else { 
-            el.style.display = 'flex'; 
-            pararAtualizacaoAutomatica();
-        } 
-    }
-    if(id === 'screenRedefinir'){
-        document.getElementById('etapaSolicitar').classList.remove('hidden');
-        document.getElementById('etapaVerificar').classList.add('hidden');
-        document.getElementById('redefTitulo').textContent = 'Etapa 1: Verificar identidade';
-        ['redefCPF','redefNomeMae','redefCidade','redefCodigo','redefNovaSenha'].forEach(id => document.getElementById(id).value = '');
-    }
+    document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});
+    const el=document.getElementById(id);
+    if(el){ el.classList.add('active'); if(id==='screenPortal'){ el.style.display='block'; iniciarAtualizacaoAutomatica(); } else { el.style.display='flex'; pararAtualizacaoAutomatica(); } }
+    if(id==='screenRedefinir'){ document.getElementById('etapaSolicitar').classList.remove('hidden'); document.getElementById('etapaVerificar').classList.add('hidden'); document.getElementById('redefTitulo').textContent='Etapa 1: Verificar identidade'; ['redefCPF','redefNomeMae','redefCidade','redefCodigo','redefNovaSenha'].forEach(id=>document.getElementById(id).value=''); }
+}
+function mostrarMsg(id,texto,cor){
+    const el=document.getElementById(id);
+    el.className='mt-4 p-3 rounded-xl text-sm font-bold border-l-4 '+(cor==='emerald'?'bg-emerald-50 text-emerald-700 border-emerald-500':cor==='amber'?'bg-amber-50 text-amber-700 border-amber-500':'bg-rose-50 text-rose-700 border-rose-500');
+    el.textContent=texto; el.classList.remove('hidden');
 }
 
-function mostrarMsg(id, texto, cor){
-    const el = document.getElementById(id);
-    el.className = 'mt-4 p-3 rounded-xl text-sm font-bold border-l-4 ' + 
-        (cor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-500' : 
-         cor === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-500' :
-         'bg-rose-50 text-rose-700 border-rose-500');
-    el.textContent = texto;
-    el.classList.remove('hidden');
-}
-
-// ============================================
-// DROPDOWN DE UNIDADES DE SAÚDE (UBS)
-// ============================================
+// DROPDOWN UBS
 function filtrarUBS(){
-    const input = document.getElementById('unidadeSaude');
-    const dropdown = document.getElementById('dropdownUBS');
-    const termo = input.value.toLowerCase().trim();
-    let listaFiltrada = termo ? LISTA_UBS.filter(ubs => ubs.toLowerCase().includes(termo) || (DISTRITO_MAP[ubs] || '').toLowerCase().includes(termo)) : LISTA_UBS;
-    dropdown.innerHTML = listaFiltrada.length === 0 ? '<div class="dropdown-ubs-item text-slate-400">Nenhuma unidade encontrada</div>' : listaFiltrada.map(ubs => `<div class="dropdown-ubs-item" onclick="selecionarUBS('${ubs.replace(/'/g,"\\'")}')">${ubs}<span class="distrito-tag">${DISTRITO_MAP[ubs] || ''}</span></div>`).join('');
+    const input=document.getElementById('unidadeSaude'), dropdown=document.getElementById('dropdownUBS'), termo=input.value.toLowerCase().trim();
+    let lista=termo?LISTA_UBS.filter(u=>u.toLowerCase().includes(termo)||(DISTRITO_MAP[u]||'').toLowerCase().includes(termo)):LISTA_UBS;
+    dropdown.innerHTML=lista.length===0?'<div class="dropdown-ubs-item text-slate-400">Nenhuma unidade</div>':lista.map(u=>`<div class="dropdown-ubs-item" onclick="selecionarUBS('${u.replace(/'/g,"\\'")}')">${u}<span class="distrito-tag">${DISTRITO_MAP[u]||''}</span></div>`).join('');
     dropdown.classList.add('show');
 }
-
-function selecionarUBS(ubs){ document.getElementById('unidadeSaude').value = ubs; document.getElementById('dropdownUBS').classList.remove('show'); }
-
-document.addEventListener('click', function(e){
-    const dropdown = document.getElementById('dropdownUBS');
-    const input = document.getElementById('unidadeSaude');
-    if(dropdown && input && !input.contains(e.target) && !dropdown.contains(e.target)){ dropdown.classList.remove('show'); }
-    const dropdownSIGTAP = document.getElementById('dropdownSIGTAP');
-    const sigtapInput = document.getElementById('sigtapSearch');
-    if(dropdownSIGTAP && sigtapInput && !sigtapInput.contains(e.target) && !dropdownSIGTAP.contains(e.target)){ dropdownSIGTAP.classList.remove('show'); }
+function selecionarUBS(ubs){ document.getElementById('unidadeSaude').value=ubs; document.getElementById('dropdownUBS').classList.remove('show'); }
+document.addEventListener('click',function(e){
+    const d=document.getElementById('dropdownUBS'), i=document.getElementById('unidadeSaude');
+    if(d&&i&&!i.contains(e.target)&&!d.contains(e.target)) d.classList.remove('show');
+    const ds=document.getElementById('dropdownSIGTAP'), si=document.getElementById('sigtapSearch');
+    if(ds&&si&&!si.contains(e.target)&&!ds.contains(e.target)) ds.classList.remove('show');
 });
 
 // ============================================
@@ -931,14 +635,12 @@ function filtrarSIGTAP(){
     dropdown.innerHTML = listaFiltrada.length === 0 ? '<div class="dropdown-sigtap-item text-slate-400">Nenhum subgrupo encontrado</div>' : listaFiltrada.map(s => `
         <div class="dropdown-sigtap-item" onclick="selecionarSIGTAP('${s.codigo}','${s.nome.replace(/'/g,"\\'")}',${JSON.stringify(s.exames).replace(/"/g,'&quot;')})">
             <span class="font-bold text-sm">${s.codigo}</span><br>
-            <span class="text-xs text-slate-500">${s.nome.substring(0,60)}...</span><br>
+            <span class="text-xs text-slate-500">${s.nome.substring(0,60)}</span><br>
             <span class="text-[10px] text-blue-500">${s.grupo}</span>
         </div>
     `).join('');
     dropdown.classList.add('show');
 }
-
-let subgrupoSelecionado = null;
 
 function selecionarSIGTAP(codigo, nome, exames){
     document.getElementById('sigtapSearch').value = codigo + ' - ' + nome;
@@ -948,18 +650,31 @@ function selecionarSIGTAP(codigo, nome, exames){
     subgrupoSelecionado = { codigo, nome, exames: JSON.parse(exames.replace(/&quot;/g,'"')) };
     examesSelecionados = [];
     atualizarExamesSelecionados();
+    // 🆕 Permite trocar de subgrupo - limpa pesquisa ao clicar
+    document.getElementById('sigtapSearch').value = codigo + ' - ' + nome;
 }
 
+// 🆕 Permitir limpar SIGTAP ao clicar no campo
+document.getElementById('sigtapSearch').addEventListener('click', function(){
+    if(subgrupoSelecionado){
+        this.value = '';
+        document.getElementById('sigtapSelecionado').value = '';
+        subgrupoSelecionado = null;
+        examesSelecionados = [];
+        atualizarExamesSelecionados();
+        toggleDropdownSIGTAP(true);
+    }
+});
+
 // ============================================
-// 🆕 MODAL DE SELEÇÃO DE EXAMES
+// 🆕 MODAL DE SELEÇÃO DE EXAMES (MODERNO)
 // ============================================
 function abrirModalSelecaoExames(){
     if(!subgrupoSelecionado) {
-        // Se não tiver subgrupo, cria um vazio
         subgrupoSelecionado = { codigo: 'OUTRO', nome: 'SubGrupo não especificado', exames: [] };
     }
     document.getElementById('modalSubgrupoNome').textContent = subgrupoSelecionado.nome;
-    document.getElementById('modalSubgrupoCodigo').textContent = subgrupoSelecionado.codigo;
+    document.getElementById('modalSubgrupoCodigo').textContent = 'Código: ' + subgrupoSelecionado.codigo;
     
     const listaEl = document.getElementById('modalListaExames');
     const exames = subgrupoSelecionado.exames || [];
@@ -968,14 +683,14 @@ function abrirModalSelecaoExames(){
         listaEl.innerHTML = '<p class="text-slate-400 text-sm text-center py-4">Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo.</p>';
     } else {
         listaEl.innerHTML = exames.map((e, idx) => `
-            <div class="flex items-center gap-3 p-3 border-2 border-slate-100 rounded-xl mb-2 hover:border-emerald-300 transition-all">
+            <div class="flex items-center gap-3 p-3 bg-white border-2 border-blue-100 rounded-xl mb-2 hover:border-blue-300 transition-all">
                 <div class="flex-1">
                     <p class="text-sm font-bold text-slate-700">${e.codigo}</p>
                     <p class="text-xs text-slate-500">${e.nome}</p>
                 </div>
-                <input type="date" id="modalDataExame_${idx}" class="px-3 py-2 border-2 border-slate-200 rounded-xl text-sm input-field" style="width:150px">
+                <input type="date" id="modalDataExame_${idx}" class="px-3 py-2 border-2 border-blue-200 rounded-xl text-sm" style="width:150px">
                 <button onclick="adicionarExameLista('${e.codigo}','${e.nome.replace(/'/g,"\\'")}',${idx})" 
-                        class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold">
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-xl text-xs font-bold">
                     ➕ Adicionar
                 </button>
             </div>
@@ -990,9 +705,18 @@ function fecharModalExames(){ document.getElementById('modalSelecaoExames').clas
 function adicionarExameLista(codigo, nome, idx){
     const dataEl = document.getElementById('modalDataExame_' + idx);
     const data = dataEl ? dataEl.value : '';
+    // Verificar duplicata
+    if(examesSelecionados.find(e => e.codigo === codigo)){
+        alert('⚠️ Este exame já foi adicionado!');
+        return;
+    }
     examesSelecionados.push({ codigo, nome, data: data || null });
     atualizarExamesSelecionados();
-    alert('✅ Exame adicionado: ' + nome);
+    // Feedback visual
+    const btn = event.target;
+    btn.textContent = '✅';
+    btn.classList.add('bg-green-500');
+    setTimeout(() => { btn.textContent = '➕ Adicionar'; btn.classList.remove('bg-green-500'); }, 1000);
 }
 
 function adicionarOutroExame(){
@@ -1000,12 +724,15 @@ function adicionarOutroExame(){
     const nome = document.getElementById('modalOutroNome').value.trim();
     const data = document.getElementById('modalOutroData').value;
     if(!codigo || !nome) return alert('❌ Informe o código e nome do exame!');
+    if(examesSelecionados.find(e => e.codigo === codigo)){
+        alert('⚠️ Este exame já foi adicionado!');
+        return;
+    }
     examesSelecionados.push({ codigo, nome, data: data || null });
     atualizarExamesSelecionados();
     document.getElementById('modalOutroCodigo').value = '';
     document.getElementById('modalOutroNome').value = '';
     document.getElementById('modalOutroData').value = '';
-    alert('✅ Exame "Outro" adicionado!');
 }
 
 function atualizarExamesSelecionados(){
@@ -1013,15 +740,12 @@ function atualizarExamesSelecionados(){
     const msgVazio = document.getElementById('examesVazioMsg');
     
     if(examesSelecionados.length === 0){
-        container.innerHTML = '';
-        container.appendChild(msgVazio);
-        msgVazio.style.display = 'block';
+        container.innerHTML = '<p class="text-xs text-slate-400" id="examesVazioMsg">Nenhum exame selecionado. Escolha um SubGrupo SIGTAP acima.</p>';
     } else {
-        msgVazio.style.display = 'none';
         container.innerHTML = examesSelecionados.map((e, i) => `
             <div class="exame-selecionado-row">
                 <div class="flex-1">
-                    <p class="text-sm font-bold text-emerald-700">🧪 ${e.codigo} - ${e.nome}</p>
+                    <p class="text-sm font-bold text-red-700">🧪 ${e.codigo} - ${e.nome}</p>
                     ${e.data ? `<p class="text-xs text-slate-500">📅 ${formatarData(e.data)}</p>` : '<p class="text-xs text-amber-500">⚠️ Sem data</p>'}
                 </div>
                 <button onclick="removerExameSelecionado(${i})" class="btn-remove-exame" title="Remover">✕</button>
@@ -1047,7 +771,7 @@ function limparFormularioSolicitar(){
     document.getElementById('sexo').value = '';
     document.getElementById('racaCor').value = '';
     document.getElementById('sigtapSelecionado').value = '';
-    document.getElementById('btnAbrirModalExames').disabled = true;
+    document.getElementById('btnAbrirModalExames').disabled = false;
     examesSelecionados = [];
     subgrupoSelecionado = null;
     atualizarExamesSelecionados();
@@ -1112,13 +836,8 @@ document.getElementById('btnConfirmarRedefinir').addEventListener('click', async
 // ============================================
 // ATUALIZAÇÃO AUTOMÁTICA
 // ============================================
-function iniciarAtualizacaoAutomatica(){
-    pararAtualizacaoAutomatica();
-    intervaloAtualizacao = setInterval(atualizarHistoricoSilencioso, 15000);
-}
-function pararAtualizacaoAutomatica(){
-    if(intervaloAtualizacao){ clearInterval(intervaloAtualizacao); intervaloAtualizacao = null; }
-}
+function iniciarAtualizacaoAutomatica(){ pararAtualizacaoAutomatica(); intervaloAtualizacao = setInterval(atualizarHistoricoSilencioso, 15000); }
+function pararAtualizacaoAutomatica(){ if(intervaloAtualizacao){ clearInterval(intervaloAtualizacao); intervaloAtualizacao = null; } }
 async function atualizarHistoricoSilencioso(){
     if(!usuarioLogado) return;
     try {
@@ -1136,63 +855,30 @@ async function atualizarHistoricoSilencioso(){
 }
 
 // ============================================
-// FILTRO DE BUSCA DO ADMIN
+// FILTRO DE BUSCA DO ADMIN + RENDERIZAR HISTÓRICO
 // ============================================
 function filtrarHistoricoAdmin(){
     const busca = document.getElementById('buscaGlobalRetornos')?.value?.toLowerCase() || '';
     if(!todosRetornos.length) return;
     let filtrados = todosRetornos;
-    if(busca){
-        filtrados = todosRetornos.filter(r => 
-            (r.paciente_nome || '').toLowerCase().includes(busca) ||
-            (r.paciente_cpf || '').includes(busca) ||
-            (r.numero_solicitacao || '').includes(busca) ||
-            String(r.id).includes(busca)
-        );
-    }
+    if(busca){ filtrados = todosRetornos.filter(r => (r.paciente_nome||'').toLowerCase().includes(busca) || (r.paciente_cpf||'').includes(busca) || (r.numero_solicitacao||'').includes(busca) || String(r.id).includes(busca)); }
     document.getElementById('contadorRetornos').textContent = filtrados.length + ' solicitações encontradas';
     renderizarHistoricoHTML(filtrados);
 }
 
-// ============================================
-// RENDERIZAR HISTÓRICO HTML
-// ============================================
 function renderizarHistoricoHTML(lista = null){
     const dados = lista || retornosLista;
-    if(dados.length === 0){
-        document.getElementById('historicoLista').innerHTML = '<p class="text-slate-400 text-center py-8"><i class="fas fa-inbox text-4xl mb-3 block"></i>Nenhuma solicitação encontrada.</p>';
-        return;
-    }
+    if(dados.length === 0){ document.getElementById('historicoLista').innerHTML = '<p class="text-slate-400 text-center py-8"><i class="fas fa-inbox text-4xl mb-3 block"></i>Nenhuma solicitação.</p>'; return; }
     document.getElementById('historicoLista').innerHTML = dados.map(r => {
-        const statusBadge = r.status === 'solicitado' ? 'bg-amber-100 text-amber-700' : 
-                           r.status === 'apto_retorno' ? 'bg-emerald-100 text-emerald-700' : 
-                           r.status === 'agendado' ? 'bg-indigo-100 text-indigo-700' : 
-                           r.status === 'retorno_recepcionado' ? 'bg-teal-100 text-teal-700' : 'bg-purple-100 text-purple-700';
-        const statusTexto = r.status === 'solicitado' ? '⏳ Aguardando' : 
-                           r.status === 'apto_retorno' ? '✅ Apto Retorno' : 
-                           r.status === 'agendado' ? '📅 Agendado' : 
-                           r.status === 'retorno_recepcionado' ? '📋 Recepcionado' : r.status;
-        let botoesAcao = '';
-        if(r.status === 'solicitado') botoesAcao += `<button onclick="editarRetorno(${r.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-edit"></i> Editar</button>`;
-        if(usuarioLogado && usuarioLogado.tipo === 'admin'){
-            botoesAcao += `<button onclick="excluirRetornoOCI(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-trash"></i> Excluir (OCI)</button>`;
-            botoesAcao += `<button onclick="extornarRetornoOCI(${r.id})" class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-undo"></i> Extornar (OCI)</button>`;
+        const sb = r.status==='solicitado'?'bg-amber-100 text-amber-700':r.status==='apto_retorno'?'bg-emerald-100 text-emerald-700':r.status==='agendado'?'bg-indigo-100 text-indigo-700':r.status==='retorno_recepcionado'?'bg-teal-100 text-teal-700':'bg-purple-100 text-purple-700';
+        const st = r.status==='solicitado'?'⏳ Aguardando':r.status==='apto_retorno'?'✅ Apto Retorno':r.status==='agendado'?'📅 Agendado':r.status==='retorno_recepcionado'?'📋 Recepcionado':r.status;
+        let btns = '';
+        if(r.status==='solicitado') btns += `<button onclick="editarRetorno(${r.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-edit"></i> Editar</button>`;
+        if(usuarioLogado&&usuarioLogado.tipo==='admin'){
+            btns += `<button onclick="excluirRetornoOCI(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-trash"></i> Excluir (OCI)</button>`;
+            btns += `<button onclick="extornarRetornoOCI(${r.id})" class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-undo"></i> Extornar (OCI)</button>`;
         }
-        return `<div class="border-2 border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-all">
-            <div class="flex justify-between items-start flex-wrap gap-2">
-                <div>
-                    <p class="font-bold text-slate-800">📝 Solicitação #${r.id}</p>
-                    <p class="text-xs text-slate-500">📅 ${formatarData(r.created_at)} | 🏥 ${r.unidade_saude || '—'} | 👨‍⚕️ ${r.medico_solicitante || '—'}</p>
-                    <p class="text-xs text-slate-500">👤 ${r.paciente_nome || '—'} | CPF: ${(r.paciente_cpf || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}</p>
-                    ${r.prontuario_vivver ? `<p class="text-xs text-purple-600 font-bold">📋 Prontuário: ${r.prontuario_vivver}</p>` : ''}
-                    ${r.codigo_sigtap ? `<p class="text-xs text-amber-600 font-bold">🏷️ SIGTAP: ${r.codigo_sigtap}</p>` : ''}
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                    <span class="px-2 py-1 rounded-full text-xs font-bold ${statusBadge}">${statusTexto}</span>
-                    <div class="flex flex-wrap gap-1 justify-end">${botoesAcao}</div>
-                </div>
-            </div>
-        </div>`;
+        return `<div class="border-2 border-slate-200 rounded-xl p-4 hover:border-blue-300"><div class="flex justify-between items-start flex-wrap gap-2"><div><p class="font-bold">📝 #${r.id}</p><p class="text-xs text-slate-500">📅 ${formatarData(r.created_at)} | 👤 ${r.paciente_nome||'—'}</p><p class="text-xs">🔢 ${r.numero_solicitacao||'—'} | 🏷️ ${r.codigo_sigtap||'—'}</p></div><div class="flex flex-col items-end gap-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${sb}">${st}</span><div class="flex flex-wrap gap-1">${btns}</div></div></div></div>`;
     }).join('');
 }
 
@@ -1203,277 +889,213 @@ async function carregarPortal(){
     showLoading();
     document.getElementById('portalNome').textContent = usuarioLogado.nome;
     document.getElementById('sidebarNomePortal').textContent = usuarioLogado.nome || 'Usuário';
-    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
-    document.getElementById('sidebarTipoPortal').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário';
-    document.getElementById('sidebarAdminPortalSection').classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
+    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome||'U')[0].toUpperCase();
+    document.getElementById('sidebarTipoPortal').textContent = usuarioLogado.tipo==='admin'?'👑 Administrador':'👤 Usuário';
+    document.getElementById('sidebarAdminPortalSection').classList.toggle('hidden', usuarioLogado.tipo!=='admin');
     
     let query = db.from('retornos_solicitados').select('*').order('created_at', {ascending: false});
-    if(usuarioLogado.tipo !== 'admin'){ query = query.eq('paciente_id', usuarioLogado.id); }
+    if(usuarioLogado.tipo!=='admin') query = query.eq('paciente_id', usuarioLogado.id);
     const { data: rets } = await query;
     retornosLista = rets || [];
-    if(usuarioLogado.tipo === 'admin') todosRetornos = [...retornosLista];
+    if(usuarioLogado.tipo==='admin') todosRetornos = [...retornosLista];
     
-    if(usuarioLogado.tipo === 'admin'){
-        document.getElementById('buscaAdminHistorico').style.display = 'block';
-        document.getElementById('historicoTitulo').textContent = '📋 Todas as Solicitações';
-    } else {
-        document.getElementById('buscaAdminHistorico').style.display = 'none';
-        document.getElementById('historicoTitulo').textContent = 'Minhas Solicitações';
-    }
-    
-    const { data: esps } = await db.from('especialidades_oci').select('*');
-    especialidadesLista = esps || [];
+    document.getElementById('buscaAdminHistorico').style.display = usuarioLogado.tipo==='admin'?'block':'none';
+    document.getElementById('historicoTitulo').textContent = usuarioLogado.tipo==='admin'?'📋 Todas as Solicitações':'Minhas Solicitações';
     
     hideLoading();
     
-    // 🆕 CARDS SIMPLIFICADOS
     document.getElementById('infoCards').innerHTML = `
-        <div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-emerald-500">
-            <p class="text-xs text-slate-500 uppercase font-bold">👤 Usuário Logado</p>
-            <p class="text-lg font-extrabold text-slate-800">${usuarioLogado.nome || '—'}</p>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-blue-500">
-            <p class="text-xs text-slate-500 uppercase font-bold">📋 Total de Solicitações</p>
-            <p class="text-lg font-extrabold text-slate-800">${retornosLista.length}</p>
-        </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-emerald-500"><p class="text-xs text-slate-500 uppercase font-bold">👤 Usuário Logado</p><p class="text-lg font-extrabold text-slate-800">${usuarioLogado.nome||'—'}</p></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-blue-500"><p class="text-xs text-slate-500 uppercase font-bold">📋 Total de Solicitações</p><p class="text-lg font-extrabold text-slate-800">${retornosLista.length}</p></div>
     `;
-    
     renderizarHistoricoHTML();
-    if(usuarioLogado.tipo === 'admin') document.getElementById('contadorRetornos').textContent = retornosLista.length + ' solicitações no sistema';
+    if(usuarioLogado.tipo==='admin') document.getElementById('contadorRetornos').textContent = retornosLista.length + ' solicitações no sistema';
 }
 
 // ============================================
 // SWITCH DE ABAS
 // ============================================
 function switchTab(tabId){
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active', 'text-emerald-600'); b.classList.add('text-slate-400'); });
-    const tabMobile = document.getElementById('tabMobile-' + tabId);
-    if(tabMobile){ tabMobile.classList.add('active', 'text-emerald-600'); }
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById('content-' + tabId).classList.add('active');
+    document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active','text-emerald-600');b.classList.add('text-slate-400');});
+    const tm = document.getElementById('tabMobile-'+tabId); if(tm) tm.classList.add('active','text-emerald-600');
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    document.getElementById('content-'+tabId).classList.add('active');
 }
 
 // ============================================
 // VALIDAR E SOLICITAR RETORNO
 // ============================================
 document.getElementById('btnValidarRetorno').addEventListener('click', async () => {
-    const numeroSolicitacao = document.getElementById('numeroSolicitacao').value.trim();
-    const prontuarioVivver = document.getElementById('prontuarioVivver').value.trim();
-    const unidade = document.getElementById('unidadeSaude').value.trim();
-    const cep = document.getElementById('cep').value.trim();
-    const endereco = document.getElementById('endereco').value.trim();
-    const numeroResidencia = document.getElementById('numeroResidencia').value.trim();
-    const bairro = document.getElementById('bairro').value.trim();
-    const municipio = document.getElementById('municipio').value.trim();
-    const sexo = document.getElementById('sexo').value;
-    const racaCor = document.getElementById('racaCor').value;
-    const codigoSigtap = document.getElementById('sigtapSelecionado').value;
-    const cid = document.getElementById('cid').value.trim();
+    const ns = document.getElementById('numeroSolicitacao').value.trim();
+    const pv = document.getElementById('prontuarioVivver').value.trim();
+    const un = document.getElementById('unidadeSaude').value.trim();
+    const cs = document.getElementById('sigtapSelecionado').value;
     
-    if(!numeroSolicitacao) return alert('❌ Informe o Nº da Solicitação!');
-    if(!unidade) return alert('❌ Selecione a Unidade de Saúde!');
-    if(!codigoSigtap) return alert('❌ Selecione o SubGrupo SIGTAP!');
-    if(examesSelecionados.length === 0) return alert('❌ Selecione pelo menos 1 exame!');
+    if(!ns) return alert('❌ Informe o Nº da Solicitação!');
+    if(!un) return alert('❌ Selecione a Unidade de Saúde!');
+    if(!cs) return alert('❌ Selecione o SubGrupo SIGTAP!');
+    if(examesSelecionados.length===0) return alert('❌ Selecione pelo menos 1 exame!');
     
     showLoading();
-    const { data: existentes } = await db.from('retornos_solicitados').select('*').eq('numero_solicitacao', numeroSolicitacao).eq('prontuario_vivver', prontuarioVivver);
-    if(existentes && existentes.length > 0){
-        hideLoading();
-        return alert('❌ Esta solicitação já existe! Não é possível duplicar!');
-    }
+    const { data: existentes } = await db.from('retornos_solicitados').select('*').eq('numero_solicitacao',ns).eq('prontuario_vivver',pv);
+    if(existentes&&existentes.length>0){ hideLoading(); return alert('❌ Esta solicitação já existe!'); }
     
-    const { data: consulta, error } = await db.from('primeira_consulta_recepcionados').select('*').or(`numero_solicitacao.eq.${numeroSolicitacao},id.eq.${numeroSolicitacao}`).single();
-    if(error || !consulta){ hideLoading(); return mostrarMsg('msgSolicitar', '❌ Nº Solicitação NÃO encontrado!', 'rose'); }
+    const { data: consulta, error } = await db.from('primeira_consulta_recepcionados').select('*').or(`numero_solicitacao.eq.${ns},id.eq.${ns}`).single();
+    if(error||!consulta){ hideLoading(); return mostrarMsg('msgSolicitar','❌ Nº Solicitação NÃO encontrado!','rose'); }
     
     dadosPrimeiraConsulta = consulta;
     document.getElementById('btnConfirmarRetorno').onclick = async () => {
-        await confirmarRetorno({numeroSolicitacao, prontuarioVivver, unidade, cep, endereco, numeroResidencia, bairro, municipio, sexo, racaCor, codigoSigtap, cid, consulta});
+        showLoading();
+        await db.from('retornos_solicitados').insert([{
+            paciente_id: usuarioLogado.id, paciente_nome: consulta.nome_paciente, paciente_cpf: consulta.cpf_paciente,
+            numero_solicitacao: ns, consulta_id: consulta.id,
+            telefone_paciente: document.getElementById('telefoneRetorno').value,
+            unidade_saude: un, prontuario_vivver: pv, nome_mae: consulta.nome_mae,
+            medico_solicitante: consulta.medico_solicitante, local_consulta: consulta.local_consulta,
+            especialidade_id: consulta.especialidade_id, data_primeira_consulta: consulta.data_agendada,
+            cep: document.getElementById('cep').value, endereco: document.getElementById('endereco').value,
+            numero_residencia: document.getElementById('numeroResidencia').value,
+            bairro: document.getElementById('bairro').value, municipio: document.getElementById('municipio').value,
+            sexo: document.getElementById('sexo').value, raca_cor: document.getElementById('racaCor').value,
+            codigo_sigtap: cs, cid: document.getElementById('cid').value,
+            exames_realizados: JSON.stringify(examesSelecionados),
+            usuario_cadastrou: usuarioLogado.nome, status: 'solicitado'
+        }]);
+        await db.from('consultas_oci').update({ status: 'apto_retorno' }).eq('id', consulta.id);
+        hideLoading(); fecharModalConfirmacao();
+        mostrarMsg('msgSolicitar','✅ Solicitação cadastrada!','emerald');
+        limparFormularioSolicitar(); carregarPortal();
     };
     document.getElementById('modalConfirmacao').classList.add('show');
     hideLoading();
 });
-
 function fecharModalConfirmacao(){ document.getElementById('modalConfirmacao').classList.remove('show'); }
 
-async function confirmarRetorno(dados){
-    showLoading();
-    const { error } = await db.from('retornos_solicitados').insert([{
-        paciente_id: usuarioLogado.id,
-        paciente_nome: dados.consulta.nome_paciente,
-        paciente_cpf: dados.consulta.cpf_paciente,
-        numero_solicitacao: dados.numeroSolicitacao,
-        consulta_id: dados.consulta.id,
-        telefone_paciente: document.getElementById('telefoneRetorno').value,
-        unidade_saude: dados.unidade,
-        prontuario_vivver: dados.prontuarioVivver,
-        nome_mae: dados.consulta.nome_mae,
-        medico_solicitante: dados.consulta.medico_solicitante,
-        local_consulta: dados.consulta.local_consulta,
-        especialidade_id: dados.consulta.especialidade_id,
-        data_primeira_consulta: dados.consulta.data_agendada,
-        cep: dados.cep, endereco: dados.endereco, numero_residencia: dados.numeroResidencia,
-        bairro: dados.bairro, municipio: dados.municipio, sexo: dados.sexo, raca_cor: dados.racaCor,
-        codigo_sigtap: dados.codigoSigtap, cid: dados.cid,
-        exames_realizados: JSON.stringify(examesSelecionados),
-        usuario_cadastrou: usuarioLogado.nome,
-        status: 'solicitado'
-    }]);
-    if(error){ hideLoading(); alert('❌ Erro: ' + error.message); return; }
-    await db.from('consultas_oci').update({ status: 'apto_retorno' }).eq('id', dados.consulta.id);
-    hideLoading();
-    fecharModalConfirmacao();
-    mostrarMsg('msgSolicitar', '✅ Solicitação cadastrada! Status OCI atualizado!', 'emerald');
-    limparFormularioSolicitar();
-    carregarPortal();
-}
-
-// 🆕 PREENCHIMENTO AUTOMÁTICO + LIMPAR AO APAGAR
+// ============================================
+// PREENCHIMENTO AUTOMÁTICO + LIMPAR AO APAGAR
+// ============================================
 let timeoutBusca = null;
 document.getElementById('numeroSolicitacao').addEventListener('input', function(){
     clearTimeout(timeoutBusca);
     const valor = this.value.trim();
-    
-    // 🆕 LIMPAR TUDO SE APAGAR O NÚMERO
-    if(valor.length === 0){
-        const campos = ['nomePaciente','validarNomeMae','telefoneRetorno','especialidadeRetorno',
-                        'medicoSolicitante','localConsulta','dataPrimeiraConsulta','prontuarioVivver'];
-        campos.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    if(valor.length===0){
+        ['nomePaciente','validarNomeMae','telefoneRetorno','especialidadeRetorno','medicoSolicitante','localConsulta','dataPrimeiraConsulta','prontuarioVivver'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
         return;
     }
-    
-    if(valor.length >= 4){
-        timeoutBusca = setTimeout(async () => {
-            try {
-                const { data: consulta, error } = await db.from('primeira_consulta_recepcionados').select('*').or(`numero_solicitacao.eq.${valor},id.eq.${valor}`).single();
-                if(consulta && !error){
-                    document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
-                    document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
-                    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
-                    document.getElementById('localConsulta').value = consulta.local_consulta || '';
-                    document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
-                    const nomes = {1:'🫀 Cardiologia', 2:'🦴 Ortopedia', 3:'🎗️ Oncologia', 4:'👁️ Oftalmologia', 5:'👂 Otorrino'};
-                    document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
+    if(valor.length>=4){
+        timeoutBusca=setTimeout(async()=>{
+            try{
+                const{data:consulta}=await db.from('primeira_consulta_recepcionados').select('*').or(`numero_solicitacao.eq.${valor},id.eq.${valor}`).single();
+                if(consulta){
+                    document.getElementById('nomePaciente').value=consulta.nome_paciente||'';
+                    document.getElementById('validarNomeMae').value=consulta.nome_mae||'';
+                    document.getElementById('medicoSolicitante').value=consulta.medico_solicitante||'';
+                    document.getElementById('localConsulta').value=consulta.local_consulta||'';
+                    document.getElementById('dataPrimeiraConsulta').value=formatarData(consulta.data_agendada);
+                    const nomes={1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
+                    document.getElementById('especialidadeRetorno').value=nomes[consulta.especialidade_id]||'';
                     if(consulta.paciente_id){
-                        const { data: pac } = await db.from('pacientes').select('prontuario, telefone').eq('id', consulta.paciente_id).single();
-                        if(pac){
-                            document.getElementById('prontuarioVivver').value = pac.prontuario || '';
-                            document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
-                        }
+                        const{data:pac}=await db.from('pacientes').select('prontuario,telefone').eq('id',consulta.paciente_id).single();
+                        if(pac){document.getElementById('prontuarioVivver').value=pac.prontuario||'';document.getElementById('telefoneRetorno').value=formatarTelefone(pac.telefone||'');}
                     }
-                    mostrarMsg('msgSolicitar', '✅ Dados preenchidos!', 'emerald');
+                    mostrarMsg('msgSolicitar','✅ Dados preenchidos!','emerald');
                 }
-            } catch(e) {}
-        }, 800);
+            }catch(e){}
+        },800);
     }
 });
 
 // 🆕 BUSCAR CEP
 async function buscarCEP(cep){
-    cep = cep.replace(/\D/g,'');
-    if(cep.length !== 8) return;
-    try {
-        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-        const data = await response.json();
-        if(!data.erro){
-            document.getElementById('endereco').value = data.logradouro || '';
-            document.getElementById('bairro').value = data.bairro || '';
-            document.getElementById('municipio').value = data.localidade || '';
-        }
-    } catch(e) {}
+    cep=cep.replace(/\D/g,''); if(cep.length!==8)return;
+    try{const r=await fetch(`https://viacep.com.br/ws/${cep}/json/`);const d=await r.json();if(!d.erro){document.getElementById('endereco').value=d.logradouro||'';document.getElementById('bairro').value=d.bairro||'';document.getElementById('municipio').value=d.localidade||'';}}catch(e){}
 }
-document.getElementById('cep').addEventListener('input', function(){
-    const cep = this.value.replace(/\D/g,'');
-    if(cep.length === 8) buscarCEP(cep);
-});
+document.getElementById('cep').addEventListener('input',function(){const c=this.value.replace(/\D/g,'');if(c.length===8)buscarCEP(c);});
 
 // ============================================
 // EDITAR / EXCLUIR / EXTORNAR
 // ============================================
 function editarRetorno(id){
-    const retorno = retornosLista.find(r => r.id === id);
-    if(!retorno) return;
-    document.getElementById('editRetornoId').value = retorno.id;
-    document.getElementById('editRetornoNumSol').value = retorno.numero_solicitacao || '—';
-    document.getElementById('editRetornoTelefone').value = formatarTelefone(retorno.telefone_paciente);
-    document.getElementById('editRetornoProntuario').value = retorno.prontuario_vivver || '';
-    document.getElementById('editRetornoUnidade').value = retorno.unidade_saude || '';
+    const r=retornosLista.find(x=>x.id===id); if(!r)return;
+    document.getElementById('editRetornoId').value=r.id; document.getElementById('editRetornoNumSol').value=r.numero_solicitacao||'—';
+    document.getElementById('editRetornoTelefone').value=formatarTelefone(r.telefone_paciente);
+    document.getElementById('editRetornoProntuario').value=r.prontuario_vivver||'';
+    document.getElementById('editRetornoUnidade').value=r.unidade_saude||'';
     document.getElementById('modalEditarRetorno').classList.add('show');
 }
 async function salvarEdicaoRetorno(){
-    const id = parseInt(document.getElementById('editRetornoId').value);
-    const telefone = document.getElementById('editRetornoTelefone').value.replace(/\D/g,'');
-    const prontuario = document.getElementById('editRetornoProntuario').value.trim();
-    const unidade = document.getElementById('editRetornoUnidade').value.trim();
+    const id=parseInt(document.getElementById('editRetornoId').value);
     showLoading();
-    await db.from('retornos_solicitados').update({ telefone_paciente: telefone, prontuario_vivver: prontuario, unidade_saude: unidade }).eq('id', id);
-    hideLoading();
-    alert('✅ Atualizado!');
-    document.getElementById('modalEditarRetorno').classList.remove('show');
-    carregarPortal();
+    await db.from('retornos_solicitados').update({telefone_paciente:document.getElementById('editRetornoTelefone').value.replace(/\D/g,''),prontuario_vivver:document.getElementById('editRetornoProntuario').value.trim(),unidade_saude:document.getElementById('editRetornoUnidade').value.trim()}).eq('id',id);
+    hideLoading(); alert('✅ Atualizado!'); document.getElementById('modalEditarRetorno').classList.remove('show'); carregarPortal();
 }
 async function excluirRetornoOCI(id){
-    if(usuarioLogado.tipo !== 'admin') return alert('❌ Apenas Administrador.');
-    if(!confirm('⚠️ Excluir e voltar status no OCI?')) return;
-    showLoading();
-    const retorno = retornosLista.find(r => r.id === id);
-    await db.from('retornos_solicitados').delete().eq('id', id);
-    if(retorno?.consulta_id) await db.from('consultas_oci').update({ status: 'em_andamento' }).eq('id', retorno.consulta_id);
-    hideLoading();
-    carregarPortal();
+    if(usuarioLogado.tipo!=='admin')return alert('❌ Apenas Administrador.');
+    if(!confirm('⚠️ Excluir e voltar status no OCI?'))return;
+    showLoading(); const r=retornosLista.find(x=>x.id===id);
+    await db.from('retornos_solicitados').delete().eq('id',id);
+    if(r?.consulta_id)await db.from('consultas_oci').update({status:'em_andamento'}).eq('id',r.consulta_id);
+    hideLoading(); carregarPortal();
 }
 async function extornarRetornoOCI(id){
-    if(usuarioLogado.tipo !== 'admin') return alert('❌ Apenas Administrador.');
-    if(!confirm('⚠️ Extornar? Status voltará para Aguardando.')) return;
-    showLoading();
-    const retorno = retornosLista.find(r => r.id === id);
-    await db.from('retornos_solicitados').update({ status: 'solicitado' }).eq('id', id);
-    if(retorno?.consulta_id) await db.from('consultas_oci').update({ status: 'aguardando_exame' }).eq('id', retorno.consulta_id);
-    hideLoading();
-    carregarPortal();
+    if(usuarioLogado.tipo!=='admin')return alert('❌ Apenas Administrador.');
+    if(!confirm('⚠️ Extornar?'))return;
+    showLoading(); const r=retornosLista.find(x=>x.id===id);
+    await db.from('retornos_solicitados').update({status:'solicitado'}).eq('id',id);
+    if(r?.consulta_id)await db.from('consultas_oci').update({status:'aguardando_exame'}).eq('id',r.consulta_id);
+    hideLoading(); carregarPortal();
 }
 
 // ============================================
-// PAINEL ADMINISTRADOR (RESUMIDO)
+// PAINEL ADMINISTRADOR
 // ============================================
 function abrirModalAdminPortal(){ document.getElementById('modalAdminPortal').classList.add('show'); switchAdminTab('usuarios'); renderizarListaUsuarios(); }
 function fecharModalAdminPortal(){ document.getElementById('modalAdminPortal').classList.remove('show'); }
-function switchAdminTab(tabId){ /* ... mesma lógica anterior ... */ }
-function preencherCPFPortal(cpf){ document.getElementById('adminPortalCPF').value = cpf; }
-function gerarCPFPortal(){ document.getElementById('adminPortalCPF').value = gerarCPFValido(); }
-async function renderizarListaUsuarios(){ /* ... mesma lógica anterior ... */ }
-async function cadastrarUsuarioAdmin(){ /* ... mesma lógica anterior ... */ }
-function editarUsuario(u){ /* ... mesma lógica anterior ... */ }
-async function salvarEdicaoUsuario(){ /* ... mesma lógica anterior ... */ }
-async function excluirUsuario(id){ /* ... mesma lógica anterior ... */ }
-async function importarCSVPortal(){ /* ... mesma lógica anterior ... */ }
-
-// ============================================
-// FECHAR MODAIS
-// ============================================
-document.getElementById('modalConfirmacao').addEventListener('click', function(e){ if(e.target === this) fecharModalConfirmacao(); });
-document.getElementById('modalSelecaoExames').addEventListener('click', function(e){ if(e.target === this) fecharModalExames(); });
-document.getElementById('modalAdminPortal').addEventListener('click', function(e){ if(e.target === this) fecharModalAdminPortal(); });
-document.getElementById('modalEditarUsuario').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('show'); });
-document.getElementById('modalEditarRetorno').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('show'); });
-
-// ============================================
-// LOGOUT
-// ============================================
-function logout(){ 
-    pararAtualizacaoAutomatica();
-    usuarioLogado = null; 
-    showScreen('screenLogin'); 
+function switchAdminTab(tabId){
+    document.querySelectorAll('.admin-portal-tab-btn').forEach(b=>{b.classList.remove('text-purple-600','border-b-2','border-purple-600');b.classList.add('text-slate-400');});
+    document.getElementById('adminPortalTab-'+tabId).classList.add('text-purple-600','border-b-2','border-purple-600');
+    document.querySelectorAll('.admin-portal-content').forEach(c=>c.classList.add('hidden'));
+    document.getElementById('adminPortalContent-'+tabId).classList.remove('hidden');
 }
+function preencherCPFPortal(cpf){ document.getElementById('adminPortalCPF').value=cpf; }
+function gerarCPFPortal(){ document.getElementById('adminPortalCPF').value=gerarCPFValido(); }
+async function renderizarListaUsuarios(){
+    showLoading(); const{data:usuarios}=await db.from('pacientes_portal').select('*').order('nome'); hideLoading();
+    const busca=document.getElementById('adminPortalBusca')?.value?.toLowerCase()||'';
+    let lista=(usuarios||[]).filter(u=>!busca||u.nome.toLowerCase().includes(busca)||(u.cpf||'').includes(busca));
+    document.getElementById('adminPortalTabelaUsuarios').innerHTML=lista.map(u=>`<tr class="hover:bg-slate-50 border-t"><td class="px-3 py-2 font-bold text-sm">${u.nome}</td><td class="px-3 py-2 text-sm">${(u.cpf||'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}</td><td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td><td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo==='admin'?'bg-purple-100 text-purple-600':'bg-blue-100 text-blue-600'}">${u.tipo==='admin'?'👑 Admin':'👤 Usuário'}</span></td><td class="px-3 py-2"><div class="flex gap-2"><button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário</td></tr>';
+}
+async function cadastrarUsuarioAdmin(){
+    const n=document.getElementById('adminPortalNome')?.value?.trim(), c=document.getElementById('adminPortalCPF')?.value?.replace(/\D/g,''), m=document.getElementById('adminPortalNomeMae')?.value?.trim(), cn=document.getElementById('adminPortalCidadeNatal')?.value?.trim(), t=document.getElementById('adminPortalTelefone')?.value?.replace(/\D/g,''), s=document.getElementById('adminPortalSenha')?.value?.trim(), tp=document.getElementById('adminPortalTipo')?.value||'usuario';
+    if(!n||!c||!m||!cn||!t||!s)return alert('❌ Preencha todos os campos!');
+    if(!validarCPF(c))return alert('❌ CPF inválido!'); if(s.length!==6)return alert('❌ Senha 6 dígitos!');
+    showLoading(); const{data:ex}=await db.from('pacientes_portal').select('id').eq('cpf',c).single();
+    if(ex){hideLoading();return alert('❌ CPF já cadastrado!');}
+    await db.from('pacientes_portal').insert([{nome:n,cpf:c,nome_mae:m,cidade_nascimento:cn,telefone:t,senha:s,email:'',tipo:tp}]);
+    hideLoading(); alert('✅ Cadastrado!'); switchAdminTab('usuarios'); renderizarListaUsuarios();
+}
+function editarUsuario(u){ /* ... */ }
+async function salvarEdicaoUsuario(){ /* ... */ }
+async function excluirUsuario(id){ if(id===usuarioLogado?.id)return alert('❌ Não pode!'); if(!confirm('Excluir?'))return; showLoading(); await db.from('pacientes_portal').delete().eq('id',id); hideLoading(); alert('✅ Excluído!'); renderizarListaUsuarios(); }
+async function importarCSVPortal(){ /* ... */ }
 
-document.getElementById('loginSenha').addEventListener('keydown', (e) => { if(e.key === 'Enter') document.getElementById('btnLogin').click(); });
+// FECHAR MODAIS
+document.getElementById('modalConfirmacao').addEventListener('click',function(e){if(e.target===this)fecharModalConfirmacao();});
+document.getElementById('modalSelecaoExames').addEventListener('click',function(e){if(e.target===this)fecharModalExames();});
+document.getElementById('modalAdminPortal').addEventListener('click',function(e){if(e.target===this)fecharModalAdminPortal();});
+document.getElementById('modalEditarUsuario').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+document.getElementById('modalEditarRetorno').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+
+// LOGOUT
+function logout(){ pararAtualizacaoAutomatica(); usuarioLogado=null; showScreen('screenLogin'); }
+document.getElementById('loginSenha').addEventListener('keydown',(e)=>{if(e.key==='Enter')document.getElementById('btnLogin').click();});
 
 console.log('✅ PORTAL DO PACIENTE v7.0 CARREGADO!');
 console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
-console.log('🔐 Trava anti-duplicidade ativa');
-console.log('🧪 SIGTAP + Exames dinâmicos');
-console.log('🔄 Excluir/Extornar (Sistema OCI)');
-console.log('🧹 Limpeza automática ao apagar Nº Solicitação');
+console.log('❤️ EXAMES - PREENCHER (vermelho)');
+console.log('🔴 Modal moderno com fundo azul');
+console.log('🔄 SIGTAP permite trocar de subgrupo');
 </script>
 </body>
 </html>
