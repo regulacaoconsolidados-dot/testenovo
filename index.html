@@ -761,34 +761,39 @@ function filtrarSIGTAP(){
     let listaFiltrada = termo ? TODOS_SUBGRUPOS.filter(s => 
         s.nome.toLowerCase().includes(termo) || s.codigo.includes(termo) || s.grupo.toLowerCase().includes(termo)
     ) : TODOS_SUBGRUPOS;
-    dropdown.innerHTML = listaFiltrada.length === 0 ? '<div class="dropdown-sigtap-item text-slate-400">Nenhum subgrupo encontrado</div>' : listaFiltrada.map(s => `
-        <div class="dropdown-sigtap-item" onclick="selecionarSIGTAP('${s.codigo}','${s.nome.replace(/'/g,"\\'")}',${JSON.stringify(s.exames).replace(/"/g,'&quot;')})">
+    
+    dropdown.innerHTML = listaFiltrada.length === 0 ? 
+        '<div class="dropdown-sigtap-item text-slate-400">Nenhum subgrupo encontrado</div>' : 
+        listaFiltrada.map((s, i) => `
+        <div class="dropdown-sigtap-item" onclick="selecionarSIGTAP(${i})">
             <span class="font-bold text-sm">${s.codigo}</span><br>
             <span class="text-xs text-slate-500">${s.nome.substring(0,60)}</span><br>
-            <span class="text-[10px] text-blue-500">${s.grupo}</span>
+            <span class="text-[10px] text-blue-500">${s.grupo} | ${s.exames.length} exames</span>
         </div>
     `).join('');
     dropdown.classList.add('show');
 }
-
-function selecionarSIGTAP(codigo, nome, examesStr){
-    let examesArray = [];
-    try {
-        const strCorrigida = examesStr.replace(/&quot;/g, '"');
-        examesArray = JSON.parse(strCorrigida);
-    } catch(e) {
-        examesArray = [];
-    }
     
-    document.getElementById('sigtapSearch').value = codigo + ' - ' + nome;
-    document.getElementById('sigtapSelecionado').value = codigo;
+function selecionarSIGTAP(index){
+    const sub = TODOS_SUBGRUPOS[index];
+    if(!sub) return;
+    
+    document.getElementById('sigtapSearch').value = sub.codigo + ' - ' + sub.nome;
+    document.getElementById('sigtapSelecionado').value = sub.codigo;
     document.getElementById('dropdownSIGTAP').classList.remove('show');
     
-    subgrupoSelecionado = { codigo: codigo, nome: nome, exames: examesArray };
+    subgrupoSelecionado = { 
+        codigo: sub.codigo, 
+        nome: sub.nome, 
+        exames: sub.exames 
+    };
+    
     examesSelecionados = [];
     atualizarExamesSelecionados();
+    
+    console.log('✅ Subgrupo selecionado:', subgrupoSelecionado);
 }
-
+    
 // ============================================
 // 🆕 MODAL DE SELEÇÃO DE EXAMES (TABELA COM CHECKBOX)
 // ============================================
@@ -1228,41 +1233,45 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
     }
     
     if(valor.length >= 2){
-        timeoutBusca = setTimeout(async () => {
-            try {
-                const { data: consulta } = await db
-                    .from('primeira_consulta_recepcionados')
-                    .select('*')
-                    .or(`numero_solicitacao.ilike.%${valor}%,id.eq.${valor}`)
-                    .limit(1)
-                    .single();
+    timeoutBusca = setTimeout(async () => {
+        try {
+            // Busca pelo número (ex: "101" encontra "SOL-0101")
+            const { data: consulta } = await db
+                .from('primeira_consulta_recepcionados')
+                .select('*')
+                .or(`numero_solicitacao.ilike.%${valor}%,id.eq.${valor}`)
+                .limit(1)
+                .single();
+            
+            if(consulta){
+                dadosPrimeiraConsulta = consulta;
+                document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
+                document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
+                document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
+                document.getElementById('localConsulta').value = consulta.local_consulta || '';
+                document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
                 
-                if(consulta){
-                    dadosPrimeiraConsulta = consulta;
-                    document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
-                    document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
-                    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
-                    document.getElementById('localConsulta').value = consulta.local_consulta || '';
-                    document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
-                    
-                    const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
-                    document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
-                    
-                    if(consulta.paciente_id){
-                        const { data: pac } = await db.from('pacientes').select('prontuario,telefone').eq('id', consulta.paciente_id).single();
-                        if(pac){
-                            document.getElementById('prontuarioVivver').value = pac.prontuario || '';
-                            document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
-                        }
+                const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
+                document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
+                
+                // Busca telefone e prontuário
+                if(consulta.cpf_paciente){
+                    const { data: pac } = await db.from('pacientes').select('prontuario,telefone').eq('cpf', consulta.cpf_paciente).single();
+                    if(pac){
+                        document.getElementById('prontuarioVivver').value = pac.prontuario || '';
+                        document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
                     }
-                    mostrarMsg('msgSolicitar','✅ Dados preenchidos!','emerald');
                 }
-            } catch(e) {
+                mostrarMsg('msgSolicitar','✅ Dados preenchidos!','emerald');
+            } else {
                 document.getElementById('msgSolicitar').classList.add('hidden');
             }
-        }, 600);
-    }
-});
+        } catch(e) {
+            document.getElementById('msgSolicitar').classList.add('hidden');
+        }
+    }, 600);
+}
+    
 
 // 🆕 BUSCAR CEP
 async function buscarCEP(cep){
