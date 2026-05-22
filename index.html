@@ -739,17 +739,20 @@ document.addEventListener('click',function(e){
 // ============================================
 function toggleDropdownSIGTAP(show){
     const dropdown = document.getElementById('dropdownSIGTAP');
-    if(show){ 
-        dropdown.classList.add('show'); 
-        filtrarSIGTAP(); 
-        // Limpa valor pra pesquisa se já tinha selecionado
-        if(subgrupoSelecionado){
-            document.getElementById('sigtapSearch').value = '';
-        }
-    } else { 
-        dropdown.classList.remove('show'); 
-    }
+    if(show){ dropdown.classList.add('show'); filtrarSIGTAP(); }
+    else { dropdown.classList.remove('show'); }
 }
+    
+document.getElementById('sigtapSearch').addEventListener('click', function(){
+    if(subgrupoSelecionado){
+        this.value = '';
+        document.getElementById('sigtapSelecionado').value = '';
+        subgrupoSelecionado = null;
+        examesSelecionados = [];
+        atualizarExamesSelecionados();
+    }
+    toggleDropdownSIGTAP(true);
+});
 
 function filtrarSIGTAP(){
     const input = document.getElementById('sigtapSearch');
@@ -768,11 +771,20 @@ function filtrarSIGTAP(){
     dropdown.classList.add('show');
 }
 
-function selecionarSIGTAP(codigo, nome, exames){
+function selecionarSIGTAP(codigo, nome, examesStr){
+    let examesArray = [];
+    try {
+        const strCorrigida = examesStr.replace(/&quot;/g, '"');
+        examesArray = JSON.parse(strCorrigida);
+    } catch(e) {
+        examesArray = [];
+    }
+    
     document.getElementById('sigtapSearch').value = codigo + ' - ' + nome;
     document.getElementById('sigtapSelecionado').value = codigo;
     document.getElementById('dropdownSIGTAP').classList.remove('show');
-    subgrupoSelecionado = { codigo, nome, exames: JSON.parse(exames.replace(/&quot;/g,'"')) };
+    
+    subgrupoSelecionado = { codigo: codigo, nome: nome, exames: examesArray };
     examesSelecionados = [];
     atualizarExamesSelecionados();
 }
@@ -1200,37 +1212,55 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
 
 function fecharModalConfirmacao(){ document.getElementById('modalConfirmacao').classList.remove('show'); }
 
-// ============================================
-// PREENCHIMENTO AUTOMÁTICO + LIMPAR AO APAGAR
-// ============================================
 let timeoutBusca = null;
 document.getElementById('numeroSolicitacao').addEventListener('input', function(){
     clearTimeout(timeoutBusca);
+    this.value = this.value.replace(/\D/g, '');
     const valor = this.value.trim();
-    if(valor.length===0){
-        ['nomePaciente','validarNomeMae','telefoneRetorno','especialidadeRetorno','medicoSolicitante','localConsulta','dataPrimeiraConsulta','prontuarioVivver'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    
+    if(valor.length === 0){
+        ['nomePaciente','validarNomeMae','telefoneRetorno','especialidadeRetorno','medicoSolicitante','localConsulta','dataPrimeiraConsulta','prontuarioVivver'].forEach(id=>{
+            const el = document.getElementById(id); if(el) el.value = '';
+        });
+        dadosPrimeiraConsulta = null;
+        document.getElementById('msgSolicitar').classList.add('hidden');
         return;
     }
-    if(valor.length>=4){
-        timeoutBusca=setTimeout(async()=>{
-            try{
-                const{data:consulta}=await db.from('primeira_consulta_recepcionados').select('*').or(`numero_solicitacao.eq.${valor},id.eq.${valor}`).single();
+    
+    if(valor.length >= 2){
+        timeoutBusca = setTimeout(async () => {
+            try {
+                const { data: consulta } = await db
+                    .from('primeira_consulta_recepcionados')
+                    .select('*')
+                    .or(`numero_solicitacao.ilike.%${valor}%,id.eq.${valor}`)
+                    .limit(1)
+                    .single();
+                
                 if(consulta){
-                    document.getElementById('nomePaciente').value=consulta.nome_paciente||'';
-                    document.getElementById('validarNomeMae').value=consulta.nome_mae||'';
-                    document.getElementById('medicoSolicitante').value=consulta.medico_solicitante||'';
-                    document.getElementById('localConsulta').value=consulta.local_consulta||'';
-                    document.getElementById('dataPrimeiraConsulta').value=formatarData(consulta.data_agendada);
-                    const nomes={1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
-                    document.getElementById('especialidadeRetorno').value=nomes[consulta.especialidade_id]||'';
+                    dadosPrimeiraConsulta = consulta;
+                    document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
+                    document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
+                    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
+                    document.getElementById('localConsulta').value = consulta.local_consulta || '';
+                    document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
+                    
+                    const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
+                    document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
+                    
                     if(consulta.paciente_id){
-                        const{data:pac}=await db.from('pacientes').select('prontuario,telefone').eq('id',consulta.paciente_id).single();
-                        if(pac){document.getElementById('prontuarioVivver').value=pac.prontuario||'';document.getElementById('telefoneRetorno').value=formatarTelefone(pac.telefone||'');}
+                        const { data: pac } = await db.from('pacientes').select('prontuario,telefone').eq('id', consulta.paciente_id).single();
+                        if(pac){
+                            document.getElementById('prontuarioVivver').value = pac.prontuario || '';
+                            document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
+                        }
                     }
                     mostrarMsg('msgSolicitar','✅ Dados preenchidos!','emerald');
                 }
-            }catch(e){}
-        },800);
+            } catch(e) {
+                document.getElementById('msgSolicitar').classList.add('hidden');
+            }
+        }, 600);
     }
 });
 
