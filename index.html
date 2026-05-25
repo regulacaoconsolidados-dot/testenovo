@@ -384,102 +384,6 @@ let examesSelecionados = [];
 let subgrupoSelecionado = null;
 
 // ============================================
-// 🆕 AUTO-PREENCHIMENTO COM CACHE (24 horas)
-// ============================================
-let timeoutBusca = null;
-document.getElementById('numeroSolicitacao').addEventListener('input', function(){
-    clearTimeout(timeoutBusca);
-    this.value = this.value.replace(/\D/g, '');
-    const valor = this.value.trim();
-    
-    if(valor.length === 0){
-        ['nomePaciente','validarNomeMae','telefoneRetorno','especialidadeRetorno','medicoSolicitante','localConsulta','dataPrimeiraConsulta','prontuarioVivver'].forEach(id=>{ const el = document.getElementById(id); if(el) el.value = ''; });
-        dadosPrimeiraConsulta = null;
-        document.getElementById('msgSolicitar').classList.add('hidden');
-        return;
-    }
-    
-    if(valor.length >= 2){
-        // 🆕 Verifica cache primeiro
-        const cached = cacheConsultas.get(valor);
-        if (cached) {
-            console.log('📦 Dados do cache:', cached);
-            preencherDadosConsulta(cached);
-            return;
-        }
-        
-        timeoutBusca = setTimeout(async () => {
-            try {
-                console.log('🔍 Buscando no Supabase:', valor);
-                const { data: consulta, error } = await db
-                    .from('primeira_consulta_recepcionados')
-                    .select('*')
-                    .or(`numero_solicitacao.ilike.%${valor}%,id.eq.${valor}`)
-                    .limit(1)
-                    .single();
-                
-                if (error) {
-                    console.log('❌ Erro na busca:', error.message);
-                    document.getElementById('msgSolicitar').classList.add('hidden');
-                    return;
-                }
-                
-                if(consulta){
-                    console.log('✅ Consulta encontrada:', consulta);
-                    cacheConsultas.set(valor, consulta);
-                    preencherDadosConsulta(consulta);
-                } else {
-                    console.log('⚠️ Nenhum resultado para:', valor);
-                    document.getElementById('msgSolicitar').classList.add('hidden');
-                }
-            } catch(e) {
-                console.log('❌ Exceção:', e);
-                document.getElementById('msgSolicitar').classList.add('hidden');
-            }
-        }, 600);
-    }
-});
-
-function preencherDadosConsulta(consulta){
-    if (!consulta) return;
-    
-    dadosPrimeiraConsulta = consulta;
-    
-    // Preenche campos básicos
-    document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
-    document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
-    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
-    document.getElementById('localConsulta').value = consulta.local_consulta || '';
-    document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
-    
-    // Mapeia especialidade
-    const nomes = {
-        1: '🫀 Cardiologia',
-        2: '🦴 Ortopedia',
-        3: '🎗️ Oncologia',
-        4: '👁️ Oftalmologia',
-        5: '👂 Otorrino'
-    };
-    document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
-    
-    // Busca prontuário e telefone
-    if (consulta.cpf_paciente) {
-        db.from('pacientes')
-            .select('prontuario,telefone')
-            .eq('cpf', consulta.cpf_paciente)
-            .single()
-            .then(({ data: pac, error }) => {
-                if (pac) {
-                    document.getElementById('prontuarioVivver').value = pac.prontuario || '';
-                    document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
-                }
-            });
-    }
-    
-    mostrarMsg('msgSolicitar', '✅ Dados preenchidos!', 'emerald');
-}
-
-// ============================================
 // 🆕 SESSÃO PERSISTENTE (8 horas)
 // ============================================
 const gerenciarSessao = {
@@ -1072,38 +976,89 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
     
     if(valor.length === 0){
         ['nomePaciente','validarNomeMae','telefoneRetorno','especialidadeRetorno','medicoSolicitante','localConsulta','dataPrimeiraConsulta','prontuarioVivver'].forEach(id=>{ const el = document.getElementById(id); if(el) el.value = ''; });
+        dadosPrimeiraConsulta = null;
+        document.getElementById('msgSolicitar').classList.add('hidden');
         return;
     }
     
     if(valor.length >= 2){
         // 🆕 Verifica cache primeiro
         const cached = cacheConsultas.get(valor);
-        if (cached) { preencherDadosConsulta(cached); return; }
+        if (cached) {
+            console.log('📦 Dados do cache:', cached);
+            preencherDadosConsulta(cached);
+            return;
+        }
         
         timeoutBusca = setTimeout(async () => {
             try {
-                const { data: consulta } = await db.from('primeira_consulta_recepcionados').select('*').or(`numero_solicitacao.ilike.%${valor}%,id.eq.${valor}`).limit(1).single();
-                if(consulta){ cacheConsultas.set(valor, consulta); preencherDadosConsulta(consulta); }
-            } catch(e) {}
+                console.log('🔍 Buscando no Supabase:', valor);
+                const { data: consulta, error } = await db
+                    .from('primeira_consulta_recepcionados')
+                    .select('*')
+                    .or(`numero_solicitacao.ilike.%${valor}%,id.eq.${valor}`)
+                    .limit(1)
+                    .single();
+                
+                if (error) {
+                    console.log('❌ Erro na busca:', error.message);
+                    document.getElementById('msgSolicitar').classList.add('hidden');
+                    return;
+                }
+                
+                if(consulta){
+                    console.log('✅ Consulta encontrada:', consulta);
+                    cacheConsultas.set(valor, consulta);
+                    preencherDadosConsulta(consulta);
+                } else {
+                    console.log('⚠️ Nenhum resultado para:', valor);
+                    document.getElementById('msgSolicitar').classList.add('hidden');
+                }
+            } catch(e) {
+                console.log('❌ Exceção:', e);
+                document.getElementById('msgSolicitar').classList.add('hidden');
+            }
         }, 600);
     }
 });
 
 function preencherDadosConsulta(consulta){
+    if (!consulta) return;
+    
     dadosPrimeiraConsulta = consulta;
+    
+    // Preenche campos básicos
     document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
     document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
     document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
     document.getElementById('localConsulta').value = consulta.local_consulta || '';
     document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
-    const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
+    
+    // Mapeia especialidade
+    const nomes = {
+        1: '🫀 Cardiologia',
+        2: '🦴 Ortopedia',
+        3: '🎗️ Oncologia',
+        4: '👁️ Oftalmologia',
+        5: '👂 Otorrino'
+    };
     document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
-    if(consulta.cpf_paciente){
-        db.from('pacientes').select('prontuario,telefone').eq('cpf', consulta.cpf_paciente).single().then(({data: pac}) => {
-            if(pac){ document.getElementById('prontuarioVivver').value = pac.prontuario || ''; document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || ''); }
-        });
+    
+    // Busca prontuário e telefone
+    if (consulta.cpf_paciente) {
+        db.from('pacientes')
+            .select('prontuario,telefone')
+            .eq('cpf', consulta.cpf_paciente)
+            .single()
+            .then(({ data: pac, error }) => {
+                if (pac) {
+                    document.getElementById('prontuarioVivver').value = pac.prontuario || '';
+                    document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
+                }
+            });
     }
-    mostrarMsg('msgSolicitar','✅ Dados preenchidos!','emerald');
+    
+    mostrarMsg('msgSolicitar', '✅ Dados preenchidos!', 'emerald');
 }
 
 // BUSCAR CEP
