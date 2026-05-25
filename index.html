@@ -384,42 +384,103 @@ let examesSelecionados = [];
 let subgrupoSelecionado = null;
 
 // ============================================
-// 🆕 OTIMIZAÇÃO 1: SISTEMA DE CACHE (24 horas)
+// 🆕 AUTO-PREENCHIMENTO COM CACHE (24 horas)
 // ============================================
-const cacheConsultas = {
-    CHAVE: 'cache_consultas_oci_portal',
-    VALIDADE: 86400000, // 24 horas
+let timeoutBusca = null;
+document.getElementById('numeroSolicitacao').addEventListener('input', function(){
+    clearTimeout(timeoutBusca);
+    this.value = this.value.replace(/\D/g, '');
+    const valor = this.value.trim();
     
-    get(numero) {
-        try {
-            const cache = JSON.parse(localStorage.getItem(this.CHAVE) || '{}');
-            const item = cache[numero];
-            if (item && (Date.now() - item.timestamp < this.VALIDADE)) {
-                console.log('✅ Cache hit:', numero);
-                return item.data;
+    if(valor.length === 0){
+        ['nomePaciente','validarNomeMae','telefoneRetorno','especialidadeRetorno','medicoSolicitante','localConsulta','dataPrimeiraConsulta','prontuarioVivver'].forEach(id=>{ const el = document.getElementById(id); if(el) el.value = ''; });
+        dadosPrimeiraConsulta = null;
+        document.getElementById('msgSolicitar').classList.add('hidden');
+        return;
+    }
+    
+    if(valor.length >= 2){
+        // 🆕 Verifica cache primeiro
+        const cached = cacheConsultas.get(valor);
+        if (cached) {
+            console.log('📦 Dados do cache:', cached);
+            preencherDadosConsulta(cached);
+            return;
+        }
+        
+        timeoutBusca = setTimeout(async () => {
+            try {
+                console.log('🔍 Buscando no Supabase:', valor);
+                const { data: consulta, error } = await db
+                    .from('primeira_consulta_recepcionados')
+                    .select('*')
+                    .or(`numero_solicitacao.ilike.%${valor}%,id.eq.${valor}`)
+                    .limit(1)
+                    .single();
+                
+                if (error) {
+                    console.log('❌ Erro na busca:', error.message);
+                    document.getElementById('msgSolicitar').classList.add('hidden');
+                    return;
+                }
+                
+                if(consulta){
+                    console.log('✅ Consulta encontrada:', consulta);
+                    cacheConsultas.set(valor, consulta);
+                    preencherDadosConsulta(consulta);
+                } else {
+                    console.log('⚠️ Nenhum resultado para:', valor);
+                    document.getElementById('msgSolicitar').classList.add('hidden');
+                }
+            } catch(e) {
+                console.log('❌ Exceção:', e);
+                document.getElementById('msgSolicitar').classList.add('hidden');
             }
-        } catch(e) {}
-        return null;
-    },
+        }, 600);
+    }
+});
+
+function preencherDadosConsulta(consulta){
+    if (!consulta) return;
     
-    set(numero, dados) {
-        try {
-            const cache = JSON.parse(localStorage.getItem(this.CHAVE) || '{}');
-            cache[numero] = { data: dados, timestamp: Date.now() };
-            const keys = Object.keys(cache);
-            if (keys.length > 500) {
-                keys.sort((a, b) => cache[a].timestamp - cache[b].timestamp);
-                delete cache[keys[0]];
-            }
-            localStorage.setItem(this.CHAVE, JSON.stringify(cache));
-        } catch(e) {}
-    },
+    dadosPrimeiraConsulta = consulta;
     
-    clear() { localStorage.removeItem(this.CHAVE); }
-};
+    // Preenche campos básicos
+    document.getElementById('nomePaciente').value = consulta.nome_paciente || '';
+    document.getElementById('validarNomeMae').value = consulta.nome_mae || '';
+    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
+    document.getElementById('localConsulta').value = consulta.local_consulta || '';
+    document.getElementById('dataPrimeiraConsulta').value = formatarData(consulta.data_agendada);
+    
+    // Mapeia especialidade
+    const nomes = {
+        1: '🫀 Cardiologia',
+        2: '🦴 Ortopedia',
+        3: '🎗️ Oncologia',
+        4: '👁️ Oftalmologia',
+        5: '👂 Otorrino'
+    };
+    document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
+    
+    // Busca prontuário e telefone
+    if (consulta.cpf_paciente) {
+        db.from('pacientes')
+            .select('prontuario,telefone')
+            .eq('cpf', consulta.cpf_paciente)
+            .single()
+            .then(({ data: pac, error }) => {
+                if (pac) {
+                    document.getElementById('prontuarioVivver').value = pac.prontuario || '';
+                    document.getElementById('telefoneRetorno').value = formatarTelefone(pac.telefone || '');
+                }
+            });
+    }
+    
+    mostrarMsg('msgSolicitar', '✅ Dados preenchidos!', 'emerald');
+}
 
 // ============================================
-// 🆕 OTIMIZAÇÃO 2: SESSÃO PERSISTENTE (8 horas)
+// 🆕 SESSÃO PERSISTENTE (8 horas)
 // ============================================
 const gerenciarSessao = {
     CHAVE: 'sessao_portal_oci_v7',
@@ -448,7 +509,7 @@ const gerenciarSessao = {
 };
 
 // ============================================
-// 🆕 OTIMIZAÇÃO 3: DEBOUNCE (500ms)
+// 🆕 DEBOUNCE (500ms)
 // ============================================
 function debounce(func, delay = 500) {
     let timeout;
@@ -1124,8 +1185,8 @@ document.getElementById('modalEditarRetorno').addEventListener('click',function(
 function logout(){ gerenciarSessao.limpar(); cacheConsultas.clear(); pararAtualizacaoAutomatica(); usuarioLogado=null; showScreen('screenLogin'); }
 document.getElementById('loginSenha').addEventListener('keydown',(e)=>{if(e.key==='Enter')document.getElementById('btnLogin').click();});
 
-console.log('✅ PORTAL DO PACIENTE v7.0 OTIMIZADO CARREGADO!');
-console.log('🟢 Otimizações: Cache 24h | Sessão 8h | Debounce 500ms | Batch Promise.all');
+console.log('✅ PORTAL DO PACIENTE v7.0');
+console.log('🟢 Cache 24h | Sessão 8h | Debounce 500ms | Batch Promise.all');
 console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
 </script>
 </body>
