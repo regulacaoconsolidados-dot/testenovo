@@ -129,7 +129,7 @@
             <button onclick="switchAdminTab('novo')" id="adminTab-novo" class="admin-tab-btn pb-2 text-sm font-bold text-slate-400 whitespace-nowrap">➕ Novo Usuário</button>
             <button onclick="switchAdminTab('importar')" id="adminTab-importar" class="admin-tab-btn pb-2 text-sm font-bold text-slate-400 whitespace-nowrap">📥 Importar CSV</button>
         </div>
-        <div id="adminContent-usuarios" class="admin-content"><div class="mb-3"><input type="text" id="adminBuscaUsuario" placeholder="🔍 Buscar usuário..." class="w-full px-4 py-2 border rounded-xl text-sm" oninput="renderizarListaUsuarios()"></div><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-slate-50"><th class="px-3 py-2 text-left text-xs font-bold">Nome</th><th class="px-3 py-2 text-left text-xs font-bold">CPF</th><th class="px-3 py-2 text-left text-xs font-bold">Tipo</th><th class="px-3 py-2 text-left text-xs font-bold">Ações</th></tr></thead><tbody id="adminTabelaUsuarios"></tbody></table></div></div>
+        <div id="adminContent-usuarios" class="admin-content"><div class="mb-3"><input type="text" id="adminBuscaUsuario" placeholder="🔍 Buscar usuário..." class="w-full px-4 py-2 border rounded-xl text-sm" oninput="renderizarListaUsuarios()"></div><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-slate-50"><th class="px-3 py-2 text-left text-xs font-bold">Nome <i class="fas fa-sort"></i></th><th class="px-3 py-2 text-left text-xs font-bold">CPF <i class="fas fa-sort"></i></th><th class="px-3 py-2 text-left text-xs font-bold">Tipo <i class="fas fa-sort"></i></th><th class="px-3 py-2 text-left text-xs font-bold">Ações <i class="fas fa-sort"></i></th></tr></thead><tbody id="adminTabelaUsuarios"></tbody></table></div></div>
         <div id="adminContent-novo" class="admin-content hidden">
             <form class="space-y-3" onsubmit="return false;">
                 <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-2"><p class="text-xs text-blue-700 font-bold mb-2">💡 CPFs válidos:</p><div class="flex flex-wrap gap-1"><span class="text-xs bg-white px-2 py-1 rounded cursor-pointer hover:bg-blue-100 font-mono" onclick="preencherCPF('529.982.247-25')">529.982.247-25</span><span class="text-xs bg-white px-2 py-1 rounded cursor-pointer hover:bg-blue-100 font-bold" onclick="gerarCPFAdmin()">🎲 Gerar CPF</span></div></div>
@@ -461,12 +461,12 @@
                         <table class="w-full text-sm">
                             <thead>
                                 <tr class="text-left bg-white">
-                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Paciente</th>
-                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Especialidade</th>
-                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Progresso OCI</th>
-                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Exames</th>
-                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Status</th>
-                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase text-center">Ações</th>
+                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Paciente <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Especialidade <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Progresso OCI <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Exames <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Status <i class="fas fa-sort"></i></th>
+                                    <th class="px-4 py-3 text-[10px] font-black text-slate-400 uppercase text-center">Ações <i class="fas fa-sort"></i></th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -728,10 +728,10 @@
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','nome')">Paciente <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','grupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Linha de Produção</th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Linha de Produção <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','status')">Status <i class="fas fa-sort"></i></th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">⏳ Dias Restantes</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Alerta</th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">⏳ Dias Restantes <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Alerta <i class="fas fa-sort"></i></th>
                             </tr></thead>
                             <tbody class="divide-y" id="tabelaMonitoramento"></tbody>
                         </table>
@@ -857,9 +857,9 @@
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','medico')">Médico <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','local')">Local <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','data')">Data 1ª <i class="fas fa-sort"></i></th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por</th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por <i class="fas fa-sort"></i></th>
                             </tr></thead>
                             <tbody id="tabelaAptosRetorno"></tbody>
                         </table>
@@ -894,9 +894,9 @@
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Local <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Data 1ª <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Data Retorno <i class="fas fa-sort"></i></th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por</th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por <i class="fas fa-sort"></i></th>
                             </tr></thead>
                             <tbody id="tabelaRetornosAgendados"></tbody>
                         </table>
@@ -931,9 +931,9 @@
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Local <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Data 1ª <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Data Recepção <i class="fas fa-sort"></i></th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por</th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por <i class="fas fa-sort"></i></th>
                             </tr></thead>
                             <tbody id="tabelaRetornosRecepcionados"></tbody>
                         </table>
@@ -1041,9 +1041,9 @@
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Local <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Data 1ª <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Data Fechamento <i class="fas fa-sort"></i></th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por</th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por <i class="fas fa-sort"></i></th>
                             </tr></thead>
                             <tbody id="tabelaAPAC"></tbody>
                         </table>
@@ -1088,9 +1088,9 @@
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Data 1ª <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable">Data Fechamento <i class="fas fa-sort"></i></th>
                                 <th class="px-4 py-3 text-xs font-bold uppercase th-sortable bg-indigo-50">Nº APAC <i class="fas fa-sort"></i></th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização</th>
-                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por</th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Exame Realizado <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase">Cadastrado por <i class="fas fa-sort"></i></th>
                             </tr></thead>
                             <tbody id="tabelaAPACSGeradas"></tbody>
                         </table>
@@ -1617,22 +1617,32 @@ function renderizarTabelas(){
                 
               if(tipo === 'absenteismo-1consulta' || tipo === 'absenteismo-retorno'){
               // Ordem correta para absenteísmos
-              cols += `<td class="px-3 py-2"><span class="text-xs font-bold text-purple-600">${p.prontuario||'—'}</span></td>`;
+              cols += `<td class="px-3 py-2"><span class="text-xs font-bold text-purple-600">${p.prontuario || item.prontuario || '—'}</span></td>`;
               cols += `<td class="px-3 py-2 font-bold text-xs">${p.nome||item.nome_paciente||'—'}</td>`;
               cols += `<td class="px-3 py-2 text-xs">${formatarCPF(p.cpf||item.cpf_paciente||'')}</td>`;
               cols += `<td class="px-3 py-2 text-xs">${p.unidade_saude||'—'}</td>`;
               cols += `<td class="px-3 py-2 text-xs font-bold">${e.icone||''} ${e.nome||''}</td>`;
+                if(tipo === 'monitoramento') {
+                    const statusMap = { 'agendada': { p: 5, c: 'bg-slate-400', t: '0%' }, 'em_andamento': { p: 20, c: 'bg-blue-500', t: '20%' }, 'aguardando_exame': { p: 40, c: 'bg-amber-500', t: '40%' }, 'apto_retorno': { p: 60, c: 'bg-emerald-500', t: '60%' }, 'retorno_agendado': { p: 75, c: 'bg-indigo-500', t: '75%' }, 'retorno_recepcionado': { p: 90, c: 'bg-teal-500', t: '90%' }, 'oci_fechada': { p: 100, c: 'bg-purple-500', t: '100%' }, 'apacs_geradas': { p: 100, c: 'bg-purple-600', t: '100%' }, 'faltou': { p: 10, c: 'bg-rose-500', t: '10%' }, 'retorno_faltou': { p: 70, c: 'bg-rose-600', t: '70%' } };
+                    const prog = statusMap[item.status] || { p: 0, c: 'bg-slate-200', t: '0%' };
+                    cols += `<td class="px-3 py-2"><div class="flex flex-col"><div class="w-24 bg-slate-100 h-2 rounded-full overflow-hidden border"><div class="${prog.c} h-full" style="width:${prog.p}%"></div></div><span class="text-[8px] font-bold mt-1">${prog.t}</span></div></td>`;
+                }
               cols += `<td class="px-3 py-2 text-[10px]"><span class="font-bold">${gs.grupoNome.split(' - ')[0]}</span><br><span class="text-[9px] text-slate-500">${gs.codigo}</span></td>`;
               cols += `<td class="px-3 py-2 text-xs">${item.medico_solicitante||'—'}</td>`;
               cols += `<td class="px-3 py-2 text-xs">${item.local_consulta||'—'}</td>`;
               cols += `<td class="px-3 py-2 text-xs">${formatarData(item.data_agendada)}</td>`;
               } else {
               // Outras tabelas
-              cols += `<td class="px-3 py-2"><span class="text-xs font-bold text-purple-600">${p.prontuario||'—'}</span></td>`;
+              cols += `<td class="px-3 py-2"><span class="text-xs font-bold text-purple-600">${p.prontuario || item.prontuario || '—'}</span></td>`;
               cols += `<td class="px-3 py-2 font-bold text-xs">${p.nome||item.nome_paciente||'—'}</td>`;
               cols += `<td class="px-3 py-2 text-xs">${formatarCPF(p.cpf||item.cpf_paciente||'')}</td>`;
               if(tipo !== 'primeira-consulta-agendadas'){ cols += `<td class="px-3 py-2 text-xs">${p.unidade_saude||'—'}</td>`; }
               cols += `<td class="px-3 py-2 text-xs font-bold">${e.icone||''} ${e.nome||''}</td>`;
+                if(tipo === 'monitoramento') {
+                    const statusMap = { 'agendada': { p: 5, c: 'bg-slate-400', t: '0%' }, 'em_andamento': { p: 20, c: 'bg-blue-500', t: '20%' }, 'aguardando_exame': { p: 40, c: 'bg-amber-500', t: '40%' }, 'apto_retorno': { p: 60, c: 'bg-emerald-500', t: '60%' }, 'retorno_agendado': { p: 75, c: 'bg-indigo-500', t: '75%' }, 'retorno_recepcionado': { p: 90, c: 'bg-teal-500', t: '90%' }, 'oci_fechada': { p: 100, c: 'bg-purple-500', t: '100%' }, 'apacs_geradas': { p: 100, c: 'bg-purple-600', t: '100%' }, 'faltou': { p: 10, c: 'bg-rose-500', t: '10%' }, 'retorno_faltou': { p: 70, c: 'bg-rose-600', t: '70%' } };
+                    const prog = statusMap[item.status] || { p: 0, c: 'bg-slate-200', t: '0%' };
+                    cols += `<td class="px-3 py-2"><div class="flex flex-col"><div class="w-24 bg-slate-100 h-2 rounded-full overflow-hidden border"><div class="${prog.c} h-full" style="width:${prog.p}%"></div></div><span class="text-[8px] font-bold mt-1">${prog.t}</span></div></td>`;
+                }
               if(tipo !== 'absenteismo-1consulta' && tipo !== 'absenteismo-retorno' && tipo !== 'primeira-consulta-agendadas'){
               cols += `<td class="px-3 py-2 text-[10px]"><span class="font-bold">${gs.grupoNome.split(' - ')[0]}</span><br><span class="text-[9px] text-slate-500">${gs.codigo}</span></td>`;
     }
@@ -1748,7 +1758,7 @@ function renderizarGraficos(){
     atualizarGraficoAbsenteismo();
     
     const c3=document.getElementById('chartComparecimento');
-    if(c3){ charts.c=new Chart(c3.getContext('2d'),{type:'bar',data:{labels:ml,datasets:[{label:'1ª Consulta',data:[88,85,90,92,89,91],backgroundColor:'#10b981',borderRadius:10,borderSkipped:false,barPercentage:0.7},{label:'Retorno',data:[82,80,85,88,84,87],backgroundColor:'#6366f1',borderRadius:10,borderSkipped:false,barPercentage:0.7}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30}},plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,font:{size:13,weight:'bold'},padding:20}},datalabels:{anchor:'center',align:'center',color:'#FFFFFF',font:{weight:'bold',size:16},formatter:(v)=>v+'%',display:true},tooltip:{enabled:false}},scales:{y:{beginAtZero:false,min:70,max:100,ticks:{callback:(v)=>v+'%',font:{size:12}},grid:{display:false}},x:{grid:{display:false},ticks:{font:{size:12}}}}},plugins:[ChartDataLabels]}); }
+    if(c3){ charts.c=new Chart(c3.getContext('2d'),{type:'bar',data:{labels:ml,datasets:[{label:'1ª Consulta',data:[88,85,90,92,89,91],backgroundColor:'#10b981',borderRadius:10,borderSkipped:false,barPercentage:0.7},{label:'Retorno',data:[82,80,85,88,84,87],backgroundColor:'#6366f1',borderRadius:10,borderSkipped:false,barPercentage:0.7}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30}},plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,font:{size:13,weight:'bold'},padding:20}},datalabels:{anchor:'center',align:'center',color:'#FFFFFF',font:{weight:'bold',size:14},formatter:(v)=>v+'%',display:true,clip:false},tooltip:{enabled:false}},scales:{y:{beginAtZero:false,min:70,max:100,ticks:{callback:(v)=>v+'%',font:{size:12}},grid:{display:false}},x:{grid:{display:false},ticks:{font:{size:12}}}}},plugins:[ChartDataLabels]}); }
     
     const c4=document.getElementById('chartTempoMedio');
     if(c4){ charts.t=new Chart(c4.getContext('2d'),{type:'line',data:{labels:ml,datasets:[{label:'Dias',data:[18,16,14,12,11,10],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.08)',borderWidth:3,fill:true,tension:0.4,pointRadius:7,pointBackgroundColor:'#fff',pointBorderColor:'#f59e0b',pointBorderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,font:{size:13,weight:'bold'}}},datalabels:{anchor:'end',align:'top',offset:6,color:'#92400e',font:{weight:'bold',size:13},backgroundColor:'rgba(255,255,255,0.95)',borderRadius:6,padding:6,formatter:(v)=>v+'d'}},scales:{y:{beginAtZero:false,min:5,max:22,ticks:{callback:(v)=>v+'d',font:{size:12}},grid:{display:false}},x:{grid:{display:false},ticks:{font:{size:12}}}}},plugins:[ChartDataLabels]}); }
