@@ -575,27 +575,74 @@ function salvarEdicaoUsuario(){ const id = parseInt(document.getElementById('edi
 function excluirUsuario(id){ if(id === usuarioLogado?.id) return alert('❌ Não pode!'); if(!confirm('Excluir?')) return; usuariosCadastrados = usuariosCadastrados.filter(u => u.id !== id); alert('✅ Excluído!'); renderizarListaUsuarios(); }
 function importarCSV(){ const file = document.getElementById('adminCSVFile')?.files[0]; if(!file) return alert('⚠️ Selecione!'); const reader = new FileReader(); reader.onload = function(e){ const linhas = e.target.result.split('\n').filter(l => l.trim()); if(linhas.length < 2) return; let importados = 0; linhas.slice(1).forEach(linha => { const cols = linha.split(','); if(cols.length >= 5){ const nome = cols[0]?.trim(), cpf = cols[1]?.replace(/\D/g,'').trim(), senha = cols[4]?.trim(); if(nome && cpf && senha && validarCPF(cpf) && !usuariosCadastrados.find(u => u.cpf === cpf)){ usuariosCadastrados.push({ id: usuariosCadastrados.length + 1, nome, cpf, nome_mae: '', cidade_natal: '', senha, tipo: cols[5]?.trim() || 'usuario' }); importados++; } } }); document.getElementById('adminCSVResultado').innerHTML = `<div class="bg-green-50 p-3 rounded-xl"><p class="text-sm text-green-700 font-bold">✅ ${importados} importados!</p></div>`; renderizarListaUsuarios(); }; reader.readAsText(file); }
 
-// Função principal de renderização das tabelas (corrigida - números reais, sem prefixos)
-function renderizarTabelas(){
+// ============================================
+// FUNÇÃO RENDERIZAR TABELAS - CORRIGIDA
+// ============================================
+function renderizarTabelas() {
     const tipo = 'monitoramento';
     let dados = [...consultas];
+    
+    // Busca
     const busca = document.getElementById('buscaMonitoramento')?.value?.toLowerCase() || '';
-    if(busca) dados = dados.filter(item => { const p = pacientes.find(x => x.id === item.paciente_id) || {}; return String(item.numero_solicitacao).includes(busca) || (p.nome||'').toLowerCase().includes(busca) || (p.cpf||'').includes(busca); });
-    const fe = document.getElementById('filtroEspecialidadeMonitoramento')?.value; if(fe) dados = dados.filter(c => c.especialidade_id == parseInt(fe));
-    const fs = document.getElementById('filtroStatusMonitoramento')?.value; if(fs) dados = dados.filter(c => c.status === fs);
+    if (busca) {
+        dados = dados.filter(item => {
+            const p = pacientes.find(x => x.id === item.paciente_id) || {};
+            return String(item.numero_solicitacao).includes(busca) ||
+                   (p.nome || '').toLowerCase().includes(busca) ||
+                   (p.cpf || '').includes(busca);
+        });
+    }
+    
+    // Filtros
+    const fe = document.getElementById('filtroEspecialidadeMonitoramento')?.value;
+    if (fe) dados = dados.filter(c => c.especialidade_id == parseInt(fe));
+    const fs = document.getElementById('filtroStatusMonitoramento')?.value;
+    if (fs) dados = dados.filter(c => c.status === fs);
+    
+    // Ordenação
     dados = getDadosOrdenados(dados, tipo);
+    
+    // Paginação
     const totalPag = Math.ceil(dados.length / itensPorPagina[tipo]) || 1;
-    if(paginaAtual[tipo] > totalPag) paginaAtual[tipo] = totalPag;
+    if (paginaAtual[tipo] > totalPag) paginaAtual[tipo] = totalPag;
     const inicio = (paginaAtual[tipo] - 1) * itensPorPagina[tipo];
     const pag = dados.slice(inicio, inicio + itensPorPagina[tipo]);
+    
+    // Renderizar tabela
     const tabelaEl = document.getElementById('tabelaMonitoramento');
-    if(!tabelaEl) return;
-    if(pag.length === 0){ tabelaEl.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-slate-400 font-bold">Nenhum registro encontrado</td></tr>'; }
-    else { tabelaEl.innerHTML = pag.map(c => { const p = pacientes.find(x => x.id === c.paciente_id) || {}; const e = especialidades.find(x => x.id === c.especialidade_id) || {}; const st = getStatusBadge(c.status); const diasRest = getDiasRestantes(c); return `<tr class="hover:bg-slate-50"><td class="px-4 py-3"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">${c.numero_solicitacao || c.id}</span></td><td class="px-4 py-3"><span class="text-sm font-bold text-purple-600">${p.prontuario || '—'}</span></td><td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td><td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td><td class="px-4 py-3 text-[10px]">Grupo</td><td class="px-4 py-3"><div class="w-32"><div class="w-full bg-slate-100 h-4 rounded-full"><div class="${st.c} h-full rounded-full flex items-center justify-center text-white text-[10px] font-bold" style="width:30%">30%</div></div></div></td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${st.c}">${st.t}</span></td><td class="px-4 py-3"><span class="text-xs font-bold ${diasRest.cor}">${diasRest.dias}</span></td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">🟢 Dentro do Prazo</span></td></tr>`; }).join(''); } }
-
-function filtrarTabela(tipo){ paginaAtual[tipo] = 1; renderizarTabelas(); }
-function exportarExcel(tipo){ alert('📊 Função de exportação disponível!'); }
-
+    if (!tabelaEl) return;
+    
+    if (pag.length === 0) {
+        tabelaEl.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400 font-bold">Nenhum registro encontrado</td></tr>';
+    } else {
+        tabelaEl.innerHTML = pag.map(c => {
+            const p = pacientes.find(x => x.id === c.paciente_id) || {};
+            const e = especialidades.find(x => x.id === c.especialidade_id) || {};
+            const st = getStatusBadge(c.status);
+            const diasRest = getDiasRestantes(c);
+            return '<tr class="hover:bg-slate-50 transition-colors">' +
+                '<td class="px-4 py-3"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">' + (c.numero_solicitacao || c.id) + '</span></td>' +
+                '<td class="px-4 py-3"><span class="text-sm font-mono font-bold text-purple-600">' + (p.prontuario || '—') + '</span></td>' +
+                '<td class="px-4 py-3 font-bold text-sm">' + (p.nome || '—') + '</td>' +
+                '<td class="px-4 py-3"><span class="px-2 py-1 bg-slate-100 rounded-full text-xs font-bold">' + (e.icone || '') + ' ' + (e.nome || '—') + '</span></td>' +
+                '<td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ' + st.c + ' border">' + st.t + '</span></td>' +
+                '<td class="px-4 py-3"><span class="text-xs font-bold ' + diasRest.cor + '">' + diasRest.dias + '</span></td>' +
+                '<td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">🟢 Dentro do Prazo</span></td>' +
+                '</tr>';
+        }).join('');
+    }
+    
+    // Paginação
+    const pagEl = document.getElementById('paginacaoMonitoramento');
+    if (pagEl) {
+        let pagHTML = '';
+        for (let i = 1; i <= Math.min(totalPag, 10); i++) {
+            pagHTML += '<button onclick="paginaAtual[\'monitoramento\']=' + i + ';renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ' + (i === paginaAtual[tipo] ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 hover:bg-slate-200') + '">' + i + '</button>';
+        }
+        pagEl.innerHTML = '<span class="text-xs text-slate-500">📊 ' + dados.length + ' registros | Pág ' + paginaAtual[tipo] + ' de ' + totalPag + '</span><div class="flex gap-1 flex-wrap">' + pagHTML + '</div>';
+    }
+}
+    
 // Gráficos
 function atualizarGraficoEspecialidade(){ if(charts.s) charts.s.destroy(); const c2 = document.getElementById('chartSpecialty'); if(!c2) return; charts.s = new Chart(c2.getContext('2d'),{ type:'doughnut', data:{ labels:['Cardiologia','Ortopedia','Oncologia'], datasets:[{ data:[45,30,25], backgroundColor:['#3b82f6','#8b5cf6','#ef4444'], borderWidth:3, borderColor:'#fff' }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'70%', plugins:{ legend:{ display:true, position:'bottom' }, datalabels:{ color:'#fff', font:{ weight:'bold', size:14 }, formatter:(v,ctx)=>{ const t=ctx.dataset.data.reduce((a,b)=>a+b,0); return t===0?'0%':Math.round((v/t)*100)+'%'; } } } }, plugins:[ChartDataLabels] }); }
 function atualizarGraficoAbsenteismo(){ if(charts.ab) charts.ab.destroy(); const c5 = document.getElementById('chartAbsenteismo'); if(!c5) return; charts.ab = new Chart(c5.getContext('2d'),{ type:'bar', data:{ labels:['Cardiologia','Ortopedia','Oncologia'], datasets:[{ label:'Absenteísmo', data:[12,8,5], backgroundColor:'#f97316', borderRadius:8, barPercentage:0.7 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true }, datalabels:{ anchor:'center', align:'center', color:'#FFFFFF', font:{ weight:'bold', size:16 }, formatter:(v)=>v, display:true } } }, plugins:[ChartDataLabels] }); }
