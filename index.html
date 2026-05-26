@@ -1401,7 +1401,7 @@ async function carregarDadosSupabase() {
     if (!supabaseClient) return;
     try {
         const { data: pacientesDB } = await supabaseClient.from('pacientes').select('*');
-        if (pacientesDB) { pacientesDB.forEach(pDB => { if (!pacientes.find(p => p.id === pDB.id)) { pacientes.push({ id: pDB.id, nome: pDB.nome, cpf: pDB.cpf, prontuario: pDB.prontuario, nome_mae: pDB.nome_mae, unidade_saude: pDB.unidade_saude }); } }); }
+        if (pacientesDB) { pacientesDB.forEach(pDB => { if (!pacientes.find(p => p.id === pDB.id)) { pacientes.push({ id: pDB.id, nome: pDB.nome, cpf: pDB.cpf, prontuario: pDB.prontuario, nome_mae: pDB.nome_mae, unidade_saude: pDB.unidade_saude, telefone: pDB.telefone }); } }); }
         
         const { data: consultasDB } = await supabaseClient.from('consultas_oci').select('*');
         // 🆕 Também buscar da tabela de recepcionados
@@ -1749,9 +1749,7 @@ function renderizarGraficos(){
     atualizarGraficoAbsenteismo();
     
     const c3=document.getElementById('chartComparecimento');
-    
-    if(c3){ charts.c=new Chart(c3.getContext('2d'),{type:'bar',data:{labels:ml,datasets:[{label:'1ª Consulta',data:[88,85,90,92,89,91],backgroundColor:'#10b981',borderRadius:10,borderSkipped:false,barPercentage:0.7},{label:'Retorno',data:[82,80,85,88,84,87],backgroundColor:'#6366f1',borderRadius:10,borderSkipped:false,barPercentage:0.7}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30}},plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,font:{size:13,weight:'bold'},color:'#064E3B',padding:20}},datalabels:{anchor:'center',align:'center',color:'#FFFFFF',font:{weight:'bold',size:14},formatter:(v)=>v+'%',display:true,clip:false},tooltip:{enabled:false}},scales:{y:{beginAtZero:false,min:70,max:100,ticks:{callback:(v)=>v+'%',font:{size:12}},grid:{display:false}},x:{grid:{display:false},ticks:{font:{size:12}}}}},plugins:[ChartDataLabels]}); }
-
+    if(c3){ charts.c=new Chart(c3.getContext('2d'),{type:'bar',data:{labels:ml,datasets:[{label:'1ª Consulta',data:[88,85,90,92,89,91],backgroundColor:'#10b981',borderRadius:10,borderSkipped:false,barPercentage:0.7},{label:'Retorno',data:[82,80,85,88,84,87],backgroundColor:'#6366f1',borderRadius:10,borderSkipped:false,barPercentage:0.7}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30}},plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,font:{size:13,weight:'bold'},padding:20}},datalabels:{anchor:'center',align:'center',color:'#FFFFFF',font:{weight:'bold',size:14},formatter:(v)=>v+'%',display:true,clip:false,backgroundColor:'rgba(0,0,0,0.3)',borderRadius:4,padding:4},tooltip:{enabled:false}},scales:{y:{beginAtZero:false,min:70,max:100,ticks:{callback:(v)=>v+'%',font:{size:12}},grid:{display:false}},x:{grid:{display:false},ticks:{font:{size:12}}}}},plugins:[ChartDataLabels]}); }
     
     const c4=document.getElementById('chartTempoMedio');
     if(c4){ charts.t=new Chart(c4.getContext('2d'),{type:'line',data:{labels:ml,datasets:[{label:'Dias',data:[18,16,14,12,11,10],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.08)',borderWidth:3,fill:true,tension:0.4,pointRadius:7,pointBackgroundColor:'#fff',pointBorderColor:'#f59e0b',pointBorderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,font:{size:13,weight:'bold'}}},datalabels:{anchor:'end',align:'top',offset:6,color:'#92400e',font:{weight:'bold',size:13},backgroundColor:'rgba(255,255,255,0.95)',borderRadius:6,padding:6,formatter:(v)=>v+'d'}},scales:{y:{beginAtZero:false,min:5,max:22,ticks:{callback:(v)=>v+'d',font:{size:12}},grid:{display:false}},x:{grid:{display:false},ticks:{font:{size:12}}}}},plugins:[ChartDataLabels]}); }
@@ -1785,7 +1783,6 @@ function switchTab(tabId){
 // ============ EXPORTAR EXCEL ============
 
 
-
 function exportarExcel(tipo){
     const dados=getDadosFiltrados(tipo); if(!dados.length) return alert('⚠️ Nenhum dado.');
     let ed=dados.map(item=>{
@@ -1794,17 +1791,11 @@ function exportarExcel(tipo){
         const gs=getGrupoSubgrupo(item.especialidade_id);
         const row={
             'Nº Solicitação': item.numero_solicitacao || item.id,
-            'Prontuário': p.prontuario || item.prontuario || '—',
-            'Paciente': p.nome || item.paciente_nome || '—',
-            'CPF': formatarCPF(p.cpf || item.cpf_paciente || ''),
-            'Data de Nascimento': formatarData(p.data_nascimento || item.data_nascimento),
-            'Telefone': p.telefone || item.telefone || '—',
-            'CEP': p.cep || item.cep || '—',
-            'Logradouro': p.logradouro || item.logradouro || '—',
-            'Bairro': p.bairro || item.bairro || '—',
-            'Cidade': p.cidade || item.cidade || '—',
-            'Nome da Mãe': p.nome_mae || item.nome_mae || '—',
-            'Unidade': p.unidade_saude || item.unidade_saude || '—',
+            'Prontuário': p.prontuario || '—',
+            'Paciente': p.nome || '—',
+            'CPF': formatarCPF(p.cpf || ''),
+            'Nome da Mãe': p.nome_mae || '—',
+            'Unidade': p.unidade_saude || '—',
             'Especialidade': e.nome || '—',
             'Grupo': gs.grupoNome,
             'Subgrupo': gs.subgrupoNome,
