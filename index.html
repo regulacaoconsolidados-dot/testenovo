@@ -1425,62 +1425,170 @@ function logout(){
     showScreen('screenLogin'); 
 }
 
+// ============ FUNÇÃO DE SEGURANÇA PARA EVITAR TELA BRANCA ============
+function inicializarSistema() {
+    console.log('🚀 Inicializando sistema...');
+    
+    // Garante que os elementos básicos existem
+    const sidebarAdmin = document.getElementById('sidebarAdminSection');
+    if (sidebarAdmin && usuarioLogado) {
+        sidebarAdmin.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
+    }
+    
+    // Se não há dados ainda, mostra mensagem de carregamento
+    const tabelaMonitoramentoResumo = document.getElementById('tabelaMonitoramentoResumo');
+    if (tabelaMonitoramentoResumo && consultas.length === 0) {
+        tabelaMonitoramentoResumo.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-8 text-slate-400">
+                    <i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i>
+                    Carregando dados do Supabase...
+                </td>
+            </tr>
+        `;
+    }
+    
+    // Força a renderização mesmo com dados vazios
+    if (typeof renderizarTabelas === 'function') renderizarTabelas();
+    if (typeof renderizarGraficos === 'function') renderizarGraficos();
+}
+
+// Sobrescreve a função atualizarTudo para garantir que não quebre
+const originalAtualizarTudo = atualizarTudo;
+window.atualizarTudo = async function() {
+    try {
+        await originalAtualizarTudo();
+    } catch(e) {
+        console.error('Erro no atualizarTudo:', e);
+        hideLoading();
+        const container = document.querySelector('.tab-content.active');
+        if (container) {
+            container.innerHTML = '<div class="bg-rose-50 border border-rose-200 rounded-xl p-8 text-center"><i class="fas fa-exclamation-triangle text-rose-500 text-3xl mb-3 block"></i><p class="text-rose-700 font-bold">Erro ao carregar dados. Verifique sua conexão com o Supabase.</p><button onclick="location.reload()" class="mt-4 bg-rose-600 text-white px-4 py-2 rounded-xl">🔄 Tentar novamente</button></div>';
+        }
+    }
+};
+
 // ============ INICIALIZAÇÃO ============
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🏥 SISTEMA OCI v7.0 - INICIANDO...');
     console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
     
-    document.getElementById('btnLogin').addEventListener('click', () => {
-        const nome = document.getElementById('loginNome').value.trim();
-        const cpf = limparCPF(document.getElementById('loginCPF').value);
-        const senha = document.getElementById('loginSenha').value.trim();
-        if(!nome || !cpf || !senha) return alert('⚠️ Preencha todos os campos!');
-        if(!validarCPF(cpf)) return alert('❌ CPF inválido!');
-        const usuario = usuariosCadastrados.find(u => u.cpf === cpf && u.senha === senha);
-        if(usuario){ 
-            usuarioLogado = usuario; 
-            document.getElementById('screenLogin').style.display = 'none'; 
-            document.getElementById('screenLogin').classList.remove('active'); 
-            document.getElementById('screenSistema').classList.add('active'); 
-            document.getElementById('screenSistema').style.display = 'flex'; 
-            atualizarTudo(); 
-        } else { 
-            alert('❌ Usuário não encontrado!'); 
-        }
-    });
+    // Botão de login
+    const btnLogin = document.getElementById('btnLogin');
+    if (btnLogin) {
+        btnLogin.addEventListener('click', () => {
+            const nome = document.getElementById('loginNome')?.value?.trim() || '';
+            const cpf = limparCPF(document.getElementById('loginCPF')?.value || '');
+            const senha = document.getElementById('loginSenha')?.value?.trim() || '';
+            
+            if(!nome || !cpf || !senha) return alert('⚠️ Preencha todos os campos!');
+            if(!validarCPF(cpf)) return alert('❌ CPF inválido!');
+            
+            const usuario = usuariosCadastrados.find(u => u.cpf === cpf && u.senha === senha);
+            if(usuario){ 
+                usuarioLogado = usuario; 
+                
+                const screenLogin = document.getElementById('screenLogin');
+                const screenSistema = document.getElementById('screenSistema');
+                
+                if(screenLogin) screenLogin.style.display = 'none';
+                if(screenLogin) screenLogin.classList.remove('active');
+                if(screenSistema) {
+                    screenSistema.classList.add('active');
+                    screenSistema.style.display = 'flex';
+                }
+                
+                showLoading();
+                
+                atualizarTudo().finally(() => {
+                    hideLoading();
+                    inicializarSistema();
+                });
+            } else { 
+                alert('❌ Usuário não encontrado!'); 
+            }
+        });
+    }
     
-    document.getElementById('btnResetVerificar').addEventListener('click', () => {
-        const cpf = limparCPF(document.getElementById('resetCPF').value);
-        const nm = document.getElementById('resetNomeMae').value.trim().toLowerCase();
-        const cn = document.getElementById('resetCidadeNatal').value.trim().toLowerCase();
-        if(!cpf || !nm || !cn) return alert('⚠️ Preencha todos os campos!');
-        const usuario = usuariosCadastrados.find(u => u.cpf === cpf && (u.nome_mae || '').toLowerCase() === nm && (u.cidade_natal || '').toLowerCase() === cn);
-        if(!usuario) return alert('❌ Dados não encontrados!');
-        document.getElementById('resetStep1').classList.add('hidden'); 
-        document.getElementById('resetStep2').classList.remove('hidden');
-        document.getElementById('resetStepTitle').textContent = 'Etapa 2: Redefinir senha';
-        document.getElementById('resetStep2').dataset.usuarioId = usuario.id;
-    });
+    // Redefinir senha - Etapa 1
+    const btnResetVerificar = document.getElementById('btnResetVerificar');
+    if (btnResetVerificar) {
+        btnResetVerificar.addEventListener('click', () => {
+            const cpf = limparCPF(document.getElementById('resetCPF')?.value || '');
+            const nm = document.getElementById('resetNomeMae')?.value?.trim()?.toLowerCase() || '';
+            const cn = document.getElementById('resetCidadeNatal')?.value?.trim()?.toLowerCase() || '';
+            
+            if(!cpf || !nm || !cn) return alert('⚠️ Preencha todos os campos!');
+            
+            const usuario = usuariosCadastrados.find(u => u.cpf === cpf && (u.nome_mae || '').toLowerCase() === nm && (u.cidade_natal || '').toLowerCase() === cn);
+            if(!usuario) return alert('❌ Dados não encontrados!');
+            
+            const step1 = document.getElementById('resetStep1');
+            const step2 = document.getElementById('resetStep2');
+            const stepTitle = document.getElementById('resetStepTitle');
+            
+            if(step1) step1.classList.add('hidden');
+            if(step2) step2.classList.remove('hidden');
+            if(stepTitle) stepTitle.textContent = 'Etapa 2: Redefinir senha';
+            if(step2) step2.dataset.usuarioId = usuario.id;
+        });
+    }
     
-    document.getElementById('btnResetConfirmar').addEventListener('click', () => {
-        const codigo = document.getElementById('resetCodigo').value.trim();
-        const ns = document.getElementById('resetNovaSenha').value.trim();
-        const cs = document.getElementById('resetConfirmaSenha').value.trim();
-        if(codigo !== CODIGO_SEGURANCA) return alert('❌ Código incorreto!');
-        if(ns.length !== 6) return alert('⚠️ A senha deve ter 6 dígitos!');
-        if(ns !== cs) return alert('❌ As senhas não conferem!');
-        const u = usuariosCadastrados.find(u => u.id === parseInt(document.getElementById('resetStep2').dataset.usuarioId));
-        if(u){ u.senha = ns; alert('✅ Senha redefinida com sucesso!'); showScreen('screenLogin'); }
-    });
+    // Redefinir senha - Etapa 2 (confirmar)
+    const btnResetConfirmar = document.getElementById('btnResetConfirmar');
+    if (btnResetConfirmar) {
+        btnResetConfirmar.addEventListener('click', () => {
+            const codigo = document.getElementById('resetCodigo')?.value?.trim() || '';
+            const ns = document.getElementById('resetNovaSenha')?.value?.trim() || '';
+            const cs = document.getElementById('resetConfirmaSenha')?.value?.trim() || '';
+            
+            if(codigo !== CODIGO_SEGURANCA) return alert('❌ Código incorreto! Use: 123456');
+            if(ns.length !== 6) return alert('⚠️ A senha deve ter 6 dígitos!');
+            if(ns !== cs) return alert('❌ As senhas não conferem!');
+            
+            const step2 = document.getElementById('resetStep2');
+            const u = usuariosCadastrados.find(u => u.id === parseInt(step2?.dataset?.usuarioId));
+            if(u){ 
+                u.senha = ns; 
+                alert('✅ Senha redefinida com sucesso!'); 
+                showScreen('screenLogin'); 
+            }
+        });
+    }
     
-    document.getElementById('loginSenha').addEventListener('keydown', (e) => { if(e.key === 'Enter') document.getElementById('btnLogin').click(); });
-    document.getElementById('modalAdmin').addEventListener('click', function(e){ if(e.target === this) fecharModalAdmin(); });
-    document.getElementById('modalEditarUsuario').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('show'); });
+    // Enter no campo senha do login
+    const loginSenha = document.getElementById('loginSenha');
+    if(loginSenha) {
+        loginSenha.addEventListener('keydown', (e) => { 
+            if(e.key === 'Enter') {
+                const btn = document.getElementById('btnLogin');
+                if(btn) btn.click();
+            }
+        });
+    }
     
-    setInterval(() => { if(usuarioLogado) atualizarTudo(); }, 30000);
+    // Fechar modais clicando fora
+    const modalAdmin = document.getElementById('modalAdmin');
+    if(modalAdmin) {
+        modalAdmin.addEventListener('click', function(e){ 
+            if(e.target === this) fecharModalAdmin(); 
+        });
+    }
+    
+    const modalEditarUsuario = document.getElementById('modalEditarUsuario');
+    if(modalEditarUsuario) {
+        modalEditarUsuario.addEventListener('click', function(e){ 
+            if(e.target === this) this.classList.remove('show'); 
+        });
+    }
+    
+    // Atualização automática a cada 30 segundos
+    setInterval(() => { 
+        if(usuarioLogado && typeof atualizarTudo === 'function') atualizarTudo(); 
+    }, 30000);
     
     console.log('✅ SISTEMA OCI v7.0 PRONTO!');
-});
+});    
 </script>
 </body>
 </html>
