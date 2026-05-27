@@ -1938,86 +1938,96 @@ function renderizarTabelas() {
                 </tr>`;
             }).join('');
         } else {
-            // Tabelas genéricas
-            tabelaEl.innerHTML = pag.map(item => {
-                const p = pacientes.find(x => x.id === item.paciente_id) || {};
-                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
-                const gs = getGrupoSubgrupo(item.especialidade_id);
-                const prontuarioFinal = p.prontuario || '—';
-                const nomeFinal = p.nome || '—';
-                const cpfFinal = p.cpf || '';
+    tabelaEl.innerHTML = pag.map(item => {
+        const p = pacientes.find(x => x.id === item.paciente_id) || {};
+        const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+        const gs = getGrupoSubgrupo(item.especialidade_id);
+        const prontuarioFinal = p.prontuario || '—';
+        const nomeFinal = p.nome || '—';
+        const cpfFinal = p.cpf || '';
 
-                let cols = `<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">${item.numero_solicitacao || item.id}</span></td>`;
+        let cols = `<td class="px-3 py-2"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">${item.numero_solicitacao || item.id}</span></td>`;
 
-                if (tipo === 'retornos-agendados' || tipo === 'retornos-recepcionados') {
-                    cols += `<td class="px-3 py-2"><span class="text-xs font-bold text-${tipo==='retornos-agendados'?'indigo':'teal'}-600 bg-${tipo==='retornos-agendados'?'indigo':'teal'}-50 px-2 py-1 rounded-lg">${item.numero_solicitacao_retorno || item.id}</span></td>`;
-                }
-                cols += `<td class="px-3 py-2"><span class="text-xs font-bold text-purple-600">${prontuarioFinal}</span></td>`;
-                cols += `<td class="px-3 py-2 font-bold text-xs">${nomeFinal}</td>`;
-                cols += `<td class="px-3 py-2 text-xs">${formatarCPF(cpfFinal)}</td>`;
+        // Coluna extra para Retornos (Nº Solic. Retorno)
+        if (tipo === 'retornos-agendados' || tipo === 'retornos-recepcionados') {
+            cols += `<td class="px-3 py-2"><span class="text-xs font-bold text-${tipo==='retornos-agendados'?'indigo':'teal'}-600 bg-${tipo==='retornos-agendados'?'indigo':'teal'}-50 px-2 py-1 rounded-lg">${item.numero_solicitacao_retorno || item.id}</span></td>`;
+        }
+        
+        cols += `<td class="px-3 py-2"><span class="text-xs font-bold text-purple-600">${prontuarioFinal}</span></td>`;
+        cols += `<td class="px-3 py-2 font-bold text-xs">${nomeFinal}</td>`;
+        cols += `<td class="px-3 py-2 text-xs">${formatarCPF(cpfFinal)}</td>`;
 
-                if (tipo === 'apac' || tipo === 'apacs-geradas') {
-                    cols += `<td class="px-3 py-2 text-xs">${formatarData(p.data_nascimento)}</td>`;
-                    cols += `<td class="px-3 py-2 text-xs">${p.nome_mae || '—'}</td>`;
-                    cols += `<td class="px-3 py-2 text-xs">${p.telefone || '—'}</td>`;
-                    cols += `<td class="px-3 py-2 text-xs">${p.cep || '—'}</td>`;
-                    cols += `<td class="px-3 py-2 text-xs">${p.endereco_completo || '—'}</td>`;
-                    cols += `<td class="px-3 py-2 text-xs">${p.sexo || '—'}</td>`;
-                }
-
-                if (tipo !== 'primeira-consulta-agendadas') {
-                    cols += `<td class="px-3 py-2 text-xs">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>`;
-                }
-                cols += `<td class="px-3 py-2 text-xs font-bold">${e.icone || ''} ${e.nome || ''}</td>`;
-
-                if (tipo !== 'absenteismo-1consulta' && tipo !== 'absenteismo-retorno' && tipo !== 'primeira-consulta-agendadas') {
-                    cols += `<td class="px-3 py-2 text-[10px]"><span class="font-bold">${gs.grupoNome.split(' - ')[0]}</span><br><span class="text-[9px] text-slate-500">${item.subgrupo_sigtap || gs.codigo}</span></td>`;
-                }
-                cols += `<td class="px-3 py-2 text-xs">${item.medico_solicitante || '—'}</td>`;
-                cols += `<td class="px-3 py-2 text-xs">${item.local_consulta || '—'}</td>`;
-                cols += `<td class="px-3 py-2 text-xs">${formatarData(item.data_agendada)}</td>`;
-
-                if (tipo === 'primeira-consulta-agendadas' || tipo === 'primeira-consulta') {
-                    cols += `<td class="px-3 py-2 text-xs">${item.operador_agendamento || '—'}</td>`;
-                }
-                if (tipo === 'retornos-agendados') cols += `<td class="px-3 py-2 text-xs font-bold text-blue-600">${formatarData(item.data_retorno_agendada)}</td>`;
-                if (tipo === 'retornos-recepcionados') cols += `<td class="px-3 py-2 text-xs font-bold text-teal-600">${formatarData(item.data_retorno_recepcionada)}</td>`;
-                if (tipo === 'apac') cols += `<td class="px-3 py-2 text-xs font-bold text-purple-600">${formatarData(item.data_fechamento)}</td>`;
-                if (tipo === 'apacs-geradas') {
-                    cols += `<td class="px-3 py-2 text-xs font-bold text-purple-600">${formatarData(item.data_fechamento)}</td>`;
-                    cols += `<td class="px-3 py-2 text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">${item.numero_apac || '—'}</td>`;
-                }
-                if (tipo === 'aptos-retorno' || tipo === 'retornos-agendados' || tipo === 'retornos-recepcionados' || tipo === 'apac' || tipo === 'apacs-geradas') {
-                    const examesNomes = [];
-                    if (item.exames_realizados && item.exames_realizados !== '[]') {
-                        try {
-                            const exames = typeof item.exames_realizados === 'string' ? JSON.parse(item.exames_realizados) : item.exames_realizados;
-                            if (Array.isArray(exames)) exames.forEach(ex => examesNomes.push(ex.nome));
-                        } catch(e) {}
-                    }
-                    cols += `<td class="px-3 py-2 text-[10px]">${examesNomes.join(', ') || '—'}</td>`;
-                    cols += `<td class="px-3 py-2 text-xs">${formatarData(item.data_realizacao_exame)}</td>`;
-                }
-                if (tipo === 'aptos-retorno' || tipo === 'retornos-agendados' || tipo === 'retornos-recepcionados' || tipo === 'apac' || tipo === 'apacs-geradas') {
-                    cols += `<td class="px-3 py-2 text-[10px]">${item.usuario_cadastrou || '—'}</td>`;
-                }
-                if (tipo === 'apac') {
-                    cols += `<td class="px-3 py-2 text-[10px]">${item.cid || '—'}</td>`;
-                }
-
-                return `<tr class="hover:bg-slate-50">${cols}</tr>`;
-            }).join('');
+        // Coluna Data Nascimento (SÓ para 1ª Consulta e OCI Fechada/APAC)
+        if (tipo === 'primeira-consulta' || tipo === 'apac' || tipo === 'apacs-geradas') {
+            cols += `<td class="px-3 py-2 text-xs">${formatarData(p.data_nascimento)}</td>`;
         }
 
-        // Paginação
-        let pagHTML = '';
-        if (totalPag > 1) {
-            for (let i = 1; i <= totalPag; i++) {
-                pagHTML += `<button onclick="paginaAtual['${tipo}']=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i === paginaAtual[tipo] ? 'bg-blue-600 text-white' : 'bg-slate-100 hover:bg-slate-200'}">${i}</button>`;
+        // Colunas extras para OCI Fechada/APAC (Nome da Mãe, Telefone, CEP, Endereço, Sexo)
+        if (tipo === 'apac' || tipo === 'apacs-geradas') {
+            cols += `<td class="px-3 py-2 text-xs">${p.nome_mae || '—'}</td>`;
+            cols += `<td class="px-3 py-2 text-xs">${p.telefone || '—'}</td>`;
+            cols += `<td class="px-3 py-2 text-xs">${p.cep || '—'}</td>`;
+            cols += `<td class="px-3 py-2 text-xs">${p.endereco_completo || '—'}</td>`;
+            cols += `<td class="px-3 py-2 text-xs">${p.sexo || '—'}</td>`;
+        }
+
+        // Unidade de Saúde (NÃO aparece em 1ª Cons. Agendadas)
+        if (tipo !== 'primeira-consulta-agendadas') {
+            cols += `<td class="px-3 py-2 text-xs">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>`;
+        }
+        
+        cols += `<td class="px-3 py-2 text-xs font-bold">${e.icone || ''} ${e.nome || ''}</td>`;
+
+        // Grupo/Subgrupo (NÃO aparece em Absenteísmo e 1ª Cons. Agendadas)
+        if (tipo !== 'absenteismo-1consulta' && tipo !== 'absenteismo-retorno' && tipo !== 'primeira-consulta-agendadas') {
+            cols += `<td class="px-3 py-2 text-[10px]"><span class="font-bold">${gs.grupoNome.split(' - ')[0]}</span><br><span class="text-[9px] text-slate-500">${item.subgrupo_sigtap || gs.codigo}</span></td>`;
+        }
+        
+        cols += `<td class="px-3 py-2 text-xs">${item.medico_solicitante || '—'}</td>`;
+        cols += `<td class="px-3 py-2 text-xs">${item.local_consulta || '—'}</td>`;
+        cols += `<td class="px-3 py-2 text-xs">${formatarData(item.data_agendada)}</td>`;
+
+        // Operador (SÓ para 1ª Cons. Agendadas e 1ª Consulta)
+        if (tipo === 'primeira-consulta-agendadas' || tipo === 'primeira-consulta') {
+            cols += `<td class="px-3 py-2 text-xs">${item.operador_agendamento || '—'}</td>`;
+        }
+        
+        // Data Retorno (SÓ para Retornos)
+        if (tipo === 'retornos-agendados') cols += `<td class="px-3 py-2 text-xs font-bold text-blue-600">${formatarData(item.data_retorno_agendada)}</td>`;
+        if (tipo === 'retornos-recepcionados') cols += `<td class="px-3 py-2 text-xs font-bold text-teal-600">${formatarData(item.data_retorno_recepcionada)}</td>`;
+        
+        // Data Fechamento (SÓ para OCI Fechada/APAC)
+        if (tipo === 'apac') cols += `<td class="px-3 py-2 text-xs font-bold text-purple-600">${formatarData(item.data_fechamento)}</td>`;
+        if (tipo === 'apacs-geradas') {
+            cols += `<td class="px-3 py-2 text-xs font-bold text-purple-600">${formatarData(item.data_fechamento)}</td>`;
+            cols += `<td class="px-3 py-2 text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">${item.numero_apac || '—'}</td>`;
+        }
+        
+        // Exames e Data Realização (para Aptos, Retornos, OCI Fechada, APAC)
+        if (tipo === 'aptos-retorno' || tipo === 'retornos-agendados' || tipo === 'retornos-recepcionados' || tipo === 'apac' || tipo === 'apacs-geradas') {
+            const examesNomes = [];
+            if (item.exames_realizados && item.exames_realizados !== '[]') {
+                try {
+                    const exames = typeof item.exames_realizados === 'string' ? JSON.parse(item.exames_realizados) : item.exames_realizados;
+                    if (Array.isArray(exames)) exames.forEach(ex => examesNomes.push(ex.nome));
+                } catch(e) {}
             }
+            cols += `<td class="px-3 py-2 text-[10px]">${examesNomes.join(', ') || '—'}</td>`;
+            cols += `<td class="px-3 py-2 text-xs">${formatarData(item.data_realizacao_exame)}</td>`;
         }
-        pagEl.innerHTML = `<span class="text-xs text-slate-500">${dados.length} registros | Pág ${paginaAtual[tipo]} de ${totalPag}</span><div class="flex gap-1 flex-wrap">${pagHTML}</div>`;
-    });
+        
+        // Cadastrado por (para Aptos, Retornos, OCI Fechada, APAC)
+        if (tipo === 'aptos-retorno' || tipo === 'retornos-agendados' || tipo === 'retornos-recepcionados' || tipo === 'apac' || tipo === 'apacs-geradas') {
+            cols += `<td class="px-3 py-2 text-[10px]">${item.usuario_cadastrou || '—'}</td>`;
+        }
+        
+        // CID (SÓ para OCI Fechada)
+        if (tipo === 'apac') {
+            cols += `<td class="px-3 py-2 text-[10px]">${item.cid || '—'}</td>`;
+        }
+
+        return `<tr class="hover:bg-slate-50">${cols}</tr>`;
+    }).join('');
 }
 
 // ============================================
