@@ -849,6 +849,41 @@
 </div><!-- Fim do screenSistema -->
 
 <script>
+    
+// ============================================
+// FUNÇÕES DE MÁSCARA - PRECISAM SER GLOBAIS
+// ============================================
+function mascaraCPF(input){
+    let v = input.value.replace(/\D/g,'');
+    if(v.length > 11) v = v.slice(0,11);
+    v = v.replace(/(\d{3})(\d)/,'$1.$2');
+    v = v.replace(/(\d{3})(\d)/,'$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    input.value = v;
+}
+
+function mascaraTelefone(input){
+    let v = input.value.replace(/\D/g,'');
+    if(v.length > 11) v = v.slice(0,11);
+    if(v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+    if(v.length > 10) v = v.slice(0,10) + '-' + v.slice(10);
+    input.value = v;
+}
+
+function toggleSenha(id, btn){
+    const input = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    if(input.type === 'password'){
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+    
 // ============================================
 // 🏥 SISTEMA OCI v7.0 - JAVASCRIPT COMPLETO
 // 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704
@@ -1117,9 +1152,6 @@ function importarCSV() {
     };
     reader.readAsText(file);
 }
-
-<script>
-// CONTINUAÇÃO DO JAVASCRIPT - PARTE 4
 
 // ============================================
 // STATUS BADGE E ALERTAS
