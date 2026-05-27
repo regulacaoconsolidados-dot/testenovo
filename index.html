@@ -2021,14 +2021,26 @@ function renderizarTabelas() {
             cols += `<td class="px-3 py-2 text-[10px]">${item.usuario_cadastrou || '—'}</td>`;
         }
         
-        // CID (SÓ para OCI Fechada)
+                // CID (SÓ para OCI Fechada)
         if (tipo === 'apac') {
             cols += `<td class="px-3 py-2 text-[10px]">${item.cid || '—'}</td>`;
         }
 
         return `<tr class="hover:bg-slate-50">${cols}</tr>`;
-    }).join('');
-}
+    }).join('');  // ← FECHA o .map().join()
+
+    // Paginação
+    let pagHTML = '';
+    if (totalPag > 1) {
+        for (let i = 1; i <= totalPag; i++) {
+            pagHTML += `<button onclick="paginaAtual['${tipo}']=${i};renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ${i === paginaAtual[tipo] ? 'bg-blue-600 text-white' : 'bg-slate-100 hover:bg-slate-200'}">${i}</button>`;
+        }
+    }
+    pagEl.innerHTML = `<span class="text-xs text-slate-500">${dados.length} registros | Pág ${paginaAtual[tipo]} de ${totalPag}</span><div class="flex gap-1 flex-wrap">${pagHTML}</div>`;
+
+    }); // ← FECHA o forEach
+
+} // ← FECHA a função renderizarTabelas()
 
 // ============================================
 // GRÁFICOS
@@ -2225,7 +2237,6 @@ if (c8) {
         },
         plugins: [ChartDataLabels]
     });
-}
 }
 
 // ============================================
