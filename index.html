@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏥 SISTEMA OCI v7.0 - Painel de Monitoramento</title>
+    <title>🏥 FERRAMENTA OCI v7.0 - Painel de Monitoramento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -130,23 +130,22 @@ function toggleSenha(id, btn){
 
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
-    <p class="text-white mt-4 font-bold">Carregando Sistema OCI v7.0...</p>
+    <p class="text-white mt-4 font-bold">Carregando Ferramenta OCI v7.0...</p>
     <p class="text-blue-300 text-sm mt-2">Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
 </div>
 
 <div id="screenLogin" class="screen active fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%);">
     <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
         <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
-        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Sistema OCI</h1>
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Ferramenta OCI</h1>
         <p class="text-slate-500 text-sm mb-2">Painel Linha do Cuidado do Paciente v7.0</p>
         <div class="text-left space-y-4">
             <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome Completo</label><input type="text" id="loginNome" placeholder="Digite seu nome completo" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all"></div>
             <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">CPF</label><input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all" oninput="mascaraCPF(this)"></div>
             <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Senha</label><div class="relative"><input type="password" id="loginSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all pr-12"><button type="button" onclick="toggleSenha('loginSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i class="far fa-eye"></i></button></div></div>
         </div>
-        <button id="btnLogin" class="w-full mt-6 bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all transform hover:scale-[1.02] active:scale-95">🔓 ENTRAR NO SISTEMA</button>
+        <button id="btnLogin" class="w-full mt-6 bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all transform hover:scale-[1.02] active:scale-95">🔓 ENTRAR NA FERRAMENTA</button>
         <div class="mt-4 space-y-2"><p class="text-xs text-rose-500 cursor-pointer hover:underline font-bold" onclick="showScreen('screenReset')">🔑 Esqueci a senha / Redefinir</p></div>
-        <div class="mt-4 p-3 bg-slate-50 rounded-xl"><p class="text-[10px] text-slate-500 font-bold">Acessos:</p><p class="text-[10px] text-slate-400">Admin: 123.456.789-09 | Senha: 201704</p></div>
     </div>
 </div>
 
@@ -314,7 +313,7 @@ function toggleSenha(id, btn){
         <header class="h-20 gradient-header text-white flex items-center justify-between px-4 md:px-8 z-40 flex-shrink-0 border-b border-white/10">
             <div>
                 <h2 class="text-lg md:text-xl font-extrabold" id="headerTitle">🧠 Lógica e Indicadores</h2>
-                <p class="text-blue-400 text-[10px] font-bold uppercase">Sistema OCI v7.0 | 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
+                <p class="text-blue-400 text-[10px] font-bold uppercase">Ferramenta OCI v7.0 | 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
             </div>
             <div class="flex items-center gap-3 md:gap-5">
                 <div class="relative hidden lg:block">
@@ -381,7 +380,7 @@ function toggleSenha(id, btn){
             <!-- ============ 🧠 LÓGICA E INDICADORES ============ -->
 <div id="content-logica-indicadores" class="tab-content active space-y-6">
     <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg">
-        <h2 class="text-xl font-extrabold mb-2"><i class="fas fa-brain mr-2"></i> Lógica e Indicadores do Sistema OCI v7.0</h2>
+        <h2 class="text-xl font-extrabold mb-2"><i class="fas fa-brain mr-2"></i> Lógica e Indicadores do Ferramenta OCI v7.0</h2>
         <p class="text-blue-100 text-sm">Entenda como funciona a Linha do Cuidado OCI e todos os seus indicadores</p>
     </div>
 
@@ -544,7 +543,7 @@ function toggleSenha(id, btn){
                 </ul>
             </div>
             <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-sync-alt mr-2"></i>Sistema OCI (Painel Admin)</h4>
+                <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-sync-alt mr-2"></i>Ferramenta OCI (Painel Admin)</h4>
                 <ul class="text-sm text-slate-600 space-y-1">
                     <li>📊 Monitora todo o fluxo em tempo real</li>
                     <li>📊 Atualiza automaticamente a cada 30 segundos</li>
@@ -1126,12 +1125,12 @@ function toggleSenha(id, btn){
             
         </div><!-- Fim do conteúdo principal -->
     </main>
-</div><!-- Fim do screenSistema -->
+</div>
 
     
 <script>
 // ============================================
-// 🏥 SISTEMA OCI v7.0 - JAVASCRIPT PRINCIPAL
+// 🏥 FERRAMENTA OCI v7.0 - JAVASCRIPT PRINCIPAL
 // ============================================
 const SUPABASE_URL = 'https://hheuvkyhwujdrvjvtryg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe';
@@ -1209,7 +1208,7 @@ const pacientes = [];
 const consultas = [];
 
 let usuariosCadastrados = [
-    {id:1, nome:'Ana Paula Araújo da Silva', cpf:'12345678909', nome_mae:'Maria Araújo', cidade_natal:'Contagem', senha:'201704', tipo:'admin'}
+    {id:1, nome:'Ana Paula Araújo da Silva', cpf:'12345678909', nome_mae:'Maria Araújo', cidade_natal:'Contagem', senha:'0', tipo:'admin'}
 ];
 
 let usuarioLogado = null;
@@ -2311,7 +2310,7 @@ function logout() {
 // INICIALIZAÇÃO
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🏥 SISTEMA OCI v7.0 - INICIANDO...');
+    console.log('🏥 FERRAMENTA OCI v7.0 - INICIANDO...');
     console.log('👑 Ana Paula Araújo da Silva | Mat: 201704');
 
     // Login
@@ -2358,8 +2357,8 @@ document.addEventListener('DOMContentLoaded', () => {
     usuario.codigo_expira = Date.now() + 30 * 60 * 1000;
     
     // Abrir e-mail do usuário com o código
-    const assunto = 'Código de Redefinição - Sistema OCI';
-    const corpo = `Olá ${usuario.nome},\n\nSeu código de verificação é: ${codigo}\n\nDigite este código no sistema para redefinir sua senha.\n\nCódigo válido por 30 minutos.`;
+    const assunto = 'Código de Redefinição - FERRAMENTA OCI';
+    const corpo = `Olá ${usuario.nome},\n\nSeu código de verificação é: ${codigo}\n\nDigite este código na ferrmenta para redefinir sua senha.\n\nCódigo válido por 30 minutos.`;
     const mailtoLink = `mailto:${usuario.email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
     window.open(mailtoLink, '_blank');
     
@@ -2392,7 +2391,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Atualização automática a cada 30 segundos
     setInterval(() => { if (usuarioLogado) atualizarTudo(); }, 30000);
 
-    console.log('✅ SISTEMA OCI v7.0 PRONTO!');
+    console.log('✅ FERRAMENTA OCI v7.0');
 });
 </script>
 </body>
