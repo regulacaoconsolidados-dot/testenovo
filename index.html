@@ -164,7 +164,7 @@ function toggleSenha(id, btn){
             <button id="btnResetVerificar" class="..."><i class="fas fa-envelope"></i> RECEBER CÓDIGO POR E-MAIL</button>
         </div>
         <div id="resetStep2" class="hidden">
-            <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-4"><p class="text-sm text-green-700 font-bold">✅ Código enviado! Use: <span class="text-lg">123456</span></p></div>
+            <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-4"><p class="text-sm text-green-700 font-bold">✅ Código enviado para seu e-mail! Verifique sua caixa de entrada ou spam.</p></div>
             <div class="text-left space-y-4">
                 <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Código Recebido *</label><input type="text" id="resetCodigo" placeholder="123456" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all"></div>
                 <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nova Senha (6 dígitos) *</label><div class="relative"><input type="password" id="resetNovaSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all pr-12"><button type="button" onclick="toggleSenha('resetNovaSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i class="far fa-eye"></i></button></div></div>
@@ -1207,9 +1207,7 @@ const especialidades = [
 const pacientes = [];
 const consultas = [];
 
-let usuariosCadastrados = [
-    {id:1, nome:'Ana Paula Araújo da Silva', cpf:'12345678909', nome_mae:'Maria Araújo', cidade_natal:'Contagem', senha:'0', tipo:'admin'}
-];
+let usuariosCadastrados = [];
 
 let usuarioLogado = null;
 let charts = {};
