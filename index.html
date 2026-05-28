@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏥 Portal do Paciente | Sistema OCI v7.0</title>
+    <title>🏥 Portal do Paciente | Ferramenta OCI v7.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -185,7 +185,7 @@
     <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border-2 border-slate-100 mx-4">
         <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
         <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Portal do Paciente</h1>
-        <p class="text-slate-500 text-sm mb-2">Sistema OCI v7.0</p>
+        <p class="text-slate-500 text-sm mb-2">Ferramenta OCI v7.0</p>
         <p class="text-slate-400 text-xs mb-6">Acesso restrito - Faça login para continuar</p>
         <div class="text-left space-y-4">
             <div><label class="form-label text-slate-600 mb-1"><i class="fas fa-id-card text-emerald-500"></i> CPF *</label><input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg input-field" oninput="mascaraCPF(this)"></div>
@@ -195,7 +195,6 @@
         <div class="mt-4 space-y-2">
             <p class="text-sm text-slate-500"><span onclick="showScreen('screenRedefinir')" class="text-rose-600 font-bold hover:underline cursor-pointer"><i class="fas fa-key"></i> Esqueci minha senha</span></p>
         </div>
-        <p class="text-[10px] text-slate-400 mt-4">Admin: 123.456.789-09 | senha: admin1</p>
     </div>
 </div>
 
@@ -263,7 +262,7 @@
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-lg md:hidden">🏥</div>
-                        <div><h2 class="text-lg font-extrabold">Portal do Paciente</h2><p class="text-emerald-300 text-xs">Sistema OCI v7.0 | Desenvolvido por: Ana Paula Araújo da Silva</p></div>
+                        <div><h2 class="text-lg font-extrabold">Portal do Paciente</h2><p class="text-emerald-300 text-xs">Ferramenta OCI v7.0 | Desenvolvido por: Ana Paula Araújo da Silva</p></div>
                     </div>
                     <div class="flex items-center gap-4">
                         <span class="text-sm font-bold hidden md:block" id="portalNome"></span>
@@ -283,7 +282,7 @@
 
                 <div class="aviso-regras" id="avisoRegras">
                     <p class="font-bold mb-1">📋 Regras do Portal:</p>
-                    <p>✏️ <b>Editar:</b> apenas status "Aguardando" | 🔄 <b>Extornar (Sistema OCI):</b> volta status no OCI | 🗑️ <b>Excluir (Sistema OCI):</b> remove e volta status</p>
+                    <p>✏️ <b>Editar:</b> apenas status "Aguardando" | 🔄 <b>Extornar (Ferramenta OCI):</b> volta status no OCI | 🗑️ <b>Excluir (Ferramenta OCI):</b> remove e volta status</p>
                 </div>
 
                 <!-- ABA: SOLICITAR RETORNO -->
@@ -880,7 +879,7 @@ document.getElementById('btnLogin').addEventListener('click', async () => {
 // Função para enviar código por e-mail
 function enviarCodigoEmail(email, nome, codigo) {
     const assunto = '🔐 Código de Redefinição de Senha - Portal do Paciente OCI';
-    const corpo = `Olá ${nome},\n\nRecebemos uma solicitação para redefinir sua senha no Portal do Paciente OCI.\n\n🔑 SEU CÓDIGO DE VERIFICAÇÃO: ${codigo}\n\nDigite este código no sistema para prosseguir com a redefinição da sua senha.\n\n⚠️ Este código é válido por 30 minutos.\n\nSe você não solicitou esta redefinição, ignore este e-mail.\n\nAtenciosamente,\nEquipe Portal do Paciente OCI`;
+    const corpo = `Olá ${nome},\n\nRecebemos uma solicitação para redefinir sua senha no Portal do Paciente OCI.\n\n🔑 SEU CÓDIGO DE VERIFICAÇÃO: ${codigo}\n\nDigite este código na ferramenta para prosseguir com a redefinição da sua senha.\n\n⚠️ Este código é válido por 30 minutos.\n\nSe você não solicitou esta redefinição, ignore este e-mail.\n\nAtenciosamente,\nEquipe Portal do Paciente OCI`;
     const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
     window.open(mailtoLink, '_blank');
     return true;
