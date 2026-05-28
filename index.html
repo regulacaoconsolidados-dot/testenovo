@@ -623,18 +623,61 @@ function mostrarMsg(id,texto,cor){
 // ============================================
 // DROPDOWN UBS
 // ============================================
-function filtrarUBS(){
-    const input=document.getElementById('unidadeSaude'), dropdown=document.getElementById('dropdownUBS'), termo=input.value.toLowerCase().trim();
-    let lista=termo?LISTA_UBS.filter(u=>u.toLowerCase().includes(termo)||(DISTRITO_MAP[u]||'').toLowerCase().includes(termo)):LISTA_UBS;
-    dropdown.innerHTML=lista.length===0?'<div class="dropdown-ubs-item text-slate-400">Nenhuma unidade</div>':lista.map(u=>`<div class="dropdown-ubs-item" onclick="selecionarUBS('${u.replace(/'/g,"\\'")}')">${u}<span class="distrito-tag">${DISTRITO_MAP[u]||''}</span></div>`).join('');
+function filtrarUBS() {
+    const input = document.getElementById('unidadeSaude');
+    const dropdown = document.getElementById('dropdownUBS');
+    
+    if (!input || !dropdown) {
+        console.error('Elementos não encontrados');
+        return;
+    }
+    
+    const termo = input.value.toLowerCase().trim();
+    
+    // Se o campo estiver vazio, mostrar todas as unidades
+    let lista = LISTA_UBS;
+    if (termo) {
+        lista = LISTA_UBS.filter(u => 
+            u.toLowerCase().includes(termo) || 
+            (DISTRITO_MAP[u] || '').toLowerCase().includes(termo)
+        );
+    }
+    
+    // Adicionar a opção "Outra Unidade" no final
+    if (lista.length === 0) {
+        dropdown.innerHTML = '<div class="dropdown-ubs-item text-slate-400">Nenhuma unidade encontrada</div>';
+    } else {
+        dropdown.innerHTML = lista.map(u => `
+            <div class="dropdown-ubs-item" onclick="selecionarUBS('${u.replace(/'/g, "\\'")}')">
+                ${u}
+                <span class="distrito-tag">${DISTRITO_MAP[u] || ''}</span>
+            </div>
+        `).join('');
+    }
+    
     dropdown.classList.add('show');
 }
-function selecionarUBS(ubs){ document.getElementById('unidadeSaude').value=ubs; document.getElementById('dropdownUBS').classList.remove('show'); }
-document.addEventListener('click',function(e){
-    const d=document.getElementById('dropdownUBS'), i=document.getElementById('unidadeSaude');
-    if(d&&i&&!i.contains(e.target)&&!d.contains(e.target)) d.classList.remove('show');
-    const ds=document.getElementById('dropdownSIGTAP'), si=document.getElementById('sigtapSearch');
-    if(ds&&si&&!si.contains(e.target)&&!ds.contains(e.target)) ds.classList.remove('show');
+
+function selecionarUBS(ubs) {
+    const input = document.getElementById('unidadeSaude');
+    const dropdown = document.getElementById('dropdownUBS');
+    if (input) input.value = ubs;
+    if (dropdown) dropdown.classList.remove('show');
+}
+
+// Fechar dropdown ao clicar fora
+document.addEventListener('click', function(e) {
+    const dropdownUBS = document.getElementById('dropdownUBS');
+    const inputUBS = document.getElementById('unidadeSaude');
+    if (dropdownUBS && inputUBS && !inputUBS.contains(e.target) && !dropdownUBS.contains(e.target)) {
+        dropdownUBS.classList.remove('show');
+    }
+    
+    const dropdownSIGTAP = document.getElementById('dropdownSIGTAP');
+    const inputSIGTAP = document.getElementById('sigtapSearch');
+    if (dropdownSIGTAP && inputSIGTAP && !inputSIGTAP.contains(e.target) && !dropdownSIGTAP.contains(e.target)) {
+        dropdownSIGTAP.classList.remove('show');
+    }
 });
 
 // ============================================
