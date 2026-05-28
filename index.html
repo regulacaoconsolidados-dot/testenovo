@@ -418,27 +418,67 @@ let subgrupoSelecionado = null;
 const GRUPOS_SIGTAP = {
   "01": { nome: "01 - Atenção em Oncologia", subgrupos: [
     { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama", exames: [{codigo: "02.04.03.003-0", nome: "MAMOGRAFIA"}]},
-    { codigo: "09.01.01.005-7", nome: "OCI Investigação Diagnóstica de Câncer de Colo do Útero", exames: [{codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.066-6", nome: "BIÓPSIA DO COLO DO ÚTERO"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}]},
-    { codigo: "09.01.01.009-0", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - I", exames: [{codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"}, {codigo: "02.03.01.004-3", nome: "CITOPATOLOGICO"}]},
-    { codigo: "09.01.01.010-3", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - II", exames: [{codigo: "02.03.02.006-5", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.060-7", nome: "CORE BIOPSY"}]}
+    { codigo: "09.01.01.002-2", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama", exames: []},
+    { codigo: "09.01.01.003-0", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Próstata", exames: []},
+    { codigo: "09.01.01.004-9", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Próstata", exames: []},
+    { codigo: "09.01.01.005-7", nome: "OCI Investigação Diagnóstica de Câncer de Colo do Útero", exames: [
+      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.066-6", nome: "BIÓPSIA DO COLO DO ÚTERO"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
+    ]},
+    { codigo: "09.01.01.006-5", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero", exames: []},
+    { codigo: "09.01.01.007-3", nome: "OCI Avaliação Diagnóstica de Câncer Gástrico", exames: []},
+    { codigo: "09.01.01.008-1", nome: "OCI Avaliação Diagnóstica de Câncer Colorretal", exames: []},
+    { codigo: "09.01.01.009-0", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - I", exames: [
+      {codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"}, {codigo: "02.03.01.004-3", nome: "CITOPATOLOGICO"}
+    ]},
+    { codigo: "09.01.01.010-3", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - II", exames: [
+      {codigo: "02.03.02.006-5", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.060-7", nome: "CORE BIOPSY"}, {codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"}
+    ]},
+    { codigo: "09.01.01.011-1", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - I", exames: [
+      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "04.09.06.008-9", nome: "EXCISÃO TIPO 1"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
+    ]},
+    { codigo: "09.01.01.012-0", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - II", exames: [
+      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "04.09.06.008-9", nome: "EXCISÃO TIPO 2"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
+    ]}
   ]},
   "02": { nome: "02 - Atenção em Cardiologia", subgrupos: [
-    { codigo: "09.02.01.003-4", nome: "OCI Avaliação Diagnóstica Inicial - Síndrome Coronariana Crônica", exames: [{codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"}, {codigo: "02.11.02.006-0", nome: "TESTE ERGOMÉTRICO"}]},
-    { codigo: "09.02.01.006-9", nome: "OCI Avaliação Diagnóstica - Insuficiência Cardíaca", exames: [{codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"}, {codigo: "02.02.01.079-1", nome: "DOSEGEM DE PEPTÍDEOS"}, {codigo: "02.11.02.004-4", nome: "HOLTER 24H"}]}
+    { codigo: "09.02.01.001-8", nome: "OCI Avaliação de Risco Cirúrgico", exames: []},
+    { codigo: "09.02.01.002-6", nome: "OCI Avaliação Cardiológica", exames: []},
+    { codigo: "09.02.01.003-4", nome: "OCI Avaliação Diagnóstica Inicial - Síndrome Coronariana Crônica", exames: [
+      {codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"}, {codigo: "02.11.02.006-0", nome: "TESTE ERGOMÉTRICO"}
+    ]},
+    { codigo: "09.02.01.004-2", nome: "OCI Progressão da Avaliação Diagnóstica I", exames: []},
+    { codigo: "09.02.01.005-0", nome: "OCI Progressão da Avaliação Diagnóstica II", exames: [
+      {codigo: "02.08.01.003-3", nome: "CINTILOGRAFIA REPOUSO"}, {codigo: "02.08.01.002-5", nome: "CINTILOGRAFIA ESTRESSE"}
+    ]},
+    { codigo: "09.02.01.006-9", nome: "OCI Avaliação Diagnóstica - Insuficiência Cardíaca", exames: [
+      {codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"}, {codigo: "02.11.02.006-0", nome: "TESTE ERGOMÉTRICO"}, {codigo: "02.02.01.079-1", nome: "DOSEGEM DE PEPTÍDEOS"}, {codigo: "02.11.02.004-4", nome: "HOLTER 24H"}
+    ]}
   ]},
   "03": { nome: "03 - Atenção em Ortopedia", subgrupos: [
-    { codigo: "09.03.01.001-1", nome: "OCI com Recursos de Radiologia", exames: [{codigo: "02.07.01.004-8", nome: "RX LOMBAR"}, {codigo: "02.07.02.002-7", nome: "RX OMBRO"}, {codigo: "02.07.03.003-0", nome: "RX JOELHO"}]},
+    { codigo: "09.03.01.001-1", nome: "OCI com Recursos de Radiologia", exames: [
+      {codigo: "02.07.01.004-8", nome: "RX LOMBAR"}, {codigo: "02.07.02.002-7", nome: "RX OMBRO D"}, {codigo: "02.07.02.002-7", nome: "RX OMBRO E"}, {codigo: "02.07.03.003-0", nome: "RX JOELHO D"}, {codigo: "02.07.03.003-0", nome: "RX JOELHO E"}
+    ]},
     { codigo: "09.03.01.002-0", nome: "OCI com Radiologia e Ultrassonografia", exames: [{codigo: "02.05.02.006-2", nome: "USG DE ARTICULAÇÃO"}]},
     { codigo: "09.03.01.003-8", nome: "OCI com Radiologia e Tomografia", exames: [{codigo: "02.06.01.003-6", nome: "TC COLUNA TORACICA"}, {codigo: "02.06.01.002-8", nome: "TC COLUNA LOMBOSSACRA"}]},
-    { codigo: "09.03.01.004-6", nome: "OCI com Radiologia e Ressonância Magnética", exames: [{codigo: "02.07.01.004-8", nome: "RX LOMBAR"}, {codigo: "02.07.03.002-2", nome: "RNM DE QUADRIL"}]}
+    { codigo: "09.03.01.004-6", nome: "OCI com Radiologia e Ressonância Magnética", exames: [
+      {codigo: "02.07.01.004-8", nome: "RX LOMBAR"}, {codigo: "02.07.02.002-7", nome: "MÃO E PUNHO E"}, {codigo: "02.07.02.002-7", nome: "MÃO E PUNHO D"}, {codigo: "02.07.03.002-2", nome: "RNM DE QUADRIL"}
+    ]}
   ]},
   "04": { nome: "04 - Atenção em Otorrinolaringologia", subgrupos: [
     { codigo: "09.04.01.001-5", nome: "OCI Avaliação Inicial de Déficit Auditivo", exames: []},
-    { codigo: "09.04.01.002-3", nome: "OCI Progressão de Déficit Auditivo", exames: []}
+    { codigo: "09.04.01.002-3", nome: "OCI Progressão de Déficit Auditivo", exames: []},
+    { codigo: "09.04.01.003-1", nome: "OCI Avaliação de Nasofaringe e Orofaringe", exames: []}
   ]},
   "05": { nome: "05 - Atenção em Oftalmologia", subgrupos: [
-    { codigo: "09.05.01.001-9", nome: "OCI Inicial 0 a 8 Anos", exames: []},
-    { codigo: "09.05.01.003-5", nome: "OCI Inicial a Partir de 9 Anos", exames: []}
+    { codigo: "09.05.01.001-9", nome: "OCI Inicial 0 a 8 Anos", exames: []}, { codigo: "09.05.01.002-7", nome: "OCI Estrabismo", exames: []},
+    { codigo: "09.05.01.003-5", nome: "OCI Inicial a Partir de 9 Anos", exames: []}, { codigo: "09.05.01.004-3", nome: "OCI Retinopatia Diabética", exames: []},
+    { codigo: "09.05.01.005-1", nome: "OCI Oncologia Oftalmológica", exames: []}, { codigo: "09.05.01.006-0", nome: "OCI Neuro Oftalmologia", exames: []},
+    { codigo: "09.05.01.007-8", nome: "OCI Exames Sob Sedação", exames: []}
+  ]},
+  "06": { nome: "06 - Atenção em Saúde da Mulher", subgrupos: [
+    { codigo: "09.06.01.001-2", nome: "GIN1 - Avaliação Inicial I", exames: []}, { codigo: "09.06.01.002-0", nome: "GIN1 - Avaliação Inicial II", exames: []},
+    { codigo: "09.06.01.003-9", nome: "GIN2 - Sangramento Uterino Anormal I", exames: []}, { codigo: "09.06.01.004-7", nome: "GIN2 - Sangramento Uterino Anormal II", exames: []},
+    { codigo: "09.06.01.005-5", nome: "GIN3 - Endometriose Profunda", exames: []}
   ]}
 };
 
@@ -449,19 +489,94 @@ Object.keys(GRUPOS_SIGTAP).forEach(gk => {
     });
 });
 
-// LISTA DE UNIDADES DE SAÚDE
+// ============================================
+// LISTA DE UNIDADES DE SAÚDE (UBS)
+// ============================================
 const DISTRITO_MAP = {
   'UNIDADE BASICA DE SAUDE JARDIM BANDEIRANTES': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE FLAMENGO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE AGUA BRANCA': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE XV': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE CSU ELDORADO': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE PARQUE SAO JOAO': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE JARDIM ELDORADO': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE NOVO ELDORADO': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE SANTA CRUZ': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE PEROBAS': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE BELA VISTA': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE INDUSTRIAL III SECAO': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE JARDIM INDUSTRIAL': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE VILA SAO PAULO': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE SANDOVAL DE AZEVEDO': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE JOAO EVANGELISTA': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE BANDEIRANTES': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE AMAZONAS': 'INDUSTRIAL',
+  'UNIDADE BASICA DE SAUDE VILA DINIZ': 'INDUSTRIAL',
   'UNIDADE BASICA DE SAUDE NACIONAL': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE ILDA EFIGENIA': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE JOAQUIM MURTINHO': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE XANGRILA': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE AMENDOEIRAS': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE ESTRELA DALVA': 'NACIONAL',
+  'UNIDADE BASICA DE SAUDE TIJUCA': 'NACIONAL',
   'UNIDADE BASICA DE SAUDE PETROLANDIA': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE TROPICAL II': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE SAPUCAIAS': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE DUQUE DE CAXIAS': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE SAO LUIZ II': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE SAO LUIZ I': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE CAMPO ALTO': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE TROPICAL I': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE ESTANCIAS IMPERIAIS': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE NASCENTES IMPERIAIS': 'PETROLANDIA',
+  'UNIDADE BASICA DE SAUDE CAMPINA VERDE': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE LAGUNA': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE ARPOADOR': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE SAO JOAQUIM': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE PARQUE TURISTA': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE VILA PEROLA': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE NOVO PROGRESSO II': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE COLORADO': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE CANDIDA FERREIRA': 'RESSACA',
+  'UNIDADE DE SAUDE DA FAMILIA VILA PEROLA II USF 84': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE PRESIDENTE KENNEDY': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE OITIS': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE MORADA NOVA': 'RESSACA',
+  'UNIDADE BASICA DE SAUDE INCONFIDENTES': 'RIACHO',
   'UNIDADE BASICA DE SAUDE RIACHO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE FLAMENGO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE NOVO RIACHO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE DURVAL DE BARROS': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE MONTE CASTELO': 'RIACHO',
+  'UNIDADE BASICA DE SAUDE CHACARAS': 'SEDE',
+  'UNIDADE BASICA DE SAUDE CANADA': 'SEDE',
   'UNIDADE BASICA DE SAUDE CENTRO (CAD)': 'SEDE',
+  'UBS BERNARDO MONTEIRO/MOACIR PINTO MOREIRA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE LINDA VISTA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE SANTA HELENA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE VILA ITALIA': 'SEDE',
+  'UNIDADE BASICA DE SAUDE BEATRIZ USF 72': 'SEDE',
+  'UNIDADE BASICA DE SAUDE MARIA DA CONCEICAO': 'SEDE',
+  'UNIDADE BASICA DE SAUDE FUNCIONARIOS': 'SEDE',
+  'UNIDADE BASICA DE SAUDE PRAIA': 'SEDE',
+  'UBS UNIDADE XVI (SEDE)': 'SEDE',
+  'UNIDADE BASICA DE SAUDE VILA RENASCER': 'VARGEM DAS FLORES',
   'UNIDADE BASICA DE SAUDE NOVA CONTAGEM': 'VARGEM DAS FLORES',
-  'CAE RESSACA': 'RESSACA'
+  'UNIDADE BASICA DE SAUDE VILA SOLEDADE': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE ESTALEIRO': 'VARGEM DAS FLORES',
+  'CERESP CONTAGEM': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE RETIRO II': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE RETIRO': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE IPE AMARELO': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE SAO JUDAS TADEU': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE VILA ESPERANCA': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE DARCY RIBEIRO': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE ICAIVERA': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE NOVA CONTAGEM I': 'VARGEM DAS FLORES',
+  'CONTAGEM PENITENCIARIA NELSON HUNGRIA': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE TUPA': 'VARGEM DAS FLORES',
+  'UNIDADE BASICA DE SAUDE LIBERDADE II': 'VARGEM DAS FLORES'
 };
 const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
-
 // ============================================
 // FUNÇÕES UTILITÁRIAS
 // ============================================
@@ -922,7 +1037,6 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
                         const { data: paciente } = await db.from('pacientes').select('*').eq('id', consulta.paciente_id).single();
                         if(paciente){
                             document.getElementById('nomePaciente').value = paciente.nome || '';
-                            // CORREÇÃO: Campos type="date" precisam do formato AAAA-MM-DD
                             document.getElementById('dataNascimentoRetorno').value = paciente.data_nascimento ? paciente.data_nascimento.split('T')[0] : '';
                             document.getElementById('validarNomeMae').value = paciente.nome_mae || '';
                             document.getElementById('telefoneRetorno').value = formatarTelefone(paciente.telefone || '');
@@ -933,7 +1047,6 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
                     
                     document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
                     document.getElementById('localConsulta').value = consulta.local_consulta || '';
-                    // CORREÇÃO: Campos type="date" precisam do formato AAAA-MM-DD
                     document.getElementById('dataPrimeiraConsulta').value = consulta.data_agendada ? consulta.data_agendada.split('T')[0] : '';
                     
                     const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
@@ -944,7 +1057,6 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
                     document.getElementById('msgSolicitar').classList.add('hidden');
                 }
             } catch(e) {
-                console.error('Erro na busca automática:', e);
                 document.getElementById('msgSolicitar').classList.add('hidden');
             }
         }, 600);
