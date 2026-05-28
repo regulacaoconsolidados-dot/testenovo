@@ -377,9 +377,25 @@ function toggleSenha(id, btn){
                             <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-history text-purple-500"></i> <span id="historicoTitulo">Minhas Solicitações</span></h3>
                             <span class="text-[10px] text-slate-400 font-normal" id="historicoBadge">Atualiza automaticamente</span>
                         </div>
+                        <div id="buscaAdminHistorico" class="mb-4" style="display:none">
+                            <input type="text" id="buscaGlobalRetornos" placeholder="🔍 Buscar por paciente, CPF ou nº solicitação..." class="w-full px-4 py-2 border-2 rounded-xl text-sm input-field" oninput="filtrarHistoricoAdmin()">
+                            <span class="text-xs text-slate-500 mt-1" id="contadorRetornos"></span>
+                        </div>
                         <div class="space-y-4" id="historicoLista"><p class="text-slate-400 text-center py-8">Carregando...</p></div>
                     </div>
                 </div>
+                
+                <!-- ABA: MEUS DADOS -->
+                <div id="content-meusdados" class="tab-content">
+                    <div class="bg-white rounded-2xl shadow-sm border-2 border-slate-100 p-6 md:p-8">
+                        <h3 class="text-lg font-bold text-slate-800 mb-6"><i class="fas fa-user-circle text-amber-500"></i> Meus Dados Cadastrais</h3>
+                        <div id="meusDadosConteudo" class="grid grid-cols-1 md:grid-cols-2 gap-4"><p class="text-slate-400">Carregando...</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                 
                 <!-- ABA: MEUS DADOS -->
                 <div id="content-meusdados" class="tab-content">
@@ -857,6 +873,34 @@ document.getElementById('btnConfirmarRedefinir').addEventListener('click', async
 });
 
 // ============================================
+// FILTRO DE BUSCA DO ADMIN + RENDERIZAR HISTÓRICO
+// ============================================
+function filtrarHistoricoAdmin(){
+    const busca = document.getElementById('buscaGlobalRetornos')?.value?.toLowerCase() || '';
+    if(!todosRetornos.length) return;
+    let filtrados = todosRetornos;
+    if(busca){ filtrados = todosRetornos.filter(r => (r.paciente_nome||'').toLowerCase().includes(busca) || (r.paciente_cpf||'').includes(busca) || (r.numero_solicitacao||'').includes(busca) || String(r.id).includes(busca)); }
+    document.getElementById('contadorRetornos').textContent = filtrados.length + ' solicitações encontradas';
+    renderizarHistoricoHTML(filtrados);
+}
+
+function renderizarHistoricoHTML(lista = null){
+    const dados = lista || retornosLista;
+    if(dados.length === 0){ document.getElementById('historicoLista').innerHTML = '<p class="text-slate-400 text-center py-8"><i class="fas fa-inbox text-4xl mb-3 block"></i>Nenhuma solicitação.</p>'; return; }
+    document.getElementById('historicoLista').innerHTML = dados.map(r => {
+        const sb = r.status==='solicitado'?'bg-amber-100 text-amber-700':r.status==='apto_retorno'?'bg-emerald-100 text-emerald-700':r.status==='agendado'?'bg-indigo-100 text-indigo-700':r.status==='retorno_recepcionado'?'bg-teal-100 text-teal-700':'bg-purple-100 text-purple-700';
+        const st = r.status==='solicitado'?'⏳ Aguardando':r.status==='apto_retorno'?'✅ Apto Retorno':r.status==='agendado'?'📅 Agendado':r.status==='retorno_recepcionado'?'📋 Recepcionado':r.status;
+        let btns = '';
+        if(r.status==='solicitado') btns += `<button onclick="editarRetorno(${r.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-edit"></i> Editar</button>`;
+        if(usuarioLogado&&usuarioLogado.tipo==='admin'){
+            btns += `<button onclick="excluirRetornoOCI(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-trash"></i> Excluir (OCI)</button>`;
+            btns += `<button onclick="extornarRetornoOCI(${r.id})" class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-undo"></i> Extornar (OCI)</button>`;
+        }
+        return `<div class="border-2 border-slate-200 rounded-xl p-4 hover:border-blue-300"><div class="flex justify-between items-start flex-wrap gap-2"><div><p class="font-bold">📝 #${r.id}</p><p class="text-xs text-slate-500">📅 ${formatarData(r.created_at)} | 👤 ${r.paciente_nome||'—'}</p><p class="text-xs">🔢 ${r.numero_solicitacao||'—'} | 🏷️ ${r.codigo_sigtap||'—'}</p></div><div class="flex flex-col items-end gap-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${sb}">${st}</span><div class="flex flex-wrap gap-1">${btns}</div></div></div></div>`;
+    }).join('');
+}
+
+// ============================================
 // CARREGAR PORTAL
 // ============================================
 async function carregarPortal(){
@@ -915,7 +959,18 @@ function switchTab(tabId){
 }
 
 // ============================================
-// VALIDAR E SOLICITAR RETORNO (LÓGICA CORRIGIDA)
+// SWITCH DE ABAS
+// ============================================
+function switchTab(tabId){
+    document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active','text-emerald-600');b.classList.add('text-slate-400');});
+    const tm = document.getElementById('tabMobile-'+tabId); if(tm) tm.classList.add('active','text-emerald-600');
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    document.getElementById('content-'+tabId).classList.add('active');
+}
+
+// ============================================
+// VALIDAR E SOLICITAR RETORNO
 // ============================================
 document.getElementById('btnValidarRetorno').addEventListener('click', async () => {
     const ns = document.getElementById('numeroSolicitacao').value.trim();
@@ -1085,47 +1140,87 @@ document.getElementById('cep').addEventListener('input',function(){
 });
 
 // ============================================
-// EDITAR RETORNO
+// EDITAR / EXCLUIR / EXTORNAR
 // ============================================
 function editarRetorno(id){
     const r=retornosLista.find(x=>x.id===id); if(!r)return;
-    document.getElementById('editRetornoId').value=r.id; 
-    document.getElementById('editRetornoNumSol').value=r.numero_solicitacao||'—';
+    document.getElementById('editRetornoId').value=r.id; document.getElementById('editRetornoNumSol').value=r.numero_solicitacao||'—';
     document.getElementById('editRetornoTelefone').value=formatarTelefone(r.telefone_paciente);
     document.getElementById('editRetornoProntuario').value=r.prontuario_vivver||'';
     document.getElementById('editRetornoUnidade').value=r.unidade_saude||'';
     document.getElementById('modalEditarRetorno').classList.add('show');
 }
-
 async function salvarEdicaoRetorno(){
     const id=parseInt(document.getElementById('editRetornoId').value);
     showLoading();
-    await db.from('linha_cuidado').update({
-        unidade_basica_saude: document.getElementById('editRetornoUnidade').value.trim(),
-        updated_at: new Date().toISOString()
-    }).eq('id', id);
-    hideLoading(); 
-    alert('✅ Atualizado!'); 
-    document.getElementById('modalEditarRetorno').classList.remove('show'); 
-    carregarPortal();
+    await db.from('retornos_solicitados').update({telefone_paciente:document.getElementById('editRetornoTelefone').value.replace(/\D/g,''),prontuario_vivver:document.getElementById('editRetornoProntuario').value.trim(),unidade_saude:document.getElementById('editRetornoUnidade').value.trim()}).eq('id',id);
+    hideLoading(); alert('✅ Atualizado!'); document.getElementById('modalEditarRetorno').classList.remove('show'); carregarPortal();
 }
+async function excluirRetornoOCI(id){
+    if(usuarioLogado.tipo!=='admin')return alert('❌ Apenas Administrador.');
+    if(!confirm('⚠️ Excluir e voltar status no OCI?'))return;
+    showLoading(); const r=retornosLista.find(x=>x.id===id);
+    await db.from('retornos_solicitados').delete().eq('id',id);
+    if(r?.consulta_id)await db.from('consultas_oci').update({status:'em_andamento'}).eq('id',r.consulta_id);
+    hideLoading(); carregarPortal();
+}
+async function extornarRetornoOCI(id){
+    if(usuarioLogado.tipo!=='admin')return alert('❌ Apenas Administrador.');
+    if(!confirm('⚠️ Extornar?'))return;
+    showLoading(); const r=retornosLista.find(x=>x.id===id);
+    await db.from('retornos_solicitados').update({status:'solicitado'}).eq('id',id);
+    if(r?.consulta_id)await db.from('consultas_oci').update({status:'aguardando_exame'}).eq('id',r.consulta_id);
+    hideLoading(); carregarPortal();
+}
+    
+// ============================================
+// PAINEL ADMINISTRADOR
+// ============================================
+function abrirModalAdminPortal(){ document.getElementById('modalAdminPortal').classList.add('show'); switchAdminTab('usuarios'); renderizarListaUsuarios(); }
+function fecharModalAdminPortal(){ document.getElementById('modalAdminPortal').classList.remove('show'); }
+function switchAdminTab(tabId){
+    document.querySelectorAll('.admin-portal-tab-btn').forEach(b=>{b.classList.remove('text-purple-600','border-b-2','border-purple-600');b.classList.add('text-slate-400');});
+    document.getElementById('adminPortalTab-'+tabId).classList.add('text-purple-600','border-b-2','border-purple-600');
+    document.querySelectorAll('.admin-portal-content').forEach(c=>c.classList.add('hidden'));
+    document.getElementById('adminPortalContent-'+tabId).classList.remove('hidden');
+}
+function preencherCPFPortal(cpf){ document.getElementById('adminPortalCPF').value=cpf; }
+function gerarCPFPortal(){ document.getElementById('adminPortalCPF').value=gerarCPFValido(); }
+async function renderizarListaUsuarios(){
+    showLoading(); const{data:usuarios}=await db.from('pacientes_portal').select('*').order('nome'); hideLoading();
+    const busca=document.getElementById('adminPortalBusca')?.value?.toLowerCase()||'';
+    let lista=(usuarios||[]).filter(u=>!busca||u.nome.toLowerCase().includes(busca)||(u.cpf||'').includes(busca));
+    document.getElementById('adminPortalTabelaUsuarios').innerHTML=lista.map(u=>`<tr class="hover:bg-slate-50 border-t"><td class="px-3 py-2 font-bold text-sm">${u.nome}</td><td class="px-3 py-2 text-sm">${(u.cpf||'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')}</td><td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td><td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo==='admin'?'bg-purple-100 text-purple-600':'bg-blue-100 text-blue-600'}">${u.tipo==='admin'?'👑 Admin':'👤 Usuário'}</span></td><td class="px-3 py-2"><div class="flex gap-2"><button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário</td></tr>';
+}
+async function cadastrarUsuarioAdmin(){
+    const n=document.getElementById('adminPortalNome')?.value?.trim(), c=document.getElementById('adminPortalCPF')?.value?.replace(/\D/g,''), m=document.getElementById('adminPortalNomeMae')?.value?.trim(), cn=document.getElementById('adminPortalCidadeNatal')?.value?.trim(), t=document.getElementById('adminPortalTelefone')?.value?.replace(/\D/g,''), s=document.getElementById('adminPortalSenha')?.value?.trim(), tp=document.getElementById('adminPortalTipo')?.value||'usuario';
+    if(!n||!c||!m||!cn||!t||!s)return alert('❌ Preencha todos os campos!');
+    if(!validarCPF(c))return alert('❌ CPF inválido!'); if(s.length!==6)return alert('❌ Senha 6 dígitos!');
+    showLoading(); const{data:ex}=await db.from('pacientes_portal').select('id').eq('cpf',c).single();
+    if(ex){hideLoading();return alert('❌ CPF já cadastrado!');}
+    await db.from('pacientes_portal').insert([{nome:n,cpf:c,nome_mae:m,cidade_nascimento:cn,telefone:t,senha:s,email:'',tipo:tp}]);
+    hideLoading(); alert('✅ Cadastrado!'); switchAdminTab('usuarios'); renderizarListaUsuarios();
+}
+function editarUsuario(u){ /* ... */ }
+async function salvarEdicaoUsuario(){ /* ... */ }
+async function excluirUsuario(id){ if(id===usuarioLogado?.id)return alert('❌ Não pode!'); if(!confirm('Excluir?'))return; showLoading(); await db.from('pacientes_portal').delete().eq('id',id); hideLoading(); alert('✅ Excluído!'); renderizarListaUsuarios(); }
+async function importarCSVPortal(){ /* ... */ }
 
-// ============================================
 // FECHAR MODAIS
-// ============================================
 document.getElementById('modalConfirmacao').addEventListener('click',function(e){if(e.target===this)fecharModalConfirmacao();});
 document.getElementById('modalSelecaoExames').addEventListener('click',function(e){if(e.target===this)fecharModalExames();});
+document.getElementById('modalAdminPortal').addEventListener('click',function(e){if(e.target===this)fecharModalAdminPortal();});
+document.getElementById('modalEditarUsuario').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
 document.getElementById('modalEditarRetorno').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
 
-// ============================================
 // LOGOUT
-// ============================================
-function logout(){ usuarioLogado=null; showScreen('screenLogin'); }
+function logout(){ pararAtualizacaoAutomatica(); usuarioLogado=null; showScreen('screenLogin'); }
 document.getElementById('loginSenha').addEventListener('keydown',(e)=>{if(e.key==='Enter')document.getElementById('btnLogin').click();});
 
-console.log('✅ PORTAL DO PACIENTE v7.0 CORRIGIDO E COMPLETO!');
-console.log('👑 Ana Paula Araújo da Silva | Mat: 201704');
-console.log('🔄 Integrado com linha_cuidado no Supabase');
+console.log('✅ PORTAL DO PACIENTE v7.0 CARREGADO!');
+console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
+console.log('🧪 NOVO: Modal com tabela de exames e checkboxes');
+console.log('🔄 Lógica: Todos realizados → APTO | Pendentes → AGUARDANDO');
 </script>
 </body>
 </html>
