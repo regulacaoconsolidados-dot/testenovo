@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏥 Portal do Paciente | Sistema OCI v7.0</title>
+    <title>🏥 Portal do Paciente | Ferramenta OCI v7.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -164,18 +164,41 @@
         </div>
         <div id="adminPortalContent-usuarios" class="admin-portal-content">
             <div class="mb-4"><input type="text" id="adminPortalBusca" placeholder="🔍 Buscar usuário..." class="w-full px-4 py-2 border-2 rounded-xl text-sm" oninput="renderizarListaUsuarios()"></div>
-            <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="text-left py-2">Nome</th><th class="text-left py-2">CPF</th><th class="text-left py-2">Telefone</th><th class="text-left py-2">Tipo</th><th class="text-left py-2">Ações</th></tr></thead><tbody id="adminPortalTabelaUsuarios"></tbody></table></div>
+            <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="text-left py-2">Nome</th><th class="text-left py-2">CPF</th><th class="text-left py-2">E-mail</th><th class="text-left py-2">Telefone</th><th class="text-left py-2">Tipo</th><th class="text-left py-2">Ações</th></tr></thead><tbody id="adminPortalTabelaUsuarios"></tbody></table></div>
         </div>
         <div id="adminPortalContent-cadastrar" class="admin-portal-content hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="form-label">Nome Completo *</label><input type="text" id="adminPortalNome" class="w-full px-3 py-2 border-2 rounded-xl"></div><div><label class="form-label">CPF *</label><div class="flex gap-2"><input type="text" id="adminPortalCPF" class="flex-1 px-3 py-2 border-2 rounded-xl" oninput="mascaraCPF(this)"><button onclick="gerarCPFPortal()" class="bg-slate-200 px-3 rounded-xl text-xs font-bold">Gerar</button></div></div><div><label class="form-label">Nome da Mãe *</label><input type="text" id="adminPortalNomeMae" class="w-full px-3 py-2 border-2 rounded-xl"></div><div><label class="form-label">Cidade Natal *</label><input type="text" id="adminPortalCidadeNatal" class="w-full px-3 py-2 border-2 rounded-xl"></div><div><label class="form-label">Telefone *</label><input type="text" id="adminPortalTelefone" class="w-full px-3 py-2 border-2 rounded-xl" oninput="mascaraTelefone(this)"></div><div><label class="form-label">Senha (6 dígitos) *</label><input type="password" id="adminPortalSenha" maxlength="6" class="w-full px-3 py-2 border-2 rounded-xl"></div><div><label class="form-label">Tipo *</label><select id="adminPortalTipo" class="w-full px-3 py-2 border-2 rounded-xl"><option value="usuario">👤 Usuário Comum</option><option value="admin">👑 Administrador</option></select></div></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label class="form-label">Nome Completo *</label><input type="text" id="adminPortalNome" class="w-full px-3 py-2 border-2 rounded-xl"></div>
+                <div><label class="form-label">CPF *</label><div class="flex gap-2"><input type="text" id="adminPortalCPF" class="flex-1 px-3 py-2 border-2 rounded-xl" oninput="mascaraCPF(this)"><button onclick="gerarCPFPortal()" class="bg-slate-200 px-3 rounded-xl text-xs font-bold">Gerar</button></div></div>
+                <div><label class="form-label">Nome da Mãe *</label><input type="text" id="adminPortalNomeMae" class="w-full px-3 py-2 border-2 rounded-xl"></div>
+                <div><label class="form-label">Cidade Natal *</label><input type="text" id="adminPortalCidadeNatal" class="w-full px-3 py-2 border-2 rounded-xl"></div>
+                <div><label class="form-label">E-mail *</label><input type="email" id="adminPortalEmail" class="w-full px-3 py-2 border-2 rounded-xl"></div>
+                <div><label class="form-label">Telefone *</label><input type="text" id="adminPortalTelefone" class="w-full px-3 py-2 border-2 rounded-xl" oninput="mascaraTelefone(this)"></div>
+                <div><label class="form-label">Senha (6 dígitos) *</label><input type="password" id="adminPortalSenha" maxlength="6" class="w-full px-3 py-2 border-2 rounded-xl"></div>
+                <div><label class="form-label">Tipo *</label><select id="adminPortalTipo" class="w-full px-3 py-2 border-2 rounded-xl"><option value="usuario">👤 Usuário Comum</option><option value="admin">👑 Administrador</option></select></div>
+            </div>
             <button onclick="cadastrarUsuarioAdmin()" class="mt-6 w-full bg-purple-600 text-white py-3 rounded-xl font-bold">✅ CADASTRAR USUÁRIO</button>
         </div>
     </div>
 </div>
-
+    
 <!-- MODAL EDITAR USUÁRIO ADMIN -->
 <div id="modalEditarUsuario" class="modal-overlay">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl mx-4"><h3 class="font-bold mb-4">✏️ Editar Usuário</h3><input type="hidden" id="editUserId"><div class="space-y-3"><input type="text" id="editUserNome" placeholder="Nome" class="w-full px-3 py-2 border-2 rounded-xl"><input type="text" id="editUserTelefone" placeholder="Telefone" class="w-full px-3 py-2 border-2 rounded-xl" oninput="mascaraTelefone(this)"><select id="editUserTipo" class="w-full px-3 py-2 border-2 rounded-xl"><option value="usuario">Usuário Comum</option><option value="admin">Administrador</option></select><input type="password" id="editUserSenha" placeholder="Nova senha (opcional)" maxlength="6" class="w-full px-3 py-2 border-2 rounded-xl"></div><div class="flex gap-3 mt-6"><button onclick="salvarEdicaoUsuario()" class="flex-1 bg-blue-600 text-white py-2 rounded-xl">💾 Salvar</button><button onclick="document.getElementById('modalEditarUsuario').classList.remove('show')" class="flex-1 bg-slate-200 py-2 rounded-xl">Cancelar</button></div></div>
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl mx-4">
+        <h3 class="font-bold mb-4">✏️ Editar Usuário</h3>
+        <input type="hidden" id="editUserId">
+        <div class="space-y-3">
+            <input type="text" id="editUserNome" placeholder="Nome" class="w-full px-3 py-2 border-2 rounded-xl">
+            <input type="text" id="editUserTelefone" placeholder="Telefone" class="w-full px-3 py-2 border-2 rounded-xl" oninput="mascaraTelefone(this)">
+            <input type="email" id="editUserEmail" placeholder="E-mail" class="w-full px-3 py-2 border-2 rounded-xl">
+            <select id="editUserTipo" class="w-full px-3 py-2 border-2 rounded-xl"><option value="usuario">Usuário Comum</option><option value="admin">Administrador</option></select>
+            <input type="password" id="editUserSenha" placeholder="Nova senha (opcional)" maxlength="6" class="w-full px-3 py-2 border-2 rounded-xl">
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button onclick="salvarEdicaoUsuario()" class="flex-1 bg-blue-600 text-white py-2 rounded-xl">💾 Salvar</button>
+            <button onclick="document.getElementById('modalEditarUsuario').classList.remove('show')" class="flex-1 bg-slate-200 py-2 rounded-xl">Cancelar</button>
+        </div>
+    </div>
 </div>
 
 <!-- ============================================ -->
@@ -185,7 +208,7 @@
     <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border-2 border-slate-100 mx-4">
         <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
         <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Portal do Paciente</h1>
-        <p class="text-slate-500 text-sm mb-2">Sistema OCI v7.0</p>
+        <p class="text-slate-500 text-sm mb-2">Ferramenta OCI v7.0</p>
         <p class="text-slate-400 text-xs mb-6">Acesso restrito - Faça login para continuar</p>
         <div class="text-left space-y-4">
             <div><label class="form-label text-slate-600 mb-1"><i class="fas fa-id-card text-emerald-500"></i> CPF *</label><input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg input-field" oninput="mascaraCPF(this)"></div>
@@ -195,37 +218,128 @@
         <div class="mt-4 space-y-2">
             <p class="text-sm text-slate-500"><span onclick="showScreen('screenRedefinir')" class="text-rose-600 font-bold hover:underline cursor-pointer"><i class="fas fa-key"></i> Esqueci minha senha</span></p>
         </div>
-        <p class="text-[10px] text-slate-400 mt-4">Admin: 123.456.789-09 | senha: admin1</p>
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- TELA 2: REDEFINIR SENHA -->
-<!-- ============================================ -->
-<div id="screenRedefinir" class="screen gradient-bg">
-    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border-2 border-slate-100 mx-4">
-        <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🔑</div>
-        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Redefinir Senha</h1>
-        <p class="text-slate-500 text-sm mb-6" id="redefTitulo">Etapa 1: Verificar identidade</p>
-        <div id="etapaSolicitar">
-            <div class="text-left space-y-4">
-                <div><label class="form-label text-slate-600 mb-1">CPF *</label><input type="text" id="redefCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none input-field" oninput="mascaraCPF(this)"></div>
-                <div><label class="form-label text-slate-600 mb-1">Nome da sua Mãe *</label><input type="text" id="redefNomeMae" placeholder="Nome completo da sua mãe" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none input-field"></div>
-                <div><label class="form-label text-slate-600 mb-1">Cidade onde Nasceu *</label><input type="text" id="redefCidade" placeholder="Sua cidade natal" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none input-field"></div>
-            </div>
-            <button id="btnSolicitarCodigo" class="w-full mt-4 bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm"><i class="fab fa-whatsapp"></i> RECEBER CÓDIGO NO WHATSAPP</button>
-        </div>
-        <div id="etapaVerificar" class="hidden">
-            <div class="bg-green-50 border-2 border-green-200 rounded-xl p-3 mb-4"><p class="text-sm text-green-700 font-bold"><i class="fas fa-check-circle"></i> Código enviado!</p></div>
-            <div class="text-left space-y-4">
-                <div><label class="form-label text-slate-600 mb-1">Código Recebido *</label><input type="text" id="redefCodigo" placeholder="000000" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none text-center text-2xl font-bold tracking-widest input-field"></div>
-                <div><label class="form-label text-slate-600 mb-1">Nova Senha (6 dígitos) *</label><input type="password" id="redefNovaSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none input-field"></div>
-            </div>
-            <button id="btnConfirmarRedefinir" class="w-full mt-4 bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm"><i class="fas fa-check"></i> REDEFINIR SENHA</button>
-        </div>
-        <p class="text-sm text-slate-500 mt-4"><span onclick="showScreen('screenLogin')" class="text-emerald-600 font-bold hover:underline cursor-pointer"><i class="fas fa-arrow-left"></i> Voltar ao Login</span></p>
-    </div>
-</div>
+// ============================================
+// REDEFINIR SENHA COM E-MAIL
+// ============================================
+
+// Função para enviar código por e-mail (abre cliente de e-mail)
+function enviarCodigoEmail(email, nome, codigo) {
+    const assunto = '🔐 Código de Redefinição de Senha - Portal do Paciente OCI';
+    const corpo = `Olá ${nome},\n\nRecebemos uma solicitação para redefinir sua senha no Portal do Paciente OCI.\n\n🔑 SEU CÓDIGO DE VERIFICAÇÃO: ${codigo}\n\nDigite este código no sistema para prosseguir com a redefinição da sua senha.\n\n⚠️ Este código é válido por 30 minutos.\n\nSe você não solicitou esta redefinição, ignore este e-mail.\n\nAtenciosamente,\nEquipe Portal do Paciente OCI\nDesenvolvido por: Ana Paula Araújo da Silva`;
+    
+    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+    window.open(mailtoLink, '_blank');
+    return true;
+}
+
+// Evento do botão "RECEBER CÓDIGO"
+document.getElementById('btnSolicitarCodigo').addEventListener('click', async () => {
+    const cpf = document.getElementById('redefCPF').value.replace(/\D/g,'');
+    const nome_mae = document.getElementById('redefNomeMae').value.trim();
+    const cidade = document.getElementById('redefCidade').value.trim();
+    
+    if(!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
+    if(!nome_mae) return alert('❌ Informe o nome da sua mãe!');
+    if(!cidade) return alert('❌ Informe sua cidade natal!');
+    
+    showLoading();
+    
+    // Buscar usuário
+    const { data, error } = await db.from('pacientes_portal').select('*').eq('cpf', cpf).single();
+    
+    hideLoading();
+    
+    if(error || !data) return alert('❌ Usuário não encontrado.');
+    
+    // Verificar dados de segurança
+    if((data.nome_mae || '').toUpperCase() !== nome_mae.toUpperCase()) {
+        return alert('❌ Nome da mãe não confere!');
+    }
+    
+    if((data.cidade_nascimento || '').toUpperCase() !== cidade.toUpperCase()) {
+        return alert('❌ Cidade natal não confere!');
+    }
+    
+    // Verificar se o usuário tem e-mail cadastrado
+    if(!data.email || data.email === '') {
+        return alert('❌ Você não possui e-mail cadastrado!\n\nEntre em contato com o administrador do sistema para cadastrar seu e-mail.');
+    }
+    
+    // Gerar código de 6 dígitos
+    const codigoRedefinicao = gerarCodigoAleatorio();
+    
+    // Salvar código no banco com timestamp
+    await db.from('pacientes_portal').update({ 
+        codigo_redefinicao: codigoRedefinicao,
+        codigo_expira: new Date(Date.now() + 30 * 60 * 1000).toISOString() // Expira em 30 minutos
+    }).eq('cpf', cpf);
+    
+    // Enviar e-mail
+    enviarCodigoEmail(data.email, data.nome, codigoRedefinicao);
+    
+    // Mostrar próxima etapa
+    document.getElementById('etapaSolicitar').classList.add('hidden');
+    document.getElementById('etapaVerificar').classList.remove('hidden');
+    document.getElementById('redefTitulo').innerHTML = 'Etapa 2: Verificar Código <span class="text-xs text-slate-400 ml-2">(código enviado para seu e-mail)</span>';
+    
+    alert(`✅ Código de verificação enviado para:\n📧 ${data.email}\n\n⚠️ Verifique sua caixa de entrada ou spam.\n\nSeu cliente de e-mail será aberto automaticamente.`);
+});
+
+// Evento do botão "REDEFINIR SENHA"
+document.getElementById('btnConfirmarRedefinir').addEventListener('click', async () => {
+    const codigo = document.getElementById('redefCodigo').value.trim();
+    const novaSenha = document.getElementById('redefNovaSenha').value.trim();
+    const cpf = document.getElementById('redefCPF').value.replace(/\D/g,'');
+    
+    if(!codigo || codigo.length !== 6) return alert('❌ Digite o código de 6 dígitos recebido por e-mail!');
+    if(!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
+    
+    showLoading();
+    
+    // Verificar código no banco
+    const { data, error } = await db.from('pacientes_portal')
+        .select('codigo_redefinicao, codigo_expira')
+        .eq('cpf', cpf)
+        .single();
+    
+    if(error || !data) {
+        hideLoading();
+        return alert('❌ Usuário não encontrado!');
+    }
+    
+    // Verificar se o código expirou
+    if(data.codigo_expira && new Date(data.codigo_expira) < new Date()) {
+        hideLoading();
+        return alert('❌ Código expirado! Solicite um novo código.');
+    }
+    
+    // Verificar código
+    if(data.codigo_redefinicao !== codigo) {
+        hideLoading();
+        return alert('❌ Código incorreto! Verifique seu e-mail e tente novamente.');
+    }
+    
+    // Atualizar senha e limpar código
+    await db.from('pacientes_portal').update({ 
+        senha: novaSenha, 
+        codigo_redefinicao: null,
+        codigo_expira: null
+    }).eq('cpf', cpf);
+    
+    hideLoading();
+    alert('✅ Senha redefinida com sucesso!\n\nFaça login com sua nova senha.');
+    showScreen('screenLogin');
+    
+    // Limpar campos
+    document.getElementById('redefCPF').value = '';
+    document.getElementById('redefNomeMae').value = '';
+    document.getElementById('redefCidade').value = '';
+    document.getElementById('redefCodigo').value = '';
+    document.getElementById('redefNovaSenha').value = '';
+});
 
 <!-- ============================================ -->
 <!-- TELA 3: PORTAL PRINCIPAL -->
@@ -263,7 +377,7 @@
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-lg md:hidden">🏥</div>
-                        <div><h2 class="text-lg font-extrabold">Portal do Paciente</h2><p class="text-emerald-300 text-xs">Sistema OCI v7.0 | Desenvolvido por: Ana Paula Araújo da Silva</p></div>
+                        <div><h2 class="text-lg font-extrabold">Portal do Paciente</h2><p class="text-emerald-300 text-xs">Ferramenta OCI v7.0 | Desenvolvido por: Ana Paula Araújo da Silva</p></div>
                     </div>
                     <div class="flex items-center gap-4">
                         <span class="text-sm font-bold hidden md:block" id="portalNome"></span>
@@ -283,7 +397,7 @@
 
                 <div class="aviso-regras" id="avisoRegras">
                     <p class="font-bold mb-1">📋 Regras do Portal:</p>
-                    <p>✏️ <b>Editar:</b> apenas status "Aguardando" | 🔄 <b>Extornar (Sistema OCI):</b> volta status no OCI | 🗑️ <b>Excluir (Sistema OCI):</b> remove e volta status</p>
+                    <p>✏️ <b>Editar:</b> apenas status "Aguardando" | 🔄 <b>Extornar (Ferramenta OCI):</b> volta status no OCI | 🗑️ <b>Excluir (Ferramenta OCI):</b> remove e volta status</p>
                 </div>
 
                 <!-- ABA: SOLICITAR RETORNO -->
@@ -388,9 +502,9 @@
 
 <script>
 // ============================================
-// 🏥 PORTAL DO PACIENTE v7.0 - CORRIGIDO
-// 👑 Ana Paula Araújo da Silva | Mat: 201704
-// 📅 27/05/2026 - VERSÃO FINAL CORRIGIDA
+// 🏥 PORTAL DO PACIENTE v7.0
+// 👑 Ana Paula A. da Silva | Mat: 201704
+// 📅 27/05/2026 
 // CORREÇÕES: LOGOUT FIX, DATAS CORRETAS, ADMIN RESTAURADO
 // ============================================
 
@@ -966,7 +1080,6 @@ async function carregarPortal(){
     document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome||'U')[0].toUpperCase();
     document.getElementById('sidebarTipoPortal').textContent = usuarioLogado.tipo==='admin'?'👑 Administrador':'👤 Usuário';
     
-    // Mostrar menu de administração apenas para admin
     const menuAdmin = document.getElementById('menuAdminPortal');
     if(usuarioLogado.tipo === 'admin'){
         menuAdmin.classList.remove('hidden');
@@ -976,39 +1089,19 @@ async function carregarPortal(){
         document.getElementById('buscaAdminHistorico').style.display = 'none';
     }
     
-    // Buscar da linha_cuidado
     const { data: rets } = await db.from('linha_cuidado').select('*').order('created_at', {ascending: false});
     retornosLista = rets || [];
     todosRetornos = [...retornosLista];
     
     hideLoading();
     
-    document.getElementById('infoCards').innerHTML = `
-        <div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-emerald-500"><p class="text-xs text-slate-500 uppercase font-bold">👤 Usuário Logado</p><p class="text-lg font-extrabold text-slate-800">${usuarioLogado.nome||'—'}</p></div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-blue-500"><p class="text-xs text-slate-500 uppercase font-bold">📋 Solicitações na Linha do Cuidado</p><p class="text-lg font-extrabold text-slate-800">${retornosLista.length}</p></div>
-    `;
+    document.getElementById('infoCards').innerHTML = `<div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-emerald-500"><p class="text-xs text-slate-500 uppercase font-bold">👤 Usuário Logado</p><p class="text-lg font-extrabold text-slate-800">${usuarioLogado.nome||'—'}</p></div><div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-blue-500"><p class="text-xs text-slate-500 uppercase font-bold">📋 Solicitações na Linha do Cuidado</p><p class="text-lg font-extrabold text-slate-800">${retornosLista.length}</p></div>`;
     renderizarHistoricoHTML();
     
-    // Carregar meus dados
     const { data: pacienteData } = await db.from('pacientes').select('*').eq('cpf', usuarioLogado.cpf).single();
     if(pacienteData){
-        document.getElementById('meusDadosConteudo').innerHTML = `
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Nome Completo</p><p class="font-bold">${pacienteData.nome || '—'}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">CPF</p><p class="font-bold">${formatarCPF(pacienteData.cpf)}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Data de Nascimento</p><p class="font-bold">${formatarData(pacienteData.data_nascimento)}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Telefone</p><p class="font-bold">${formatarTelefone(pacienteData.telefone)}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Endereço</p><p class="font-bold">${pacienteData.endereco_completo || '—'}, ${pacienteData.numero_residencia || '—'}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Bairro / Cidade</p><p class="font-bold">${pacienteData.bairro || '—'} / ${pacienteData.municipio || '—'}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Unidade de Saúde</p><p class="font-bold">${pacienteData.unidade_saude || '—'}</p></div>
-        `;
+        document.getElementById('meusDadosConteudo').innerHTML = `<div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Nome Completo</p><p class="font-bold">${pacienteData.nome || '—'}</p></div><div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">CPF</p><p class="font-bold">${formatarCPF(pacienteData.cpf)}</p></div><div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Data de Nascimento</p><p class="font-bold">${formatarData(pacienteData.data_nascimento)}</p></div><div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Telefone</p><p class="font-bold">${formatarTelefone(pacienteData.telefone)}</p></div><div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">E-mail</p><p class="font-bold">${usuarioLogado.email || 'Não cadastrado'}</p></div><div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Endereço</p><p class="font-bold">${pacienteData.endereco_completo || '—'}, ${pacienteData.numero_residencia || '—'}</p></div><div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Bairro / Cidade</p><p class="font-bold">${pacienteData.bairro || '—'} / ${pacienteData.municipio || '—'}</p></div><div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Unidade de Saúde</p><p class="font-bold">${pacienteData.unidade_saude || '—'}</p></div>`;
     }
-}
-
-function formatarCPF(cpf){
-    if(!cpf) return '—';
-    cpf = cpf.toString().replace(/\D/g,'');
-    if(cpf.length !== 11) return cpf;
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 }
 
 // ============================================
@@ -1265,24 +1358,14 @@ async function renderizarListaUsuarios(){
     document.getElementById('adminPortalTabelaUsuarios').innerHTML=lista.map(u=>`<tr class="hover:bg-slate-50 border-t"><td class="px-3 py-2 font-bold text-sm">${u.nome}</td><td class="px-3 py-2 text-sm">${formatarCPF(u.cpf)}</td><td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td><td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo==='admin'?'bg-purple-100 text-purple-600':'bg-blue-100 text-blue-600'}">${u.tipo==='admin'?'👑 Admin':'👤 Usuário'}</span></td><td class="px-3 py-2"><div class="flex gap-2"><button onclick='abrirEdicaoUsuario(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário</td></tr>';
 }
 async function cadastrarUsuarioAdmin(){
-    const n=document.getElementById('adminPortalNome')?.value?.trim(), 
-          c=document.getElementById('adminPortalCPF')?.value?.replace(/\D/g,''), 
-          m=document.getElementById('adminPortalNomeMae')?.value?.trim(), 
-          cn=document.getElementById('adminPortalCidadeNatal')?.value?.trim(), 
-          t=document.getElementById('adminPortalTelefone')?.value?.replace(/\D/g,''), 
-          s=document.getElementById('adminPortalSenha')?.value?.trim(), 
-          tp=document.getElementById('adminPortalTipo')?.value||'usuario';
-    if(!n||!c||!m||!cn||!t||!s)return alert('❌ Preencha todos os campos!');
-    if(!validarCPF(c))return alert('❌ CPF inválido!'); 
-    if(s.length!==6)return alert('❌ Senha 6 dígitos!');
-    showLoading(); 
-    const{data:ex}=await db.from('pacientes_portal').select('id').eq('cpf',c).single();
+    const n=document.getElementById('adminPortalNome')?.value?.trim(), c=document.getElementById('adminPortalCPF')?.value?.replace(/\D/g,''), m=document.getElementById('adminPortalNomeMae')?.value?.trim(), cn=document.getElementById('adminPortalCidadeNatal')?.value?.trim(), e=document.getElementById('adminPortalEmail')?.value?.trim(), t=document.getElementById('adminPortalTelefone')?.value?.replace(/\D/g,''), s=document.getElementById('adminPortalSenha')?.value?.trim(), tp=document.getElementById('adminPortalTipo')?.value||'usuario';
+    if(!n||!c||!m||!cn||!e||!t||!s) return alert('❌ Preencha todos os campos!');
+    if(!validarCPF(c)) return alert('❌ CPF inválido!'); if(s.length!==6) return alert('❌ Senha 6 dígitos!');
+    if(!e.includes('@') || !e.includes('.')) return alert('❌ E-mail inválido!');
+    showLoading(); const{data:ex}=await db.from('pacientes_portal').select('id').eq('cpf',c).single();
     if(ex){hideLoading();return alert('❌ CPF já cadastrado!');}
-    await db.from('pacientes_portal').insert([{nome:n,cpf:c,nome_mae:m,cidade_nascimento:cn,telefone:t,senha:s,email:'',tipo:tp}]);
-    hideLoading(); 
-    alert('✅ Cadastrado!'); 
-    switchAdminTab('usuarios'); 
-    renderizarListaUsuarios();
+    await db.from('pacientes_portal').insert([{nome:n,cpf:c,nome_mae:m,cidade_nascimento:cn,email:e,telefone:t,senha:s,tipo:tp}]);
+    hideLoading(); alert('✅ Cadastrado!'); switchAdminTab('usuarios'); renderizarListaUsuarios();
 }
 let usuarioEditando = null;
 function abrirEdicaoUsuario(u){
@@ -1290,6 +1373,7 @@ function abrirEdicaoUsuario(u){
     document.getElementById('editUserId').value = u.id;
     document.getElementById('editUserNome').value = u.nome;
     document.getElementById('editUserTelefone').value = u.telefone;
+    document.getElementById('editUserEmail').value = u.email || '';
     document.getElementById('editUserTipo').value = u.tipo;
     document.getElementById('editUserSenha').value = '';
     document.getElementById('modalEditarUsuario').classList.add('show');
@@ -1298,10 +1382,12 @@ async function salvarEdicaoUsuario(){
     const id = parseInt(document.getElementById('editUserId').value);
     const nome = document.getElementById('editUserNome').value.trim();
     const telefone = document.getElementById('editUserTelefone').value.replace(/\D/g,'');
+    const email = document.getElementById('editUserEmail').value.trim();
     const tipo = document.getElementById('editUserTipo').value;
     const novaSenha = document.getElementById('editUserSenha').value.trim();
-    const updateData = { nome, telefone, tipo };
+    const updateData = { nome, telefone, email, tipo };
     if(novaSenha && novaSenha.length === 6) updateData.senha = novaSenha;
+    
     showLoading();
     await db.from('pacientes_portal').update(updateData).eq('id', id);
     hideLoading();
@@ -1364,7 +1450,7 @@ function toggleSenha(id, btn){
 }
 
 console.log('✅ PORTAL DO PACIENTE v7.0 CARREGADO!');
-console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
+console.log('👑 Desenvolvido por: Ana Paula A. da Silva | Mat: 201704');
 console.log('✅ CORREÇÕES: Logout funcionando, datas corrigidas, admin restaurado!');
 </script>
 </body>
