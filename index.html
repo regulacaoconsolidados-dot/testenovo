@@ -505,7 +505,6 @@ document.getElementById('btnConfirmarRedefinir').addEventListener('click', async
 // 🏥 PORTAL DO PACIENTE v7.0
 // 👑 Ana Paula A. da Silva | Mat: 201704
 // 📅 27/05/2026 
-// CORREÇÕES: LOGOUT FIX, DATAS CORRETAS, ADMIN RESTAURADO
 // ============================================
 
 const db = window.supabase.createClient(
@@ -989,8 +988,16 @@ document.getElementById('btnLogin').addEventListener('click', async () => {
 });
 
 // ============================================
-// REDEFINIR SENHA
+// REDEFINIR SENHA COM E-MAIL
 // ============================================
+function enviarCodigoEmail(email, nome, codigo) {
+    const assunto = '🔐 Código de Redefinição de Senha - Portal do Paciente OCI';
+    const corpo = `Olá ${nome},\n\nRecebemos uma solicitação para redefinir sua senha no Portal do Paciente OCI.\n\n🔑 SEU CÓDIGO DE VERIFICAÇÃO: ${codigo}\n\nDigite este código no sistema para prosseguir com a redefinição da sua senha.\n\n⚠️ Este código é válido por 30 minutos.\n\nSe você não solicitou esta redefinição, ignore este e-mail.\n\nAtenciosamente,\nEquipe Portal do Paciente OCI\nDesenvolvido por: Ana Paula Araújo da Silva`;
+    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+    window.open(mailtoLink, '_blank');
+    return true;
+}
+
 document.getElementById('btnSolicitarCodigo').addEventListener('click', async () => {
     const cpf = document.getElementById('redefCPF').value.replace(/\D/g,'');
     const nome_mae = document.getElementById('redefNomeMae').value.trim();
@@ -1004,27 +1011,38 @@ document.getElementById('btnSolicitarCodigo').addEventListener('click', async ()
     if(error || !data) return alert('❌ Usuário não encontrado.');
     if((data.nome_mae || '').toUpperCase() !== nome_mae.toUpperCase()) return alert('❌ Nome da mãe não confere!');
     if((data.cidade_nascimento || '').toUpperCase() !== cidade.toUpperCase()) return alert('❌ Cidade natal não confere!');
+    if(!data.email || data.email === '') return alert('❌ Você não possui e-mail cadastrado!\n\nEntre em contato com o administrador do sistema para cadastrar seu e-mail.');
     const codigoRedefinicao = gerarCodigoAleatorio();
-    await db.from('pacientes_portal').update({ codigo_redefinicao: codigoRedefinicao }).eq('cpf', cpf);
+    await db.from('pacientes_portal').update({ codigo_redefinicao: codigoRedefinicao, codigo_expira: new Date(Date.now() + 30 * 60 * 1000).toISOString() }).eq('cpf', cpf);
+    enviarCodigoEmail(data.email, data.nome, codigoRedefinicao);
     document.getElementById('etapaSolicitar').classList.add('hidden');
     document.getElementById('etapaVerificar').classList.remove('hidden');
-    document.getElementById('redefTitulo').textContent = 'Etapa 2: Verificar Código';
-    alert('📱 Use o código: ' + codigoRedefinicao);
+    document.getElementById('redefTitulo').innerHTML = 'Etapa 2: Verificar Código <span class="text-xs text-slate-400 ml-2">(código enviado para seu e-mail)</span>';
+    alert(`✅ Código de verificação enviado para:\n📧 ${data.email}\n\n⚠️ Verifique sua caixa de entrada ou spam.\n\nSeu cliente de e-mail será aberto automaticamente.`);
 });
 
 document.getElementById('btnConfirmarRedefinir').addEventListener('click', async () => {
     const codigo = document.getElementById('redefCodigo').value.trim();
     const novaSenha = document.getElementById('redefNovaSenha').value.trim();
-    if(!novaSenha || novaSenha.length !== 6) return alert('❌ Senha deve ter 6 dígitos!');
+    const cpf = document.getElementById('redefCPF').value.replace(/\D/g,'');
+    if(!codigo || codigo.length !== 6) return alert('❌ Digite o código de 6 dígitos recebido por e-mail!');
+    if(!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
     showLoading();
-    const { data } = await db.from('pacientes_portal').select('codigo_redefinicao').eq('cpf', document.getElementById('redefCPF').value.replace(/\D/g,'')).single();
-    if(!data || data.codigo_redefinicao !== codigo) return alert('❌ Código incorreto!');
-    await db.from('pacientes_portal').update({ senha: novaSenha, codigo_redefinicao: null }).eq('cpf', document.getElementById('redefCPF').value.replace(/\D/g,''));
+    const { data, error } = await db.from('pacientes_portal').select('codigo_redefinicao, codigo_expira').eq('cpf', cpf).single();
+    if(error || !data) { hideLoading(); return alert('❌ Usuário não encontrado!'); }
+    if(data.codigo_expira && new Date(data.codigo_expira) < new Date()) { hideLoading(); return alert('❌ Código expirado! Solicite um novo código.'); }
+    if(data.codigo_redefinicao !== codigo) { hideLoading(); return alert('❌ Código incorreto! Verifique seu e-mail e tente novamente.'); }
+    await db.from('pacientes_portal').update({ senha: novaSenha, codigo_redefinicao: null, codigo_expira: null }).eq('cpf', cpf);
     hideLoading();
-    alert('✅ Senha redefinida!');
+    alert('✅ Senha redefinida com sucesso!\n\nFaça login com sua nova senha.');
     showScreen('screenLogin');
+    document.getElementById('redefCPF').value = '';
+    document.getElementById('redefNomeMae').value = '';
+    document.getElementById('redefCidade').value = '';
+    document.getElementById('redefCodigo').value = '';
+    document.getElementById('redefNovaSenha').value = '';
 });
-
+    
 // ============================================
 // FILTRO DE BUSCA DO ADMIN + RENDERIZAR HISTÓRICO
 // ============================================
