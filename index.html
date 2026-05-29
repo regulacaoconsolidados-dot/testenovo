@@ -2312,24 +2312,41 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('👑 Ana Paula Araújo da Silva | Mat: 201704');
 
     // Login
-    document.getElementById('btnLogin').addEventListener('click', () => {
-        const nome = document.getElementById('loginNome').value.trim();
-        const cpf = limparCPF(document.getElementById('loginCPF').value);
-        const senha = document.getElementById('loginSenha').value.trim();
-        if (!nome || !cpf || !senha) return alert('⚠️ Preencha todos!');
-        if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
-        const usuario = usuariosCadastrados.find(u => u.cpf === cpf && u.senha === senha);
-        if (usuario) {
-            usuarioLogado = usuario;
-            document.getElementById('screenLogin').style.display = 'none';
-            document.getElementById('screenLogin').classList.remove('active');
-            document.getElementById('screenSistema').classList.add('active');
-            document.getElementById('screenSistema').style.display = 'flex';
-            atualizarTudo();
-        } else {
-            alert('❌ Usuário não encontrado!');
-        }
-    });
+    document.getElementById('btnLogin').addEventListener('click', async () => {
+    const nome = document.getElementById('loginNome').value.trim();
+    const cpf = limparCPF(document.getElementById('loginCPF').value);
+    const senha = document.getElementById('loginSenha').value.trim();
+    
+    if (!nome || !cpf || !senha) return alert('⚠️ Preencha todos os campos!');
+    if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
+    
+    showLoading();
+    
+    // Buscar no Supabase (tabela usuarios)
+    const { data, error } = await supabaseClient
+        .from('usuarios')
+        .select('*')
+        .eq('cpf', cpf)
+        .single();
+    
+    hideLoading();
+    
+    if (error || !data) {
+        return alert('❌ Usuário não encontrado!');
+    }
+    
+    if (data.senha !== senha) {
+        return alert('❌ Senha incorreta!');
+    }
+    
+    // Login bem sucedido
+    usuarioLogado = data;
+    document.getElementById('screenLogin').style.display = 'none';
+    document.getElementById('screenLogin').classList.remove('active');
+    document.getElementById('screenSistema').classList.add('active');
+    document.getElementById('screenSistema').style.display = 'flex';
+    atualizarTudo();
+});
 
     // Reset senha
     document.getElementById('btnResetVerificar').addEventListener('click', () => {
