@@ -2322,21 +2322,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     showLoading();
     
-    // Buscar no Supabase (tabela usuarios)
-    const { data, error } = await supabaseClient
-        .from('usuarios')
-        .select('*')
-        .eq('cpf', cpf)
-        .single();
+    // BUSCAR DO SUPABASE USANDO A FUNÇÃO SEGURA
+    const { data, error } = await supabaseClient.rpc('login_painel_admin', {
+        p_cpf: cpf,
+        p_senha: senha
+    });
     
     hideLoading();
     
-    if (error || !data) {
-        return alert('❌ Usuário não encontrado!');
-    }
-    
-    if (data.senha !== senha) {
-        return alert('❌ Senha incorreta!');
+    if (error || !data || !data.success) {
+        return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
     }
     
     // Login bem sucedido
@@ -2347,7 +2342,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('screenSistema').style.display = 'flex';
     atualizarTudo();
 });
-
     // Reset senha
     document.getElementById('btnResetVerificar').addEventListener('click', () => {
     const cpf = limparCPF(document.getElementById('resetCPF').value);
