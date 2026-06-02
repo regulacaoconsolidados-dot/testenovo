@@ -113,7 +113,7 @@
                 <thead>
                     <tr><th style="width:40px; text-align:center;">☑</th><th>Código</th><th>Nome do Exame</th><th style="width:140px;">📅 Data Solicitação</th><th style="width:140px;">📅 Data Realização</th></tr>
                 </thead>
-                <tbody id="modalExamesTbody"><tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold">Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo.</td></tr></tbody>
+                <tbody id="modalExamesTbody"><tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold">Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo.穷</tbody>
             </table>
         </div>
         <div class="text-xs text-slate-500 mb-3" id="contadorExamesSelecionados">0 exames selecionados</div>
@@ -252,11 +252,8 @@
                         <p class="text-sm text-emerald-300 font-bold" id="sidebarTipoPortal"></p>
                         <button onclick="logout()" class="text-sm text-red-400 hover:text-red-300 font-bold">Sair</button>
                     </div>
-                </div>
-            </div>
-        </aside>
 
-        <!-- CONTEÚDO PRINCIPAL -->
+                            <!-- CONTEÚDO PRINCIPAL -->
         <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
             <header class="gradient-bg text-white p-4 md:p-6 shadow-lg flex-shrink-0">
                 <div class="flex items-center justify-between flex-wrap gap-3">
@@ -731,7 +728,7 @@ function selecionarSIGTAPPorCodigo(codigo){
     atualizarExamesSelecionados();
 }
 
-// ============================================
+    // ============================================
 // MODAL DE SELEÇÃO DE EXAMES
 // ============================================
 function abrirModalSelecaoExames(){
@@ -744,7 +741,7 @@ function abrirModalSelecaoExames(){
     const exames = subgrupoSelecionado.exames || [];
     
     if(exames.length === 0){
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold">📋 Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo para cadastrar.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold">📋 Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo para cadastrar.穷</tbody>';
     } else {
         tbody.innerHTML = exames.map((e, idx) => {
             const jaSelecionado = examesSelecionados.find(x => x.codigo === e.codigo);
@@ -855,6 +852,17 @@ function limparFormularioSolicitar(){
 }
 
 // ============================================
+// FUNÇÃO PARA ENVIAR E-MAIL (CORRIGIDA)
+// ============================================
+function enviarCodigoEmail(email, nome, codigo) {
+    const assunto = '🔐 Código de Redefinição de Senha - Portal do Paciente OCI';
+    const corpo = `Olá ${nome},\n\nRecebemos uma solicitação para redefinir sua senha no Portal do Paciente OCI.\n\n🔑 SEU CÓDIGO DE VERIFICAÇÃO: ${codigo}\n\nDigite este código na ferramenta para prosseguir com a redefinição da sua senha.\n\n⚠️ Este código é válido por 30 minutos.\n\nSe você não solicitou esta redefinição, ignore este e-mail.\n\nAtenciosamente,\nEquipe Portal do Paciente OCI`;
+    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+    window.open(mailtoLink, '_blank');
+    return true;
+}
+
+// ============================================
 // LOGIN
 // ============================================
 document.getElementById('btnLogin').addEventListener('click', async () => {
@@ -883,17 +891,8 @@ document.getElementById('btnLogin').addEventListener('click', async () => {
 });
     
 // ============================================
-// REDEFINIR SENHA COM E-MAIL
+// REDEFINIR SENHA COM E-MAIL (CORRIGIDO)
 // ============================================
-
-// Função para enviar código por e-mail
-function enviarCodigoEmail(email, nome, codigo) {
-    const assunto = '🔐 Código de Redefinição de Senha - Portal do Paciente OCI';
-    const corpo = `Olá ${nome},\n\nRecebemos uma solicitação para redefinir sua senha no Portal do Paciente OCI.\n\n🔑 SEU CÓDIGO DE VERIFICAÇÃO: ${codigo}\n\nDigite este código na ferramenta para prosseguir com a redefinição da sua senha.\n\n⚠️ Este código é válido por 30 minutos.\n\nSe você não solicitou esta redefinição, ignore este e-mail.\n\nAtenciosamente,\nEquipe Portal do Paciente OCI`;
-    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
-    window.open(mailtoLink, '_blank');
-    return true;
-}
 
 // Botão "RECEBER CÓDIGO"
 document.getElementById('btnSolicitarCodigo').addEventListener('click', async () => {
@@ -942,10 +941,12 @@ document.getElementById('btnSolicitarCodigo').addEventListener('click', async ()
 document.getElementById('btnConfirmarRedefinir').addEventListener('click', async () => {
     const codigo = document.getElementById('redefCodigo').value.trim();
     const novaSenha = document.getElementById('redefNovaSenha').value.trim();
+    const confirmaSenha = document.getElementById('redefConfirmaSenha').value.trim();
     const cpf = document.getElementById('redefCPF').value.replace(/\D/g,'');
     
     if(!codigo || codigo.length !== 6) return alert('❌ Digite o código de 6 dígitos!');
     if(!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
+    if(novaSenha !== confirmaSenha) return alert('❌ As senhas não conferem!');
     
     showLoading();
     
@@ -988,9 +989,10 @@ document.getElementById('btnConfirmarRedefinir').addEventListener('click', async
     document.getElementById('redefCidade').value = '';
     document.getElementById('redefCodigo').value = '';
     document.getElementById('redefNovaSenha').value = '';
+    document.getElementById('redefConfirmaSenha').value = '';
 });
 
-// ============================================
+    // ============================================
 // FILTRO DE BUSCA DO ADMIN + RENDERIZAR HISTÓRICO
 // ============================================
 let todosRetornos = [];
@@ -1031,7 +1033,8 @@ function renderizarHistoricoHTML(lista = null){
             <div class="flex justify-between items-start flex-wrap gap-2">
                 <div><p class="font-bold">📝 #${r.id}</p><p class="text-xs text-slate-500">📅 ${formatarData(r.created_at)} | 👤 ${r.paciente_nome||'—'}</p><p class="text-xs">🔢 ${r.numero_solicitacao||'—'} | 🏷️ ${r.codigo_sigtap||'—'}</p></div>
                 <div class="flex flex-col items-end gap-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${sb}">${st}</span>${btns}</div>
-            </div></div>`;
+            </div>
+        </div>`;
     }).join('');
 }
 
@@ -1341,22 +1344,22 @@ async function renderizarListaUsuarios(){
     hideLoading();
     const busca=document.getElementById('adminPortalBusca')?.value?.toLowerCase()||'';
     let lista=(usuarios||[]).filter(u=>!busca||u.nome.toLowerCase().includes(busca)||(u.cpf||'').includes(busca));
-    document.getElementById('adminPortalTabelaUsuarios').innerHTML=lista.map(u=>`<tr class="hover:bg-slate-50 border-t"><td class="px-3 py-2 font-bold text-sm">${u.nome}</td><td class="px-3 py-2 text-sm">${formatarCPF(u.cpf)}</td><td class="px-3 py-2 text-sm">${u.email || '—'}</td><td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td><td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo==='admin'?'bg-purple-100 text-purple-600':'bg-blue-100 text-blue-600'}">${u.tipo==='admin'?'👑 Admin':'👤 Usuário'}</span></td><td class="px-3 py-2"><div class="flex gap-2"><button onclick='abrirEdicaoUsuario(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td></tr>`).join('')
+    document.getElementById('adminPortalTabelaUsuarios').innerHTML=lista.map(u=>`<tr class="hover:bg-slate-50 border-t"><td class="px-3 py-2 font-bold text-sm">${u.nome}</td><td class="px-3 py-2 text-sm">${formatarCPF(u.cpf)}</td><td class="px-3 py-2 text-sm">${u.email || '—'}</td><td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td><td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo==='admin'?'bg-purple-100 text-purple-600':'bg-blue-100 text-blue-600'}">${u.tipo==='admin'?'👑 Admin':'👤 Usuário'}</span></td><td class="px-3 py-2"><div class="flex gap-2"><button onclick='abrirEdicaoUsuario(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></tr></tr>`).join('')
 }
 async function cadastrarUsuarioAdmin(){
     const n=document.getElementById('adminPortalNome')?.value?.trim(), 
           c=document.getElementById('adminPortalCPF')?.value?.replace(/\D/g,''), 
           m=document.getElementById('adminPortalNomeMae')?.value?.trim(), 
           cn=document.getElementById('adminPortalCidadeNatal')?.value?.trim(), 
-          e=document.getElementById('adminPortalEmail')?.value?.trim(),  // <-- NOVO
+          e=document.getElementById('adminPortalEmail')?.value?.trim(),
           t=document.getElementById('adminPortalTelefone')?.value?.replace(/\D/g,''), 
           s=document.getElementById('adminPortalSenha')?.value?.trim(), 
           tp=document.getElementById('adminPortalTipo')?.value||'usuario';
     
-    if(!n||!c||!m||!cn||!e||!t||!s) return alert('❌ Preencha todos os campos!');  // Inclui e-mail
+    if(!n||!c||!m||!cn||!e||!t||!s) return alert('❌ Preencha todos os campos!');
     if(!validarCPF(c)) return alert('❌ CPF inválido!'); 
     if(s.length!==6) return alert('❌ Senha 6 dígitos!');
-    if(!e.includes('@') || !e.includes('.')) return alert('❌ E-mail inválido!');  // Valida e-mail
+    if(!e.includes('@') || !e.includes('.')) return alert('❌ E-mail inválido!');
     
     showLoading(); 
     const{data:ex}=await db.from('pacientes_portal').select('id').eq('cpf',c).single();
@@ -1377,7 +1380,7 @@ function abrirEdicaoUsuario(u){
     document.getElementById('editUserId').value = u.id;
     document.getElementById('editUserNome').value = u.nome;
     document.getElementById('editUserTelefone').value = u.telefone;
-    document.getElementById('editUserEmail').value = u.email || '';  // NOVO
+    document.getElementById('editUserEmail').value = u.email || '';
     document.getElementById('editUserTipo').value = u.tipo;
     document.getElementById('editUserSenha').value = '';
     document.getElementById('modalEditarUsuario').classList.add('show');
@@ -1387,7 +1390,7 @@ async function salvarEdicaoUsuario(){
     const id = parseInt(document.getElementById('editUserId').value);
     const nome = document.getElementById('editUserNome').value.trim();
     const telefone = document.getElementById('editUserTelefone').value.replace(/\D/g,'');
-    const email = document.getElementById('editUserEmail').value.trim();  // NOVO
+    const email = document.getElementById('editUserEmail').value.trim();
     const tipo = document.getElementById('editUserTipo').value;
     const novaSenha = document.getElementById('editUserSenha').value.trim();
     const updateData = { nome, telefone, email, tipo };
@@ -1460,3 +1463,6 @@ console.log('✅ CORREÇÕES: Logout funcionando, datas corrigidas, admin restau
 </script>
 </body>
 </html>
+                </div>
+            </div>
+        </aside>
