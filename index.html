@@ -9,65 +9,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f4f8; }
         .gradient-bg { background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%); }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
         .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         .loading-overlay.show { display: flex; }
         .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .tab-btn { cursor: pointer; transition: all 0.2s; }
-        .tab-btn.active { color: #10b981; border-bottom: 3px solid #10b981; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
         .screen { display: none; min-height: 100vh; }
         .screen.active { display: flex; justify-content: center; align-items: center; padding: 20px; }
-        input:focus, select:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 10000; }
-        .modal-overlay.show { display: flex; }
+        .tab-btn { cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { color: #10b981; border-bottom: 3px solid #10b981; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
         .sidebar-item { transition: all 0.2s; }
         .sidebar-item:hover { background: rgba(255,255,255,0.06); }
         .sidebar-item.active { background: rgba(16,185,129,0.15); border-left: 4px solid #10b981; }
-        .campo-obrigatorio::after { content: ' *'; color: #ef4444; font-weight: bold; }
-        .campo-opcional::after { content: ' (opcional)'; color: #94a3b8; font-size: 11px; font-weight: normal; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 10000; }
+        .modal-overlay.show { display: flex; }
+        .form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; }
+        .input-field { border-width: 2px; border-radius: 12px; padding: 10px 14px; width: 100%; transition: all 0.2s; border-color: #e2e8f0; }
+        .input-field:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
         .campo-automatico { background: #f1f5f9 !important; color: #475569 !important; cursor: not-allowed; }
-        .form-label { font-size: 12px !important; font-weight: 700 !important; text-transform: uppercase; letter-spacing: 0.5px; }
-        .input-field { border-width: 2px !important; }
-        .section-card { border-width: 2px !important; }
-        .dropdown-ubs { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #e2e8f0; border-radius: 12px; max-height: 250px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        .dropdown-ubs.show { display: block; }
-        .dropdown-ubs-item { padding: 10px 16px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; transition: all 0.15s; }
-        .dropdown-ubs-item:hover { background: #eff6ff; }
-        .dropdown-ubs-item:last-child { border-bottom: none; }
-        .dropdown-ubs-item .distrito-tag { font-size: 10px; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
-        .aviso-regras { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 8px 14px; font-size: 11px; color: #92400e; margin-bottom: 16px; }
-        .btn-limpar { background: #fef2f2; color: #dc2626; border: 2px solid #fecaca; }
-        .btn-limpar:hover { background: #fee2e2; }
-        .dropdown-sigtap { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #e2e8f0; border-radius: 12px; max-height: 300px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        .dropdown-sigtap.show { display: block; }
-        .dropdown-sigtap-item { padding: 10px 14px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #f1f5f9; transition: all 0.15s; }
-        .dropdown-sigtap-item:hover { background: #eff6ff; }
-        .tabela-exames { width: 100%; border-collapse: collapse; }
-        .tabela-exames th { background: #dbeafe; color: #1e40af; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 10px 8px; border: 1px solid #bfdbfe; white-space: nowrap; letter-spacing: 0.5px; }
-        .tabela-exames td { padding: 8px; border: 1px solid #e2e8f0; vertical-align: middle; }
-        .tabela-exames tr:hover td { background: #f0f9ff; }
-        .tabela-exames .checkbox-exame { width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444; }
-        .tabela-exames input[type="date"] { width: 100%; min-width: 120px; padding: 6px 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .tabela-exames input[type="date"]:focus { border-color: #3b82f6; outline: none; }
-        .exame-checked { background: #fef2f2 !important; }
-        .exame-realizado { background: #f0fdf4 !important; }
-        .exame-realizado td { color: #166534; }
-        .modal-moderno { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-moderno .modal-content { background: #ffffff; border: 2px solid #93c5fd; }
-        .exame-card { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; border: 2px solid #e2e8f0; margin-bottom: 6px; font-size: 12px; }
-        .exame-card.realizado { border-color: #86efac; background: #f0fdf4; }
-        .exame-card.pendente { border-color: #fcd34d; background: #fffbeb; }
-        .btn-remover-exame { background: #fee2e2; color: #dc2626; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 12px; flex-shrink: 0; }
+        .dropdown-ubs, .dropdown-sigtap { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #e2e8f0; border-radius: 12px; max-height: 250px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .dropdown-ubs.show, .dropdown-sigtap.show { display: block; }
+        .dropdown-ubs-item, .dropdown-sigtap-item { padding: 10px 14px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; transition: all 0.15s; }
+        .dropdown-ubs-item:hover, .dropdown-sigtap-item:hover { background: #eff6ff; }
+        .exame-card { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; border: 2px solid #e2e8f0; margin-bottom: 8px; }
+        .exame-card.realizado { background: #f0fdf4; border-color: #86efac; }
+        .exame-card.pendente { background: #fffbeb; border-color: #fcd34d; }
+        .btn-remover-exame { background: #fee2e2; color: #dc2626; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 12px; flex-shrink: 0; border: none; }
         .btn-remover-exame:hover { background: #fecaca; }
         .tabela-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .admin-portal-tab-btn.active { color: #9333ea !important; border-bottom-color: #9333ea !important; }
+        .tabela-exames { width: 100%; border-collapse: collapse; }
+        .tabela-exames th { background: #dbeafe; color: #1e40af; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 10px 8px; border: 1px solid #bfdbfe; white-space: nowrap; }
+        .tabela-exames td { padding: 8px; border: 1px solid #e2e8f0; vertical-align: middle; }
+        .tabela-exames .checkbox-exame { width: 18px; height: 18px; accent-color: #ef4444; }
+        .exame-checked { background: #fef2f2; }
+        .exame-realizado-row { background: #f0fdf4; }
+        .aviso-regras { background: #fffbeb; border-left: 4px solid #fcd34d; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; color: #92400e; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -77,7 +61,9 @@
     <p class="text-white mt-4 font-bold">Processando...</p>
 </div>
 
-<!-- MODAL DE CONFIRMAÇÃO -->
+<!-- ============================================ -->
+<!-- MODAL DE CONFIRMAÇÃO DE SOLICITAÇÃO -->
+<!-- ============================================ -->
 <div id="modalConfirmacao" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="text-center mb-6">
@@ -85,24 +71,28 @@
             <h2 class="text-xl font-extrabold text-slate-800">Confirmação da Solicitação</h2>
             <p class="text-sm text-slate-500 mt-1">Verifique os dados antes de confirmar</p>
         </div>
-        <div class="bg-slate-50 rounded-2xl p-4 mb-4 space-y-3" id="modalDadosConfirmacao"></div>
-        <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-3 mb-4"><p class="text-xs text-amber-700 font-bold">⚠️ Confira todos os dados acima.</p></div>
+        <div class="bg-slate-50 rounded-2xl p-4 mb-4 space-y-3 text-sm" id="modalDadosConfirmacao"></div>
+        <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-3 mb-4">
+            <p class="text-xs text-amber-700 font-bold">⚠️ Confira todos os dados acima.</p>
+        </div>
         <div class="flex gap-3">
-            <button onclick="fecharModalConfirmacao()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-3 rounded-xl font-bold text-sm">❌ CANCELAR</button>
+            <button onclick="fecharModal('modalConfirmacao')" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-3 rounded-xl font-bold text-sm">❌ CANCELAR</button>
             <button id="btnConfirmarRetorno" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold shadow-lg text-sm">✅ CONFIRMAR</button>
         </div>
     </div>
 </div>
 
+<!-- ============================================ -->
 <!-- MODAL DE SELEÇÃO DE EXAMES -->
-<div id="modalSelecaoExames" class="modal-overlay modal-moderno">
-    <div class="modal-content rounded-3xl p-4 md:p-6 w-full max-w-4xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
+<!-- ============================================ -->
+<div id="modalSelecaoExames" class="modal-overlay">
+    <div class="bg-white rounded-3xl p-4 md:p-6 w-full max-w-5xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg md:text-xl font-extrabold flex items-center gap-2 text-blue-800">
+            <h2 class="text-xl font-extrabold flex items-center gap-2 text-blue-800">
                 <span class="w-10 h-10 bg-blue-200 text-blue-600 rounded-xl flex items-center justify-center text-lg">🧪</span>
-                <span>Selecionar Exames do SubGrupo</span>
+                Selecionar Exames
             </h2>
-            <button onclick="fecharModalExames()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+            <button onclick="fecharModal('modalSelecaoExames')" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
         </div>
         <div class="bg-blue-50 rounded-xl p-3 mb-4 border-2 border-blue-200">
             <p class="text-sm font-bold text-blue-700" id="modalSubgrupoNome">Subgrupo</p>
@@ -111,90 +101,54 @@
         <div class="tabela-scroll mb-4">
             <table class="tabela-exames" id="tabelaExamesModal">
                 <thead>
-                    <tr><th style="width:40px; text-align:center;">☑</th><th>Código</th><th>Nome do Exame</th><th style="width:140px;">📅 Data Solicitação</th><th style="width:140px;">📅 Data Realização</th></tr>
+                    <tr><th style="width:40px">☑</th><th>Código</th><th>Nome do Exame</th><th style="width:140px">📅 Data Solicitação</th><th style="width:140px">📅 Data Realização</th></tr>
                 </thead>
-                <tbody id="modalExamesTbody"><tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold">Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo.</td></tr></tbody>
+                <tbody id="modalExamesTbody"><tr><td colspan="5" class="text-center py-8 text-slate-400">Nenhum exame listado</td></tr></tbody>
             </table>
         </div>
         <div class="text-xs text-slate-500 mb-3" id="contadorExamesSelecionados">0 exames selecionados</div>
-        <div class="border-2 border-dashed border-amber-300 rounded-xl p-4 bg-amber-50">
-            <p class="text-sm font-bold text-amber-700 mb-3">📝 Adicionar Outro Exame (não listado)</p>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
-                <input type="text" id="modalOutroCodigo" placeholder="Código" class="w-full px-2 py-2 border-2 border-amber-200 rounded-lg text-xs">
-                <input type="text" id="modalOutroNome" placeholder="Nome do exame" class="w-full px-2 py-2 border-2 border-amber-200 rounded-lg text-xs">
-                <input type="date" id="modalOutroDataSolicitacao" class="w-full px-2 py-2 border-2 border-amber-200 rounded-lg text-xs">
-                <input type="date" id="modalOutroDataRealizacao" class="w-full px-2 py-2 border-2 border-amber-200 rounded-lg text-xs">
+        <div class="border-2 border-dashed border-amber-300 rounded-xl p-4 bg-amber-50 mb-3">
+            <p class="text-sm font-bold text-amber-700 mb-2">📝 Adicionar Outro Exame</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <input type="text" id="modalOutroCodigo" placeholder="Código" class="border rounded-lg p-2 text-xs">
+                <input type="text" id="modalOutroNome" placeholder="Nome do exame" class="border rounded-lg p-2 text-xs">
+                <input type="date" id="modalOutroDataSolicitacao" class="border rounded-lg p-2 text-xs">
+                <input type="date" id="modalOutroDataRealizacao" class="border rounded-lg p-2 text-xs">
             </div>
-            <button onclick="adicionarOutroExame()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-xs font-bold">➕ Adicionar Outro</button>
+            <button onclick="adicionarOutroExame()" class="mt-2 bg-amber-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold">➕ Adicionar</button>
         </div>
-        <button onclick="fecharModalExames()" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">✅ CONCLUIR E SALVAR SELEÇÃO</button>
+        <button onclick="fecharModal('modalSelecaoExames')" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">✅ CONCLUIR</button>
     </div>
 </div>
 
-<!-- MODAL EDITAR RETORNO -->
-<div id="modalEditarRetorno" class="modal-overlay">
-    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-extrabold flex items-center gap-2"><span class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">✏️</span>Editar Solicitação</h2>
-            <button onclick="document.getElementById('modalEditarRetorno').classList.remove('show')" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+<!-- ============================================ -->
+<!-- MODAL EDITAR EXAME (HISTÓRICO) -->
+<!-- ============================================ -->
+<div id="modalEditarExame" class="modal-overlay">
+    <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-extrabold flex items-center gap-2">✏️ Editar Exames</h2>
+            <button onclick="fecharModal('modalEditarExame')" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
         </div>
-        <form class="space-y-3" onsubmit="return false;">
-            <input type="hidden" id="editRetornoId">
-            <div><label class="form-label text-slate-600 mb-1">Nº Solicitação 1ª Consulta</label><input type="text" id="editRetornoNumSol" class="w-full px-3 py-2.5 border-2 rounded-xl text-sm bg-slate-100 input-field" readonly></div>
-            <div class="grid grid-cols-2 gap-3">
-                <div><label class="form-label text-slate-600 mb-1">📱 Telefone *</label><input type="text" id="editRetornoTelefone" class="w-full px-3 py-2.5 border-2 rounded-xl text-sm input-field" maxlength="15" oninput="mascaraTelefone(this)"></div>
-                <div><label class="form-label text-slate-600 mb-1">Prontuário Vivver *</label><input type="text" id="editRetornoProntuario" class="w-full px-3 py-2.5 border-2 rounded-xl text-sm input-field"></div>
-            </div>
-            <div><label class="form-label text-slate-600 mb-1">Unidade de Saúde *</label><input type="text" id="editRetornoUnidade" class="w-full px-3 py-2.5 border-2 rounded-xl text-sm input-field"></div>
-            <button onclick="salvarEdicaoRetorno()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">💾 Salvar Alterações</button>
-        </form>
+        <div id="modalEditarExameConteudo"></div>
     </div>
-</div>
-
-<!-- MODAL ADMIN PORTAL -->
-<div id="modalAdminPortal" class="modal-overlay">
-    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-5xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-extrabold flex items-center gap-2"><span class="w-10 h-10 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center">👑</span>Painel Administrativo</h2>
-            <button onclick="fecharModalAdminPortal()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
-        </div>
-        <div class="flex gap-6 border-b mb-4 overflow-x-auto">
-            <button onclick="switchAdminTab('usuarios')" id="adminPortalTab-usuarios" class="admin-portal-tab-btn pb-2 text-sm font-bold text-purple-600 border-b-2 border-purple-600">👥 Usuários</button>
-            <button onclick="switchAdminTab('cadastrar')" id="adminPortalTab-cadastrar" class="admin-portal-tab-btn pb-2 text-sm font-bold text-slate-400">➕ Cadastrar</button>
-        </div>
-        <div id="adminPortalContent-usuarios" class="admin-portal-content">
-            <div class="mb-4"><input type="text" id="adminPortalBusca" placeholder="🔍 Buscar usuário..." class="w-full px-4 py-2 border-2 rounded-xl text-sm" oninput="renderizarListaUsuarios()"></div>
-            <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="text-left py-2">Nome</th><th class="text-left py-2">CPF</th><th class="text-left py-2">E-mail</th><th class="text-left py-2">Telefone</th><th class="text-left py-2">Tipo</th><th class="text-left py-2">Ações</th></tr></thead><tbody id="adminPortalTabelaUsuarios"></tbody></table></div>
-        </div>
-        <div id="adminPortalContent-cadastrar" class="admin-portal-content hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="form-label">Nome Completo *</label><input type="text" id="adminPortalNome" class="w-full px-3 py-2 border-2 rounded-xl"></div><div><label class="form-label">CPF *</label><div class="flex gap-2"><input type="text" id="adminPortalCPF" class="flex-1 px-3 py-2 border-2 rounded-xl" oninput="mascaraCPF(this)"><button onclick="gerarCPFPortal()" class="bg-slate-200 px-3 rounded-xl text-xs font-bold">Gerar</button></div></div><div><label class="form-label">Nome da Mãe *</label><input type="text" id="adminPortalNomeMae" class="w-full px-3 py-2 border-2 rounded-xl"></div><div><label class="form-label">Cidade Natal *</label><input type="text" id="adminPortalCidadeNatal" class="w-full px-3 py-2 border-2 rounded-xl"></div><div><label class="form-label">Telefone *</label><input type="text" id="adminPortalTelefone" class="w-full px-3 py-2 border-2 rounded-xl" oninput="mascaraTelefone(this)"></div><div><label class="form-label">E-mail *</label><input type="email" id="adminPortalEmail" class="w-full px-3 py-2 border-2 rounded-xl"></div><div><label class="form-label">Senha (6 dígitos) *</label><input type="password" id="adminPortalSenha" maxlength="6" class="w-full px-3 py-2 border-2 rounded-xl"></div><div><label class="form-label">Tipo *</label><select id="adminPortalTipo" class="w-full px-3 py-2 border-2 rounded-xl"><option value="usuario">👤 Usuário Comum</option><option value="admin">👑 Administrador</option></select></div></div>
-            <button onclick="cadastrarUsuarioAdmin()" class="mt-6 w-full bg-purple-600 text-white py-3 rounded-xl font-bold">✅ CADASTRAR USUÁRIO</button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL EDITAR USUÁRIO ADMIN -->
-<div id="modalEditarUsuario" class="modal-overlay">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl mx-4"><h3 class="font-bold mb-4">✏️ Editar Usuário</h3><input type="hidden" id="editUserId"><div class="space-y-3"><input type="text" id="editUserNome" placeholder="Nome" class="w-full px-3 py-2 border-2 rounded-xl"><input type="text" id="editUserTelefone" placeholder="Telefone" class="w-full px-3 py-2 border-2 rounded-xl" oninput="mascaraTelefone(this)"><input type="email" id="editUserEmail" placeholder="E-mail" class="w-full px-3 py-2 border-2 rounded-xl"><select id="editUserTipo" class="w-full px-3 py-2 border-2 rounded-xl"><option value="usuario">Usuário Comum</option><option value="admin">Administrador</option></select><input type="password" id="editUserSenha" placeholder="Nova senha (opcional)" maxlength="6" class="w-full px-3 py-2 border-2 rounded-xl"></div><div class="flex gap-3 mt-6"><button onclick="salvarEdicaoUsuario()" class="flex-1 bg-blue-600 text-white py-2 rounded-xl">💾 Salvar</button><button onclick="document.getElementById('modalEditarUsuario').classList.remove('show')" class="flex-1 bg-slate-200 py-2 rounded-xl">Cancelar</button></div></div>
 </div>
 
 <!-- ============================================ -->
 <!-- TELA 1: LOGIN -->
 <!-- ============================================ -->
 <div id="screenLogin" class="screen active gradient-bg">
-    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border-2 border-slate-100 mx-4">
+    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center mx-4">
         <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
         <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Portal do Paciente</h1>
         <p class="text-slate-500 text-sm mb-2">Ferramenta OCI v7.0</p>
-        <p class="text-slate-400 text-xs mb-6">Acesso restrito - Faça login para continuar</p>
+        <p class="text-slate-400 text-xs mb-6">Acesso restrito</p>
         <div class="text-left space-y-4">
-            <div><label class="form-label text-slate-600 mb-1"><i class="fas fa-id-card text-emerald-500"></i> CPF *</label><input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg input-field" oninput="mascaraCPF(this)"></div>
-            <div><label class="form-label text-slate-600 mb-1"><i class="fas fa-lock text-emerald-500"></i> Senha (6 dígitos) *</label><div class="relative"><input type="password" id="loginSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-all text-lg pr-12 input-field"><button type="button" onclick="toggleSenha('loginSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i class="far fa-eye text-lg"></i></button></div></div>
+            <div><label class="form-label">CPF *</label><input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="input-field" oninput="mascaraCPF(this)"></div>
+            <div><label class="form-label">Senha (6 dígitos) *</label><div class="relative"><input type="password" id="loginSenha" maxlength="6" class="input-field pr-12"><button type="button" onclick="toggleSenha('loginSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="far fa-eye"></i></button></div></div>
         </div>
-        <button id="btnLogin" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-emerald-200 transition-all transform hover:scale-[1.02] active:scale-95"><i class="fas fa-sign-in-alt"></i> ENTRAR</button>
-        <div class="mt-4 space-y-2">
-            <p class="text-sm text-slate-500"><span onclick="showScreen('screenRedefinir')" class="text-rose-600 font-bold hover:underline cursor-pointer"><i class="fas fa-key"></i> Esqueci minha senha</span></p>
-        </div>
+        <button id="btnLogin" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold">🔓 ENTRAR</button>
+        <p class="text-sm text-slate-500 mt-4"><span onclick="showScreen('screenRedefinir')" class="text-rose-600 font-bold hover:underline cursor-pointer">🔑 Esqueci minha senha</span></p>
     </div>
 </div>
 
@@ -202,36 +156,36 @@
 <!-- TELA 2: REDEFINIR SENHA -->
 <!-- ============================================ -->
 <div id="screenRedefinir" class="screen gradient-bg">
-    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border-2 border-slate-100 mx-4">
+    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center mx-4">
         <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🔑</div>
         <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Redefinir Senha</h1>
         <p class="text-slate-500 text-sm mb-6" id="redefTitulo">Etapa 1: Verificar identidade</p>
         <div id="etapaSolicitar">
             <div class="text-left space-y-4">
-                <div><label class="form-label text-slate-600 mb-1">CPF *</label><input type="text" id="redefCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none input-field" oninput="mascaraCPF(this)"></div>
-                <div><label class="form-label text-slate-600 mb-1">Nome da sua Mãe *</label><input type="text" id="redefNomeMae" placeholder="Nome completo da sua mãe" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none input-field"></div>
-                <div><label class="form-label text-slate-600 mb-1">Cidade onde Nasceu *</label><input type="text" id="redefCidade" placeholder="Sua cidade natal" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none input-field"></div>
+                <div><label class="form-label">CPF *</label><input type="text" id="redefCPF" maxlength="14" class="input-field" oninput="mascaraCPF(this)"></div>
+                <div><label class="form-label">Nome da sua Mãe *</label><input type="text" id="redefNomeMae" class="input-field"></div>
+                <div><label class="form-label">Cidade onde Nasceu *</label><input type="text" id="redefCidade" class="input-field"></div>
             </div>
-            <button id="btnSolicitarCodigo" class="w-full mt-4 bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm"><i class="fas fa-envelope"></i> RECEBER CÓDIGO POR E-MAIL</button>
+            <button id="btnSolicitarCodigo" class="w-full mt-4 bg-rose-600 text-white py-3 rounded-xl font-bold">📧 RECEBER CÓDIGO</button>
         </div>
         <div id="etapaVerificar" class="hidden">
-            <div class="bg-green-50 border-2 border-green-200 rounded-xl p-3 mb-4"><p class="text-sm text-green-700 font-bold"><i class="fas fa-check-circle"></i> Código enviado!</p></div>
+            <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 text-green-700 font-bold text-sm">✅ Código enviado!</div>
             <div class="text-left space-y-4">
-                <div><label class="form-label text-slate-600 mb-1">Código Recebido *</label><input type="text" id="redefCodigo" placeholder="000000" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none text-center text-2xl font-bold tracking-widest input-field"></div>
-                <div><label class="form-label text-slate-600 mb-1">Nova Senha (6 dígitos) *</label><input type="password" id="redefNovaSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-rose-500 outline-none input-field"></div>
+                <div><label class="form-label">Código Recebido *</label><input type="text" id="redefCodigo" maxlength="6" class="input-field text-center text-2xl font-bold tracking-widest"></div>
+                <div><label class="form-label">Nova Senha (6 dígitos) *</label><div class="relative"><input type="password" id="redefNovaSenha" maxlength="6" class="input-field pr-12"><button type="button" onclick="toggleSenha('redefNovaSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="far fa-eye"></i></button></div></div>
+                <div><label class="form-label">Confirmar Senha *</label><div class="relative"><input type="password" id="redefConfirmaSenha" maxlength="6" class="input-field pr-12"><button type="button" onclick="toggleSenha('redefConfirmaSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="far fa-eye"></i></button></div></div>
             </div>
-            <button id="btnConfirmarRedefinir" class="w-full mt-4 bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm"><i class="fas fa-check"></i> REDEFINIR SENHA</button>
+            <button id="btnConfirmarRedefinir" class="w-full mt-4 bg-rose-600 text-white py-3 rounded-xl font-bold">✅ REDEFINIR</button>
         </div>
-        <p class="text-sm text-slate-500 mt-4"><span onclick="showScreen('screenLogin')" class="text-emerald-600 font-bold hover:underline cursor-pointer"><i class="fas fa-arrow-left"></i> Voltar ao Login</span></p>
+        <p class="text-sm text-slate-500 mt-4"><span onclick="showScreen('screenLogin')" class="text-emerald-600 font-bold hover:underline cursor-pointer">← Voltar ao Login</span></p>
     </div>
 </div>
 
 <!-- ============================================ -->
-<!-- TELA 3: PORTAL PRINCIPAL -->
+<!-- TELA 3: PORTAL PRINCIPAL (SIDEBAR + HEADER) -->
 <!-- ============================================ -->
 <div id="screenPortal" class="screen" style="display:none; min-height:100vh; background:#f8fafc; padding:0;">
     <div style="width:100%; display:flex; min-height:100vh;">
-        
         <!-- SIDEBAR -->
         <aside class="w-64 gradient-bg text-white hidden md:flex flex-col min-h-screen shadow-2xl z-50 flex-shrink-0">
             <div class="p-6 flex items-center gap-3 border-b border-white/10">
@@ -258,125 +212,117 @@
 
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+            <!-- HEADER -->
             <header class="gradient-bg text-white p-4 md:p-6 shadow-lg flex-shrink-0">
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-lg md:hidden">🏥</div>
-                        <div><h2 class="text-lg font-extrabold">Portal do Paciente</h2><p class="text-emerald-300 text-xs">Ferramenta OCI v7.0 | Desenvolvido por: Ana Paula Araújo da Silva</p></div>
+                        <div><h2 class="text-lg font-extrabold">Portal do Paciente</h2><p class="text-emerald-300 text-xs">Ferramenta OCI v7.0 | Ana Paula Araújo da Silva</p></div>
                     </div>
                     <div class="flex items-center gap-4">
                         <span class="text-sm font-bold hidden md:block" id="portalNome"></span>
-                        <button onclick="logout()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm font-bold transition-all"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                        <button onclick="logout()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm font-bold">Sair</button>
                     </div>
                 </div>
             </header>
 
+            <!-- CONTEÚDO ROLÁVEL -->
             <div class="flex-1 overflow-y-auto p-4 md:p-6">
+                <!-- CARDS INFO -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="infoCards"></div>
-                
-                <div class="flex gap-4 md:gap-6 border-b-2 border-slate-200 mb-6 overflow-x-auto md:hidden">
-                    <button onclick="switchTab('solicitar')" id="tabMobile-solicitar" class="tab-btn active pb-3 text-sm font-bold flex items-center gap-2 whitespace-nowrap"><i class="fas fa-paper-plane text-blue-500"></i> Solicitar</button>
-                    <button onclick="switchTab('historico')" id="tabMobile-historico" class="tab-btn pb-3 text-sm font-bold text-slate-400 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-history text-purple-500"></i> Histórico</button>
-                    <button onclick="switchTab('meusdados')" id="tabMobile-meusdados" class="tab-btn pb-3 text-sm font-bold text-slate-400 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-user-circle text-amber-500"></i> Dados</button>
+
+                <!-- TABS MOBILE -->
+                <div class="flex gap-4 border-b-2 border-slate-200 mb-6 overflow-x-auto md:hidden">
+                    <button onclick="switchTab('solicitar')" id="tabMobile-solicitar" class="tab-btn active pb-3 text-sm font-bold whitespace-nowrap">📤 Solicitar</button>
+                    <button onclick="switchTab('historico')" id="tabMobile-historico" class="tab-btn pb-3 text-sm font-bold text-slate-400 whitespace-nowrap">📋 Histórico</button>
+                    <button onclick="switchTab('meusdados')" id="tabMobile-meusdados" class="tab-btn pb-3 text-sm font-bold text-slate-400 whitespace-nowrap">👤 Dados</button>
                 </div>
 
-                <div class="aviso-regras" id="avisoRegras">
+                <!-- REGRAS -->
+                <div class="aviso-regras">
                     <p class="font-bold mb-1">📋 Regras do Portal:</p>
-                    <p>✏️ <b>Editar:</b> apenas status "Aguardando" | 🔄 <b>Extornar (Ferramenta OCI):</b> volta status no OCI | 🗑️ <b>Excluir (Ferramenta OCI):</b> remove e volta status</p>
+                    <p>✏️ Editar: apenas status "Aguardando" | 🔄 Extornar: volta status | 🗑️ Excluir: remove e volta status</p>
                 </div>
 
-                <!-- ABA: SOLICITAR RETORNO -->
+                <!-- ==================== ABA 1: SOLICITAR RETORNO ==================== -->
                 <div id="content-solicitar" class="tab-content active">
-                    <div class="bg-white rounded-2xl shadow-sm border-2 border-slate-100 p-6 md:p-8">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-paper-plane text-blue-500"></i> Solicitar Retorno</h3>
-                            <button onclick="limparFormularioSolicitar()" class="btn-limpar px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-broom"></i> Limgar Preenchimento
-                            </button>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-paper-plane text-blue-500 mr-2"></i>Solicitar Retorno</h3>
+                            <button onclick="limparFormularioSolicitar()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100">🧹 Limpar</button>
                         </div>
-                        <p class="text-sm text-slate-500 mb-6">⚠️ O número da solicitação deve existir na <strong>Linha do Cuidado</strong> com status "Recepcionada".</p>
-                        
+                        <p class="text-sm text-amber-600 mb-6">⚠️ O número da solicitação deve existir na Linha do Cuidado com status "Recepcionada" ou "Aguardando Exames"</p>
+
                         <!-- DADOS DA 1ª CONSULTA -->
-                        <div class="bg-blue-50 rounded-2xl p-4 mb-6 border-2 border-blue-200 section-card">
-                            <h4 class="text-sm font-bold text-blue-700 mb-3"><i class="fas fa-search"></i> Dados da 1ª Consulta</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div><label class="form-label text-blue-600 mb-1 campo-obrigatorio">Nº Solicitação 1ª Consulta</label><input type="text" id="numeroSolicitacao" placeholder="Somente números" class="w-full px-3 py-2.5 border-2 border-blue-200 rounded-xl focus:border-blue-500 outline-none font-bold text-blue-600 text-sm input-field" oninput="this.value = this.value.replace(/\D/g,'')"></div>
-                                <div><label class="form-label text-blue-600 mb-1">Prontuário <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="prontuarioVivver" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico font-bold text-purple-600 text-sm input-field"></div>
-                                <div><label class="form-label text-blue-600 mb-1">Nome do Paciente <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="nomePaciente" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 font-bold text-sm input-field"></div>
-                                <div><label class="form-label text-blue-600 mb-1">📅 Data Nascimento <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="dataNascimentoRetorno" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
-                                <div><label class="form-label text-blue-600 mb-1">Nome da Mãe <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="validarNomeMae" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
-                                <div><label class="form-label text-blue-600 mb-1">📱 Telefone <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="telefoneRetorno" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
-                                <div><label class="form-label text-blue-600 mb-1">Especialidade <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="especialidadeRetorno" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
-                                <div><label class="form-label text-blue-600 mb-1">Médico <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="medicoSolicitante" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
-                                <div><label class="form-label text-blue-600 mb-1">Local do Atendimento <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="localConsulta" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
-                                <div><label class="form-label text-blue-600 mb-1">Data da 1ª Consulta <span class="text-[10px] text-blue-400">(automático)</span></label><input type="text" id="dataPrimeiraConsulta" readonly class="w-full px-3 py-2.5 border-2 border-blue-100 rounded-xl campo-automatico text-slate-700 text-sm input-field"></div>
+                        <div class="bg-blue-50 rounded-2xl p-5 mb-6 border border-blue-200">
+                            <h4 class="font-bold text-blue-700 mb-4"><i class="fas fa-search mr-2"></i> Dados da 1ª Consulta</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><label class="form-label text-blue-600">Nº Solicitação 1ª Consulta *</label><input type="text" id="numeroSolicitacao" placeholder="Somente números" class="input-field" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+                                <div><label class="form-label text-blue-600">Prontuário</label><input type="text" id="prontuarioPaciente" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Nome do Paciente</label><input type="text" id="nomePacienteRetorno" readonly class="input-field campo-automatico font-bold"></div>
+                                <div><label class="form-label text-blue-600">Data Nascimento</label><input type="text" id="dataNascimentoRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Nome da Mãe</label><input type="text" id="nomeMaeRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Telefone</label><input type="text" id="telefoneRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Especialidade</label><input type="text" id="especialidadeRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Médico Solicitante</label><input type="text" id="medicoSolicitanteRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Local da Consulta</label><input type="text" id="localConsultaRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Data da 1ª Consulta</label><input type="text" id="dataPrimeiraConsultaRetorno" readonly class="input-field campo-automatico"></div>
                             </div>
                         </div>
 
                         <!-- DADOS CADASTRAIS -->
-                        <div class="bg-purple-50 rounded-2xl p-4 mb-6 border-2 border-purple-200 section-card">
-                            <h4 class="text-sm font-bold text-purple-700 mb-3"><i class="fas fa-address-card"></i> Dados Cadastrais</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div class="relative"><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Unidade de Saúde</label><input type="text" id="unidadeSaude" placeholder="Digite para buscar..." autocomplete="off" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field" oninput="filtrarUBS()" onfocus="filtrarUBS()"><div id="dropdownUBS" class="dropdown-ubs"></div></div>
-                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">CEP</label><input type="text" id="cep" placeholder="00000-000" maxlength="9" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field" oninput="mascaraCEP(this)"></div>
-                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Endereço Completo</label><input type="text" id="endereco" placeholder="Rua, Avenida..." class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"></div>
-                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Número da Residência</label><input type="text" id="numeroResidencia" placeholder="Nº" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"></div>
-                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Bairro</label><input type="text" id="bairro" placeholder="Bairro" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"></div>
-                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Município</label><input type="text" id="municipio" placeholder="Município" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"></div>
-                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Sexo</label><select id="sexo" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"><option value="">Selecione...</option><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option></select></div>
-                                <div><label class="form-label text-purple-600 mb-1 campo-obrigatorio">Raça/Cor</label><select id="racaCor" class="w-full px-3 py-2.5 border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none text-sm input-field"><option value="">Selecione...</option><option value="Branca">Branca</option><option value="Preta">Preta</option><option value="Parda">Parda</option><option value="Amarela">Amarela</option><option value="Indígena">Indígena</option></select></div>
+                        <div class="bg-purple-50 rounded-2xl p-5 mb-6 border border-purple-200">
+                            <h4 class="font-bold text-purple-700 mb-4"><i class="fas fa-address-card mr-2"></i> Dados Cadastrais</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="relative"><label class="form-label text-purple-600">Unidade de Saúde *</label><input type="text" id="unidadeSaude" placeholder="Digite para buscar..." class="input-field" oninput="filtrarUBS()" onfocus="filtrarUBS()"><div id="dropdownUBS" class="dropdown-ubs"></div></div>
+                                <div><label class="form-label text-purple-600">CEP</label><input type="text" id="cep" maxlength="9" class="input-field" oninput="mascaraCEP(this)"></div>
+                                <div><label class="form-label text-purple-600">Endereço</label><input type="text" id="endereco" class="input-field"></div>
+                                <div><label class="form-label text-purple-600">Número</label><input type="text" id="numeroResidencia" class="input-field"></div>
+                                <div><label class="form-label text-purple-600">Bairro</label><input type="text" id="bairro" class="input-field"></div>
+                                <div><label class="form-label text-purple-600">Município</label><input type="text" id="municipio" class="input-field"></div>
+                                <div><label class="form-label text-purple-600">Sexo</label><select id="sexo" class="input-field"><option value="">Selecione</option><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option></select></div>
+                                <div><label class="form-label text-purple-600">Raça/Cor</label><select id="racaCor" class="input-field"><option value="">Selecione</option><option value="Branca">Branca</option><option value="Preta">Preta</option><option value="Parda">Parda</option><option value="Amarela">Amarela</option><option value="Indígena">Indígena</option></select></div>
                             </div>
                         </div>
 
                         <!-- EXAMES -->
-                        <div class="bg-red-50 rounded-2xl p-4 mb-6 border-2 border-red-200 section-card">
-                            <h4 class="text-sm font-bold text-red-700 mb-3"><i class="fas fa-flask"></i> EXAMES - PREENCHER</h4>
+                        <div class="bg-red-50 rounded-2xl p-5 mb-6 border border-red-200">
+                            <h4 class="font-bold text-red-700 mb-4"><i class="fas fa-flask mr-2"></i> EXAMES</h4>
                             <div class="relative mb-4">
-                                <label class="form-label text-red-600 mb-1 campo-obrigatorio">Selecione o SubGrupo Sigtap para descrever os exames.</label>
-                                <input type="text" id="sigtapSearch" placeholder="Digite para buscar o SubGrupo SIGTAP..." autocomplete="off" class="w-full px-3 py-2.5 border-2 border-red-200 rounded-xl focus:border-red-500 outline-none text-sm input-field bg-white cursor-pointer" onfocus="toggleDropdownSIGTAP(true)" oninput="filtrarSIGTAP()">
+                                <label class="form-label text-red-600">SubGrupo SIGTAP *</label>
+                                <input type="text" id="sigtapSearch" placeholder="Digite para buscar..." class="input-field" onfocus="toggleDropdownSIGTAP(true)" oninput="filtrarSIGTAP()">
                                 <input type="hidden" id="sigtapSelecionado">
                                 <div id="dropdownSIGTAP" class="dropdown-sigtap"></div>
                             </div>
-                            <div class="mb-3">
-                                <button onclick="abrirModalSelecaoExames()" id="btnAbrirModalExames" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all">
-                                    🔴 Clique aqui após selecionar o subgrupo
-                                </button>
-                            </div>
-                            <div id="examesSelecionadosContainer" class="space-y-2">
-                                <p class="text-xs text-slate-400" id="examesVazioMsg">Nenhum exame selecionado. Escolha um SubGrupo SIGTAP acima.</p>
-                            </div>
-                            <div class="mt-4">
-                                <label class="form-label text-red-600 mb-1 campo-opcional">CID</label>
-                                <input type="text" id="cid" placeholder="CID (opcional)" class="w-full px-3 py-2.5 border-2 border-red-200 rounded-xl focus:border-red-500 outline-none text-sm input-field">
-                            </div>
+                            <button onclick="abrirModalSelecaoExames()" id="btnAbrirModalExames" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold mb-3">🔴 Selecionar Exames</button>
+                            <div id="examesSelecionadosContainer" class="space-y-2"></div>
+                            <div class="mt-4"><label class="form-label text-red-600">CID (opcional)</label><input type="text" id="cid" class="input-field"></div>
                         </div>
 
-                        <button id="btnValidarRetorno" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-search"></i> VALIDAR E SOLICITAR RETORNO
-                        </button>
+                        <button id="btnValidarRetorno" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-lg">🔍 VALIDAR E SOLICITAR RETORNO</button>
                         <div id="msgSolicitar" class="mt-4 hidden"></div>
                     </div>
                 </div>
 
-                <!-- ABA: HISTÓRICO -->
+                <!-- ==================== ABA 2: HISTÓRICO ==================== -->
                 <div id="content-historico" class="tab-content">
-                    <div class="bg-white rounded-2xl shadow-sm border-2 border-slate-100 p-6 md:p-8">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-history text-purple-500"></i> <span id="historicoTitulo">Minhas Solicitações</span></h3>
-                            <span class="text-[10px] text-slate-400 font-normal" id="historicoBadge">Atualiza automaticamente</span>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-history text-purple-500 mr-2"></i>Minhas Solicitações</h3>
+                            <span class="text-xs text-slate-400">Atualiza automaticamente</span>
                         </div>
-                        <div id="buscaAdminHistorico" class="mb-4" style="display:none">
-                            <input type="text" id="buscaGlobalRetornos" placeholder="🔍 Buscar por paciente, CPF ou nº solicitação..." class="w-full px-4 py-2 border-2 rounded-xl text-sm input-field" oninput="filtrarHistoricoAdmin()">
-                            <span class="text-xs text-slate-500 mt-1" id="contadorRetornos"></span>
+                        <div id="buscaAdminHistorico" class="mb-4 hidden">
+                            <input type="text" id="buscaGlobalRetornos" placeholder="🔍 Buscar por paciente, CPF ou nº solicitação..." class="input-field" oninput="filtrarHistoricoAdmin()">
+                            <span class="text-xs text-slate-500" id="contadorRetornos"></span>
                         </div>
-                        <div class="space-y-4" id="historicoLista"><p class="text-slate-400 text-center py-8">Carregando...</p></div>
+                        <div id="historicoLista" class="space-y-3"><p class="text-slate-400 text-center py-8">Carregando...</p></div>
                     </div>
                 </div>
-                
-                <!-- ABA: MEUS DADOS -->
+
+                <!-- ==================== ABA 3: MEUS DADOS ==================== -->
                 <div id="content-meusdados" class="tab-content">
-                    <div class="bg-white rounded-2xl shadow-sm border-2 border-slate-100 p-6 md:p-8">
-                        <h3 class="text-lg font-bold text-slate-800 mb-6"><i class="fas fa-user-circle text-amber-500"></i> Meus Dados Cadastrais</h3>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                        <h3 class="text-xl font-bold text-slate-800 mb-6"><i class="fas fa-user-circle text-amber-500 mr-2"></i>Meus Dados Cadastrais</h3>
                         <div id="meusDadosConteudo" class="grid grid-cols-1 md:grid-cols-2 gap-4"><p class="text-slate-400">Carregando...</p></div>
                     </div>
                 </div>
@@ -385,24 +331,78 @@
     </div>
 </div>
 
+<!-- ============================================ -->
+<!-- MODAL ADMIN PORTAL -->
+<!-- ============================================ -->
+<div id="modalAdminPortal" class="modal-overlay">
+    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-5xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-extrabold"><span class="w-10 h-10 bg-purple-100 text-purple-600 rounded-xl inline-flex items-center justify-center mr-2">👑</span>Painel Administrativo</h2>
+            <button onclick="fecharModal('modalAdminPortal')" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+        </div>
+        <div class="flex gap-6 border-b mb-4 overflow-x-auto">
+            <button onclick="switchAdminTab('usuarios')" id="adminPortalTab-usuarios" class="admin-portal-tab-btn pb-2 text-sm font-bold text-purple-600 border-b-2 border-purple-600">👥 Usuários</button>
+            <button onclick="switchAdminTab('cadastrar')" id="adminPortalTab-cadastrar" class="admin-portal-tab-btn pb-2 text-sm font-bold text-slate-400">➕ Cadastrar</button>
+        </div>
+        <div id="adminPortalContent-usuarios" class="admin-portal-content">
+            <input type="text" id="adminPortalBusca" placeholder="🔍 Buscar usuário..." class="input-field mb-4" oninput="renderizarListaUsuarios()">
+            <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-slate-50"><th class="p-2 text-left">Nome</th><th class="p-2 text-left">CPF</th><th class="p-2 text-left">E-mail</th><th class="p-2 text-left">Telefone</th><th class="p-2 text-left">Tipo</th><th class="p-2 text-left">Ações</th></tr></thead><tbody id="adminPortalTabelaUsuarios"></tbody></table></div>
+        </div>
+        <div id="adminPortalContent-cadastrar" class="admin-portal-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label class="form-label">Nome Completo *</label><input type="text" id="adminPortalNome" class="input-field"></div>
+                <div><label class="form-label">CPF *</label><div class="flex gap-2"><input type="text" id="adminPortalCPF" class="flex-1 input-field" oninput="mascaraCPF(this)"><button onclick="gerarCPFPortal()" class="bg-slate-200 px-3 rounded-xl text-xs">Gerar</button></div></div>
+                <div><label class="form-label">Nome da Mãe *</label><input type="text" id="adminPortalNomeMae" class="input-field"></div>
+                <div><label class="form-label">Cidade Natal *</label><input type="text" id="adminPortalCidadeNatal" class="input-field"></div>
+                <div><label class="form-label">Telefone *</label><input type="text" id="adminPortalTelefone" class="input-field" oninput="mascaraTelefone(this)"></div>
+                <div><label class="form-label">E-mail *</label><input type="email" id="adminPortalEmail" class="input-field"></div>
+                <div><label class="form-label">Senha (6 dígitos) *</label><input type="password" id="adminPortalSenha" maxlength="6" class="input-field"></div>
+                <div><label class="form-label">Tipo *</label><select id="adminPortalTipo" class="input-field"><option value="usuario">Usuário Comum</option><option value="admin">Administrador</option></select></div>
+            </div>
+            <button onclick="cadastrarUsuarioAdmin()" class="mt-6 w-full bg-purple-600 text-white py-3 rounded-xl font-bold">✅ CADASTRAR</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR USUÁRIO -->
+<div id="modalEditarUsuario" class="modal-overlay">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl mx-4">
+        <h3 class="font-bold text-xl mb-4">✏️ Editar Usuário</h3>
+        <input type="hidden" id="editUserId"><div class="space-y-3">
+            <input type="text" id="editUserNome" placeholder="Nome" class="input-field">
+            <input type="text" id="editUserTelefone" placeholder="Telefone" class="input-field" oninput="mascaraTelefone(this)">
+            <input type="email" id="editUserEmail" placeholder="E-mail" class="input-field">
+            <select id="editUserTipo" class="input-field"><option value="usuario">Usuário Comum</option><option value="admin">Administrador</option></select>
+            <input type="password" id="editUserSenha" placeholder="Nova senha (opcional)" maxlength="6" class="input-field">
+        </div>
+        <div class="flex gap-3 mt-6"><button onclick="salvarEdicaoUsuario()" class="flex-1 bg-blue-600 text-white py-2 rounded-xl">💾 Salvar</button><button onclick="fecharModal('modalEditarUsuario')" class="flex-1 bg-slate-200 py-2 rounded-xl">Cancelar</button></div>
+    </div>
+</div>
+
 <script>
 // ============================================
-// 🏥 PORTAL DO PACIENTE v7.0 
+// 🏥 PORTAL DO PACIENTE v7.0 - CÓDIGO REFATORADO
 // 👑 Ana Paula Araújo da Silva | Mat: 201704
-// 📅 27/05/2026
+// 📅 02/06/2026
 // ============================================
 
+// ============================================
+// CONEXÃO COM SUPABASE
+// ============================================
 const db = window.supabase.createClient(
     'https://hheuvkyhwujdrvjvtryg.supabase.co', 
     'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe'
 );
 
+// ============================================
+// VARIÁVEIS GLOBAIS
+// ============================================
 let usuarioLogado = null;
 let retornosLista = [];
 let dadosPrimeiraConsulta = null;
-let intervaloAtualizacao = null;
 let examesSelecionados = [];
 let subgrupoSelecionado = null;
+let intervaloAtualizacao = null;
 
 // ============================================
 // GRUPOS SIGTAP COM EXAMES
@@ -410,15 +410,9 @@ let subgrupoSelecionado = null;
 const GRUPOS_SIGTAP = {
   "01": { nome: "01 - Atenção em Oncologia", subgrupos: [
     { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama", exames: [{codigo: "02.04.03.003-0", nome: "MAMOGRAFIA"}]},
-    { codigo: "09.01.01.002-2", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama", exames: []},
-    { codigo: "09.01.01.003-0", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Próstata", exames: []},
-    { codigo: "09.01.01.004-9", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Próstata", exames: []},
     { codigo: "09.01.01.005-7", nome: "OCI Investigação Diagnóstica de Câncer de Colo do Útero", exames: [
       {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.066-6", nome: "BIÓPSIA DO COLO DO ÚTERO"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
     ]},
-    { codigo: "09.01.01.006-5", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero", exames: []},
-    { codigo: "09.01.01.007-3", nome: "OCI Avaliação Diagnóstica de Câncer Gástrico", exames: []},
-    { codigo: "09.01.01.008-1", nome: "OCI Avaliação Diagnóstica de Câncer Colorretal", exames: []},
     { codigo: "09.01.01.009-0", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - I", exames: [
       {codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"}, {codigo: "02.03.01.004-3", nome: "CITOPATOLOGICO"}
     ]},
@@ -462,14 +456,19 @@ const GRUPOS_SIGTAP = {
     { codigo: "09.04.01.003-1", nome: "OCI Avaliação de Nasofaringe e Orofaringe", exames: []}
   ]},
   "05": { nome: "05 - Atenção em Oftalmologia", subgrupos: [
-    { codigo: "09.05.01.001-9", nome: "OCI Inicial 0 a 8 Anos", exames: []}, { codigo: "09.05.01.002-7", nome: "OCI Estrabismo", exames: []},
-    { codigo: "09.05.01.003-5", nome: "OCI Inicial a Partir de 9 Anos", exames: []}, { codigo: "09.05.01.004-3", nome: "OCI Retinopatia Diabética", exames: []},
-    { codigo: "09.05.01.005-1", nome: "OCI Oncologia Oftalmológica", exames: []}, { codigo: "09.05.01.006-0", nome: "OCI Neuro Oftalmologia", exames: []},
+    { codigo: "09.05.01.001-9", nome: "OCI Inicial 0 a 8 Anos", exames: []},
+    { codigo: "09.05.01.002-7", nome: "OCI Estrabismo", exames: []},
+    { codigo: "09.05.01.003-5", nome: "OCI Inicial a Partir de 9 Anos", exames: []},
+    { codigo: "09.05.01.004-3", nome: "OCI Retinopatia Diabética", exames: []},
+    { codigo: "09.05.01.005-1", nome: "OCI Oncologia Oftalmológica", exames: []},
+    { codigo: "09.05.01.006-0", nome: "OCI Neuro Oftalmologia", exames: []},
     { codigo: "09.05.01.007-8", nome: "OCI Exames Sob Sedação", exames: []}
   ]},
   "06": { nome: "06 - Atenção em Saúde da Mulher", subgrupos: [
-    { codigo: "09.06.01.001-2", nome: "GIN1 - Avaliação Inicial I", exames: []}, { codigo: "09.06.01.002-0", nome: "GIN1 - Avaliação Inicial II", exames: []},
-    { codigo: "09.06.01.003-9", nome: "GIN2 - Sangramento Uterino Anormal I", exames: []}, { codigo: "09.06.01.004-7", nome: "GIN2 - Sangramento Uterino Anormal II", exames: []},
+    { codigo: "09.06.01.001-2", nome: "GIN1 - Avaliação Inicial I", exames: []},
+    { codigo: "09.06.01.002-0", nome: "GIN1 - Avaliação Inicial II", exames: []},
+    { codigo: "09.06.01.003-9", nome: "GIN2 - Sangramento Uterino Anormal I", exames: []},
+    { codigo: "09.06.01.004-7", nome: "GIN2 - Sangramento Uterino Anormal II", exames: []},
     { codigo: "09.06.01.005-5", nome: "GIN3 - Endometriose Profunda", exames: []}
   ]}
 };
@@ -569,53 +568,119 @@ const DISTRITO_MAP = {
   'UNIDADE BASICA DE SAUDE LIBERDADE II': 'VARGEM DAS FLORES'
 };
 const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
-    
+
 // ============================================
 // FUNÇÕES UTILITÁRIAS
 // ============================================
-function showLoading(){ document.getElementById('loadingOverlay').classList.add('show'); }
-function hideLoading(){ document.getElementById('loadingOverlay').classList.remove('show'); }
+function showLoading() { document.getElementById('loadingOverlay').classList.add('show'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+function fecharModal(modalId) { document.getElementById(modalId).classList.remove('show'); }
 
-function validarCPF(cpf){ 
-    cpf=cpf.replace(/\D/g,''); if(cpf.length!==11||/^(\d)\1{10}$/.test(cpf)) return false; 
-    let s=0; for(let i=0;i<9;i++) s+=parseInt(cpf[i])*(10-i); let r=(s*10)%11; if(r===10) r=0; if(r!==parseInt(cpf[9])) return false;
-    s=0; for(let i=0;i<10;i++) s+=parseInt(cpf[i])*(11-i); r=(s*10)%11; if(r===10) r=0; return r===parseInt(cpf[10]); 
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+    const el = document.getElementById(id);
+    if (el) { el.classList.add('active'); if (id === 'screenPortal') { el.style.display = 'block'; } else { el.style.display = 'flex'; } }
 }
-function formatarData(data){ 
-    if(!data) return '—'; 
-    try { 
-        // CORREÇÃO: Garantir que a data seja interpretada corretamente independente do fuso
-        let dataObj;
-        if (data.includes('T')) {
-            dataObj = new Date(data.split('T')[0] + 'T12:00:00');
-        } else {
-            dataObj = new Date(data + 'T12:00:00');
-        }
-        // Verificar se a data é válida
-        if (isNaN(dataObj.getTime())) return '—';
-        // Formatar como DD/MM/YYYY
-        const dia = String(dataObj.getDate()).padStart(2, '0');
-        const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
-        const ano = dataObj.getFullYear();
-        return `${dia}/${mes}/${ano}`;
-    } catch(e) { return '—'; } 
-}
-function formatarTelefone(tel){
-    if(!tel) return '—'; tel=tel.replace(/\D/g,'');
-    if(tel.length===11) return '('+tel.slice(0,2)+') '+tel.slice(2,7)+'-'+tel.slice(7);
-    if(tel.length===10) return '('+tel.slice(0,2)+') '+tel.slice(2,6)+'-'+tel.slice(6); return tel;
-}
-function gerarCodigoAleatorio(){ return String(Math.floor(100000+Math.random()*900000)); }
 
-function showScreen(id){
-    document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});
-    const el=document.getElementById(id);
-    if(el){ el.classList.add('active'); if(id==='screenPortal'){ el.style.display='block'; } else { el.style.display='flex'; } }
+function formatarData(data) {
+    if (!data) return '—';
+    try {
+        const d = new Date(data.split('T')[0] + 'T12:00:00');
+        if (isNaN(d.getTime())) return '—';
+        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+    } catch(e) { return '—'; }
 }
-function mostrarMsg(id,texto,cor){
-    const el=document.getElementById(id);
-    el.className='mt-4 p-3 rounded-xl text-sm font-bold border-l-4 '+(cor==='emerald'?'bg-emerald-50 text-emerald-700 border-emerald-500':cor==='amber'?'bg-amber-50 text-amber-700 border-amber-500':'bg-rose-50 text-rose-700 border-rose-500');
-    el.textContent=texto; el.classList.remove('hidden');
+
+function formatarTelefone(tel) {
+    if (!tel) return '—';
+    tel = tel.replace(/\D/g, '');
+    if (tel.length === 11) return `(${tel.slice(0,2)}) ${tel.slice(2,7)}-${tel.slice(7)}`;
+    if (tel.length === 10) return `(${tel.slice(0,2)}) ${tel.slice(2,6)}-${tel.slice(6)}`;
+    return tel;
+}
+
+function formatarCPF(cpf) {
+    if (!cpf) return '—';
+    cpf = cpf.toString().replace(/\D/g, '');
+    if (cpf.length !== 11) return cpf;
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+
+function validarCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+    let s = 0;
+    for (let i = 0; i < 9; i++) s += parseInt(cpf[i]) * (10 - i);
+    let r = (s * 10) % 11;
+    if (r === 10) r = 0;
+    if (r !== parseInt(cpf[9])) return false;
+    s = 0;
+    for (let i = 0; i < 10; i++) s += parseInt(cpf[i]) * (11 - i);
+    r = (s * 10) % 11;
+    if (r === 10) r = 0;
+    return r === parseInt(cpf[10]);
+}
+
+function gerarCodigoAleatorio() { return String(Math.floor(100000 + Math.random() * 900000)); }
+function gerarCPFValido() {
+    let cpf = '';
+    for (let i = 0; i < 9; i++) cpf += Math.floor(Math.random() * 10);
+    let s = 0;
+    for (let i = 0; i < 9; i++) s += parseInt(cpf[i]) * (10 - i);
+    let r = (s * 10) % 11;
+    if (r === 10) r = 0;
+    cpf += r;
+    s = 0;
+    for (let i = 0; i < 10; i++) s += parseInt(cpf[i]) * (11 - i);
+    r = (s * 10) % 11;
+    if (r === 10) r = 0;
+    cpf += r;
+    return cpf;
+}
+
+function mascaraCPF(input) {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    input.value = v;
+}
+
+function mascaraTelefone(input) {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.slice(0, 11);
+    if (v.length > 2) v = '(' + v.slice(0, 2) + ') ' + v.slice(2);
+    if (v.length > 10) v = v.slice(0, 10) + '-' + v.slice(10);
+    input.value = v;
+}
+
+function mascaraCEP(input) {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length > 8) v = v.slice(0, 8);
+    if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5);
+    input.value = v;
+}
+
+function toggleSenha(id, btn) {
+    const input = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function mostrarMsg(id, texto, cor) {
+    const el = document.getElementById(id);
+    el.className = 'mt-4 p-3 rounded-xl text-sm font-bold border-l-4 ' + (cor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-500' : cor === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-500' : 'bg-rose-50 text-rose-700 border-rose-500');
+    el.textContent = texto;
+    el.classList.remove('hidden');
 }
 
 // ============================================
@@ -624,141 +689,68 @@ function mostrarMsg(id,texto,cor){
 function filtrarUBS() {
     const input = document.getElementById('unidadeSaude');
     const dropdown = document.getElementById('dropdownUBS');
-    
-    if (!input || !dropdown) {
-        console.error('Elementos não encontrados');
-        return;
-    }
-    
+    if (!input || !dropdown) return;
     const termo = input.value.toLowerCase().trim();
-    
-    // Se o campo estiver vazio, mostrar todas as unidades
     let lista = LISTA_UBS;
-    if (termo) {
-        lista = LISTA_UBS.filter(u => 
-            u.toLowerCase().includes(termo) || 
-            (DISTRITO_MAP[u] || '').toLowerCase().includes(termo)
-        );
-    }
-    
-    // Adicionar a opção "Outra Unidade" no final
-    if (lista.length === 0) {
-        dropdown.innerHTML = '<div class="dropdown-ubs-item text-slate-400">Nenhuma unidade encontrada</div>';
-    } else {
-        dropdown.innerHTML = lista.map(u => `
-            <div class="dropdown-ubs-item" onclick="selecionarUBS('${u.replace(/'/g, "\\'")}')">
-                ${u}
-                <span class="distrito-tag">${DISTRITO_MAP[u] || ''}</span>
-            </div>
-        `).join('');
-    }
-    
+    if (termo) lista = LISTA_UBS.filter(u => u.toLowerCase().includes(termo) || (DISTRITO_MAP[u] || '').toLowerCase().includes(termo));
+    dropdown.innerHTML = lista.length === 0 ? '<div class="dropdown-ubs-item text-slate-400">Nenhuma unidade encontrada</div>' : lista.map(u => `<div class="dropdown-ubs-item" onclick="selecionarUBS('${u.replace(/'/g, "\\'")}')">${u}<span class="text-[10px] bg-blue-100 text-blue-700 ml-2 px-1 rounded">${DISTRITO_MAP[u] || ''}</span></div>`).join('');
     dropdown.classList.add('show');
 }
 
 function selecionarUBS(ubs) {
-    const input = document.getElementById('unidadeSaude');
-    const dropdown = document.getElementById('dropdownUBS');
-    if (input) input.value = ubs;
-    if (dropdown) dropdown.classList.remove('show');
+    document.getElementById('unidadeSaude').value = ubs;
+    document.getElementById('dropdownUBS').classList.remove('show');
 }
-
-// Fechar dropdown ao clicar fora
-document.addEventListener('click', function(e) {
-    const dropdownUBS = document.getElementById('dropdownUBS');
-    const inputUBS = document.getElementById('unidadeSaude');
-    if (dropdownUBS && inputUBS && !inputUBS.contains(e.target) && !dropdownUBS.contains(e.target)) {
-        dropdownUBS.classList.remove('show');
-    }
-    
-    const dropdownSIGTAP = document.getElementById('dropdownSIGTAP');
-    const inputSIGTAP = document.getElementById('sigtapSearch');
-    if (dropdownSIGTAP && inputSIGTAP && !inputSIGTAP.contains(e.target) && !dropdownSIGTAP.contains(e.target)) {
-        dropdownSIGTAP.classList.remove('show');
-    }
-});
 
 // ============================================
 // DROPDOWN SIGTAP
 // ============================================
-function toggleDropdownSIGTAP(show){
+function toggleDropdownSIGTAP(show) {
     const dropdown = document.getElementById('dropdownSIGTAP');
-    if(show){ dropdown.classList.add('show'); filtrarSIGTAP(); }
+    if (show) { dropdown.classList.add('show'); filtrarSIGTAP(); }
     else { dropdown.classList.remove('show'); }
 }
-    
-document.getElementById('sigtapSearch').addEventListener('click', function(){
-    if(subgrupoSelecionado){
-        this.value = '';
-        document.getElementById('sigtapSelecionado').value = '';
-        subgrupoSelecionado = null;
-        examesSelecionados = [];
-        atualizarExamesSelecionados();
-    }
-    toggleDropdownSIGTAP(true);
-});
 
-function filtrarSIGTAP(){
+function filtrarSIGTAP() {
     const input = document.getElementById('sigtapSearch');
     const dropdown = document.getElementById('dropdownSIGTAP');
     const termo = input.value.toLowerCase().trim();
-    let listaFiltrada = termo ? TODOS_SUBGRUPOS.filter(s => 
-        s.nome.toLowerCase().includes(termo) || s.codigo.includes(termo) || s.grupo.toLowerCase().includes(termo)
-    ) : TODOS_SUBGRUPOS;
-    
-    dropdown.innerHTML = listaFiltrada.length === 0 ? 
-        '<div class="dropdown-sigtap-item text-slate-400">Nenhum subgrupo encontrado</div>' : 
-        listaFiltrada.map((s) => `
-        <div class="dropdown-sigtap-item" onclick='selecionarSIGTAPPorCodigo("${s.codigo}")'>
-            <span class="font-bold text-sm">${s.codigo}</span><br>
-            <span class="text-xs text-slate-500">${s.nome.substring(0,60)}</span><br>
-            <span class="text-[10px] text-blue-500">${s.grupo} | ${s.exames.length} exames</span>
-        </div>
-    `).join('');
+    let lista = termo ? TODOS_SUBGRUPOS.filter(s => s.nome.toLowerCase().includes(termo) || s.codigo.includes(termo) || s.grupo.toLowerCase().includes(termo)) : TODOS_SUBGRUPOS;
+    dropdown.innerHTML = lista.length === 0 ? '<div class="dropdown-sigtap-item text-slate-400">Nenhum subgrupo encontrado</div>' : lista.map(s => `<div class="dropdown-sigtap-item" onclick='selecionarSIGTAP("${s.codigo}")'><span class="font-bold text-sm">${s.codigo}</span><br><span class="text-xs">${s.nome.substring(0,60)}</span><br><span class="text-[10px] text-blue-500">${s.grupo} | ${s.exames.length} exames</span></div>`).join('');
     dropdown.classList.add('show');
 }
-    
-function selecionarSIGTAPPorCodigo(codigo){
+
+function selecionarSIGTAP(codigo) {
     const sub = TODOS_SUBGRUPOS.find(s => s.codigo === codigo);
-    if(!sub) return;
-    
-    document.getElementById('sigtapSearch').value = sub.codigo + ' - ' + sub.nome;
+    if (!sub) return;
+    document.getElementById('sigtapSearch').value = `${sub.codigo} - ${sub.nome}`;
     document.getElementById('sigtapSelecionado').value = sub.codigo;
     document.getElementById('dropdownSIGTAP').classList.remove('show');
-    
     subgrupoSelecionado = { codigo: sub.codigo, nome: sub.nome, exames: sub.exames };
     examesSelecionados = [];
     atualizarExamesSelecionados();
 }
 
 // ============================================
-// MODAL DE SELEÇÃO DE EXAMES
+// MODAL DE EXAMES
 // ============================================
-function abrirModalSelecaoExames(){
-    if(!subgrupoSelecionado) { alert('⚠️ Selecione um SubGrupo SIGTAP primeiro!'); return; }
-    
-    document.getElementById('modalSubgrupoNome').textContent = '📂 ' + subgrupoSelecionado.nome;
-    document.getElementById('modalSubgrupoCodigo').textContent = 'Código: ' + subgrupoSelecionado.codigo;
-    
-    const tbody = document.getElementById('modalExamesTbody');
+function abrirModalSelecaoExames() {
+    if (!subgrupoSelecionado) return alert('⚠️ Selecione um SubGrupo SIGTAP primeiro!');
+    document.getElementById('modalSubgrupoNome').textContent = `📂 ${subgrupoSelecionado.nome}`;
+    document.getElementById('modalSubgrupoCodigo').textContent = `Código: ${subgrupoSelecionado.codigo}`;
     const exames = subgrupoSelecionado.exames || [];
-    
-    if(exames.length === 0){
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold">📋 Nenhum exame pré-listado para este subgrupo.<br>Use a opção <b>"Outro"</b> abaixo para cadastrar.</td></tr>';
+    const tbody = document.getElementById('modalExamesTbody');
+    if (exames.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400">Nenhum exame pré-listado. Use a opção "Outro" abaixo.</td></tr>';
     } else {
         tbody.innerHTML = exames.map((e, idx) => {
             const jaSelecionado = examesSelecionados.find(x => x.codigo === e.codigo);
-            const checked = jaSelecionado ? 'checked' : '';
-            const dataSol = jaSelecionado?.data_solicitacao || '';
-            const dataReal = jaSelecionado?.data_realizacao || '';
-            const rowClass = jaSelecionado ? (jaSelecionado.data_realizacao ? 'exame-realizado' : 'exame-checked') : '';
-            return `
-            <tr class="${rowClass}" id="rowExame_${idx}">
-                <td style="text-align:center;"><input type="checkbox" class="checkbox-exame" id="checkExame_${idx}" ${checked} onchange="toggleExameTabela(${idx}, '${e.codigo}', '${e.nome.replace(/'/g,"\\'")}')"></td>
+            return `<tr id="rowExameModal_${idx}" class="${jaSelecionado ? (jaSelecionado.data_realizacao ? 'exame-realizado-row' : 'exame-checked') : ''}">
+                <td class="text-center"><input type="checkbox" class="checkbox-exame" id="checkExameModal_${idx}" ${jaSelecionado ? 'checked' : ''} onchange="toggleExameModal(${idx}, '${e.codigo}', '${e.nome.replace(/'/g, "\\'")}')"></td>
                 <td class="font-mono font-bold text-xs">${e.codigo}</td>
                 <td class="font-bold text-xs">${e.nome}</td>
-                <td><input type="date" id="dataSol_${idx}" class="w-full" value="${dataSol}" onchange="atualizarDataExame(${idx})"></td>
-                <td><input type="date" id="dataReal_${idx}" class="w-full" value="${dataReal}" onchange="atualizarDataExame(${idx})"></td>
+                <td><input type="date" id="dataSolModal_${idx}" class="w-full border rounded p-1 text-xs" value="${jaSelecionado?.data_solicitacao || ''}" onchange="atualizarDataExameModal(${idx})"></td>
+                <td><input type="date" id="dataRealModal_${idx}" class="w-full border rounded p-1 text-xs" value="${jaSelecionado?.data_realizacao || ''}" onchange="atualizarDataExameModal(${idx})"></td>
             </tr>`;
         }).join('');
     }
@@ -766,353 +758,332 @@ function abrirModalSelecaoExames(){
     document.getElementById('modalSelecaoExames').classList.add('show');
 }
 
-function toggleExameTabela(idx, codigo, nome){
-    const check = document.getElementById('checkExame_' + idx);
-    const dataSol = document.getElementById('dataSol_' + idx)?.value || '';
-    const dataReal = document.getElementById('dataReal_' + idx)?.value || '';
-    const row = document.getElementById('rowExame_' + idx);
-    
-    if(check.checked){
-        if(!examesSelecionados.find(e => e.codigo === codigo)){
+function toggleExameModal(idx, codigo, nome) {
+    const check = document.getElementById(`checkExameModal_${idx}`);
+    const dataSol = document.getElementById(`dataSolModal_${idx}`).value;
+    const dataReal = document.getElementById(`dataRealModal_${idx}`).value;
+    const row = document.getElementById(`rowExameModal_${idx}`);
+    if (check.checked) {
+        if (!examesSelecionados.find(e => e.codigo === codigo)) {
             examesSelecionados.push({ codigo, nome, data_solicitacao: dataSol || null, data_realizacao: dataReal || null });
         }
-        if(row){ row.classList.remove('exame-realizado'); row.classList.add('exame-checked'); }
+        if (row) row.classList.add('exame-checked');
     } else {
         examesSelecionados = examesSelecionados.filter(e => e.codigo !== codigo);
-        if(row){ row.classList.remove('exame-checked', 'exame-realizado'); }
+        if (row) row.classList.remove('exame-checked', 'exame-realizado-row');
     }
     atualizarContadorModal();
 }
 
-function atualizarDataExame(idx){
-    const check = document.getElementById('checkExame_' + idx);
-    if(!check || !check.checked) return;
+function atualizarDataExameModal(idx) {
+    const check = document.getElementById(`checkExameModal_${idx}`);
+    if (!check || !check.checked) return;
     const codigo = subgrupoSelecionado?.exames[idx]?.codigo;
-    if(!codigo) return;
-    const dataSol = document.getElementById('dataSol_' + idx)?.value || '';
-    const dataReal = document.getElementById('dataReal_' + idx)?.value || '';
-    const row = document.getElementById('rowExame_' + idx);
+    if (!codigo) return;
+    const dataSol = document.getElementById(`dataSolModal_${idx}`).value;
+    const dataReal = document.getElementById(`dataRealModal_${idx}`).value;
+    const row = document.getElementById(`rowExameModal_${idx}`);
     const exame = examesSelecionados.find(e => e.codigo === codigo);
-    if(exame){ exame.data_solicitacao = dataSol || null; exame.data_realizacao = dataReal || null; if(row){ if(dataReal){ row.classList.remove('exame-checked'); row.classList.add('exame-realizado'); } } }
+    if (exame) {
+        exame.data_solicitacao = dataSol || null;
+        exame.data_realizacao = dataReal || null;
+        if (row) {
+            if (dataReal) { row.classList.remove('exame-checked'); row.classList.add('exame-realizado-row'); }
+            else { row.classList.remove('exame-realizado-row'); row.classList.add('exame-checked'); }
+        }
+    }
+    atualizarContadorModal();
 }
 
-function atualizarContadorModal(){
+function atualizarContadorModal() {
     const total = examesSelecionados.length;
     const realizados = examesSelecionados.filter(e => e.data_realizacao).length;
-    document.getElementById('contadorExamesSelecionados').textContent = `${total} exames selecionados | ${realizados} com data de realização ✅`;
+    document.getElementById('contadorExamesSelecionados').textContent = `${total} exames selecionados | ${realizados} com realização`;
 }
 
-function adicionarOutroExame(){
+function adicionarOutroExame() {
     const codigo = document.getElementById('modalOutroCodigo').value.trim();
     const nome = document.getElementById('modalOutroNome').value.trim();
     const dataSol = document.getElementById('modalOutroDataSolicitacao').value;
     const dataReal = document.getElementById('modalOutroDataRealizacao').value;
-    if(!codigo || !nome) return alert('❌ Informe o código e nome do exame!');
-    if(examesSelecionados.find(e => e.codigo === codigo)){ alert('⚠️ Este exame já foi adicionado!'); return; }
+    if (!codigo || !nome) return alert('❌ Informe código e nome!');
+    if (examesSelecionados.find(e => e.codigo === codigo)) return alert('⚠️ Exame já adicionado!');
     examesSelecionados.push({ codigo, nome, data_solicitacao: dataSol || null, data_realizacao: dataReal || null });
     atualizarExamesSelecionados();
-    document.getElementById('modalOutroCodigo').value = ''; document.getElementById('modalOutroNome').value = '';
-    document.getElementById('modalOutroDataSolicitacao').value = ''; document.getElementById('modalOutroDataRealizacao').value = '';
+    document.getElementById('modalOutroCodigo').value = '';
+    document.getElementById('modalOutroNome').value = '';
+    document.getElementById('modalOutroDataSolicitacao').value = '';
+    document.getElementById('modalOutroDataRealizacao').value = '';
+    atualizarContadorModal();
 }
 
-function fecharModalExames(){ document.getElementById('modalSelecaoExames').classList.remove('show'); atualizarExamesSelecionados(); }
-
-function atualizarExamesSelecionados(){
+function atualizarExamesSelecionados() {
     const container = document.getElementById('examesSelecionadosContainer');
-    if(examesSelecionados.length === 0){
-        container.innerHTML = '<p class="text-xs text-slate-400 text-center py-3">Nenhum exame selecionado. Escolha um SubGrupo SIGTAP acima.</p>';
+    if (examesSelecionados.length === 0) {
+        container.innerHTML = '<p class="text-xs text-slate-400 text-center py-3">Nenhum exame selecionado</p>';
     } else {
         container.innerHTML = examesSelecionados.map((e, i) => {
-            const realizado = e.data_realizacao ? true : false;
-            return `
-            <div class="exame-card ${realizado ? 'realizado' : 'pendente'}">
-                <span style="font-size:20px;">${realizado ? '🟢' : '🟡'}</span>
-                <div style="flex:1;">
-                    <p class="font-bold text-slate-700" style="font-size:12px;">${e.codigo} - ${e.nome}</p>
-                    <div style="display:flex; gap:16px; margin-top:4px;">
-                        <span style="font-size:10px; color:#64748b;">📅 Solicitação: ${e.data_solicitacao ? formatarData(e.data_solicitacao) : '—'}</span>
-                        <span style="font-size:10px; color:#64748b;">📅 Realização: ${e.data_realizacao ? formatarData(e.data_realizacao) : '—'}</span>
-                    </div>
-                </div>
-                <button onclick="removerExameSelecionado(${i})" class="btn-remover-exame" title="Remover">✕</button>
+            const realizado = !!e.data_realizacao;
+            return `<div class="exame-card ${realizado ? 'realizado' : 'pendente'}">
+                <span>${realizado ? '🟢' : '🟡'}</span>
+                <div class="flex-1"><p class="font-bold text-sm">${e.codigo} - ${e.nome}</p><div class="flex gap-4 text-xs text-slate-500"><span>📅 Solicitação: ${e.data_solicitacao || '—'}</span><span>📅 Realização: ${e.data_realizacao || '—'}</span></div></div>
+                <button onclick="removerExameSelecionado(${i})" class="btn-remover-exame">✕</button>
             </div>`;
         }).join('');
     }
 }
 
-function removerExameSelecionado(index){ examesSelecionados.splice(index, 1); atualizarExamesSelecionados(); }
-
-function limparFormularioSolicitar(){
-    const campos = ['numeroSolicitacao','prontuarioVivver','nomePaciente','dataNascimentoRetorno','validarNomeMae',
-                    'telefoneRetorno','especialidadeRetorno','medicoSolicitante','localConsulta','dataPrimeiraConsulta',
-                    'unidadeSaude','cep','endereco','numeroResidencia','bairro','municipio','sigtapSearch','cid'];
-    campos.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-    document.getElementById('sexo').value = ''; document.getElementById('racaCor').value = '';
-    document.getElementById('sigtapSelecionado').value = '';
-    examesSelecionados = []; subgrupoSelecionado = null;
-    atualizarExamesSelecionados(); document.getElementById('msgSolicitar').classList.add('hidden');
-    dadosPrimeiraConsulta = null;
-}
+function removerExameSelecionado(index) { examesSelecionados.splice(index, 1); atualizarExamesSelecionados(); }
 
 // ============================================
 // LOGIN
 // ============================================
 document.getElementById('btnLogin').addEventListener('click', async () => {
-    const cpf = document.getElementById('loginCPF').value.replace(/\D/g,'');
+    const cpf = document.getElementById('loginCPF').value.replace(/\D/g, '');
     const senha = document.getElementById('loginSenha').value.trim();
-    
-    if(!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
-    if(!senha || senha.length !== 6) return alert('❌ Senha deve ter 6 dígitos!');
-    
+    if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
+    if (!senha || senha.length !== 6) return alert('❌ Senha deve ter 6 dígitos!');
     showLoading();
-    
-    const { data, error } = await db.rpc('login_portal_paciente', {
-        p_cpf: cpf,
-        p_senha: senha
-    });
-    
+    const { data, error } = await db.rpc('login_portal_paciente', { p_cpf: cpf, p_senha: senha });
     hideLoading();
-    
-    if (error || !data || !data.success) {
-        return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
-    }
-    
+    if (error || !data || !data.success) return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
     usuarioLogado = data;
     showScreen('screenPortal');
     carregarPortal();
 });
-    
-// ============================================
-// REDEFINIR SENHA COM E-MAIL
-// ============================================
 
-// Função para enviar código por e-mail
+// ============================================
+// REDEFINIR SENHA
+// ============================================
 function enviarCodigoEmail(email, nome, codigo) {
-    const assunto = '🔐 Código de Redefinição de Senha - Portal do Paciente OCI';
-    const corpo = `Olá ${nome},\n\nRecebemos uma solicitação para redefinir sua senha no Portal do Paciente OCI.\n\n🔑 SEU CÓDIGO DE VERIFICAÇÃO: ${codigo}\n\nDigite este código na ferramenta para prosseguir com a redefinição da sua senha.\n\n⚠️ Este código é válido por 30 minutos.\n\nSe você não solicitou esta redefinição, ignore este e-mail.\n\nAtenciosamente,\nEquipe Portal do Paciente OCI`;
-    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
-    window.open(mailtoLink, '_blank');
-    return true;
+    const assunto = encodeURIComponent(`🔐 Código de Redefinição: ${codigo}`);
+    const corpo = encodeURIComponent(`Olá ${nome},\n\nSEU CÓDIGO: ${codigo}\n\nVálido por 30 minutos.`);
+    window.location.href = `mailto:${email}?subject=${assunto}&body=${corpo}`;
+    alert(`📧 E-mail aberto para: ${email}\n\nENVIE o e-mail para você mesmo. O código está no assunto.`);
 }
 
-// Botão "RECEBER CÓDIGO"
 document.getElementById('btnSolicitarCodigo').addEventListener('click', async () => {
-    const cpf = document.getElementById('redefCPF').value.replace(/\D/g,'');
+    const cpf = document.getElementById('redefCPF').value.replace(/\D/g, '');
     const nome_mae = document.getElementById('redefNomeMae').value.trim();
     const cidade = document.getElementById('redefCidade').value.trim();
-    
-    if(!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
-    if(!nome_mae) return alert('❌ Informe o nome da sua mãe!');
-    if(!cidade) return alert('❌ Informe sua cidade natal!');
-    
+    if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
+    if (!nome_mae) return alert('❌ Informe o nome da sua mãe!');
+    if (!cidade) return alert('❌ Informe sua cidade natal!');
     showLoading();
-    
     const { data, error } = await db.from('pacientes_portal').select('*').eq('cpf', cpf).maybeSingle();
-    
     hideLoading();
-    
-    if(error || !data) return alert('❌ Usuário não encontrado.');
-    if((data.nome_mae || '').toUpperCase() !== nome_mae.toUpperCase()) return alert('❌ Nome da mãe não confere!');
-    if((data.cidade_nascimento || '').toUpperCase() !== cidade.toUpperCase()) return alert('❌ Cidade natal não confere!');
-    
-    // Verificar se tem e-mail
-    if(!data.email || data.email === '') {
-        return alert('❌ Você não possui e-mail cadastrado!\n\nEntre em contato com o administrador.');
-    }
-    
-    const codigoRedefinicao = gerarCodigoAleatorio();
-    
-    // Salvar código com expiração de 30 minutos
-    await db.from('pacientes_portal').update({ 
-        codigo_redefinicao: codigoRedefinicao,
-        codigo_expira: new Date(Date.now() + 30 * 60 * 1000).toISOString()
-    }).eq('cpf', cpf);
-    
-    // Enviar e-mail
-    enviarCodigoEmail(data.email, data.nome, codigoRedefinicao);
-    
+    if (error || !data) return alert('❌ Usuário não encontrado.');
+    if (data.nome_mae?.toUpperCase() !== nome_mae.toUpperCase()) return alert('❌ Nome da mãe não confere!');
+    if (data.cidade_nascimento?.toUpperCase() !== cidade.toUpperCase()) return alert('❌ Cidade natal não confere!');
+    if (!data.email) return alert('❌ Você não possui e-mail cadastrado!');
+    const codigo = gerarCodigoAleatorio();
+    await db.from('pacientes_portal').update({ codigo_redefinicao: codigo, codigo_expira: new Date(Date.now() + 30 * 60 * 1000).toISOString() }).eq('cpf', cpf);
+    enviarCodigoEmail(data.email, data.nome, codigo);
     document.getElementById('etapaSolicitar').classList.add('hidden');
     document.getElementById('etapaVerificar').classList.remove('hidden');
-    document.getElementById('redefTitulo').innerHTML = 'Etapa 2: Verificar Código <span class="text-xs text-slate-400 ml-2">(enviado para seu e-mail)</span>';
-    
-    alert(`✅ Código enviado para:\n📧 ${data.email}\n\nVerifique sua caixa de entrada ou spam.`);
+    document.getElementById('redefTitulo').innerHTML = 'Etapa 2: Verificar Código';
 });
 
-// Botão "REDEFINIR SENHA"
 document.getElementById('btnConfirmarRedefinir').addEventListener('click', async () => {
     const codigo = document.getElementById('redefCodigo').value.trim();
     const novaSenha = document.getElementById('redefNovaSenha').value.trim();
-    const cpf = document.getElementById('redefCPF').value.replace(/\D/g,'');
-    
-    if(!codigo || codigo.length !== 6) return alert('❌ Digite o código de 6 dígitos!');
-    if(!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
-    
+    const confirma = document.getElementById('redefConfirmaSenha').value.trim();
+    const cpf = document.getElementById('redefCPF').value.replace(/\D/g, '');
+    if (!codigo || codigo.length !== 6) return alert('❌ Código de 6 dígitos!');
+    if (!novaSenha || novaSenha.length !== 6) return alert('❌ Senha deve ter 6 dígitos!');
+    if (novaSenha !== confirma) return alert('❌ Senhas não conferem!');
     showLoading();
-    
-    const { data, error } = await db.from('pacientes_portal')
-        .select('codigo_redefinicao, codigo_expira')
-        .eq('cpf', cpf)
-        .maybeSingle();
-    
-    if(error || !data) {
-        hideLoading();
-        return alert('❌ Usuário não encontrado!');
-    }
-    
-    // Verificar expiração
-    if(data.codigo_expira && new Date(data.codigo_expira) < new Date()) {
-        hideLoading();
-        return alert('❌ Código expirado! Solicite um novo código.');
-    }
-    
-    // Verificar código
-    if(data.codigo_redefinicao !== codigo) {
-        hideLoading();
-        return alert('❌ Código incorreto!');
-    }
-    
-    // Atualizar senha
-    await db.from('pacientes_portal').update({ 
-        senha: novaSenha, 
-        codigo_redefinicao: null,
-        codigo_expira: null
-    }).eq('cpf', cpf);
-    
+    const { data } = await db.from('pacientes_portal').select('codigo_redefinicao, codigo_expira').eq('cpf', cpf).maybeSingle();
+    if (!data) { hideLoading(); return alert('❌ Usuário não encontrado!'); }
+    if (new Date(data.codigo_expira) < new Date()) { hideLoading(); return alert('❌ Código expirado!'); }
+    if (data.codigo_redefinicao !== codigo) { hideLoading(); return alert('❌ Código incorreto!'); }
+    await db.from('pacientes_portal').update({ senha: novaSenha, codigo_redefinicao: null, codigo_expira: null }).eq('cpf', cpf);
     hideLoading();
-    alert('✅ Senha redefinida com sucesso!');
+    alert('✅ Senha redefinida!');
     showScreen('screenLogin');
-    
-    // Limpar campos
-    document.getElementById('redefCPF').value = '';
-    document.getElementById('redefNomeMae').value = '';
-    document.getElementById('redefCidade').value = '';
-    document.getElementById('redefCodigo').value = '';
-    document.getElementById('redefNovaSenha').value = '';
+});
+
+// Fechar modais ao clicar fora
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('show');
 });
 
 // ============================================
-// FILTRO DE BUSCA DO ADMIN + RENDERIZAR HISTÓRICO
+// FUNÇÕES PRINCIPAIS DO PORTAL
 // ============================================
-let todosRetornos = [];
-function filtrarHistoricoAdmin(){
-    const busca = document.getElementById('buscaGlobalRetornos')?.value?.toLowerCase() || '';
-    if(!todosRetornos.length) return;
-    let filtrados = todosRetornos;
-    if(busca){ filtrados = todosRetornos.filter(r => (r.paciente_nome||'').toLowerCase().includes(busca) || (r.paciente_cpf||'').includes(busca) || (r.numero_solicitacao||'').includes(busca) || String(r.id).includes(busca)); }
-    document.getElementById('contadorRetornos').textContent = filtrados.length + ' solicitações encontradas';
-    renderizarHistoricoHTML(filtrados);
-}
 
-function renderizarHistoricoHTML(lista = null){
-    const dados = lista || retornosLista;
-    if(dados.length === 0){ document.getElementById('historicoLista').innerHTML = '<p class="text-slate-400 text-center py-8"><i class="fas fa-inbox text-4xl mb-3 block"></i>Nenhuma solicitação.</p>'; return; }
-    document.getElementById('historicoLista').innerHTML = dados.map(r => {
-        const sb = r.status==='aguardando_exame'?'bg-amber-100 text-amber-700':
-                   r.status==='apto_retorno'?'bg-emerald-100 text-emerald-700':
-                   r.status==='retorno_agendado'?'bg-indigo-100 text-indigo-700':
-                   r.status==='retorno_recepcionado'?'bg-teal-100 text-teal-700':
-                   r.status==='oci_fechada'?'bg-purple-100 text-purple-700':
-                   'bg-blue-100 text-blue-700';
-        const st = r.status==='aguardando_exame'?'⏳ Aguardando Exames':
-                   r.status==='apto_retorno'?'✅ Apto Retorno':
-                   r.status==='retorno_agendado'?'📅 Retorno Agendado':
-                   r.status==='retorno_recepcionado'?'📋 Retorno Recepcionado':
-                   r.status==='oci_fechada'?'✔️ OCI Fechada':r.status;
-        
-        let btns = '';
-        if(usuarioLogado && usuarioLogado.tipo === 'admin'){
-            btns = `<div class="flex gap-2 mt-2 md:mt-0">
-                        <button onclick="editarExameOCI(${r.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-edit"></i> Editar Exame</button>
-                        <button onclick="excluirRetornoOCI(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-trash"></i> Excluir (OCI)</button>
-                        <button onclick="extornarRetornoOCI(${r.id})" class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1 rounded-lg text-xs font-bold"><i class="fas fa-undo"></i> Extornar (OCI)</button>
-                    </div>`;
-        }
-        
-        return `<div class="border-2 border-slate-200 rounded-xl p-4 hover:border-blue-300">
-            <div class="flex justify-between items-start flex-wrap gap-2">
-                <div><p class="font-bold">📝 #${r.id}</p><p class="text-xs text-slate-500">📅 ${formatarData(r.created_at)} | 👤 ${r.paciente_nome||'—'}</p><p class="text-xs">🔢 ${r.numero_solicitacao||'—'} | 🏷️ ${r.codigo_sigtap||'—'}</p></div>
-                <div class="flex flex-col items-end gap-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${sb}">${st}</span>${btns}</div>
-            </div></div>`;
-    }).join('');
-}
-
-// ============================================
-// CARREGAR PORTAL
-// ============================================
-async function carregarPortal(){
+async function carregarPortal() {
     showLoading();
     document.getElementById('portalNome').textContent = usuarioLogado.nome;
     document.getElementById('sidebarNomePortal').textContent = usuarioLogado.nome || 'Usuário';
-    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome||'U')[0].toUpperCase();
-    document.getElementById('sidebarTipoPortal').textContent = usuarioLogado.tipo==='admin'?'👑 Administrador':'👤 Usuário';
-    
-    // Mostrar menu de administração apenas para admin
+    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
+    document.getElementById('sidebarTipoPortal').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário';
+
     const menuAdmin = document.getElementById('menuAdminPortal');
-    if(usuarioLogado.tipo === 'admin'){
+    if (usuarioLogado.tipo === 'admin') {
         menuAdmin.classList.remove('hidden');
         document.getElementById('buscaAdminHistorico').style.display = 'block';
     } else {
         menuAdmin.classList.add('hidden');
         document.getElementById('buscaAdminHistorico').style.display = 'none';
     }
-    
-    // Buscar da linha_cuidado
-    const { data: rets } = await db.from('linha_cuidado').select('*').order('created_at', {ascending: false});
+
+    // Buscar dados atualizados da linha_cuidado
+    const { data: rets } = await db.from('linha_cuidado').select('*, pacientes(nome, cpf, prontuario, telefone, endereco_completo, numero_residencia, bairro, municipio, cep, sexo, raca_cor, data_nascimento, nome_mae, unidade_saude)').order('created_at', { ascending: false });
     retornosLista = rets || [];
     todosRetornos = [...retornosLista];
-    
-    hideLoading();
-    
+
     document.getElementById('infoCards').innerHTML = `
-        <div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-emerald-500"><p class="text-xs text-slate-500 uppercase font-bold">👤 Usuário Logado</p><p class="text-lg font-extrabold text-slate-800">${usuarioLogado.nome||'—'}</p></div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm card-hover border-l-4 border-blue-500"><p class="text-xs text-slate-500 uppercase font-bold">📋 Solicitações na Linha do Cuidado</p><p class="text-lg font-extrabold text-slate-800">${retornosLista.length}</p></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500"><p class="text-xs text-slate-500 uppercase font-bold">👤 Usuário Logado</p><p class="text-lg font-extrabold">${usuarioLogado.nome || '—'}</p></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-blue-500"><p class="text-xs text-slate-500 uppercase font-bold">📋 Solicitações</p><p class="text-lg font-extrabold">${retornosLista.length}</p></div>
     `;
     renderizarHistoricoHTML();
-    
-    // Carregar meus dados
-    
-    let pacienteData = null;
+
+    // Buscar dados do paciente logado
     if (usuarioLogado && usuarioLogado.cpf) {
-        const { data } = await db.from('pacientes').select('*').eq('cpf', usuarioLogado.cpf).maybeSingle();
-        pacienteData = data;
-    }
-    if(pacienteData){
-        document.getElementById('meusDadosConteudo').innerHTML = `
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Nome Completo</p><p class="font-bold">${pacienteData.nome || '—'}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">CPF</p><p class="font-bold">${formatarCPF(pacienteData.cpf)}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Data de Nascimento</p><p class="font-bold">${formatarData(pacienteData.data_nascimento)}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Telefone</p><p class="font-bold">${formatarTelefone(pacienteData.telefone)}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Endereço</p><p class="font-bold">${pacienteData.endereco_completo || '—'}, ${pacienteData.numero_residencia || '—'}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Bairro / Cidade</p><p class="font-bold">${pacienteData.bairro || '—'} / ${pacienteData.municipio || '—'}</p></div>
-            <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Unidade de Saúde</p><p class="font-bold">${pacienteData.unidade_saude || '—'}</p></div>
-        `;
-    }
-}
-
-function formatarCPF(cpf){
-    if(!cpf) return '—';
-    cpf = cpf.toString().replace(/\D/g,'');
-    if(cpf.length !== 11) return cpf;
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-}
-
-// ============================================
-// SWITCH DE ABAS
-// ============================================
-function switchTab(tabId){
-    document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active','text-emerald-600');b.classList.add('text-slate-400');});
-    const tm = document.getElementById('tabMobile-'+tabId); if(tm) tm.classList.add('active','text-emerald-600');
-    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-    document.getElementById('content-'+tabId).classList.add('active');
-    
-    // Atualizar classe active na sidebar
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-        if(item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabId)){
-            item.classList.add('active');
+        const { data: paciente } = await db.from('pacientes').select('*').eq('cpf', usuarioLogado.cpf).maybeSingle();
+        if (paciente) {
+            document.getElementById('meusDadosConteudo').innerHTML = `
+                <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Nome</p><p class="font-bold">${paciente.nome || '—'}</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">CPF</p><p class="font-bold">${formatarCPF(paciente.cpf)}</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Data Nascimento</p><p class="font-bold">${formatarData(paciente.data_nascimento)}</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Telefone</p><p class="font-bold">${formatarTelefone(paciente.telefone)}</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Endereço</p><p class="font-bold">${paciente.endereco_completo || '—'}, ${paciente.numero_residencia || '—'}</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Bairro/Cidade</p><p class="font-bold">${paciente.bairro || '—'} / ${paciente.municipio || '—'}</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Unidade de Saúde</p><p class="font-bold">${paciente.unidade_saude || '—'}</p></div>
+            `;
         }
-    });
+    }
+    hideLoading();
 }
+
+// ============================================
+// HISTÓRICO
+// ============================================
+let todosRetornos = [];
+
+function filtrarHistoricoAdmin() {
+    const busca = document.getElementById('buscaGlobalRetornos')?.value?.toLowerCase() || '';
+    if (!todosRetornos.length) return;
+    let filtrados = todosRetornos;
+    if (busca) {
+        filtrados = todosRetornos.filter(r => {
+            const pacienteNome = r.pacientes?.nome || '';
+            const pacienteCpf = r.pacientes?.cpf || '';
+            return pacienteNome.toLowerCase().includes(busca) || pacienteCpf.includes(busca) || (r.numero_solicitacao || '').includes(busca) || String(r.id).includes(busca);
+        });
+    }
+    document.getElementById('contadorRetornos').textContent = `${filtrados.length} solicitações encontradas`;
+    renderizarHistoricoHTML(filtrados);
+}
+
+function renderizarHistoricoHTML(lista = null) {
+    const dados = lista || retornosLista;
+    if (dados.length === 0) {
+        document.getElementById('historicoLista').innerHTML = '<p class="text-slate-400 text-center py-8"><i class="fas fa-inbox text-4xl mb-3 block"></i>Nenhuma solicitação.</p>';
+        return;
+    }
+    document.getElementById('historicoLista').innerHTML = dados.map(r => {
+        const statusMap = {
+            'aguardando_exame': { cor: 'bg-amber-100 text-amber-700', texto: '⏳ Aguardando Exames' },
+            'apto_retorno': { cor: 'bg-emerald-100 text-emerald-700', texto: '✅ Apto Retorno' },
+            'retorno_agendado': { cor: 'bg-indigo-100 text-indigo-700', texto: '📅 Retorno Agendado' },
+            'retorno_recepcionado': { cor: 'bg-teal-100 text-teal-700', texto: '📋 Retorno Recepcionado' },
+            'oci_fechada': { cor: 'bg-purple-100 text-purple-700', texto: '✔️ OCI Fechada' },
+            'apac_gerada': { cor: 'bg-pink-100 text-pink-700', texto: '📑 APAC Gerada' },
+            'faltou': { cor: 'bg-orange-100 text-orange-700', texto: '🚫 Faltou' },
+            'retorno_faltou': { cor: 'bg-red-100 text-red-700', texto: '🚫 Faltou Retorno' }
+        };
+        const st = statusMap[r.status] || { cor: 'bg-blue-100 text-blue-700', texto: r.status };
+        const pacienteNome = r.pacientes?.nome || '—';
+        const pacienteCpf = r.pacientes?.cpf || '—';
+
+        let btns = '';
+        if (usuarioLogado && usuarioLogado.tipo === 'admin') {
+            btns = `<div class="flex flex-wrap gap-2 mt-2">
+                        <button onclick="editarExameOCI(${r.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-edit"></i> Editar Exame</button>
+                        <button onclick="excluirRetornoOCI(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-trash"></i> Excluir</button>
+                        <button onclick="extornarRetornoOCI(${r.id})" class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-undo"></i> Extornar</button>
+                    </div>`;
+        }
+
+        return `<div class="border-2 border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-all">
+            <div class="flex justify-between items-start flex-wrap gap-2">
+                <div>
+                    <p class="font-bold text-slate-800">📝 #${r.id}</p>
+                    <p class="text-xs text-slate-500">📅 ${formatarData(r.created_at)} | 👤 ${pacienteNome}</p>
+                    <p class="text-xs text-slate-500">🔢 ${r.numero_solicitacao || '—'} | 🏷️ ${r.codigo_sigtap || '—'}</p>
+                    <p class="text-xs text-slate-500">📞 ${formatarTelefone(r.pacientes?.telefone)} | CPF: ${formatarCPF(pacienteCpf)}</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span class="px-3 py-1.5 rounded-full text-xs font-bold ${st.cor}">${st.texto}</span>
+                    ${btns}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ============================================
+// BUSCA AUTOMÁTICA DA SOLICITAÇÃO
+// ============================================
+let timeoutBusca = null;
+
+document.getElementById('numeroSolicitacao').addEventListener('input', function() {
+    clearTimeout(timeoutBusca);
+    const valor = this.value.trim();
+
+    if (valor.length === 0) {
+        ['prontuarioPaciente', 'nomePacienteRetorno', 'dataNascimentoRetorno', 'nomeMaeRetorno', 'telefoneRetorno', 'especialidadeRetorno', 'medicoSolicitanteRetorno', 'localConsultaRetorno', 'dataPrimeiraConsultaRetorno', 'unidadeSaude', 'cep', 'endereco', 'numeroResidencia', 'bairro', 'municipio', 'sexo', 'racaCor'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        dadosPrimeiraConsulta = null;
+        document.getElementById('msgSolicitar').classList.add('hidden');
+        return;
+    }
+
+    if (valor.length >= 2) {
+        timeoutBusca = setTimeout(async () => {
+            try {
+                let { data: consulta } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', valor).maybeSingle();
+                if (!consulta && !isNaN(valor)) {
+                    const { data: consultaNum } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', parseInt(valor)).maybeSingle();
+                    consulta = consultaNum;
+                }
+                if (consulta) {
+                    dadosPrimeiraConsulta = consulta;
+                    if (consulta.paciente_id) {
+                        const { data: paciente } = await db.from('pacientes').select('*').eq('id', consulta.paciente_id).maybeSingle();
+                        if (paciente) {
+                            document.getElementById('nomePacienteRetorno').value = paciente.nome || '';
+                            document.getElementById('prontuarioPaciente').value = paciente.prontuario || '';
+                            document.getElementById('dataNascimentoRetorno').value = paciente.data_nascimento ? paciente.data_nascimento.split('T')[0] : '';
+                            document.getElementById('nomeMaeRetorno').value = paciente.nome_mae || '';
+                            document.getElementById('telefoneRetorno').value = formatarTelefone(paciente.telefone || '');
+                            document.getElementById('unidadeSaude').value = paciente.unidade_saude || consulta.unidade_basica_saude || '';
+                            if (paciente.cep) document.getElementById('cep').value = paciente.cep;
+                            if (paciente.endereco_completo) document.getElementById('endereco').value = paciente.endereco_completo;
+                            if (paciente.numero_residencia) document.getElementById('numeroResidencia').value = paciente.numero_residencia;
+                            if (paciente.bairro) document.getElementById('bairro').value = paciente.bairro;
+                            if (paciente.municipio) document.getElementById('municipio').value = paciente.municipio;
+                            if (paciente.sexo) document.getElementById('sexo').value = paciente.sexo;
+                            if (paciente.raca_cor) document.getElementById('racaCor').value = paciente.raca_cor;
+                        }
+                    }
+                    document.getElementById('medicoSolicitanteRetorno').value = consulta.medico_solicitante || '';
+                    document.getElementById('localConsultaRetorno').value = consulta.local_consulta || '';
+                    document.getElementById('dataPrimeiraConsultaRetorno').value = consulta.data_agendada ? consulta.data_agendada.split('T')[0] : '';
+                    const especialidadesMap = { 1: '🫀 Cardiologia', 2: '🦴 Ortopedia', 3: '🎗️ Oncologia', 4: '👁️ Oftalmologia', 5: '👂 Otorrino' };
+                    document.getElementById('especialidadeRetorno').value = especialidadesMap[consulta.especialidade_id] || '';
+                    mostrarMsg('msgSolicitar', '✅ Dados preenchidos da Linha do Cuidado!', 'emerald');
+                }
+            } catch (e) {
+                console.error('Erro na busca:', e);
+            }
+        }, 600);
+    }
+});
 
 // ============================================
 // VALIDAR E SOLICITAR RETORNO
@@ -1121,49 +1092,37 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
     const ns = document.getElementById('numeroSolicitacao').value.trim();
     const un = document.getElementById('unidadeSaude').value.trim();
     const cs = document.getElementById('sigtapSelecionado').value;
-    
-    if(!ns) return alert('❌ Informe o Nº da Solicitação!');
-    if(!un) return alert('❌ Selecione a Unidade de Saúde!');
-    if(!cs) return alert('❌ Selecione o SubGrupo SIGTAP!');
-    if(examesSelecionados.length===0) return alert('❌ Selecione pelo menos 1 exame!');
-    
+
+    if (!ns) return alert('❌ Informe o Nº da Solicitação!');
+    if (!un) return alert('❌ Selecione a Unidade de Saúde!');
+    if (!cs) return alert('❌ Selecione o SubGrupo SIGTAP!');
+    if (examesSelecionados.length === 0) return alert('❌ Selecione pelo menos 1 exame!');
+
     showLoading();
-    
-    // Buscar na linha_cuidado
-    const { data: consulta, error } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', ns).maybeSingle();
-    
-    if(error || !consulta) { hideLoading(); return mostrarMsg('msgSolicitar','❌ Nº Solicitação NÃO encontrado na Linha do Cuidado!','rose'); }
-    if(consulta.status !== 'recepcionada' && consulta.status !== 'aguardando_exame' && consulta.status !== 'apto_retorno') { 
-        hideLoading(); 
-        return mostrarMsg('msgSolicitar','❌ Esta OCI não está no status correto para solicitar retorno! Status atual: ' + consulta.status,'rose'); 
+    const { data: consulta } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', ns).maybeSingle();
+    if (!consulta) { hideLoading(); return mostrarMsg('msgSolicitar', '❌ Nº Solicitação não encontrado!', 'rose'); }
+    if (!['recepcionada', 'aguardando_exame', 'apto_retorno'].includes(consulta.status)) {
+        hideLoading();
+        return mostrarMsg('msgSolicitar', `❌ Status incorreto: ${consulta.status}`, 'rose');
     }
-    
-    dadosPrimeiraConsulta = consulta;
-    
-     // Verificar se TODOS os exames têm data de realização (e tem exames!)
-     const todosRealizados = examesSelecionados.length > 0 && examesSelecionados.every(e => e.data_realizacao);
-     const statusInicial = todosRealizados ? 'apto_retorno' : 'aguardando_exame';
-    
-    // Preparar dados para confirmação
+
+    const todosRealizados = examesSelecionados.length > 0 && examesSelecionados.every(e => e.data_realizacao);
+    const novoStatus = todosRealizados ? 'apto_retorno' : 'aguardando_exame';
+
     const modalDados = document.getElementById('modalDadosConfirmacao');
     modalDados.innerHTML = `
-        <div class="flex justify-between"><span class="text-xs text-slate-500">Nº Solicitação:</span><span class="text-sm font-bold">${ns}</span></div>
-        <div class="flex justify-between"><span class="text-xs text-slate-500">Paciente:</span><span class="text-sm font-bold">${document.getElementById('nomePaciente').value || '—'}</span></div>
-        <div class="flex justify-between"><span class="text-xs text-slate-500">Unidade:</span><span class="text-sm font-bold">${un}</span></div>
-        <div class="flex justify-between"><span class="text-xs text-slate-500">Exames:</span><span class="text-sm font-bold">${examesSelecionados.length} selecionados</span></div>
-        <div class="flex justify-between"><span class="text-xs text-slate-500">Status:</span><span class="text-sm font-bold ${todosRealizados?'text-emerald-600':'text-amber-600'}">${todosRealizados?'✅ APTO PARA RETORNO':'⏳ AGUARDANDO EXAMES'}</span></div>
-        ${examesSelecionados.map(e => `
-        <div class="text-[10px] text-slate-500 border-t pt-2 mt-1">
-            🧪 ${e.codigo} - ${e.nome} | Solicitação: ${e.data_solicitacao||'—'} | Realização: ${e.data_realizacao||'—'} ${e.data_realizacao?'🟢':'🟡'}
-        </div>`).join('')}
+        <div class="flex justify-between"><span class="text-slate-500">Nº Solicitação:</span><span class="font-bold">${ns}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Paciente:</span><span class="font-bold">${document.getElementById('nomePacienteRetorno').value || '—'}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Unidade:</span><span class="font-bold">${un}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Exames:</span><span class="font-bold">${examesSelecionados.length} selecionados</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Status:</span><span class="font-bold ${todosRealizados ? 'text-emerald-600' : 'text-amber-600'}">${todosRealizados ? '✅ APTO PARA RETORNO' : '⏳ AGUARDANDO EXAMES'}</span></div>
+        ${examesSelecionados.map(e => `<div class="text-xs border-t pt-2 mt-1">🧪 ${e.codigo} - ${e.nome} | Solicitação: ${e.data_solicitacao || '—'} | Realização: ${e.data_realizacao || '—'} ${e.data_realizacao ? '🟢' : '🟡'}</div>`).join('')}
     `;
-    
+
     document.getElementById('btnConfirmarRetorno').onclick = async () => {
         showLoading();
-        
-        // Atualizar linha_cuidado com exames e status
-        const { error: updateError } = await db.from('linha_cuidado').update({
-            status: statusInicial,
+        const { error } = await db.from('linha_cuidado').update({
+            status: novoStatus,
             exames_solicitados: JSON.stringify(examesSelecionados),
             exames_realizados: todosRealizados ? JSON.stringify(examesSelecionados) : '[]',
             data_solicitacao_exame: examesSelecionados[0]?.data_solicitacao || null,
@@ -1174,15 +1133,10 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
             cid: document.getElementById('cid').value,
             updated_at: new Date().toISOString()
         }).eq('numero_solicitacao', ns);
-        
-        if(updateError) {
-            hideLoading();
-            return alert('❌ Erro ao salvar: ' + updateError.message);
-        }
-        
-        // Atualizar dados do paciente
-        const pacienteId = consulta.paciente_id;
-        if(pacienteId){
+
+        if (error) { hideLoading(); return alert('❌ Erro: ' + error.message); }
+
+        if (consulta.paciente_id) {
             await db.from('pacientes').update({
                 cep: document.getElementById('cep').value,
                 endereco_completo: document.getElementById('endereco').value,
@@ -1193,237 +1147,234 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
                 raca_cor: document.getElementById('racaCor').value,
                 unidade_saude: un,
                 updated_at: new Date().toISOString()
-            }).eq('id', pacienteId);
+            }).eq('id', consulta.paciente_id);
         }
-        
-        hideLoading(); 
-        fecharModalConfirmacao();
-        mostrarMsg('msgSolicitar', todosRealizados ? '✅ Paciente APTO PARA RETORNO!' : '✅ Aguardando realização de exames.', 'emerald');
-        limparFormularioSolicitar(); 
-        carregarPortal();
+
+        hideLoading();
+        fecharModal('modalConfirmacao');
+        mostrarMsg('msgSolicitar', todosRealizados ? '✅ Paciente APTO para retorno!' : '✅ Aguardando realização de exames.', 'emerald');
+        limparFormularioSolicitar();
+        await carregarPortal();
     };
-    
     document.getElementById('modalConfirmacao').classList.add('show');
     hideLoading();
 });
 
-function fecharModalConfirmacao(){ document.getElementById('modalConfirmacao').classList.remove('show'); }
+function limparFormularioSolicitar() {
+    const campos = ['numeroSolicitacao', 'prontuarioPaciente', 'nomePacienteRetorno', 'dataNascimentoRetorno', 'nomeMaeRetorno', 'telefoneRetorno', 'especialidadeRetorno', 'medicoSolicitanteRetorno', 'localConsultaRetorno', 'dataPrimeiraConsultaRetorno', 'unidadeSaude', 'cep', 'endereco', 'numeroResidencia', 'bairro', 'municipio', 'sigtapSearch', 'cid'];
+    campos.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('sexo').value = '';
+    document.getElementById('racaCor').value = '';
+    document.getElementById('sigtapSelecionado').value = '';
+    examesSelecionados = [];
+    subgrupoSelecionado = null;
+    atualizarExamesSelecionados();
+    dadosPrimeiraConsulta = null;
+}
 
 // ============================================
-// BUSCA AUTOMÁTICA AO DIGITAR Nº SOLICITAÇÃO
+// EDIÇÃO DE EXAME (HISTÓRICO)
 // ============================================
-let timeoutBusca = null;
-document.getElementById('numeroSolicitacao').addEventListener('input', function(){
-    clearTimeout(timeoutBusca);
-    const valor = this.value.trim();
-    
-    if(valor.length === 0){
-        ['nomePaciente','dataNascimentoRetorno','validarNomeMae','telefoneRetorno','especialidadeRetorno','medicoSolicitante','localConsulta','dataPrimeiraConsulta','prontuarioVivver'].forEach(id=>{
-            const el = document.getElementById(id); if(el) el.value = '';
+async function editarExameOCI(id) {
+    const solicitacao = retornosLista.find(r => r.id === id);
+    if (!solicitacao) return alert('❌ Solicitação não encontrada!');
+    if (solicitacao.status !== 'aguardando_exame') {
+        return alert('⚠️ Só é possível editar exames de solicitações com status "Aguardando Exames"');
+    }
+    let exames = [];
+    try { exames = JSON.parse(solicitacao.exames_solicitados || '[]'); } catch (e) { exames = []; }
+    if (exames.length === 0) return alert('❌ Nenhum exame encontrado para editar!');
+
+    const modalDiv = document.createElement('div');
+    modalDiv.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+    modalDiv.innerHTML = `
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-auto">
+            <h3 class="text-xl font-bold mb-4">✏️ Editar Exames</h3>
+            <div class="space-y-4" id="editarExamesLista">
+                ${exames.map((exame, idx) => `
+                    <div class="border rounded-xl p-3">
+                        <p class="font-bold text-sm">${exame.codigo} - ${exame.nome}</p>
+                        <label class="text-xs text-slate-500 block mt-2">📅 Data Realização</label>
+                        <input type="date" id="editDataReal_${idx}" value="${exame.data_realizacao || ''}" class="w-full border rounded-lg p-2 mt-1">
+                    </div>
+                `).join('')}
+            </div>
+            <button onclick="salvarEdicaoExames(${id})" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold mt-4">💾 SALVAR</button>
+            <button onclick="fecharModalEdicao()" class="w-full bg-slate-200 text-slate-700 py-3 rounded-xl font-bold mt-2">❌ CANCELAR</button>
+        </div>
+    `;
+    document.body.appendChild(modalDiv);
+
+    window.salvarEdicaoExames = async function(id) {
+        const examesAtualizados = [...exames];
+        examesAtualizados.forEach((_, idx) => {
+            const dataReal = document.getElementById(`editDataReal_${idx}`).value;
+            examesAtualizados[idx].data_realizacao = dataReal || null;
         });
-        dadosPrimeiraConsulta = null;
-        document.getElementById('msgSolicitar').classList.add('hidden');
-        return;
-    }
-    
-    if(valor.length >= 2){
-        timeoutBusca = setTimeout(async () => {
-            try {
-                console.log('Buscando solicitação:', valor);
-                // Tenta buscar como string primeiro
-                let { data: consulta } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', valor).maybeSingle();
-                
-                // Se não encontrar, tenta buscar como número (caso a coluna no banco seja numérica)
-                if (!consulta && !isNaN(valor)) {
-                    const { data: consultaNum } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', parseInt(valor)).maybeSingle();
-                    consulta = consultaNum;
-                }
+        const todosRealizados = examesAtualizados.every(e => e.data_realizacao);
+        const novoStatus = todosRealizados ? 'apto_retorno' : 'aguardando_exame';
+        await db.from('linha_cuidado').update({
+            exames_solicitados: JSON.stringify(examesAtualizados),
+            exames_realizados: todosRealizados ? JSON.stringify(examesAtualizados) : '[]',
+            status: novoStatus,
+            updated_at: new Date().toISOString()
+        }).eq('id', id);
+        alert(todosRealizados ? '✅ Paciente APTO para retorno!' : '✅ Datas atualizadas!');
+        fecharModalEdicao();
+        await carregarPortal();
+    };
+    window.fecharModalEdicao = function() { if (modalDiv) modalDiv.remove(); };
+}
 
-                if(consulta){
-                    processarConsulta(consulta);
-                }
-            } catch(e) {
-                console.error('Erro na busca automática:', e);
-                document.getElementById('msgSolicitar').classList.add('hidden');
-            }
-        }, 600);
+// ============================================
+// EXCLUIR E EXTORNAR RETORNO (ADMIN)
+// ============================================
+async function excluirRetornoOCI(id) {
+    if (usuarioLogado.tipo !== 'admin') return alert('❌ Apenas Administrador.');
+    if (!confirm('⚠️ EXCLUIR esta solicitação? Isso voltará o status para "em_andamento".')) return;
+    showLoading();
+    const r = retornosLista.find(x => x.id === id);
+    if (r && r.numero_solicitacao) {
+        await db.from('linha_cuidado').update({ status: 'em_andamento', exames_solicitados: null, exames_realizados: null }).eq('numero_solicitacao', r.numero_solicitacao);
     }
-});
-    
-async function processarConsulta(consulta) {
-    dadosPrimeiraConsulta = consulta;
-    
-    if(consulta.paciente_id){
-        
-        let paciente = null;
-        if (consulta.paciente_id) {
-            const { data } = await db.from('pacientes').select('*').eq('id', consulta.paciente_id).maybeSingle();
-            paciente = data;
-        }
-        if(paciente){
-            document.getElementById('nomePaciente').value = paciente.nome || '';
-            document.getElementById('dataNascimentoRetorno').value = paciente.data_nascimento ? paciente.data_nascimento.split('T')[0] : '';
-            document.getElementById('validarNomeMae').value = paciente.nome_mae || '';
-            document.getElementById('telefoneRetorno').value = formatarTelefone(paciente.telefone || '');
-            document.getElementById('prontuarioVivver').value = paciente.prontuario || '';
-            document.getElementById('unidadeSaude').value = paciente.unidade_saude || consulta.unidade_basica_saude || '';
-            
-            // Preencher campos de endereço se disponíveis
-            if (paciente.cep) document.getElementById('cep').value = paciente.cep;
-            if (paciente.endereco) document.getElementById('endereco').value = paciente.endereco;
-            if (paciente.numero) document.getElementById('numeroResidencia').value = paciente.numero;
-            if (paciente.bairro) document.getElementById('bairro').value = paciente.bairro;
-            if (paciente.municipio) document.getElementById('municipio').value = paciente.municipio;
-            if (paciente.sexo) document.getElementById('sexo').value = paciente.sexo;
-            if (paciente.raca_cor) document.getElementById('racaCor').value = paciente.raca_cor;
-        }
+    hideLoading();
+    alert('✅ Solicitação excluída!');
+    await carregarPortal();
+}
+
+async function extornarRetornoOCI(id) {
+    if (usuarioLogado.tipo !== 'admin') return alert('❌ Apenas Administrador.');
+    if (!confirm('⚠️ EXTORNAR esta solicitação? O status voltará para "aguardando_exame".')) return;
+    showLoading();
+    const r = retornosLista.find(x => x.id === id);
+    if (r && r.numero_solicitacao) {
+        await db.from('linha_cuidado').update({ status: 'aguardando_exame' }).eq('numero_solicitacao', r.numero_solicitacao);
     }
-    
-    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
-    document.getElementById('localConsulta').value = consulta.local_consulta || '';
-    document.getElementById('dataPrimeiraConsulta').value = consulta.data_agendada ? consulta.data_agendada.split('T')[0] : '';
-    
-    const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
-    document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
-    
-    mostrarMsg('msgSolicitar','✅ Dados preenchidos da Linha do Cuidado!','emerald');
+    hideLoading();
+    alert('✅ Solicitação extornada!');
+    await carregarPortal();
+}
+
+// ============================================
+// SWITCH DE ABAS
+// ============================================
+function switchTab(tabId) {
+    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active', 'text-emerald-600'); b.classList.add('text-slate-400'); });
+    const tm = document.getElementById('tabMobile-' + tabId);
+    if (tm) tm.classList.add('active', 'text-emerald-600');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('content-' + tabId).classList.add('active');
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabId)) item.classList.add('active');
+    });
 }
 
 // ============================================
 // BUSCAR CEP
 // ============================================
-async function buscarCEP(cep){
-    cep=cep.replace(/\D/g,''); if(cep.length!==8)return;
-    try{
-        const r=await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-        const d=await r.json();
-        if(!d.erro){
-            document.getElementById('endereco').value=d.logradouro||'';
-            document.getElementById('bairro').value=d.bairro||'';
-            document.getElementById('municipio').value=d.localidade||'';
+async function buscarCEP(cep) {
+    cep = cep.replace(/\D/g, '');
+    if (cep.length !== 8) return;
+    try {
+        const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const d = await r.json();
+        if (!d.erro) {
+            document.getElementById('endereco').value = d.logradouro || '';
+            document.getElementById('bairro').value = d.bairro || '';
+            document.getElementById('municipio').value = d.localidade || '';
         }
-    }catch(e){}
+    } catch (e) { }
 }
-document.getElementById('cep').addEventListener('input',function(){
-    const c=this.value.replace(/\D/g,'');
-    if(c.length===8)buscarCEP(c);
-});
+document.getElementById('cep').addEventListener('input', function () { if (this.value.replace(/\D/g, '').length === 8) buscarCEP(this.value); });
 
 // ============================================
-// EDITAR / EXCLUIR / EXTORNAR (ADMIN)
+// PAINEL ADMINISTRADOR (PORTAL)
 // ============================================
-async function excluirRetornoOCI(id){
-    if(usuarioLogado.tipo!=='admin') return alert('❌ Apenas Administrador.');
-    if(!confirm('⚠️ EXCLUIR esta solicitação? Isso irá remover o registro e voltar o status no OCI para "em_andamento".')) return;
-    showLoading(); 
-    const r = retornosLista.find(x=>x.id===id);
-    // Atualizar status no OCI
-    if(r && r.numero_solicitacao){
-        await db.from('linha_cuidado').update({ status: 'em_andamento', exames_solicitados: null, exames_realizados: null }).eq('numero_solicitacao', r.numero_solicitacao);
-    }
-    hideLoading(); 
-    alert('✅ Solicitação excluída e OCI retornada para "em_andamento"!');
-    carregarPortal();
-}
 
-async function extornarRetornoOCI(id){
-    if(usuarioLogado.tipo!=='admin') return alert('❌ Apenas Administrador.');
-    if(!confirm('⚠️ EXTORNAR esta solicitação? O status voltará para "aguardando_exame".')) return;
-    showLoading(); 
-    const r = retornosLista.find(x=>x.id===id);
-    if(r && r.numero_solicitacao){
-        await db.from('linha_cuidado').update({ status: 'aguardando_exame' }).eq('numero_solicitacao', r.numero_solicitacao);
-    }
-    hideLoading(); 
-    alert('✅ Solicitação extornada! Status voltou para "aguardando_exame".');
-    carregarPortal();
-}
-
-// ============================================
-// PAINEL ADMINISTRADOR
-// ============================================
-function abrirModalAdminPortal(){ 
-    if(usuarioLogado && usuarioLogado.tipo === 'admin'){
-        document.getElementById('modalAdminPortal').classList.add('show'); 
-        switchAdminTab('usuarios'); 
-        renderizarListaUsuarios(); 
+function abrirModalAdminPortal() {
+    if (usuarioLogado && usuarioLogado.tipo === 'admin') {
+        document.getElementById('modalAdminPortal').classList.add('show');
+        switchAdminTab('usuarios');
+        renderizarListaUsuarios();
     } else {
         alert('❌ Acesso negado! Apenas administradores.');
     }
 }
-function fecharModalAdminPortal(){ document.getElementById('modalAdminPortal').classList.remove('show'); }
-function switchAdminTab(tabId){
-    document.querySelectorAll('.admin-portal-tab-btn').forEach(b=>{b.classList.remove('text-purple-600','border-b-2','border-purple-600');b.classList.add('text-slate-400');});
-    document.getElementById('adminPortalTab-'+tabId).classList.add('text-purple-600','border-b-2','border-purple-600');
-    document.querySelectorAll('.admin-portal-content').forEach(c=>c.classList.add('hidden'));
-    document.getElementById('adminPortalContent-'+tabId).classList.remove('hidden');
+
+function switchAdminTab(tabId) {
+    document.querySelectorAll('.admin-portal-tab-btn').forEach(b => {
+        b.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
+        b.classList.add('text-slate-400');
+    });
+    document.getElementById('adminPortalTab-' + tabId).classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
+    document.querySelectorAll('.admin-portal-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById('adminPortalContent-' + tabId).classList.remove('hidden');
 }
-function gerarCPFValido(){
-    let cpf = '';
-    for(let i=0;i<9;i++) cpf += Math.floor(Math.random() * 10);
-    let s=0; for(let i=0;i<9;i++) s+=parseInt(cpf[i])*(10-i); let r=(s*10)%11; if(r===10) r=0; cpf+=r;
-    s=0; for(let i=0;i<10;i++) s+=parseInt(cpf[i])*(11-i); r=(s*10)%11; if(r===10) r=0; cpf+=r;
-    return cpf;
-}
-function gerarCPFPortal(){ document.getElementById('adminPortalCPF').value = gerarCPFValido(); }
-async function renderizarListaUsuarios(){
-    showLoading(); 
-    const{data:usuarios}=await db.from('pacientes_portal').select('*').order('nome'); 
+
+async function renderizarListaUsuarios() {
+    showLoading();
+    const { data: usuarios } = await db.from('pacientes_portal').select('*').order('nome');
     hideLoading();
-    const busca=document.getElementById('adminPortalBusca')?.value?.toLowerCase()||'';
-    let lista=(usuarios||[]).filter(u=>!busca||u.nome.toLowerCase().includes(busca)||(u.cpf||'').includes(busca));
-    document.getElementById('adminPortalTabelaUsuarios').innerHTML=lista.map(u=>`<tr class="hover:bg-slate-50 border-t"><td class="px-3 py-2 font-bold text-sm">${u.nome}</td><td class="px-3 py-2 text-sm">${formatarCPF(u.cpf)}</td><td class="px-3 py-2 text-sm">${u.email || '—'}</td><td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td><td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo==='admin'?'bg-purple-100 text-purple-600':'bg-blue-100 text-blue-600'}">${u.tipo==='admin'?'👑 Admin':'👤 Usuário'}</span></td><td class="px-3 py-2"><div class="flex gap-2"><button onclick='abrirEdicaoUsuario(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td></tr>`).join('')
+    const busca = document.getElementById('adminPortalBusca')?.value?.toLowerCase() || '';
+    let lista = (usuarios || []).filter(u => !busca || u.nome.toLowerCase().includes(busca) || (u.cpf || '').includes(busca));
+    document.getElementById('adminPortalTabelaUsuarios').innerHTML = lista.map(u => `
+        <tr class="hover:bg-slate-50 border-t">
+            <td class="px-3 py-2 font-bold text-sm">${u.nome}</td>
+            <td class="px-3 py-2 text-sm">${formatarCPF(u.cpf)}</td>
+            <td class="px-3 py-2 text-sm">${u.email || '—'}</td>
+            <td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td>
+            <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">${u.tipo === 'admin' ? '👑 Admin' : '👤 Usuário'}</span></td>
+            <td class="px-3 py-2"><div class="flex gap-2"><button onclick='abrirEdicaoUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td>
+        </tr>
+    `).join('') || '<tr><td colspan="6" class="text-center py-6 text-slate-400">Nenhum usuário encontrado</td></tr>';
 }
-async function cadastrarUsuarioAdmin(){
-    const n=document.getElementById('adminPortalNome')?.value?.trim(), 
-          c=document.getElementById('adminPortalCPF')?.value?.replace(/\D/g,''), 
-          m=document.getElementById('adminPortalNomeMae')?.value?.trim(), 
-          cn=document.getElementById('adminPortalCidadeNatal')?.value?.trim(), 
-          e=document.getElementById('adminPortalEmail')?.value?.trim(),  // <-- NOVO
-          t=document.getElementById('adminPortalTelefone')?.value?.replace(/\D/g,''), 
-          s=document.getElementById('adminPortalSenha')?.value?.trim(), 
-          tp=document.getElementById('adminPortalTipo')?.value||'usuario';
-    
-    if(!n||!c||!m||!cn||!e||!t||!s) return alert('❌ Preencha todos os campos!');  // Inclui e-mail
-    if(!validarCPF(c)) return alert('❌ CPF inválido!'); 
-    if(s.length!==6) return alert('❌ Senha 6 dígitos!');
-    if(!e.includes('@') || !e.includes('.')) return alert('❌ E-mail inválido!');  // Valida e-mail
-    
-    showLoading(); 
-    const{data:ex}=await db.from('pacientes_portal').select('id').eq('cpf',c).maybeSingle();
-    if(ex){hideLoading();return alert('❌ CPF já cadastrado!');}
-    
-    await db.from('pacientes_portal').insert([{
-        nome:n, cpf:c, nome_mae:m, cidade_nascimento:cn, 
-        email:e, telefone:t, senha:s, tipo:tp
-    }]);
-    hideLoading(); 
-    alert('✅ Cadastrado!'); 
-    switchAdminTab('usuarios'); 
+
+async function cadastrarUsuarioAdmin() {
+    const nome = document.getElementById('adminPortalNome')?.value?.trim();
+    const cpf = document.getElementById('adminPortalCPF')?.value?.replace(/\D/g, '');
+    const nomeMae = document.getElementById('adminPortalNomeMae')?.value?.trim();
+    const cidadeNatal = document.getElementById('adminPortalCidadeNatal')?.value?.trim();
+    const email = document.getElementById('adminPortalEmail')?.value?.trim();
+    const telefone = document.getElementById('adminPortalTelefone')?.value?.replace(/\D/g, '');
+    const senha = document.getElementById('adminPortalSenha')?.value?.trim();
+    const tipo = document.getElementById('adminPortalTipo')?.value || 'usuario';
+
+    if (!nome || !cpf || !nomeMae || !cidadeNatal || !email || !telefone || !senha) return alert('❌ Preencha todos os campos!');
+    if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
+    if (senha.length !== 6) return alert('❌ Senha deve ter 6 dígitos!');
+    if (!email.includes('@') || !email.includes('.')) return alert('❌ E-mail inválido!');
+
+    showLoading();
+    const { data: existente } = await db.from('pacientes_portal').select('id').eq('cpf', cpf).maybeSingle();
+    if (existente) { hideLoading(); return alert('❌ CPF já cadastrado!'); }
+    await db.from('pacientes_portal').insert([{ nome, cpf, nome_mae: nomeMae, cidade_nascimento: cidadeNatal, email, telefone, senha: senha, tipo }]);
+    hideLoading();
+    alert('✅ Usuário cadastrado!');
+    switchAdminTab('usuarios');
     renderizarListaUsuarios();
 }
-let usuarioEditando = null;
-function abrirEdicaoUsuario(u){
-    usuarioEditando = u;
+
+function abrirEdicaoUsuario(u) {
     document.getElementById('editUserId').value = u.id;
     document.getElementById('editUserNome').value = u.nome;
     document.getElementById('editUserTelefone').value = u.telefone;
-    document.getElementById('editUserEmail').value = u.email || '';  // NOVO
+    document.getElementById('editUserEmail').value = u.email || '';
     document.getElementById('editUserTipo').value = u.tipo;
     document.getElementById('editUserSenha').value = '';
     document.getElementById('modalEditarUsuario').classList.add('show');
 }
 
-async function salvarEdicaoUsuario(){
+async function salvarEdicaoUsuario() {
     const id = parseInt(document.getElementById('editUserId').value);
     const nome = document.getElementById('editUserNome').value.trim();
-    const telefone = document.getElementById('editUserTelefone').value.replace(/\D/g,'');
-    const email = document.getElementById('editUserEmail').value.trim();  // NOVO
+    const telefone = document.getElementById('editUserTelefone').value.replace(/\D/g, '');
+    const email = document.getElementById('editUserEmail').value.trim();
     const tipo = document.getElementById('editUserTipo').value;
     const novaSenha = document.getElementById('editUserSenha').value.trim();
     const updateData = { nome, telefone, email, tipo };
-    if(novaSenha && novaSenha.length === 6) updateData.senha = novaSenha;
-    
+    if (novaSenha && novaSenha.length === 6) updateData.senha = novaSenha;
+
     showLoading();
     await db.from('pacientes_portal').update(updateData).eq('id', id);
     hideLoading();
@@ -1431,129 +1382,61 @@ async function salvarEdicaoUsuario(){
     document.getElementById('modalEditarUsuario').classList.remove('show');
     renderizarListaUsuarios();
 }
-async function excluirUsuario(id){ 
-    if(id===usuarioLogado?.id)return alert('❌ Não pode excluir a si mesmo!'); 
-    if(!confirm('Excluir este usuário permanentemente?'))return; 
-    showLoading(); 
-    await db.from('pacientes_portal').delete().eq('id',id); 
-    hideLoading(); 
-    alert('✅ Excluído!'); 
-    renderizarListaUsuarios(); 
+
+async function excluirUsuario(id) {
+    if (id === usuarioLogado?.id) return alert('❌ Não pode excluir a si mesmo!');
+    if (!confirm('Excluir este usuário permanentemente?')) return;
+    showLoading();
+    await db.from('pacientes_portal').delete().eq('id', id);
+    hideLoading();
+    alert('✅ Excluído!');
+    renderizarListaUsuarios();
 }
 
-// FECHAR MODAIS
-document.getElementById('modalConfirmacao').addEventListener('click',function(e){if(e.target===this)fecharModalConfirmacao();});
-document.getElementById('modalSelecaoExames').addEventListener('click',function(e){if(e.target===this)fecharModalExames();});
-document.getElementById('modalAdminPortal').addEventListener('click',function(e){if(e.target===this)fecharModalAdminPortal();});
-document.getElementById('modalEditarUsuario').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
-document.getElementById('modalEditarRetorno').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+function gerarCPFPortal() {
+    document.getElementById('adminPortalCPF').value = gerarCPFValido();
+}
 
-// LOGOUT (CORRIGIDO - AGORA FUNCIONA!)
-function logout(){ 
-    if(intervaloAtualizacao) clearInterval(intervaloAtualizacao);
-    usuarioLogado = null; 
-    showScreen('screenLogin');
-    // Limpar campos de login
+// ============================================
+// LOGOUT
+// ============================================
+function logout() {
+    if (intervaloAtualizacao) clearInterval(intervaloAtualizacao);
+    usuarioLogado = null;
+    retornosLista = [];
+    todosRetornos = [];
     document.getElementById('loginCPF').value = '';
     document.getElementById('loginSenha').value = '';
-}
-document.getElementById('loginSenha').addEventListener('keydown',(e)=>{if(e.key==='Enter')document.getElementById('btnLogin').click();});
-
-function mascaraCPF(input){
-    let v = input.value.replace(/\D/g,'');
-    if(v.length > 11) v = v.slice(0,11);
-    v = v.replace(/(\d{3})(\d)/,'$1.$2'); v = v.replace(/(\d{3})(\d)/,'$1.$2'); v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
-    input.value = v;
-}
-function mascaraTelefone(input){
-    let v = input.value.replace(/\D/g,'');
-    if(v.length > 11) v = v.slice(0,11);
-    if(v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
-    if(v.length > 10) v = v.slice(0,10) + '-' + v.slice(10);
-    input.value = v;
-}
-function mascaraCEP(input){
-    let v = input.value.replace(/\D/g,'');
-    if(v.length > 8) v = v.slice(0,8);
-    if(v.length > 5) v = v.slice(0,5) + '-' + v.slice(5);
-    input.value = v;
-}
-function toggleSenha(id, btn){
-    const input = document.getElementById(id);
-    const icon = btn.querySelector('i');
-    if(input.type === 'password'){ input.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
-    else { input.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+    showScreen('screenLogin');
 }
 
-    // ============================================
-// FUNÇÃO EDITAR EXAME (INSERIR AQUI)
 // ============================================
-async function editarExameOCI(id) {
-    const solicitacao = retornosLista.find(r => r.id === id);
-    if(!solicitacao) return alert('❌ Solicitação não encontrada!');
-    
-    if(solicitacao.status !== 'aguardando_exame') {
-        return alert('⚠️ Só é possível editar exames de solicitações com status "Aguardando Exames"');
+// CLIQUE FORA DOS DROPDOWNS
+// ============================================
+document.addEventListener('click', function(e) {
+    const dropdownUBS = document.getElementById('dropdownUBS');
+    const inputUBS = document.getElementById('unidadeSaude');
+    if (dropdownUBS && inputUBS && !inputUBS.contains(e.target) && !dropdownUBS.contains(e.target)) {
+        dropdownUBS.classList.remove('show');
     }
-    
-    let exames = [];
-    try {
-        exames = JSON.parse(solicitacao.exames_solicitados || '[]');
-    } catch(e) { exames = []; }
-    
-    if(exames.length === 0) return alert('❌ Nenhum exame encontrado para editar!');
-    
-    // Criar modal
-    const modalDiv = document.createElement('div');
-    modalDiv.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
-    modalDiv.innerHTML = `
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-auto">
-            <h3 class="text-xl font-bold mb-4">✏️ Editar Exames</h3>
-            <div class="space-y-4">
-                ${exames.map((exame, idx) => `
-                    <div class="border rounded-xl p-3">
-                        <p class="font-bold text-sm">${exame.codigo} - ${exame.nome}</p>
-                        <label class="text-xs text-slate-500 block mt-2">📅 Data Realização</label>
-                        <input type="date" id="dataReal_${idx}" value="${exame.data_realizacao || ''}" class="w-full border rounded-lg p-2 mt-1">
-                    </div>
-                `).join('')}
-                <button onclick="salvarEdicaoExames(${id})" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold mt-4">💾 SALVAR ALTERAÇÕES</button>
-                <button onclick="fecharModalEdicao()" class="w-full bg-slate-200 text-slate-700 py-3 rounded-xl font-bold mt-2">❌ CANCELAR</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modalDiv);
-    
-    window.salvarEdicaoExames = async function(id) {
-        const examesAtualizados = [...exames];
-        examesAtualizados.forEach((_, idx) => {
-            const dataReal = document.getElementById(`dataReal_${idx}`).value;
-            examesAtualizados[idx].data_realizacao = dataReal || null;
-        });
-        
-        const todosRealizados = examesAtualizados.every(e => e.data_realizacao);
-        const novoStatus = todosRealizados ? 'apto_retorno' : 'aguardando_exame';
-        
-        await db.from('linha_cuidado').update({
-            exames_solicitados: JSON.stringify(examesAtualizados),
-            exames_realizados: todosRealizados ? JSON.stringify(examesAtualizados) : '[]',
-            status: novoStatus,
-            updated_at: new Date().toISOString()
-        }).eq('id', id);
-        
-        alert(todosRealizados ? '✅ Paciente APTO para retorno!' : '✅ Datas dos exames atualizadas!');
-        fecharModalEdicao();
-        carregarPortal();
-    };
-    
-    window.fecharModalEdicao = function() {
-        if(modalDiv) modalDiv.remove();
-    };
-}
+    const dropdownSIGTAP = document.getElementById('dropdownSIGTAP');
+    const inputSIGTAP = document.getElementById('sigtapSearch');
+    if (dropdownSIGTAP && inputSIGTAP && !inputSIGTAP.contains(e.target) && !dropdownSIGTAP.contains(e.target)) {
+        dropdownSIGTAP.classList.remove('show');
+    }
+});
 
-console.log('✅ PORTAL DO PACIENTE v7.0!');
+// ENTER NO LOGIN
+document.getElementById('loginSenha').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('btnLogin').click(); });
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
+console.log('✅ PORTAL DO PACIENTE v7.0 REFATORADO!');
 console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
-console.log('✅ CORREÇÕES: Logout funcionando!');
+
+// Limpeza de campos ao carregar a página de redefinição
+showScreen('screenLogin');
 </script>
 </body>
 </html>
