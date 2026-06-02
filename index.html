@@ -907,7 +907,7 @@ document.getElementById('btnSolicitarCodigo').addEventListener('click', async ()
     
     showLoading();
     
-    const { data, error } = await db.from('pacientes_portal').select('*').eq('cpf', cpf).single();
+    const { data, error } = await db.from('pacientes_portal').select('*').eq('cpf', cpf).maybeSingle();
     
     hideLoading();
     
@@ -952,7 +952,7 @@ document.getElementById('btnConfirmarRedefinir').addEventListener('click', async
     const { data, error } = await db.from('pacientes_portal')
         .select('codigo_redefinicao, codigo_expira')
         .eq('cpf', cpf)
-        .single();
+        .maybeSingle();
     
     if(error || !data) {
         hideLoading();
@@ -1070,7 +1070,12 @@ async function carregarPortal(){
     renderizarHistoricoHTML();
     
     // Carregar meus dados
-    const { data: pacienteData } = await db.from('pacientes').select('*').eq('cpf', usuarioLogado.cpf).single();
+    
+    let pacienteData = null;
+    if (usuarioLogado && usuarioLogado.cpf) {
+        const { data } = await db.from('pacientes').select('*').eq('cpf', usuarioLogado.cpf).maybeSingle();
+        pacienteData = data;
+    }
     if(pacienteData){
         document.getElementById('meusDadosConteudo').innerHTML = `
             <div class="bg-slate-50 p-4 rounded-xl"><p class="text-xs text-slate-500">Nome Completo</p><p class="font-bold">${pacienteData.nome || '—'}</p></div>
@@ -1125,7 +1130,7 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
     showLoading();
     
     // Buscar na linha_cuidado
-    const { data: consulta, error } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', ns).single();
+    const { data: consulta, error } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', ns).maybeSingle();
     
     if(error || !consulta) { hideLoading(); return mostrarMsg('msgSolicitar','❌ Nº Solicitação NÃO encontrado na Linha do Cuidado!','rose'); }
     if(consulta.status !== 'recepcionada' && consulta.status !== 'aguardando_exame' && consulta.status !== 'apto_retorno') { 
@@ -1135,9 +1140,9 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
     
     dadosPrimeiraConsulta = consulta;
     
-    // Verificar se TODOS os exames têm data de realização
-    const todosRealizados = examesSelecionados.every(e => e.data_realizacao);
-    const statusInicial = todosRealizados ? 'apto_retorno' : 'aguardando_exame';
+     // Verificar se TODOS os exames têm data de realização (e tem exames!)
+     const todosRealizados = examesSelecionados.length > 0 && examesSelecionados.every(e => e.data_realizacao);
+     const statusInicial = todosRealizados ? 'apto_retorno' : 'aguardando_exame';
     
     // Preparar dados para confirmação
     const modalDados = document.getElementById('modalDadosConfirmacao');
@@ -1224,41 +1229,66 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
     if(valor.length >= 2){
         timeoutBusca = setTimeout(async () => {
             try {
-                const { data: consulta } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', valor).single();
+                console.log('Buscando solicitação:', valor);
+                // Tenta buscar como string primeiro
+                let { data: consulta } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', valor).maybeSingle();
                 
+                // Se não encontrar, tenta buscar como número (caso a coluna no banco seja numérica)
+                if (!consulta && !isNaN(valor)) {
+                    const { data: consultaNum } = await db.from('linha_cuidado').select('*').eq('numero_solicitacao', parseInt(valor)).maybeSingle();
+                    consulta = consultaNum;
+                }
+
                 if(consulta){
-                    dadosPrimeiraConsulta = consulta;
-                    
-                    if(consulta.paciente_id){
-                        const { data: paciente } = await db.from('pacientes').select('*').eq('id', consulta.paciente_id).single();
-                        if(paciente){
-                            document.getElementById('nomePaciente').value = paciente.nome || '';
-                            document.getElementById('dataNascimentoRetorno').value = paciente.data_nascimento ? paciente.data_nascimento.split('T')[0] : '';
-                            document.getElementById('validarNomeMae').value = paciente.nome_mae || '';
-                            document.getElementById('telefoneRetorno').value = formatarTelefone(paciente.telefone || '');
-                            document.getElementById('prontuarioVivver').value = paciente.prontuario || '';
-                            document.getElementById('unidadeSaude').value = paciente.unidade_saude || consulta.unidade_basica_saude || '';
-                        }
-                    }
-                    
-                    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
-                    document.getElementById('localConsulta').value = consulta.local_consulta || '';
-                    document.getElementById('dataPrimeiraConsulta').value = consulta.data_agendada ? consulta.data_agendada.split('T')[0] : '';
-                    
-                    const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
-                    document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
-                    
-                    mostrarMsg('msgSolicitar','✅ Dados preenchidos da Linha do Cuidado!','emerald');
-                } else {
-                    document.getElementById('msgSolicitar').classList.add('hidden');
+                    processarConsulta(consulta);
                 }
             } catch(e) {
+                console.error('Erro na busca automática:', e);
                 document.getElementById('msgSolicitar').classList.add('hidden');
             }
         }, 600);
     }
 });
     
+async function processarConsulta(consulta) {
+    dadosPrimeiraConsulta = consulta;
+    
+    if(consulta.paciente_id){
+        
+        let paciente = null;
+        if (consulta.paciente_id) {
+            const { data } = await db.from('pacientes').select('*').eq('id', consulta.paciente_id).maybeSingle();
+            paciente = data;
+        }
+        if(paciente){
+            document.getElementById('nomePaciente').value = paciente.nome || '';
+            document.getElementById('dataNascimentoRetorno').value = paciente.data_nascimento ? paciente.data_nascimento.split('T')[0] : '';
+            document.getElementById('validarNomeMae').value = paciente.nome_mae || '';
+            document.getElementById('telefoneRetorno').value = formatarTelefone(paciente.telefone || '');
+            document.getElementById('prontuarioVivver').value = paciente.prontuario || '';
+            document.getElementById('unidadeSaude').value = paciente.unidade_saude || consulta.unidade_basica_saude || '';
+            
+            // Preencher campos de endereço se disponíveis
+            if (paciente.cep) document.getElementById('cep').value = paciente.cep;
+            if (paciente.endereco) document.getElementById('endereco').value = paciente.endereco;
+            if (paciente.numero) document.getElementById('numeroResidencia').value = paciente.numero;
+            if (paciente.bairro) document.getElementById('bairro').value = paciente.bairro;
+            if (paciente.municipio) document.getElementById('municipio').value = paciente.municipio;
+            if (paciente.sexo) document.getElementById('sexo').value = paciente.sexo;
+            if (paciente.raca_cor) document.getElementById('racaCor').value = paciente.raca_cor;
+        }
+    }
+    
+    document.getElementById('medicoSolicitante').value = consulta.medico_solicitante || '';
+    document.getElementById('localConsulta').value = consulta.local_consulta || '';
+    document.getElementById('dataPrimeiraConsulta').value = consulta.data_agendada ? consulta.data_agendada.split('T')[0] : '';
+    
+    const nomes = {1:'🫀 Cardiologia',2:'🦴 Ortopedia',3:'🎗️ Oncologia',4:'👁️ Oftalmologia',5:'👂 Otorrino'};
+    document.getElementById('especialidadeRetorno').value = nomes[consulta.especialidade_id] || '';
+    
+    mostrarMsg('msgSolicitar','✅ Dados preenchidos da Linha do Cuidado!','emerald');
+}
+
 // ============================================
 // BUSCAR CEP
 // ============================================
@@ -1360,7 +1390,7 @@ async function cadastrarUsuarioAdmin(){
     if(!e.includes('@') || !e.includes('.')) return alert('❌ E-mail inválido!');  // Valida e-mail
     
     showLoading(); 
-    const{data:ex}=await db.from('pacientes_portal').select('id').eq('cpf',c).single();
+    const{data:ex}=await db.from('pacientes_portal').select('id').eq('cpf',c).maybeSingle();
     if(ex){hideLoading();return alert('❌ CPF já cadastrado!');}
     
     await db.from('pacientes_portal').insert([{
