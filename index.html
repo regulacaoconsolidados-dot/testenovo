@@ -1011,16 +1011,25 @@ function renderizarHistoricoHTML(lista = null) {
         
         let botoes = '';
         
-        // TODOS podem editar exame se status for 'aguardando_exame'
-        if (r.status === 'aguardando_exame') {
-            botoes += `<button onclick="editarExameOCI(${r.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-edit"></i> Editar Exame</button>`;
-        }
-        
-        // Só ADMIN pode excluir e extornar
-        if (isAdmin) {
-            botoes += `<button onclick="excluirRetornoOCI(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-trash"></i> Excluir</button>
-                        <button onclick="extornarRetornoOCI(${r.id})" class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-undo"></i> Extornar</button>`;
-        }
+        // Dentro da função renderizarHistoricoHTML, substitua a parte dos botões:
+
+let botoes = '';
+const isAdmin = usuarioLogado && usuarioLogado.tipo === 'admin';
+
+// REGRA: Só mostra botão EDITAR se status for 'aguardando_exame'
+if (r.status === 'aguardando_exame') {
+    botoes += `<button onclick="editarExameOCI(${r.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-edit"></i> Editar Exame</button>`;
+}
+
+// REGRA: Só ADMIN pode EXCLUIR e apenas se status for 'aguardando_exame' ou 'apto_retorno'
+if (isAdmin && (r.status === 'aguardando_exame' || r.status === 'apto_retorno')) {
+    botoes += `<button onclick="excluirRetornoOCI(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-trash"></i> Excluir</button>`;
+}
+
+// REGRA: Só ADMIN pode EXTORNAR e apenas se status for 'aguardando_exame' ou 'apto_retorno'
+if (isAdmin && (r.status === 'aguardando_exame' || r.status === 'apto_retorno')) {
+    botoes += `<button onclick="extornarRetornoOCI(${r.id})" class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-undo"></i> Extornar</button>`;
+}
         
         return `<div class="border-2 border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-all">
             <div class="flex justify-between items-start flex-wrap gap-2">
@@ -1282,9 +1291,19 @@ async function editarExameOCI(id) {
 // ============================================
 async function excluirRetornoOCI(id) {
     if (usuarioLogado.tipo !== 'admin') return alert('❌ Apenas Administrador.');
-    if (!confirm('⚠️ EXCLUIR esta solicitação? O status voltará para "recepcionada" e os exames serão removidos.')) return;
-    showLoading();
+    
     const r = retornosLista.find(x => x.id === id);
+    if (!r) return alert('❌ Solicitação não encontrada!');
+    
+    // REGRA CORRETA: Só pode excluir se status for 'aguardando_exame' ou 'apto_retorno'
+    const statusPermitidos = ['aguardando_exame', 'apto_retorno'];
+    if (!statusPermitidos.includes(r.status)) {
+        return alert(`❌ Não é possível excluir! Status atual: ${r.status}. Só é permitido excluir solicitações com status "Aguardando Exames" ou "Apto Retorno".`);
+    }
+    
+    if (!confirm(`⚠️ EXCLUIR esta solicitação? O status voltará para "recepcionada" e os exames serão removidos.`)) return;
+    
+    showLoading();
     if (r && r.numero_solicitacao) {
         await db.from('linha_cuidado').update({ 
             status: 'recepcionada', 
@@ -1305,9 +1324,19 @@ async function excluirRetornoOCI(id) {
 // ============================================
 async function extornarRetornoOCI(id) {
     if (usuarioLogado.tipo !== 'admin') return alert('❌ Apenas Administrador.');
-    if (!confirm('⚠️ EXTORNAR esta solicitação? O status voltará para "aguardando_exame".')) return;
-    showLoading();
+    
     const r = retornosLista.find(x => x.id === id);
+    if (!r) return alert('❌ Solicitação não encontrada!');
+    
+    // REGRA CORRETA: Só pode extornar se status for 'aguardando_exame' ou 'apto_retorno'
+    const statusPermitidos = ['aguardando_exame', 'apto_retorno'];
+    if (!statusPermitidos.includes(r.status)) {
+        return alert(`❌ Não é possível extornar! Status atual: ${r.status}. Só é permitido extornar solicitações com status "Aguardando Exames" ou "Apto Retorno".`);
+    }
+    
+    if (!confirm(`⚠️ EXTORNAR esta solicitação? O status voltará para "aguardando_exame".`)) return;
+    
+    showLoading();
     if (r && r.numero_solicitacao) {
         await db.from('linha_cuidado').update({ 
             status: 'aguardando_exame',
