@@ -1505,7 +1505,7 @@ async function renderizarListaUsuarios() {
     let lista = (usuarios || []).filter(u => !busca || u.nome.toLowerCase().includes(busca) || (u.cpf || '').includes(busca));
     document.getElementById('adminPortalTabelaUsuarios').innerHTML = lista.map(u => `
         <tr class="hover:bg-slate-50 border-t">
-            <td class="px-3 py-2 font-bold text-sm">${u.none}</td>
+            <td class="px-3 py-2 font-bold text-sm">${u.nome}</td>
             <td class="px-3 py-2 text-sm">${formatarCPF(u.cpf)}</td>
             <td class="px-3 py-2 text-sm">${u.email || '—'}</td>
             <td class="px-3 py-2 text-sm">${formatarTelefone(u.telefone)}</td>
