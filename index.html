@@ -59,6 +59,7 @@
         .card-historico-mobile { background: white; border-radius: 16px; padding: 14px; margin-bottom: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .filtro-rapido-btn { padding: 6px 14px; border-radius: 30px; font-size: 12px; font-weight: 600; background: #f1f5f9; color: #475569; cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; }
         .filtro-rapido-btn.active { background: #10b981; color: white; border-color: #10b981; }
+        .banner-info { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-left: 5px solid #0284c7; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
@@ -136,7 +137,7 @@
     </div>
 </div>
 
-<!-- MODAL EDITAR EXAME (USUÁRIO COMUM - APENAS DATA REALIZAÇÃO) -->
+    <!-- MODAL EDITAR EXAME (USUÁRIO COMUM - APENAS DATA REALIZAÇÃO) -->
 <div id="modalEditarExameComum" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
@@ -211,12 +212,7 @@
         </div>
         <div id="adminPortalContent-usuarios" class="admin-portal-content">
             <input type="text" id="adminPortalBusca" placeholder="🔍 Buscar usuário..." class="input-field mb-4" oninput="renderizarListaUsuarios()">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead><tr class="bg-slate-50"><th class="p-2 text-left">Nome</th><th class="p-2 text-left">CPF</th><th class="p-2 text-left">E-mail</th><th class="p-2 text-left">Telefone</th><th class="p-2 text-left">UBS</th><th class="p-2 text-left">Tipo</th><th class="p-2 text-left">Ações</th></tr></thead>
-                    <tbody id="adminPortalTabelaUsuarios"></tbody>
-                </table>
-            </div>
+            <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-slate-50"><th class="p-2 text-left">Nome</th><th class="p-2 text-left">CPF</th><th class="p-2 text-left">E-mail</th><th class="p-2 text-left">Telefone</th><th class="p-2 text-left">UBS</th><th class="p-2 text-left">Tipo</th><th class="p-2 text-left">Ações</th></tr></thead><tbody id="adminPortalTabelaUsuarios"></tbody></table></div>
         </div>
         <div id="adminPortalContent-cadastrar" class="admin-portal-content hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -295,7 +291,7 @@
     </div>
 </div>
 
-<!-- TELA 3: PORTAL PRINCIPAL -->
+    <!-- TELA 3: PORTAL PRINCIPAL -->
 <div id="screenPortal" class="screen" style="display:none; min-height:100vh; background:#f8fafc; padding:0;">
     <div style="width:100%; display:flex; min-height:100vh;">
         <!-- SIDEBAR -->
@@ -370,7 +366,7 @@
                         <div class="bg-blue-50 rounded-2xl p-5 mb-6 border border-blue-200">
                             <h4 class="font-bold text-blue-700 mb-4"><i class="fas fa-search mr-2"></i> Dados da 1ª Consulta</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label class="form-label text-blue-600">Nº Solicitação 1ª Consulta *</label><input type="text" id="numeroSolicitacao" placeholder="Somente números" class="input-field" oninput="this.value=this.value.replace(/\D/g,''); buscarPrimeiraConsulta()"></div>
+                                <div><label class="form-label text-blue-600">Nº Solicitação 1ª Consulta *</label><input type="text" id="numeroSolicitacao" placeholder="Somente números" class="input-field" oninput="buscarPrimeiraConsulta()"></div>
                                 <div><label class="form-label text-blue-600">Prontuário</label><input type="text" id="prontuarioPaciente" readonly class="input-field campo-automatico"></div>
                                 <div><label class="form-label text-blue-600">Nome do Paciente</label><input type="text" id="nomePacienteRetorno" readonly class="input-field campo-automatico font-bold"></div>
                                 <div><label class="form-label text-blue-600">Data Nascimento</label><input type="text" id="dataNascimentoRetorno" readonly class="input-field campo-automatico"></div>
@@ -417,11 +413,20 @@
                     </div>
                 </div>
 
-                <!-- ==================== ABA 2: HISTÓRICO (TABELA MODERNA) ==================== -->
+                                <!-- ==================== ABA 2: HISTÓRICO (SOMENTE PORTAL) ==================== -->
                 <div id="content-historico" class="tab-content">
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-                        <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
-                            <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-history text-purple-500 mr-2"></i>Solicitações</h3>
+                        <!-- BANNER EXPLICATIVO -->
+                        <div class="banner-info flex items-start gap-3">
+                            <i class="fas fa-info-circle text-sky-600 text-lg mt-0.5"></i>
+                            <div>
+                                <p class="text-sm font-bold text-sky-800">📋 Histórico de Solicitações via Portal do Paciente</p>
+                                <p class="text-xs text-sky-700">Este histórico mostra apenas os pacientes que tiveram retorno <strong>solicitado através deste portal</strong>. Para visualizar toda a linha do cuidado completa (incluindo agendamentos, faltas, cancelamentos), acesse o <strong>Sistema OCI - Painel de Monitoramento</strong>.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap justify-between items-center mb-4 gap-3 mt-4">
+                            <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-history text-purple-500 mr-2"></i>Solicitações do Portal</h3>
                             <div class="flex flex-wrap gap-2">
                                 <button onclick="filtrarHistoricoPorStatus('todos')" class="filtro-rapido-btn active" id="filtroTodos">📋 Todos</button>
                                 <button onclick="filtrarHistoricoPorStatus('aguardando_exame')" class="filtro-rapido-btn" id="filtroAguardando">⏳ Aguardando</button>
@@ -474,7 +479,7 @@ let filtroStatusAtual = 'todos';
 let solicitacaoParaExcluir = null;
 let solicitacaoParaExtornar = null;
 
-// GRUPOS SIGTAP (mesmos do seu código original - mantido)
+// GRUPOS SIGTAP (mantido do código original)
 const GRUPOS_SIGTAP = {
   "01": { nome: "01 - Atenção em Oncologia", subgrupos: [
     { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama", exames: [{codigo: "02.04.03.003-0", nome: "MAMOGRAFIA"}]},
@@ -594,7 +599,7 @@ const DISTRITO_MAP = {
 };
 const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
 
-// ============================================
+    // ============================================
 // FUNÇÕES UTILITÁRIAS
 // ============================================
 function showLoading() { document.getElementById('loadingOverlay').classList.add('show'); }
@@ -718,7 +723,7 @@ function mostrarMsg(id, texto, cor) {
 }
 
 // ============================================
-// BUSCAR 1ª CONSULTA (CORRIGIDO - SÓ RECEPCIONADA)
+// BUSCAR 1ª CONSULTA (CORRIGIDA)
 // ============================================
 let timeoutBusca = null;
 
@@ -735,12 +740,16 @@ async function buscarPrimeiraConsulta() {
         timeoutBusca = setTimeout(async () => {
             showLoading();
             try {
-                // 🔥 CORREÇÃO: Buscar APENAS com status 'recepcionada'
-                let { data: consulta } = await db.from('linha_cuidado')
+                console.log('🔍 Buscando solicitação:', valor);
+                
+                // Buscar APENAS com status 'recepcionada'
+                let { data: consulta, error } = await db.from('linha_cuidado')
                     .select('*')
                     .eq('numero_solicitacao', valor)
                     .eq('status', 'recepcionada')
                     .maybeSingle();
+
+                console.log('📦 Resultado busca:', consulta, error);
 
                 if (!consulta && !isNaN(valor)) {
                     const { data: consultaNum } = await db.from('linha_cuidado')
@@ -749,10 +758,11 @@ async function buscarPrimeiraConsulta() {
                         .eq('status', 'recepcionada')
                         .maybeSingle();
                     consulta = consultaNum;
+                    console.log('📦 Busca por número:', consulta);
                 }
 
                 if (consulta) {
-                    // 🔥 VERIFICAÇÃO: Oftalmologia bloqueia retorno
+                    // Verificar Oftalmologia
                     if (consulta.especialidade_id === 4) {
                         mostrarMsg('msgSolicitar', '❌ Paciente de OFTALMOLOGIA não pode solicitar retorno. A OCI já foi fechada na primeira consulta.', 'rose');
                         limparCamposPrimeiraConsulta();
@@ -787,6 +797,7 @@ async function buscarPrimeiraConsulta() {
                     document.getElementById('especialidadeRetorno').value = especialidadesMap[consulta.especialidade_id] || '';
                     mostrarMsg('msgSolicitar', '✅ Dados preenchidos! Agora selecione o SubGrupo SIGTAP e os exames.', 'emerald');
                 } else {
+                    console.log('❌ Nenhum registro encontrado com status recepcionada');
                     mostrarMsg('msgSolicitar', '❌ Nº Solicitação não encontrado ou a consulta ainda não foi RECEPCIONADA. Aguarde a confirmação da 1ª consulta.', 'rose');
                     limparCamposPrimeiraConsulta();
                 }
@@ -1013,7 +1024,6 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
         return mostrarMsg('msgSolicitar', '❌ Nº Solicitação não encontrado ou não está RECEPCIONADA!', 'rose');
     }
 
-    // 🔥 CORREÇÃO: exames_realizados = apenas os que têm data
     const examesRealizados = examesSelecionados.filter(e => e.data_realizacao);
     const todosRealizados = examesSelecionados.length > 0 && examesSelecionados.every(e => e.data_realizacao);
     const novoStatus = todosRealizados ? 'apto_retorno' : 'aguardando_exame';
@@ -1031,7 +1041,6 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
     document.getElementById('btnConfirmarRetorno').onclick = async () => {
         showLoading();
 
-        // 🔥 CORREÇÃO: Atualizar com exames_realizados filtrados
         const { error } = await db.from('linha_cuidado').update({
             status: novoStatus,
             exames_solicitados: JSON.stringify(examesSelecionados),
@@ -1048,7 +1057,6 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
 
         if (error) { hideLoading(); return alert('❌ Erro: ' + error.message); }
 
-        // Atualizar dados do paciente
         if (dadosPrimeiraConsulta.paciente_id) {
             await db.from('pacientes').update({
                 cep: document.getElementById('cep').value,
@@ -1074,7 +1082,7 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
 });
 
 // ============================================
-// EDIÇÃO DE EXAME (USUÁRIO COMUM - APENAS DATA REALIZAÇÃO)
+// EDIÇÃO DE EXAME (USUÁRIO COMUM)
 // ============================================
 let edicaoExameComumId = null;
 let edicaoExameComumDados = null;
@@ -1137,7 +1145,7 @@ async function salvarEdicaoExameComum() {
 }
 
 // ============================================
-// FUNÇÕES ADMIN: VISUALIZAR, EXCLUIR, EXTORNAR
+// FUNÇÕES ADMIN
 // ============================================
 async function visualizarSolicitacao(id) {
     showLoading();
@@ -1215,7 +1223,7 @@ async function confirmarExtornar() {
 }
 
 // ============================================
-// LOGIN, CARREGAR PORTAL, HISTÓRICO
+// LOGIN E CARREGAR PORTAL
 // ============================================
 document.getElementById('btnLogin').addEventListener('click', async () => {
     const cpf = document.getElementById('loginCPF').value.replace(/\D/g, '');
@@ -1228,7 +1236,6 @@ document.getElementById('btnLogin').addEventListener('click', async () => {
     if (error || !data || !data.success) return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
     usuarioLogado = data;
 
-    // Buscar dados completos do usuário (incluindo UBS)
     const { data: userData } = await db.from('pacientes_portal').select('*').eq('id', usuarioLogado.id).maybeSingle();
     if (userData) {
         usuarioLogado.unidade_saude = userData.unidade_saude || '';
@@ -1286,18 +1293,16 @@ async function carregarPortal() {
         menuAdmin.classList.add('hidden');
     }
 
-    // Buscar linha_cuidado
-    let query = db.from('linha_cuidado').select('*, pacientes(*)');
+    // 🔥 CORREÇÃO: Buscar apenas registros que foram cadastrados pelo PORTAL (usuario_cadastrou não nulo)
+    let query = db.from('linha_cuidado').select('*, pacientes(*)').not('usuario_cadastrou', 'is', null);
     
     if (usuarioLogado.tipo !== 'admin' && usuarioLogado.unidade_saude) {
-        // Usuário comum vê apenas pacientes da sua UBS
         query = query.eq('unidade_basica_saude', usuarioLogado.unidade_saude);
     }
     
     const { data: rets } = await query.order('created_at', { ascending: false });
     todosRetornos = rets || [];
 
-    // Cards
     const total = todosRetornos.length;
     const aguardando = todosRetornos.filter(r => r.status === 'aguardando_exame').length;
     const aptos = todosRetornos.filter(r => r.status === 'apto_retorno').length;
@@ -1312,7 +1317,6 @@ async function carregarPortal() {
 
     renderizarHistorico();
 
-    // Meus dados
     if (usuarioLogado && usuarioLogado.cpf) {
         const { data: pacienteDados } = await db.from('pacientes').select('*').eq('cpf', usuarioLogado.cpf).maybeSingle();
         if (pacienteDados) {
@@ -1351,7 +1355,6 @@ function getStatusInfo(status) {
 function renderizarHistorico() {
     let dados = [...todosRetornos];
     
-    // Aplicar filtro de status
     if (filtroStatusAtual === 'aguardando_exame') {
         dados = dados.filter(r => r.status === 'aguardando_exame');
     } else if (filtroStatusAtual === 'apto_retorno') {
@@ -1379,7 +1382,6 @@ function renderizarHistorico() {
     const isMobile = window.innerWidth < 768;
 
     if (isMobile) {
-        // Mobile: cards
         document.getElementById('historicoListaTbody').innerHTML = '';
         document.getElementById('historicoListaMobile').innerHTML = dados.map(r => {
             const st = getStatusInfo(r.status);
@@ -1403,7 +1405,6 @@ function renderizarHistorico() {
             </div>`;
         }).join('');
     } else {
-        // Desktop: tabela
         document.getElementById('historicoListaMobile').innerHTML = '';
         document.getElementById('historicoListaTbody').innerHTML = dados.map(r => {
             const st = getStatusInfo(r.status);
@@ -1444,7 +1445,7 @@ function filtrarHistoricoPorStatus(status) {
 }
 
 // ============================================
-// SWITCH DE ABAS
+// SWITCH DE ABAS E ADMIN
 // ============================================
 function switchTab(tabId) {
     document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
@@ -1460,9 +1461,6 @@ function switchTab(tabId) {
     if (tabId === 'historico') renderizarHistorico();
 }
 
-// ============================================
-// PAINEL ADMINISTRADOR
-// ============================================
 function abrirModalAdminPortal() {
     if (usuarioLogado && usuarioLogado.tipo === 'admin') {
         document.getElementById('modalAdminPortal').classList.add('show');
@@ -1512,7 +1510,7 @@ async function renderizarListaUsuarios() {
             <td class="px-3 py-2 text-sm">${u.unidade_saude ? u.unidade_saude.substring(0, 30) + '...' : '—'}</td>
             <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">${u.tipo === 'admin' ? '👑 Admin' : '👤 Usuário'}</span></td>
             <td class="px-3 py-2"><div class="flex gap-2"><button onclick='abrirEdicaoUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuarioPortal(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td>
-        </tr>
+        <tr>
     `).join('') || '<tr><td colspan="7" class="text-center py-6 text-slate-400">Nenhum usuário encontrado</td></tr>';
 }
 
