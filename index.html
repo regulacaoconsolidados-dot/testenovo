@@ -61,7 +61,9 @@
     <p class="text-white mt-4 font-bold">Processando...</p>
 </div>
 
+<!-- ============================================ -->
 <!-- MODAL DE CONFIRMAÇÃO DE SOLICITAÇÃO -->
+<!-- ============================================ -->
 <div id="modalConfirmacao" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="text-center mb-6">
@@ -80,7 +82,9 @@
     </div>
 </div>
 
+<!-- ============================================ -->
 <!-- MODAL DE SELEÇÃO DE EXAMES -->
+<!-- ============================================ -->
 <div id="modalSelecaoExames" class="modal-overlay">
     <div class="bg-white rounded-3xl p-4 md:p-6 w-full max-w-5xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
@@ -117,7 +121,9 @@
     </div>
 </div>
 
-<!-- MODAL EDITAR EXAME (HISTÓRICO) -->
+<!-- ============================================ -->
+<!-- MODAL EDITAR EXAME -->
+<!-- ============================================ -->
 <div id="modalEditarExame" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
@@ -128,7 +134,9 @@
     </div>
 </div>
 
+<!-- ============================================ -->
 <!-- MODAL ADMIN PORTAL -->
+<!-- ============================================ -->
 <div id="modalAdminPortal" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-5xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
@@ -168,7 +176,9 @@
     </div>
 </div>
 
+<!-- ============================================ -->
 <!-- MODAL EDITAR USUÁRIO -->
+<!-- ============================================ -->
 <div id="modalEditarUsuario" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl mx-4">
         <h3 class="font-bold text-xl mb-4">✏️ Editar Usuário</h3>
@@ -184,19 +194,198 @@
     </div>
 </div>
 
+<!-- ============================================ -->
+<!-- TELA 1: LOGIN -->
+<!-- ============================================ -->
+<div id="screenLogin" class="screen active gradient-bg">
+    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center mx-4">
+        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Portal do Paciente</h1>
+        <p class="text-slate-500 text-sm mb-2">Ferramenta OCI v7.0</p>
+        <p class="text-slate-400 text-xs mb-6">👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
+        <div class="text-left space-y-4">
+            <div><label class="form-label">CPF *</label><input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="input-field" oninput="mascaraCPF(this)"></div>
+            <div><label class="form-label">Senha (6 dígitos) *</label><div class="relative"><input type="password" id="loginSenha" maxlength="6" class="input-field pr-12"><button type="button" onclick="toggleSenha('loginSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="far fa-eye"></i></button></div></div>
+        </div>
+        <button id="btnLogin" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold">🔓 ENTRAR</button>
+        <p class="text-sm text-slate-500 mt-4"><span onclick="showScreen('screenRedefinir')" class="text-rose-600 font-bold hover:underline cursor-pointer">🔑 Esqueci minha senha</span></p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- TELA 2: REDEFINIR SENHA -->
+<!-- ============================================ -->
+<div id="screenRedefinir" class="screen gradient-bg">
+    <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center mx-4">
+        <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🔑</div>
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Redefinir Senha</h1>
+        <p class="text-slate-500 text-sm mb-6">Digite seus dados + código do administrador</p>
+        <div class="text-left space-y-4">
+            <div><label class="form-label">CPF *</label><input type="text" id="redefCPF" maxlength="14" class="input-field" oninput="mascaraCPF(this)"></div>
+            <div><label class="form-label">Nome da sua Mãe *</label><input type="text" id="redefNomeMae" class="input-field"></div>
+            <div><label class="form-label">Cidade onde Nasceu *</label><input type="text" id="redefCidade" class="input-field"></div>
+            <div><label class="form-label">Código do Administrador *</label><input type="text" id="redefCodigo" maxlength="6" class="input-field text-center text-xl font-bold tracking-widest"></div>
+            <div><label class="form-label">Nova Senha (6 dígitos) *</label><div class="relative"><input type="password" id="redefNovaSenha" maxlength="6" class="input-field pr-12"><button type="button" onclick="toggleSenha('redefNovaSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="far fa-eye"></i></button></div></div>
+            <div><label class="form-label">Confirmar Senha *</label><div class="relative"><input type="password" id="redefConfirmaSenha" maxlength="6" class="input-field pr-12"><button type="button" onclick="toggleSenha('redefConfirmaSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="far fa-eye"></i></button></div></div>
+        </div>
+        <button id="btnConfirmarRedefinir" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold">✅ REDEFINIR SENHA</button>
+        <p class="text-sm text-slate-500 mt-4"><span onclick="showScreen('screenLogin')" class="text-emerald-600 font-bold hover:underline cursor-pointer">← Voltar ao Login</span></p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- TELA 3: PORTAL PRINCIPAL -->
+<!-- ============================================ -->
+<div id="screenPortal" class="screen" style="display:none; min-height:100vh; background:#f8fafc; padding:0;">
+    <div style="width:100%; display:flex; min-height:100vh;">
+        <aside class="w-64 gradient-bg text-white hidden md:flex flex-col min-h-screen shadow-2xl z-50 flex-shrink-0">
+            <div class="p-6 flex items-center gap-3 border-b border-white/10">
+                <div class="bg-emerald-600 p-2 rounded-xl">🏥</div>
+                <div><span class="text-lg font-extrabold">Portal do</span><span class="text-emerald-400 text-lg font-extrabold">Paciente</span></div>
+            </div>
+            <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
+                <a href="#" onclick="switchTab('solicitar')" class="sidebar-item active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold"><i class="fas fa-paper-plane w-4"></i> Solicitar Retorno</a>
+                <a href="#" onclick="switchTab('historico')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-history w-4"></i> Histórico</a>
+                <a href="#" onclick="switchTab('meusdados')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300"><i class="fas fa-user-circle w-4"></i> Meus Dados</a>
+                <a href="#" onclick="abrirModalAdminPortal()" id="menuAdminPortal" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300 hidden"><i class="fas fa-shield-alt w-4"></i> 👑 Administração</a>
+            </nav>
+            <div class="p-4 border-t border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-lg" id="sidebarAvatar">U</div>
+                    <div>
+                        <p class="text-base font-extrabold text-white" id="sidebarNomePortal">Usuário</p>
+                        <p class="text-sm text-emerald-300 font-bold" id="sidebarTipoPortal"></p>
+                        <button onclick="logout()" class="text-sm text-red-400 hover:text-red-300 font-bold">Sair</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+            <header class="gradient-bg text-white p-4 md:p-6 shadow-lg flex-shrink-0">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-lg md:hidden">🏥</div>
+                        <div><h2 class="text-lg font-extrabold">Portal do Paciente</h2><p class="text-emerald-300 text-xs">Ferramenta OCI v7.0 | 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p></div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm font-bold hidden md:block" id="portalNome"></span>
+                        <button onclick="logout()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm font-bold">Sair</button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-4 md:p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="infoCards"></div>
+
+                <div class="flex gap-4 border-b-2 border-slate-200 mb-6 overflow-x-auto md:hidden">
+                    <button onclick="switchTab('solicitar')" id="tabMobile-solicitar" class="tab-btn active pb-3 text-sm font-bold whitespace-nowrap">📤 Solicitar</button>
+                    <button onclick="switchTab('historico')" id="tabMobile-historico" class="tab-btn pb-3 text-sm font-bold text-slate-400 whitespace-nowrap">📋 Histórico</button>
+                    <button onclick="switchTab('meusdados')" id="tabMobile-meusdados" class="tab-btn pb-3 text-sm font-bold text-slate-400 whitespace-nowrap">👤 Dados</button>
+                </div>
+
+                <div class="aviso-regras">
+                    <p class="font-bold mb-1">📋 Regras do Portal:</p>
+                    <p>✏️ <strong>Editar Exame:</strong> qualquer usuário pode (se status = Aguardando Exames)</p>
+                    <p>🗑️ <strong>Excluir/Extornar:</strong> apenas ADMINISTRADOR (status Aguardando Exames ou Apto Retorno)</p>
+                    <p>🔍 <strong>Busca no Histórico:</strong> ADMIN vê todos | USUÁRIO vê apenas seus pacientes</p>
+                </div>
+
+                <!-- ABA SOLICITAR RETORNO -->
+                <div id="content-solicitar" class="tab-content active">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-paper-plane text-blue-500 mr-2"></i>Solicitar Retorno</h3>
+                            <button onclick="limparFormularioSolicitar()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100">🧹 Limpar</button>
+                        </div>
+                        <p class="text-sm text-amber-600 mb-6">⚠️ O número da solicitação deve existir na Linha do Cuidado com status "Recepcionada"</p>
+
+                        <div class="bg-blue-50 rounded-2xl p-5 mb-6 border border-blue-200">
+                            <h4 class="font-bold text-blue-700 mb-4"><i class="fas fa-search mr-2"></i> Dados da 1ª Consulta</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><label class="form-label text-blue-600">Nº Solicitação 1ª Consulta *</label><input type="text" id="numeroSolicitacao" placeholder="Somente números" class="input-field" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+                                <div><label class="form-label text-blue-600">Prontuário</label><input type="text" id="prontuarioPaciente" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Nome do Paciente</label><input type="text" id="nomePacienteRetorno" readonly class="input-field campo-automatico font-bold"></div>
+                                <div><label class="form-label text-blue-600">Data Nascimento</label><input type="text" id="dataNascimentoRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Nome da Mãe</label><input type="text" id="nomeMaeRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Telefone</label><input type="text" id="telefoneRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Especialidade</label><input type="text" id="especialidadeRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Médico Solicitante</label><input type="text" id="medicoSolicitanteRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Local da Consulta</label><input type="text" id="localConsultaRetorno" readonly class="input-field campo-automatico"></div>
+                                <div><label class="form-label text-blue-600">Data da 1ª Consulta</label><input type="text" id="dataPrimeiraConsultaRetorno" readonly class="input-field campo-automatico"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 rounded-2xl p-5 mb-6 border border-purple-200">
+                            <h4 class="font-bold text-purple-700 mb-4"><i class="fas fa-address-card mr-2"></i> Dados Cadastrais</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="relative"><label class="form-label text-purple-600">Unidade de Saúde *</label><input type="text" id="unidadeSaude" placeholder="Digite para buscar..." class="input-field" oninput="filtrarUBS()" onfocus="filtrarUBS()"><div id="dropdownUBS" class="dropdown-ubs"></div></div>
+                                <div><label class="form-label text-purple-600">CEP</label><input type="text" id="cep" maxlength="9" class="input-field" oninput="mascaraCEP(this)"></div>
+                                <div><label class="form-label text-purple-600">Endereço</label><input type="text" id="endereco" class="input-field"></div>
+                                <div><label class="form-label text-purple-600">Número</label><input type="text" id="numeroResidencia" class="input-field"></div>
+                                <div><label class="form-label text-purple-600">Bairro</label><input type="text" id="bairro" class="input-field"></div>
+                                <div><label class="form-label text-purple-600">Município</label><input type="text" id="municipio" class="input-field"></div>
+                                <div><label class="form-label text-purple-600">Sexo</label><select id="sexo" class="input-field"><option value="">Selecione</option><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option></select></div>
+                                <div><label class="form-label text-purple-600">Raça/Cor</label><select id="racaCor" class="input-field"><option value="">Selecione</option><option value="Branca">Branca</option><option value="Preta">Preta</option><option value="Parda">Parda</option><option value="Amarela">Amarela</option><option value="Indígena">Indígena</option></select></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-red-50 rounded-2xl p-5 mb-6 border border-red-200">
+                            <h4 class="font-bold text-red-700 mb-4"><i class="fas fa-flask mr-2"></i> EXAMES</h4>
+                            <div class="relative mb-4">
+                                <label class="form-label text-red-600">SubGrupo SIGTAP *</label>
+                                <input type="text" id="sigtapSearch" placeholder="Digite para buscar..." class="input-field" onfocus="toggleDropdownSIGTAP(true)" oninput="filtrarSIGTAP()">
+                                <input type="hidden" id="sigtapSelecionado">
+                                <div id="dropdownSIGTAP" class="dropdown-sigtap"></div>
+                            </div>
+                            <button onclick="abrirModalSelecaoExames()" id="btnAbrirModalExames" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold mb-3">🔴 Selecionar Exames</button>
+                            <div id="examesSelecionadosContainer" class="space-y-2"></div>
+                            <div class="mt-4"><label class="form-label text-red-600">CID (opcional)</label><input type="text" id="cid" class="input-field"></div>
+                        </div>
+
+                        <button id="btnValidarRetorno" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-lg">🔍 VALIDAR E SOLICITAR RETORNO</button>
+                        <div id="msgSolicitar" class="mt-4 hidden"></div>
+                    </div>
+                </div>
+
+                <!-- ABA HISTÓRICO -->
+                <div id="content-historico" class="tab-content">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-history text-purple-500 mr-2"></i>Solicitações</h3>
+                            <span class="text-xs text-slate-400">Atualiza automaticamente</span>
+                        </div>
+                        <div id="buscaAdminHistorico" class="mb-4 hidden">
+                            <input type="text" id="buscaGlobalRetornos" placeholder="🔍 Buscar por paciente, CPF, prontuário ou nº solicitação..." class="input-field" oninput="filtrarHistoricoAdmin()">
+                            <span class="text-xs text-slate-500" id="contadorRetornos"></span>
+                        </div>
+                        <div id="historicoLista" class="space-y-3"><p class="text-slate-400 text-center py-8">Carregando...</p></div>
+                    </div>
+                </div>
+
+                <!-- ABA MEUS DADOS -->
+                <div id="content-meusdados" class="tab-content">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                        <h3 class="text-xl font-bold text-slate-800 mb-6"><i class="fas fa-user-circle text-amber-500 mr-2"></i>Meus Dados Cadastrais</h3>
+                        <div id="meusDadosConteudo" class="grid grid-cols-1 md:grid-cols-2 gap-4"><p class="text-slate-400">Carregando...</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // ============================================
-// 🏥 PORTAL DO PACIENTE v7.0 - CÓDIGO COMPLETO CORRIGIDO
+// 🏥 PORTAL DO PACIENTE v7.0 - CÓDIGO COMPLETO
 // 👑 Ana Paula Araújo da Silva | Mat: 201704
 // 📅 05/06/2026
 // ============================================
 
-// CONEXÃO COM SUPABASE
 const SUPABASE_URL = 'https://hheuvkyhwujdrvjvtryg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// VARIÁVEIS GLOBAIS
 let usuarioLogado = null;
 let retornosLista = [];
 let dadosPrimeiraConsulta = null;
@@ -204,142 +393,37 @@ let examesSelecionados = [];
 let subgrupoSelecionado = null;
 let todosRetornos = [];
 
-// GRUPOS SIGTAP COM EXAMES
+// GRUPOS SIGTAP
 const GRUPOS_SIGTAP = {
   "01": { nome: "01 - Atenção em Oncologia", subgrupos: [
     { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama", exames: [{codigo: "02.04.03.003-0", nome: "MAMOGRAFIA"}]},
     { codigo: "09.01.01.005-7", nome: "OCI Investigação Diagnóstica de Câncer de Colo do Útero", exames: [
       {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.066-6", nome: "BIÓPSIA DO COLO DO ÚTERO"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
     ]}
-  ]}
-};
-// Bloco 2
-</script>
-
-<script>
-// Continuação dos GRUPOS SIGTAP
-const GRUPOS_SIGTAP_COMPLETO = {
-  "01": { nome: "01 - Atenção em Oncologia", subgrupos: [
-    { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama", exames: [{codigo: "02.04.03.003-0", nome: "MAMOGRAFIA"}]},
-    { codigo: "09.01.01.002-2", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama", exames: []},
-    { codigo: "09.01.01.003-0", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Próstata", exames: []},
-    { codigo: "09.01.01.004-9", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Próstata", exames: []},
-    { codigo: "09.01.01.005-7", nome: "OCI Investigação Diagnóstica de Câncer de Colo do Útero", exames: [
-      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.066-6", nome: "BIÓPSIA DO COLO DO ÚTERO"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
-    ]},
-    { codigo: "09.01.01.006-5", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero", exames: []},
-    { codigo: "09.01.01.007-3", nome: "OCI Avaliação Diagnóstica de Câncer Gástrico", exames: []},
-    { codigo: "09.01.01.008-1", nome: "OCI Avaliação Diagnóstica de Câncer Colorretal", exames: []},
-    { codigo: "09.01.01.009-0", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - I", exames: [
-      {codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"}, {codigo: "02.03.01.004-3", nome: "CITOPATOLOGICO"}
-    ]},
-    { codigo: "09.01.01.010-3", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - II", exames: [
-      {codigo: "02.03.02.006-5", nome: "ANATOMOPATOLOGICO"}, {codigo: "02.01.01.060-7", nome: "CORE BIOPSY"}, {codigo: "02.01.01.056-9", nome: "BIÓPSIA/EXERE DE NÓDULO"}
-    ]},
-    { codigo: "09.01.01.011-1", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - I", exames: [
-      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "04.09.06.008-9", nome: "EXCISÃO TIPO 1"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
-    ]},
-    { codigo: "09.01.01.012-0", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - II", exames: [
-      {codigo: "02.03.02.008-1", nome: "ANATOMOPATOLOGICO"}, {codigo: "04.09.06.008-9", nome: "EXCISÃO TIPO 2"}, {codigo: "02.11.04.002-9", nome: "COLPOSCOPIA"}
-    ]}
   ]},
   "02": { nome: "02 - Atenção em Cardiologia", subgrupos: [
-    { codigo: "09.02.01.001-8", nome: "OCI Avaliação de Risco Cirúrgico", exames: []},
-    { codigo: "09.02.01.002-6", nome: "OCI Avaliação Cardiológica", exames: []},
     { codigo: "09.02.01.003-4", nome: "OCI Avaliação Diagnóstica Inicial - Síndrome Coronariana Crônica", exames: [
       {codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"}, {codigo: "02.11.02.006-0", nome: "TESTE ERGOMÉTRICO"}
-    ]},
-    { codigo: "09.02.01.004-2", nome: "OCI Progressão da Avaliação Diagnóstica I", exames: []},
-    { codigo: "09.02.01.005-0", nome: "OCI Progressão da Avaliação Diagnóstica II", exames: [
-      {codigo: "02.08.01.003-3", nome: "CINTILOGRAFIA REPOUSO"}, {codigo: "02.08.01.002-5", nome: "CINTILOGRAFIA ESTRESSE"}
-    ]},
-    { codigo: "09.02.01.006-9", nome: "OCI Avaliação Diagnóstica - Insuficiência Cardíaca", exames: [
-      {codigo: "02.11.02.003-6", nome: "ELETROCARDIOGRAMA"}, {codigo: "02.11.02.006-0", nome: "TESTE ERGOMÉTRICO"}, {codigo: "02.02.01.079-1", nome: "DOSEGEM DE PEPTÍDEOS"}, {codigo: "02.11.02.004-4", nome: "HOLTER 24H"}
     ]}
   ]},
   "03": { nome: "03 - Atenção em Ortopedia", subgrupos: [
     { codigo: "09.03.01.001-1", nome: "OCI com Recursos de Radiologia", exames: [
-      {codigo: "02.07.01.004-8", nome: "RX LOMBAR"}, {codigo: "02.07.02.002-7", nome: "RX OMBRO D"}, {codigo: "02.07.02.002-7", nome: "RX OMBRO E"}, {codigo: "02.07.03.003-0", nome: "RX JOELHO D"}, {codigo: "02.07.03.003-0", nome: "RX JOELHO E"}
-    ]},
-    { codigo: "09.03.01.002-0", nome: "OCI com Radiologia e Ultrassonografia", exames: [{codigo: "02.05.02.006-2", nome: "USG DE ARTICULAÇÃO"}]},
-    { codigo: "09.03.01.003-8", nome: "OCI com Radiologia e Tomografia", exames: [{codigo: "02.06.01.003-6", nome: "TC COLUNA TORACICA"}, {codigo: "02.06.01.002-8", nome: "TC COLUNA LOMBOSSACRA"}]},
-    { codigo: "09.03.01.004-6", nome: "OCI com Radiologia e Ressonância Magnética", exames: [
-      {codigo: "02.07.01.004-8", nome: "RX LOMBAR"}, {codigo: "02.07.02.002-7", nome: "MÃO E PUNHO E"}, {codigo: "02.07.02.002-7", nome: "MÃO E PUNHO D"}, {codigo: "02.07.03.002-2", nome: "RNM DE QUADRIL"}
+      {codigo: "02.07.01.004-8", nome: "RX LOMBAR"}
     ]}
-  ]},
-  "04": { nome: "04 - Atenção em Otorrinolaringologia", subgrupos: [
-    { codigo: "09.04.01.001-5", nome: "OCI Avaliação Inicial de Déficit Auditivo", exames: []},
-    { codigo: "09.04.01.002-3", nome: "OCI Progressão de Déficit Auditivo", exames: []},
-    { codigo: "09.04.01.003-1", nome: "OCI Avaliação de Nasofaringe e Orofaringe", exames: []}
-  ]},
-  "05": { nome: "05 - Atenção em Oftalmologia", subgrupos: [
-    { codigo: "09.05.01.001-9", nome: "OCI Inicial 0 a 8 Anos", exames: []},
-    { codigo: "09.05.01.002-7", nome: "OCI Estrabismo", exames: []},
-    { codigo: "09.05.01.003-5", nome: "OCI Inicial a Partir de 9 Anos", exames: []},
-    { codigo: "09.05.01.004-3", nome: "OCI Retinopatia Diabética", exames: []},
-    { codigo: "09.05.01.005-1", nome: "OCI Oncologia Oftalmológica", exames: []},
-    { codigo: "09.05.01.006-0", nome: "OCI Neuro Oftalmologia", exames: []},
-    { codigo: "09.05.01.007-8", nome: "OCI Exames Sob Sedação", exames: []}
-  ]},
-  "06": { nome: "06 - Atenção em Saúde da Mulher", subgrupos: [
-    { codigo: "09.06.01.001-2", nome: "GIN1 - Avaliação Inicial I", exames: []},
-    { codigo: "09.06.01.002-0", nome: "GIN1 - Avaliação Inicial II", exames: []},
-    { codigo: "09.06.01.003-9", nome: "GIN2 - Sangramento Uterino Anormal I", exames: []},
-    { codigo: "09.06.01.004-7", nome: "GIN2 - Sangramento Uterino Anormal II", exames: []},
-    { codigo: "09.06.01.005-5", nome: "GIN3 - Endometriose Profunda", exames: []}
   ]}
 };
 
 const TODOS_SUBGRUPOS = [];
-Object.keys(GRUPOS_SIGTAP_COMPLETO).forEach(gk => {
-    GRUPOS_SIGTAP_COMPLETO[gk].subgrupos.forEach(sub => {
-        TODOS_SUBGRUPOS.push({ grupo: GRUPOS_SIGTAP_COMPLETO[gk].nome, codigo: sub.codigo, nome: sub.nome, exames: sub.exames });
+Object.keys(GRUPOS_SIGTAP).forEach(gk => {
+    GRUPOS_SIGTAP[gk].subgrupos.forEach(sub => {
+        TODOS_SUBGRUPOS.push({ grupo: GRUPOS_SIGTAP[gk].nome, codigo: sub.codigo, nome: sub.nome, exames: sub.exames });
     });
 });
 
-// LISTA DE UNIDADES DE SAÚDE (UBS)
 const DISTRITO_MAP = {
-  'UNIDADE BASICA DE SAUDE JARDIM BANDEIRANTES': 'ELDORADO', 'UNIDADE BASICA DE SAUDE AGUA BRANCA': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE XV': 'ELDORADO', 'UNIDADE BASICA DE SAUDE CSU ELDORADO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE PARQUE SAO JOAO': 'ELDORADO', 'UNIDADE BASICA DE SAUDE JARDIM ELDORADO': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE NOVO ELDORADO': 'ELDORADO', 'UNIDADE BASICA DE SAUDE SANTA CRUZ': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE PEROBAS': 'ELDORADO', 'UNIDADE BASICA DE SAUDE BELA VISTA': 'ELDORADO',
-  'UNIDADE BASICA DE SAUDE INDUSTRIAL III SECAO': 'INDUSTRIAL', 'UNIDADE BASICA DE SAUDE JARDIM INDUSTRIAL': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE VILA SAO PAULO': 'INDUSTRIAL', 'UNIDADE BASICA DE SAUDE SANDOVAL DE AZEVEDO': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE JOAO EVANGELISTA': 'INDUSTRIAL', 'UNIDADE BASICA DE SAUDE BANDEIRANTES': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE AMAZONAS': 'INDUSTRIAL', 'UNIDADE BASICA DE SAUDE VILA DINIZ': 'INDUSTRIAL',
-  'UNIDADE BASICA DE SAUDE NACIONAL': 'NACIONAL', 'UNIDADE BASICA DE SAUDE ILDA EFIGENIA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE JOAQUIM MURTINHO': 'NACIONAL', 'UNIDADE BASICA DE SAUDE XANGRILA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE AMENDOEIRAS': 'NACIONAL', 'UNIDADE BASICA DE SAUDE ESTRELA DALVA': 'NACIONAL',
-  'UNIDADE BASICA DE SAUDE TIJUCA': 'NACIONAL', 'UNIDADE BASICA DE SAUDE PETROLANDIA': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE TROPICAL II': 'PETROLANDIA', 'UNIDADE BASICA DE SAUDE SAPUCAIAS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE DUQUE DE CAXIAS': 'PETROLANDIA', 'UNIDADE BASICA DE SAUDE SAO LUIZ II': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE SAO LUIZ I': 'PETROLANDIA', 'UNIDADE BASICA DE SAUDE CAMPO ALTO': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE TROPICAL I': 'PETROLANDIA', 'UNIDADE BASICA DE SAUDE ESTANCIAS IMPERIAIS': 'PETROLANDIA',
-  'UNIDADE BASICA DE SAUDE NASCENTES IMPERIAIS': 'PETROLANDIA', 'UNIDADE BASICA DE SAUDE CAMPINA VERDE': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE LAGUNA': 'RESSACA', 'UNIDADE BASICA DE SAUDE ARPOADOR': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE SAO JOAQUIM': 'RESSACA', 'UNIDADE BASICA DE SAUDE PARQUE TURISTA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE VILA PEROLA': 'RESSACA', 'UNIDADE BASICA DE SAUDE NOVO PROGRESSO II': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE COLORADO': 'RESSACA', 'UNIDADE BASICA DE SAUDE CANDIDA FERREIRA': 'RESSACA',
-  'UNIDADE DE SAUDE DA FAMILIA VILA PEROLA II USF 84': 'RESSACA', 'UNIDADE BASICA DE SAUDE PRESIDENTE KENNEDY': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE OITIS': 'RESSACA', 'UNIDADE BASICA DE SAUDE MORADA NOVA': 'RESSACA',
-  'UNIDADE BASICA DE SAUDE INCONFIDENTES': 'RIACHO', 'UNIDADE BASICA DE SAUDE RIACHO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE FLAMENGO': 'RIACHO', 'UNIDADE BASICA DE SAUDE NOVO RIACHO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE DURVAL DE BARROS': 'RIACHO', 'UNIDADE BASICA DE SAUDE MONTE CASTELO': 'RIACHO',
-  'UNIDADE BASICA DE SAUDE CHACARAS': 'SEDE', 'UNIDADE BASICA DE SAUDE CANADA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE CENTRO (CAD)': 'SEDE', 'UBS BERNARDO MONTEIRO/MOACIR PINTO MOREIRA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE LINDA VISTA': 'SEDE', 'UNIDADE BASICA DE SAUDE SANTA HELENA': 'SEDE',
-  'UNIDADE BASICA DE SAUDE VILA ITALIA': 'SEDE', 'UNIDADE BASICA DE SAUDE BEATRIZ USF 72': 'SEDE',
-  'UNIDADE BASICA DE SAUDE MARIA DA CONCEICAO': 'SEDE', 'UNIDADE BASICA DE SAUDE FUNCIONARIOS': 'SEDE',
-  'UNIDADE BASICA DE SAUDE PRAIA': 'SEDE', 'UBS UNIDADE XVI (SEDE)': 'SEDE',
-  'UNIDADE BASICA DE SAUDE VILA RENASCER': 'VARGEM DAS FLORES', 'UNIDADE BASICA DE SAUDE NOVA CONTAGEM': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE VILA SOLEDADE': 'VARGEM DAS FLORES', 'UNIDADE BASICA DE SAUDE ESTALEIRO': 'VARGEM DAS FLORES',
-  'CERESP CONTAGEM': 'VARGEM DAS FLORES', 'UNIDADE BASICA DE SAUDE RETIRO II': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE RETIRO': 'VARGEM DAS FLORES', 'UNIDADE BASICA DE SAUDE IPE AMARELO': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE SAO JUDAS TADEU': 'VARGEM DAS FLORES', 'UNIDADE BASICA DE SAUDE VILA ESPERANCA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE DARCY RIBEIRO': 'VARGEM DAS FLORES', 'UNIDADE BASICA DE SAUDE ICAIVERA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE NOVA CONTAGEM I': 'VARGEM DAS FLORES', 'CONTAGEM PENITENCIARIA NELSON HUNGRIA': 'VARGEM DAS FLORES',
-  'UNIDADE BASICA DE SAUDE TUPA': 'VARGEM DAS FLORES', 'UNIDADE BASICA DE SAUDE LIBERDADE II': 'VARGEM DAS FLORES'
+  'UNIDADE BASICA DE SAUDE JARDIM BANDEIRANTES': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE AGUA BRANCA': 'ELDORADO',
+  'UNIDADE BASICA DE SAUDE XV': 'ELDORADO'
 };
 const LISTA_UBS = Object.keys(DISTRITO_MAP).sort();
 
@@ -395,7 +479,6 @@ function validarCPF(cpf) {
     return r === parseInt(cpf[10]);
 }
 
-function gerarCodigoAleatorio() { return String(Math.floor(100000 + Math.random() * 900000)); }
 function gerarCPFValido() {
     let cpf = '';
     for (let i = 0; i < 9; i++) cpf += Math.floor(Math.random() * 10);
@@ -459,7 +542,7 @@ function mostrarMsg(id, texto, cor) {
 }
 
 // ============================================
-// DROPDOWN UBS
+// DROPDOWNS
 // ============================================
 function filtrarUBS() {
     const input = document.getElementById('unidadeSaude');
@@ -477,9 +560,6 @@ function selecionarUBS(ubs) {
     document.getElementById('dropdownUBS').classList.remove('show');
 }
 
-// ============================================
-// DROPDOWN SIGTAP
-// ============================================
 function toggleDropdownSIGTAP(show) {
     const dropdown = document.getElementById('dropdownSIGTAP');
     if (show) { dropdown.classList.add('show'); filtrarSIGTAP(); }
@@ -505,11 +585,9 @@ function selecionarSIGTAP(codigo) {
     examesSelecionados = [];
     atualizarExamesSelecionados();
 }
-</script>
 
-<script>
 // ============================================
-// MODAL DE EXAMES
+// FUNÇÕES DE EXAMES
 // ============================================
 function abrirModalSelecaoExames() {
     if (!subgrupoSelecionado) return alert('⚠️ Selecione um SubGrupo SIGTAP primeiro!');
@@ -628,7 +706,7 @@ function limparFormularioSolicitar() {
 }
 
 // ============================================
-// LOGIN
+// LOGIN E REDEFINIÇÃO
 // ============================================
 document.getElementById('btnLogin').addEventListener('click', async () => {
     const cpf = document.getElementById('loginCPF').value.replace(/\D/g, '');
@@ -644,9 +722,6 @@ document.getElementById('btnLogin').addEventListener('click', async () => {
     carregarPortal();
 });
 
-// ============================================
-// REDEFINIÇÃO DE SENHA (VIA CÓDIGO DO ADMIN)
-// ============================================
 document.getElementById('btnConfirmarRedefinir').addEventListener('click', async () => {
     const cpf = document.getElementById('redefCPF').value.replace(/\D/g, '');
     const nomeMae = document.getElementById('redefNomeMae').value.trim();
@@ -680,9 +755,6 @@ document.getElementById('btnConfirmarRedefinir').addEventListener('click', async
     showScreen('screenLogin');
 });
 
-// ============================================
-// FUNÇÕES ADMIN - GERAR CÓDIGO REDEFINIÇÃO
-// ============================================
 async function gerarCodigoRedefinicaoAdmin() {
     const cpf = document.getElementById('adminGerarCodigoCPF').value.replace(/\D/g, '');
     if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
@@ -709,9 +781,6 @@ async function gerarCodigoRedefinicaoAdmin() {
     resultadoDiv.classList.remove('hidden');
 }
 
-// ============================================
-// BUSCAR CEP
-// ============================================
 async function buscarCEP(cep) {
     cep = cep.replace(/\D/g, '');
     if (cep.length !== 8) return;
@@ -726,18 +795,6 @@ async function buscarCEP(cep) {
     } catch (e) { }
 }
 
-// Evento CEP
-document.addEventListener('DOMContentLoaded', function() {
-    const cepInput = document.getElementById('cep');
-    if (cepInput) {
-        cepInput.addEventListener('input', function () { 
-            if (this.value.replace(/\D/g, '').length === 8) buscarCEP(this.value); 
-        });
-    }
-});
-</script>
-
-<script>
 // ============================================
 // CARREGAR PORTAL
 // ============================================
@@ -757,7 +814,6 @@ async function carregarPortal() {
         document.getElementById('buscaAdminHistorico').style.display = 'none';
     }
 
-    // Buscar todas as solicitações da linha_cuidado
     const { data: rets } = await db.from('linha_cuidado')
         .select('*, pacientes(nome, cpf, prontuario, telefone, endereco_completo, numero_residencia, bairro, municipio, cep, sexo, raca_cor, data_nascimento, nome_mae, unidade_saude)')
         .order('created_at', { ascending: false });
@@ -771,7 +827,6 @@ async function carregarPortal() {
     `;
     renderizarHistoricoHTML();
 
-    // Carregar meus dados (do paciente logado)
     if (usuarioLogado && usuarioLogado.cpf) {
         const { data: pacienteDados } = await db.from('pacientes').select('*').eq('cpf', usuarioLogado.cpf).maybeSingle();
         if (pacienteDados) {
@@ -825,18 +880,12 @@ function renderizarHistoricoHTML(lista = null) {
         
         let botoes = '';
         
-        // REGRA: Só mostra botão EDITAR se status for 'aguardando_exame'
         if (r.status === 'aguardando_exame') {
             botoes += `<button onclick="editarExameOCI(${r.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-edit"></i> Editar Exame</button>`;
         }
         
-        // REGRA: Só ADMIN pode EXCLUIR e apenas se status for 'aguardando_exame' ou 'apto_retorno'
         if (isAdmin && (r.status === 'aguardando_exame' || r.status === 'apto_retorno')) {
             botoes += `<button onclick="excluirRetornoOCI(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-trash"></i> Excluir</button>`;
-        }
-        
-        // REGRA: Só ADMIN pode EXTORNAR e apenas se status for 'aguardando_exame' ou 'apto_retorno'
-        if (isAdmin && (r.status === 'aguardando_exame' || r.status === 'apto_retorno')) {
             botoes += `<button onclick="extornarRetornoOCI(${r.id})" class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-undo"></i> Extornar</button>`;
         }
         
@@ -878,7 +927,7 @@ function filtrarHistoricoAdmin() {
 }
 
 // ============================================
-// BUSCA AUTOMÁTICA DA SOLICITAÇÃO
+// BUSCA AUTOMÁTICA
 // ============================================
 let timeoutBusca = null;
 
@@ -940,7 +989,7 @@ document.getElementById('numeroSolicitacao').addEventListener('input', function(
 });
 
 // ============================================
-// VALIDAR E SOLICITAR RETORNO
+// SOLICITAR RETORNO
 // ============================================
 document.getElementById('btnValidarRetorno').addEventListener('click', async () => {
     const ns = document.getElementById('numeroSolicitacao').value.trim();
@@ -954,7 +1003,6 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
 
     showLoading();
 
-    // VERIFICAR DUPLICIDADE - só bloqueia se já tiver uma solicitação ATIVA
     const { data: solicitacaoExistente } = await db.from('linha_cuidado')
         .select('id, status')
         .eq('numero_solicitacao', ns)
@@ -1031,7 +1079,7 @@ document.getElementById('btnValidarRetorno').addEventListener('click', async () 
 });
 
 // ============================================
-// EDITAR EXAME (QUALQUER USUÁRIO PODE)
+// EDITAR EXAME
 // ============================================
 async function editarExameOCI(id) {
     const solicitacao = retornosLista.find(r => r.id === id);
@@ -1087,7 +1135,7 @@ async function editarExameOCI(id) {
 }
 
 // ============================================
-// EXCLUIR RETORNO (SÓ ADMIN) - VOLTA PARA RECEPCIONADA
+// EXCLUIR E EXTORNAR
 // ============================================
 async function excluirRetornoOCI(id) {
     if (usuarioLogado.tipo !== 'admin') return alert('❌ Apenas Administrador.');
@@ -1110,8 +1158,6 @@ async function excluirRetornoOCI(id) {
             exames_realizados: [],
             subgrupo_sigtap: null,
             cid: null,
-            data_solicitacao_exame: null,
-            data_realizacao_exame: null,
             updated_at: new Date().toISOString()
         }).eq('numero_solicitacao', r.numero_solicitacao);
     }
@@ -1120,9 +1166,6 @@ async function excluirRetornoOCI(id) {
     await carregarPortal();
 }
 
-// ============================================
-// EXTORNAR RETORNO (SÓ ADMIN) - VOLTA PARA AGUARDANDO EXAME
-// ============================================
 async function extornarRetornoOCI(id) {
     if (usuarioLogado.tipo !== 'admin') return alert('❌ Apenas Administrador.');
     
@@ -1165,7 +1208,7 @@ function switchTab(tabId) {
 }
 
 // ============================================
-// PAINEL ADMINISTRADOR (PORTAL)
+// ADMIN
 // ============================================
 function abrirModalAdminPortal() {
     if (usuarioLogado && usuarioLogado.tipo === 'admin') {
@@ -1204,7 +1247,7 @@ async function renderizarListaUsuarios() {
             <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">${u.tipo === 'admin' ? '👑 Admin' : '👤 Usuário'}</span></td>
             <td class="px-3 py-2"><div class="flex gap-2"><button onclick='abrirEdicaoUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td>
         </tr>
-    `).join('') || '<td><td colspan="6" class="text-center py-6 text-slate-400">Nenhum usuário encontrado</td></tr>';
+    `).join('') || '<tr><td colspan="6" class="text-center py-6 text-slate-400">Nenhum usuário encontrado</td></tr>';
 }
 
 async function cadastrarUsuarioAdmin() {
@@ -1308,11 +1351,17 @@ document.addEventListener('click', function(e) {
 });
 
 // ENTER NO LOGIN
-document.getElementById('loginSenha').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('btnLogin').click(); });
+const loginSenhaElement = document.getElementById('loginSenha');
+if (loginSenhaElement) {
+    loginSenhaElement.addEventListener('keydown', (e) => { 
+        if (e.key === 'Enter') {
+            const btnLogin = document.getElementById('btnLogin');
+            if (btnLogin) btnLogin.click();
+        }
+    });
+}
 
-// ============================================
 // INICIALIZAÇÃO
-// ============================================
 console.log('✅ PORTAL DO PACIENTE v7.0 - CÓDIGO COMPLETO!');
 console.log('👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704');
 
