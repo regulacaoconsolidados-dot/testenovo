@@ -555,7 +555,7 @@ function toggleSenha(id, btn){
             <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
                 <h4 class="font-bold text-purple-700 mb-2"><i class="fas fa-laptop-medical mr-2"></i>Portal do Paciente</h4>
                 <ul class="text-sm text-slate-600 space-y-1">
-                    <li>✅ Paciente faz login com CPF e senha</li>
+                    <li>✅ Usuário faz login com CPF e senha</li>
                     <li>✅ Digita o Nº da Solicitação da 1ª Consulta</li>
                     <li>✅ Seleciona SubGrupo SIGTAP</li>
                     <li>✅ Marca exames com datas de solicitação e realização</li>
@@ -900,7 +900,7 @@ function toggleSenha(id, btn){
             <div id="content-retornos-agendados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
-                        <h3 class="text-lg font-bold">📅 Retornos Agendados (Vivver)</h3>
+                        <h3 class="text-lg font-bold">📅 Retornos Agendados</h3>
                         <div class="flex gap-2">
                             <input type="text" id="buscaRetornosAgendados" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos-agendados')">
                             <select id="paginaRetornosAgendados" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="mudarPagina('retornos-agendados')">
@@ -939,7 +939,7 @@ function toggleSenha(id, btn){
             <div id="content-retornos-recepcionados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
-                        <h3 class="text-lg font-bold">📋 Retornos Recepcionados (Vivver)</h3>
+                        <h3 class="text-lg font-bold">📋 Retornos Recepcionados</h3>
                         <div class="flex gap-2">
                             <input type="text" id="buscaRetornosRecepcionados" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('retornos-recepcionados')">
                             <select id="paginaRetornosRecepcionados" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="mudarPagina('retornos-recepcionados')">
@@ -1479,9 +1479,9 @@ async function cadastrarUsuarioAdmin() {
     const nome = document.getElementById('adminNovoNome')?.value?.trim();
     const cpf = limparCPF(document.getElementById('adminNovoCPF')?.value || '');
     const email = document.getElementById('adminNovoEmail')?.value?.trim();
+    const telefone = document.getElementById('adminNovoTelefone')?.value?.replace(/\D/g, '') || '';
     const senha = document.getElementById('adminNovoSenha')?.value?.trim();
     const tipo = document.getElementById('adminNovoTipo')?.value || 'usuario';
-    const telefone = document.getElementById('adminNovoTelefone')?.value?.replace(/\D/g, '') || '';
     const unidadeSaude = tipo === 'usuario' ? document.getElementById('adminNovoUbs')?.value : null;
     
     if (!nome || !cpf || !email || !senha) return alert('⚠️ Preencha todos os campos!');
@@ -1491,21 +1491,35 @@ async function cadastrarUsuarioAdmin() {
     if (tipo === 'usuario' && !unidadeSaude) return alert('❌ Selecione a UBS para usuário comum!');
     
     showLoading();
-    const { data: existente } = await supabaseClient.from('usuarios').select('id').eq('cpf', cpf).maybeSingle();
-    if (existente) { hideLoading(); return alert('❌ CPF já cadastrado!'); }
     
-    const { error } = await supabaseClient.from('usuarios').insert([{ 
-        nome, cpf, email, telefone, 
-        senha_hash: senha, tipo, 
-        unidade_saude: unidadeSaude 
-    }]);
+    // 🔥 USA A FUNÇÃO RPC, NÃO INSERT DIRETO
+    const { data, error } = await supabaseClient.rpc('cadastrar_usuario_painel', {
+        p_nome: nome,
+        p_cpf: cpf,
+        p_email: email,
+        p_telefone: telefone,
+        p_unidade_saude: unidadeSaude,
+        p_senha: senha,
+        p_tipo: tipo
+    });
+    
     hideLoading();
-    if (error) return alert('❌ Erro: ' + error.message);
-    alert('✅ Usuário cadastrado!');
+    
+    if (error || !data?.success) {
+        return alert('❌ Erro: ' + (data?.message || error?.message));
+    }
+    
+    alert('✅ Usuário cadastrado com sucesso!');
+    document.getElementById('adminNovoNome').value = '';
+    document.getElementById('adminNovoCPF').value = '';
+    document.getElementById('adminNovoEmail').value = '';
+    document.getElementById('adminNovoTelefone').value = '';
+    document.getElementById('adminNovoSenha').value = '';
+    document.getElementById('adminNovoUbs').value = '';
+    
     switchAdminTab('usuarios');
     renderizarListaUsuarios();
 }
-
 function editarUsuario(u) {
     document.getElementById('editUsuarioId').value = u.id;
     document.getElementById('editUsuarioNome').value = u.nome;
