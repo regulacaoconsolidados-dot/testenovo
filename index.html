@@ -1450,26 +1450,41 @@ function switchAdminTab(tabId) {
 
 async function renderizarListaUsuarios() {
     showLoading();
-    const { data: usuarios, error } = await supabaseClient.from('usuarios').select('*').order('nome');
+    const { data: usuarios, error } = await supabaseClient
+        .from('usuarios')
+        .select('id, nome, cpf, email, telefone, unidade_saude, tipo')
+        .order('nome');
     hideLoading();
+    
     if (error) {
         console.error('Erro ao buscar usuários:', error);
         return;
     }
+    
     const busca = (document.getElementById('adminBuscaUsuario')?.value || '').toLowerCase();
-    let lista = (usuarios || []).filter(u => !busca || u.nome.toLowerCase().includes(busca) || (u.cpf || '').includes(busca));
+    let lista = (usuarios || []).filter(u => 
+        !busca || 
+        u.nome.toLowerCase().includes(busca) || 
+        (u.cpf || '').includes(busca)
+    );
+    
     const tbody = document.getElementById('adminTabelaUsuarios');
     if (!tbody) return;
+    
     tbody.innerHTML = lista.map(u => `
         <tr class="hover:bg-slate-50 border-t">
             <td class="px-3 py-2 font-bold text-sm">${u.nome || ''}</td>
-            <td class="px-3 py-2 text-sm">${formatarCPF(u.cpf)}</td>
+            <td class="px-3 py-2 text-sm font-mono">${formatarCPF(u.cpf)}</td>
             <td class="px-3 py-2 text-sm">${u.email || '—'}</td>
             <td class="px-3 py-2 text-sm">${u.unidade_saude || '—'}</td>
-            <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo==='admin'?'bg-purple-100 text-purple-600':'bg-blue-100 text-blue-600'}">${u.tipo==='admin'?'👑 Admin':'👤 Usuário'}</span></td>
+            <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">${u.tipo === 'admin' ? '👑 Admin' : '👤 Usuário'}</span></td>
             <td class="px-3 py-2"><div class="flex gap-2"><button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td>
         </tr>
-    `).join('') || '<tr><td colspan="6" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário</td></tr>';
+    `).join('');
+    
+    if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
+    }
 }
 
 function preencherCPF(cpf) { const el = document.getElementById('adminNovoCPF'); if (el) el.value = cpf; }
@@ -2030,7 +2045,7 @@ function limparFiltroAPACS() {
 }
 
 // ============================================
-// RENDERIZAR TABELAS
+// RENDERIZAR TABELAS (CORRIGIDO - TODAS AS TABELAS COMPLETAS)
 // ============================================
 function renderizarTabelas() {
     const tiposTabela = ['monitoramento','monitoramento-exames','primeira-consulta-agendadas','primeira-consulta','aptos-retorno','retornos-agendados','retornos-recepcionados','absenteismo-1consulta','absenteismo-retorno','apac','apacs-geradas'];
@@ -2071,28 +2086,37 @@ function renderizarTabelas() {
                 const alerta = getAlertaOCI(c);
                 const diasRest = getDiasRestantes(c);
                 const prog = getProgressoDinamico(c);
-                const gs = getGrupoSubgrupo(c.especialidade_id);
-                return `<tr class="hover:bg-slate-50">
+                return `<tr class="hover:bg-slate-50 border-b">
                     <td class="px-4 py-3"><span class="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">${c.numero_solicitacao || c.id}</span></td>
                     <td class="px-4 py-3"><span class="text-sm font-bold text-purple-600">${p.prontuario || '—'}</span></td>
                     <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
                     <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${c.subgrupo_sigtap || '—'}</td>
                     <td class="px-4 py-3"><div class="w-32"><div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden"><div class="${prog.c} h-full flex items-center justify-center text-white text-[10px] font-bold" style="width:${prog.p}%">${prog.t}</div></div></div></td>
                     <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${st.c}">${st.t}</span></td>
                     <td class="px-4 py-3"><span class="text-xs font-bold ${diasRest.cor}">${diasRest.dias}</span></td>
                     <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold border ${alerta.cor}">${alerta.tipo} ${alerta.texto}</span></td>
                 </tr>`;
             }).join('');
+            
         } else if (tipo === 'monitoramento-exames') {
             let examesData = [];
             consultas.forEach(c => {
+                const p = pacientes.find(x => x.id === c.paciente_id) || {};
                 if (c.exames_solicitados && c.exames_solicitados !== '[]') {
                     try {
                         const exames = typeof c.exames_solicitados === 'string' ? JSON.parse(c.exames_solicitados) : c.exames_solicitados;
                         if (Array.isArray(exames)) {
                             exames.forEach(ex => {
-                                const p = c.pacientes || {};
-                                examesData.push({ ...c, nome_exame: ex.nome || '—', data_solicitacao_exame: ex.data_solicitacao, data_realizacao_exame: ex.data_realizacao, status_exame: ex.data_realizacao ? 'Realizado' : 'Pendente', paciente_nome: p.nome, paciente_prontuario: p.prontuario });
+                                examesData.push({
+                                    ...c,
+                                    nome_exame: ex.nome || '—',
+                                    data_solicitacao_exame: ex.data_solicitacao || c.data_solicitacao_exame,
+                                    data_realizacao_exame: ex.data_realizacao || c.data_realizacao_exame,
+                                    status_exame: ex.data_realizacao ? 'Realizado' : 'Pendente',
+                                    paciente_nome: p.nome || '—',
+                                    paciente_prontuario: p.prontuario || '—'
+                                });
                             });
                         }
                     } catch(e) {}
@@ -2101,21 +2125,251 @@ function renderizarTabelas() {
             tabelaEl.innerHTML = examesData.slice(0, 100).map(item => {
                 const dias = item.data_solicitacao_exame && item.data_realizacao_exame ? Math.floor((new Date(item.data_realizacao_exame + 'T12:00:00') - new Date(item.data_solicitacao_exame + 'T12:00:00')) / 86400000) : '—';
                 const sc = item.status_exame === 'Realizado' ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50';
-                return `<tr class="hover:bg-slate-50">
-                    <td class="px-3 py-2">${item.numero_solicitacao || item.id}</td>
-                    <td class="px-3 py-2">${item.paciente_prontuario || '—'}</td>
-                    <td class="px-3 py-2 font-bold">${item.paciente_nome || '—'}</td>
-                    <td class="px-3 py-2">${item.nome_exame || '—'}</td>
-                    <td class="px-3 py-2">${formatarData(item.data_solicitacao_exame)}</td>
-                    <td class="px-3 py-2">${formatarData(item.data_realizacao_exame)}</td>
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-3 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || item.id}</td>
+                    <td class="px-3 py-2 text-sm font-bold text-purple-600">${item.paciente_prontuario}</td>
+                    <td class="px-3 py-2 font-bold text-sm">${item.paciente_nome}</td>
+                    <td class="px-3 py-2 text-sm">${item.subgrupo_sigtap || '—'}</td>
+                    <td class="px-3 py-2 text-sm">${item.nome_exame}</td>
+                    <td class="px-3 py-2 text-sm">${formatarData(item.data_solicitacao_exame)}</td>
+                    <td class="px-3 py-2 text-sm">${formatarData(item.data_realizacao_exame)}</td>
+                    <td class="px-3 py-2 text-sm">${dias !== '—' ? dias + ' dias' : '—'}</td>
                     <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${sc}">${item.status_exame}</span></td>
                 </tr>`;
             }).join('');
-        } else {
+            
+        } else if (tipo === 'primeira-consulta-agendadas') {
+            // 🕐 1ª CONSULTA AGENDADAS - COMPLETA
             tabelaEl.innerHTML = pag.map(item => {
                 const p = pacientes.find(x => x.id === item.paciente_id) || {};
                 const e = especialidades.find(x => x.id === item.especialidade_id) || {};
-                return `<tr><td class="px-3 py-2">${item.numero_solicitacao || item.id}</td><td class="px-3 py-2 font-bold">${p.nome || '—'}</td><td class="px-3 py-2">${e.nome || '—'}</td><td class="px-3 py-2">${formatarData(item.data_agendada)}</td></tr>`;
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-4 py-3 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                    <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${item.medico_solicitante || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.local_consulta || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_agendada)}</td>
+                    <td class="px-4 py-3 text-sm">${item.operador_agendamento || '—'}</td>
+                </tr>`;
+            }).join('');
+            
+        } else if (tipo === 'primeira-consulta') {
+            // 🆕 1ª CONSULTA RECEPCIONADOS - COMPLETA
+            tabelaEl.innerHTML = pag.map(item => {
+                const p = pacientes.find(x => x.id === item.paciente_id) || {};
+                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-4 py-3 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                    <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-cyan-50 text-cyan-700 rounded-full text-xs font-bold">${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${item.subgrupo_sigtap || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.medico_solicitante || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.local_consulta || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_agendada)}</td>
+                    <td class="px-4 py-3 text-sm">${item.operador_agendamento || '—'}</td>
+                </tr>`;
+            }).join('');
+            
+        } else if (tipo === 'aptos-retorno') {
+            // ✅ APTOS RETORNO - COMPLETA
+            tabelaEl.innerHTML = pag.map(item => {
+                const p = pacientes.find(x => x.id === item.paciente_id) || {};
+                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+                let examesNomes = [];
+                let dataRealizacao = '—';
+                try {
+                    const exames = JSON.parse(item.exames_realizados || '[]');
+                    if (exames.length > 0) {
+                        examesNomes = exames.map(ex => ex.nome);
+                        const primeiroComData = exames.find(ex => ex.data_realizacao);
+                        if (primeiroComData) dataRealizacao = formatarData(primeiroComData.data_realizacao);
+                    }
+                } catch(e) {}
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-4 py-3 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                    <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold">${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${item.subgrupo_sigtap || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.medico_solicitante || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.local_consulta || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_agendada)}</td>
+                    <td class="px-4 py-3 text-sm">${examesNomes.join('; ') || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${dataRealizacao}</td>
+                    <td class="px-4 py-3 text-sm">${item.usuario_cadastrou || '—'}</td>
+                </tr>`;
+            }).join('');
+            
+        } else if (tipo === 'retornos-agendados') {
+            // 📅 RETORNOS AGENDADOS - COMPLETA
+            tabelaEl.innerHTML = pag.map(item => {
+                const p = pacientes.find(x => x.id === item.paciente_id) || {};
+                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+                let examesNomes = [];
+                let dataRealizacao = '—';
+                try {
+                    const exames = JSON.parse(item.exames_realizados || '[]');
+                    examesNomes = exames.map(ex => ex.nome);
+                    const primeiroComData = exames.find(ex => ex.data_realizacao);
+                    if (primeiroComData) dataRealizacao = formatarData(primeiroComData.data_realizacao);
+                } catch(e) {}
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-4 py-3 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${item.numero_solicitacao_retorno || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                    <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${item.subgrupo_sigtap || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.medico_retorno || item.medico_solicitante || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.local_retorno || item.local_consulta || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_agendada)}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_retorno_agendada)}</td>
+                    <td class="px-4 py-3 text-sm">${examesNomes.join('; ') || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${dataRealizacao}</td>
+                    <td class="px-4 py-3 text-sm">${item.usuario_cadastrou || '—'}</td>
+                </tr>`;
+            }).join('');
+            
+        } else if (tipo === 'retornos-recepcionados') {
+            // 📋 RETORNOS RECEPCIONADOS - COMPLETA
+            tabelaEl.innerHTML = pag.map(item => {
+                const p = pacientes.find(x => x.id === item.paciente_id) || {};
+                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+                let examesNomes = [];
+                let dataRealizacao = '—';
+                try {
+                    const exames = JSON.parse(item.exames_realizados || '[]');
+                    examesNomes = exames.map(ex => ex.nome);
+                    const primeiroComData = exames.find(ex => ex.data_realizacao);
+                    if (primeiroComData) dataRealizacao = formatarData(primeiroComData.data_realizacao);
+                } catch(e) {}
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-4 py-3 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${item.numero_solicitacao_retorno || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                    <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-bold">${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${item.subgrupo_sigtap || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.medico_retorno || item.medico_solicitante || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.local_retorno || item.local_consulta || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_agendada)}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_retorno_recepcionada)}</td>
+                    <td class="px-4 py-3 text-sm">${examesNomes.join('; ') || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${dataRealizacao}</td>
+                    <td class="px-4 py-3 text-sm">${item.usuario_cadastrou || '—'}</td>
+                </tr>`;
+            }).join('');
+            
+        } else if (tipo === 'absenteismo-1consulta') {
+            // 🚫 ABSENTEÍSMO 1ª CONSULTA - COMPLETA
+            tabelaEl.innerHTML = pag.map(item => {
+                const p = pacientes.find(x => x.id === item.paciente_id) || {};
+                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-4 py-3 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                    <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-bold">${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${item.medico_solicitante || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.local_consulta || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_agendada)}</td>
+                </tr>`;
+            }).join('');
+            
+        } else if (tipo === 'absenteismo-retorno') {
+            // 🚫 ABSENTEÍSMO RETORNO - COMPLETA
+            tabelaEl.innerHTML = pag.map(item => {
+                const p = pacientes.find(x => x.id === item.paciente_id) || {};
+                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-4 py-3 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                    <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs font-bold">${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${item.medico_retorno || item.medico_solicitante || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.local_retorno || item.local_consulta || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_retorno_agendada)}</td>
+                </tr>`;
+            }).join('');
+            
+        } else if (tipo === 'apac') {
+            // 📄 OCI FECHADAS (APAC prontas) - COMPLETA
+            tabelaEl.innerHTML = pag.map(item => {
+                const p = pacientes.find(x => x.id === item.paciente_id) || {};
+                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+                let examesNomes = [];
+                try {
+                    const exames = JSON.parse(item.exames_realizados || '[]');
+                    examesNomes = exames.map(ex => ex.nome);
+                } catch(e) {}
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-4 py-3 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                    <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(p.data_nascimento)}</td>
+                    <td class="px-4 py-3 text-sm">${p.nome_mae || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${p.telefone || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${p.cep || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${p.endereco_completo || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${p.sexo || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-bold">${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${item.subgrupo_sigtap || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.medico_solicitante || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.local_consulta || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_agendada)}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_fechamento)}</td>
+                    <td class="px-4 py-3 text-sm">${examesNomes.join('; ') || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_realizacao_exame)}</td>
+                    <td class="px-4 py-3 text-sm">${item.cid || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.usuario_cadastrou || '—'}</td>
+                </tr>`;
+            }).join('');
+            
+        } else if (tipo === 'apacs-geradas') {
+            // 📑 APAC's GERADAS - COMPLETA
+            tabelaEl.innerHTML = pag.map(item => {
+                const p = pacientes.find(x => x.id === item.paciente_id) || {};
+                const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+                let examesNomes = [];
+                try {
+                    const exames = JSON.parse(item.exames_realizados || '[]');
+                    examesNomes = exames.map(ex => ex.nome);
+                } catch(e) {}
+                return `<tr class="hover:bg-slate-50 border-b">
+                    <td class="px-4 py-3 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                    <td class="px-4 py-3 font-bold text-sm">${p.nome || '—'}</td>
+                    <td class="px-4 py-3 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.unidade_basica_saude || p.unidade_saude || '—'}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">${e.nome || '—'}</span></td>
+                    <td class="px-4 py-3 text-sm">${item.subgrupo_sigtap || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.medico_solicitante || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${item.local_consulta || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_agendada)}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_fechamento)}</td>
+                    <td class="px-4 py-3 text-sm font-bold bg-indigo-50 text-indigo-800">${item.numero_apac || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${examesNomes.join('; ') || '—'}</td>
+                    <td class="px-4 py-3 text-sm">${formatarData(item.data_realizacao_exame)}</td>
+                    <td class="px-4 py-3 text-sm">${item.usuario_cadastrou || '—'}</td>
+                </tr>`;
             }).join('');
         }
 
@@ -2460,27 +2714,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btnResetVerificar').addEventListener('click', async () => {
-        const cpf = limparCPF(document.getElementById('resetCPF').value);
-        
-        if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
-        
-        showLoading();
-        
-        const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin', { p_cpf: cpf });
-        
-        hideLoading();
-        
-        if (error || !data || !data.success) {
-            return alert('❌ ' + (data?.message || 'Erro ao gerar código!'));
-        }
-        
-        alert(`✅ Código gerado: ${data.codigo}\n\nPasse este código para o usuário.\nVálido por 1 hora.`);
-        
-        document.getElementById('resetStep1').classList.add('hidden');
-        document.getElementById('resetStep2').classList.remove('hidden');
-        document.getElementById('resetStepTitle').textContent = 'Etapa 2: Redefinir senha';
-        document.getElementById('resetStep2').dataset.cpf = cpf;
-    });
+    const cpf = limparCPF(document.getElementById('resetCPF').value);
+    
+    if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
+    
+    showLoading();
+    
+    const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin', { p_cpf: cpf });
+    
+    hideLoading();
+    
+    if (error || !data || !data.success) {
+        return alert('❌ ' + (data?.message || 'Erro ao gerar código!'));
+    }
+    
+    // ⚠️ NÃO mostrar o código! Apenas avisar que foi gerado
+    alert(`✅ Código de redefinição GERADO COM SUCESSO!\n\n📌 O código foi gerado internamente.\n👉 Agora INFORME O CÓDIGO AO USUÁRIO para que ele digite na próxima etapa.\n\n⏰ Válido por 1 hora.`);
+    
+    document.getElementById('resetStep1').classList.add('hidden');
+    document.getElementById('resetStep2').classList.remove('hidden');
+    document.getElementById('resetStepTitle').textContent = 'Etapa 2: Digite o código fornecido pelo administrador';
+    document.getElementById('resetStep2').dataset.cpf = cpf;
+});
 
     document.getElementById('btnResetConfirmar').addEventListener('click', async () => {
     const cpf = document.getElementById('resetStep2').dataset.cpf;
