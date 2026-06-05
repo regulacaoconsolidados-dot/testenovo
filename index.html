@@ -161,7 +161,7 @@ function toggleSenha(id, btn){
                 <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome da Mãe *</label><input type="text" id="resetNomeMae" placeholder="Nome completo da mãe" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all"></div>
                 <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Cidade Natal *</label><input type="text" id="resetCidadeNatal" placeholder="Cidade onde nasceu" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all"></div>
             </div>
-            <button id="btnResetVerificar" class="..."><i class="fas fa-envelope"></i> RECEBER CÓDIGO POR E-MAIL</button>
+            <button id="btnResetVerificar" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold hover:bg-rose-700 transition-all"><i class="fas fa-key"></i> VERIFICAR DADOS</button>
         </div>
         <div id="resetStep2" class="hidden">
             <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-4"><p class="text-sm text-green-700 font-bold">✅ Código enviado para seu e-mail! Verifique sua caixa de entrada ou spam.</p></div>
@@ -1478,7 +1478,13 @@ async function renderizarListaUsuarios() {
             <td class="px-3 py-2 text-sm">${u.email || '—'}</td>
             <td class="px-3 py-2 text-sm">${u.unidade_saude || '—'}</td>
             <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">${u.tipo === 'admin' ? '👑 Admin' : '👤 Usuário'}</span></td>
-            <td class="px-3 py-2"><div class="flex gap-2"><button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button><button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button></div></td>
+            <td class="px-3 py-2">
+                <div class="flex gap-2">
+                    <button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold" title="Editar usuário">✏️</button>
+                    <button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold" title="Excluir usuário">🗑️</button>
+                    <button onclick='gerarTokenRedefinicao("${u.cpf}")' class="text-amber-600 hover:text-amber-800 text-xs font-bold" title="Gerar código de redefinição de senha">🔑</button>
+                </div>
+            </td>
         </tr>
     `).join('');
     
@@ -1486,7 +1492,6 @@ async function renderizarListaUsuarios() {
         tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
     }
 }
-
 function preencherCPF(cpf) { const el = document.getElementById('adminNovoCPF'); if (el) el.value = cpf; }
 function gerarCPFAdmin() { const el = document.getElementById('adminNovoCPF'); if (el) el.value = gerarCPFValido(); }
 
@@ -2656,6 +2661,40 @@ function logout() {
 }
 
 // ============================================
+// 🔑 FUNÇÃO PARA GERAR CÓDIGO DE REDEFINIÇÃO DE SENHA (TOKEN) - USADA PELO ADMIN
+// ============================================
+function gerarTokenRedefinicao(cpf) {
+    // Gera um código aleatório de 6 dígitos
+    const token = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Salva no localStorage com validade de 1 hora
+    const tokenData = {
+        cpf: cpf,
+        codigo: token,
+        expira: Date.now() + (60 * 60 * 1000) // 1 hora
+    };
+    
+    // Recupera tokens existentes ou cria novo array
+    let tokens = JSON.parse(localStorage.getItem('tokens_redefinicao') || '[]');
+    
+    // Remove tokens antigos do mesmo CPF (evita acumular)
+    tokens = tokens.filter(t => t.cpf !== cpf);
+    
+    // Adiciona o novo token
+    tokens.push(tokenData);
+    
+    // Salva no localStorage
+    localStorage.setItem('tokens_redefinicao', JSON.stringify(tokens));
+    
+    // Mostra o código para o administrador
+    const mensagem = `🔑 CÓDIGO GERADO COM SUCESSO!\n\n📄 CPF: ${formatarCPF(cpf)}\n🔢 CÓDIGO: ${token}\n\n⏰ Válido por 1 hora\n\n📌 INFORME ESTE CÓDIGO AO PACIENTE para ele redefinir a senha.`;
+    
+    alert(mensagem);
+    
+    console.log(`✅ Token gerado para ${cpf}: ${token}`);
+}
+
+// ============================================
 // INICIALIZAÇÃO
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -2667,6 +2706,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof toggleUbsField === 'function') toggleUbsField();
     if (typeof toggleEditUbsField === 'function') toggleEditUbsField();
 
+    // ========== LOGIN ==========
     document.getElementById('btnLogin').addEventListener('click', async () => {
         const nome = document.getElementById('loginNome').value.trim();
         const cpf = limparCPF(document.getElementById('loginCPF').value);
@@ -2695,6 +2735,8 @@ document.addEventListener('DOMContentLoaded', () => {
             usuarioLogado.unidade_saude = userData.unidade_saude || '';
             usuarioLogado.email = userData.email || '';
             usuarioLogado.telefone = userData.telefone || '';
+            usuarioLogado.nome_mae = userData.nome_mae || '';
+            usuarioLogado.cidade_natal = userData.cidade_natal || '';
         }
         
         document.getElementById('screenLogin').style.display = 'none';
@@ -2705,7 +2747,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Admin';
         document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'A')[0].toUpperCase();
         document.getElementById('sidebarTipo').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário Comum';
-        document.getElementById('sidebarUbs').textContent = usuarioLogado.unidade_saude || '';
         
         const adminSection = document.getElementById('sidebarAdminSection');
         if (adminSection) adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
@@ -2713,67 +2754,100 @@ document.addEventListener('DOMContentLoaded', () => {
         atualizarTudo();
     });
 
+    // ========== REDEFINIR SENHA - ETAPA 1: VERIFICAR DADOS ==========
     document.getElementById('btnResetVerificar').addEventListener('click', async () => {
-    const cpf = limparCPF(document.getElementById('resetCPF').value);
-    
-    if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
-    
-    showLoading();
-    
-    const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin', { p_cpf: cpf });
-    
-    hideLoading();
-    
-    if (error || !data || !data.success) {
-        return alert('❌ ' + (data?.message || 'Erro ao gerar código!'));
-    }
-    
-    // ⚠️ NÃO mostrar o código! Apenas avisar que foi gerado
-    alert(`✅ Código de redefinição GERADO COM SUCESSO!\n\n📌 O código foi gerado internamente.\n👉 Agora INFORME O CÓDIGO AO USUÁRIO para que ele digite na próxima etapa.\n\n⏰ Válido por 1 hora.`);
-    
-    document.getElementById('resetStep1').classList.add('hidden');
-    document.getElementById('resetStep2').classList.remove('hidden');
-    document.getElementById('resetStepTitle').textContent = 'Etapa 2: Digite o código fornecido pelo administrador';
-    document.getElementById('resetStep2').dataset.cpf = cpf;
-});
-
-    document.getElementById('btnResetConfirmar').addEventListener('click', async () => {
-    const cpf = document.getElementById('resetStep2').dataset.cpf;
-    const nomeMae = document.getElementById('resetNomeMae').value.trim();
-    const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
-    const codigo = document.getElementById('resetCodigo').value.trim();
-    const novaSenha = document.getElementById('resetNovaSenha').value.trim();
-    const confirma = document.getElementById('resetConfirmaSenha').value.trim();
-    
-    if (!codigo || codigo.length !== 6) return alert('❌ Informe o código de 6 dígitos!');
-    if (!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
-    if (novaSenha !== confirma) return alert('❌ Senhas não conferem!');
-    
-    showLoading();
-    
-    // 🔥 USA A RPC DO SUPABASE, NÃO CÓDIGO FIXO
-    const { data, error } = await supabaseClient.rpc('redefinir_senha_com_codigo', {
-        p_cpf: cpf,
-        p_nome_mae: nomeMae,
-        p_cidade_natal: cidadeNatal,
-        p_codigo: codigo,
-        p_nova_senha: novaSenha
+        const cpf = limparCPF(document.getElementById('resetCPF').value);
+        const nomeMae = document.getElementById('resetNomeMae').value.trim();
+        const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
+        
+        if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
+        if (!nomeMae) return alert('❌ Informe o nome da mãe!');
+        if (!cidadeNatal) return alert('❌ Informe a cidade onde nasceu!');
+        
+        showLoading();
+        
+        const { data: usuario, error } = await supabaseClient
+            .from('usuarios')
+            .select('id, nome, cpf, nome_mae, cidade_natal')
+            .eq('cpf', cpf)
+            .maybeSingle();
+        
+        hideLoading();
+        
+        if (error || !usuario) {
+            return alert('❌ Usuário não encontrado! Verifique o CPF.');
+        }
+        
+        if ((usuario.nome_mae || '').toLowerCase() !== nomeMae.toLowerCase()) {
+            return alert('❌ Nome da mãe não confere!');
+        }
+        
+        if ((usuario.cidade_natal || '').toLowerCase() !== cidadeNatal.toLowerCase()) {
+            return alert('❌ Cidade onde nasceu não confere!');
+        }
+        
+        alert('✅ Dados verificados com sucesso! Agora informe o código fornecido pelo administrador.');
+        
+        document.getElementById('resetStep1').classList.add('hidden');
+        document.getElementById('resetStep2').classList.remove('hidden');
+        document.getElementById('resetStepTitle').textContent = 'Etapa 2: Digite o código fornecido pelo administrador';
+        document.getElementById('resetStep2').dataset.cpf = cpf;
     });
-    
-    hideLoading();
-    
-    if (error || !data || !data.success) {
-        return alert('❌ ' + (data?.message || 'Erro ao redefinir senha!'));
-    }
-    
-    alert('✅ Senha redefinida com sucesso!');
-    showScreen('screenLogin');
-});
-                
+
+    // ========== REDEFINIR SENHA - ETAPA 2: VALIDAR CÓDIGO E REDEFINIR ==========
+    document.getElementById('btnResetConfirmar').addEventListener('click', async () => {
+        const cpf = document.getElementById('resetStep2').dataset.cpf;
+        const codigo = document.getElementById('resetCodigo').value.trim();
+        const novaSenha = document.getElementById('resetNovaSenha').value.trim();
+        const confirma = document.getElementById('resetConfirmaSenha').value.trim();
+        
+        if (!codigo || codigo.length !== 6) return alert('❌ Informe o código de 6 dígitos!');
+        if (!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
+        if (novaSenha !== confirma) return alert('❌ As senhas não conferem!');
+        
+        // 🔥 VERIFICA O TOKEN NO localStorage (GERADO PELO ADMIN)
+        const tokens = JSON.parse(localStorage.getItem('tokens_redefinicao') || '[]');
+        const tokenValido = tokens.find(t => t.cpf === cpf && t.codigo === codigo && t.expira > Date.now());
+        
+        if (!tokenValido) {
+            return alert('❌ Código inválido ou expirado! Solicite um novo código ao administrador.');
+        }
+        
+        showLoading();
+        
+        // 🔥 ATUALIZA A SENHA DIRETAMENTE NO BANCO
+        const { error } = await supabaseClient
+            .from('usuarios')
+            .update({ senha_hash: novaSenha })
+            .eq('cpf', cpf);
+        
+        hideLoading();
+        
+        if (error) {
+            return alert('❌ Erro ao redefinir senha: ' + error.message);
+        }
+        
+        // Remove o token usado (invalida para próximas tentativas)
+        const tokensAtualizados = tokens.filter(t => !(t.cpf === cpf && t.codigo === codigo));
+        localStorage.setItem('tokens_redefinicao', JSON.stringify(tokensAtualizados));
+        
+        alert('✅ Senha redefinida com sucesso! Faça login com sua nova senha.');
+        
+        // Limpa os campos
+        document.getElementById('resetCodigo').value = '';
+        document.getElementById('resetNovaSenha').value = '';
+        document.getElementById('resetConfirmaSenha').value = '';
+        
+        // Volta para a tela de login
+        showScreen('screenLogin');
+    });
+
+    // ========== ENTER NO LOGIN ==========
     document.getElementById('loginSenha').addEventListener('keydown', (e) => { 
         if (e.key === 'Enter') document.getElementById('btnLogin').click(); 
     });
 
+    // ========== FECHAR MODAIS CLICANDO FORA ==========
     document.getElementById('modalAdmin').addEventListener('click', function(e) { 
         if (e.target === this) fecharModalAdmin(); 
     });
@@ -2781,12 +2855,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === this) fecharModal('modalEditarUsuario'); 
     });
 
+    // ========== ATUALIZAÇÃO AUTOMÁTICA A CADA 30 SEGUNDOS ==========
     setInterval(() => { 
         if (usuarioLogado) atualizarTudo(); 
     }, 30000);
 
     console.log('✅ FERRAMENTA OCI v7.0 INICIALIZADA COM SUCESSO!');
 });
-</script>
-</body>
-</html>
