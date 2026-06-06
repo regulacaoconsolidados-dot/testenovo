@@ -1154,9 +1154,9 @@ function toggleSenha(id, btn){
 // ============================================
 const SUPABASE_URL = 'https://hheuvkyhwujdrvjvtryg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe';
-let supabaseClient = null;
-try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.warn('Supabase offline'); }
-
+let supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+console.log('✅ Supabase client inicializado:', supabaseClient);
+    
 // ============================================
 // FUNÇÃO MOSTRAR TELA
 // ============================================
