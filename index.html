@@ -1160,7 +1160,7 @@ try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ============================================
 // FUNÇÃO MOSTRAR TELA
 // ============================================
-function showScreen(screenId) {
+window.showScreen = function(screenId) {
     // Esconde todas as telas
     const screens = ['screenLogin', 'screenReset', 'screenSistema'];
     for (let i = 0; i < screens.length; i++) {
