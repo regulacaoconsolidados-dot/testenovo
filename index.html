@@ -93,7 +93,18 @@ function toggleSenha(id, btn){
         icon.classList.add('fa-eye');
     }
 }
-    
+
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+        screen.style.display = 'none';
+    });
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+        targetScreen.classList.add('active');
+        targetScreen.style.display = 'flex';
+    }
+}
 </script>
 
 <div class="loading-overlay" id="loadingOverlay">
