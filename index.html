@@ -129,8 +129,7 @@ function showScreen(screenId) {
     </div>
 </div>
 
-<!-- ============ TELA DE REDEFINIR SENHA ============ -->
-
+<!-- ============ TELA DE REDEFINIR SENHA (VERSÃO ÚNICA E CORRETA) ============ -->
 <div id="screenReset" class="screen fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%);">
     <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
         <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🔑</div>
@@ -143,7 +142,7 @@ function showScreen(screenId) {
                 <input type="text" id="resetCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all" oninput="mascaraCPF(this)">
             </div>
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome da sua Mãe (opcional)</label>
+                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome da Mãe</label>
                 <input type="text" id="resetNomeMae" placeholder="Nome completo da mãe" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all">
             </div>
             <div>
@@ -171,23 +170,7 @@ function showScreen(screenId) {
         </div>
         
         <button id="btnResetConfirmar" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold hover:bg-rose-700 transition-all">✅ REDEFINIR SENHA</button>
-        <p class="text-sm text-slate-500 mt-4"><span onclick="showScreen('screenLogin')" class="text-blue-600 font-bold hover:underline cursor-pointer">← Voltar ao Login</span></p>
-    </div>
-</div>
-
-
-            <button id="btnResetVerificar" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold hover:bg-rose-700 transition-all"><i class="fas fa-key"></i> VERIFICAR DADOS</button>
-        </div>
-        <div id="resetStep2" class="hidden">
-            <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-4"><p class="text-sm text-green-700 font-bold">✅ Código enviado para seu e-mail! Verifique sua caixa de entrada ou spam.</p></div>
-            <div class="text-left space-y-4">
-                <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Código Recebido *</label><input type="text" id="resetCodigo" placeholder="123456" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all"></div>
-                <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nova Senha (6 dígitos) *</label><div class="relative"><input type="password" id="resetNovaSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all pr-12"><button type="button" onclick="toggleSenha('resetNovaSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i class="far fa-eye"></i></button></div></div>
-                <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Confirmar Senha *</label><div class="relative"><input type="password" id="resetConfirmaSenha" placeholder="******" maxlength="6" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all pr-12"><button type="button" onclick="toggleSenha('resetConfirmaSenha', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i class="far fa-eye"></i></button></div></div>
-            </div>
-            <button id="btnResetConfirmar" class="w-full mt-6 bg-rose-600 text-white py-3.5 rounded-xl font-bold hover:bg-rose-700 transition-all">✅ REDEFINIR SENHA</button>
-        </div>
-        <p class="text-xs text-blue-600 cursor-pointer hover:underline font-bold mt-4" onclick="showScreen('screenLogin')">🔙 Voltar ao Login</p>
+        <p class="text-sm text-slate-500 mt-4"><span id="btnVoltarLogin" class="text-blue-600 font-bold hover:underline cursor-pointer">← Voltar ao Login</span></p>
     </div>
 </div>
 
@@ -2710,6 +2693,7 @@ async function gerarTokenRedefinicao(cpf) {
         alert('❌ Erro inesperado ao gerar código. Tente novamente.');
     }
 }
+                
 // ============================================
 // INICIALIZAÇÃO
 // ============================================
@@ -2722,60 +2706,75 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof toggleUbsField === 'function') toggleUbsField();
     if (typeof toggleEditUbsField === 'function') toggleEditUbsField();
 
-    // ========== LOGIN ==========
-    document.getElementById('btnLogin').addEventListener('click', async () => {
-        const nome = document.getElementById('loginNome').value.trim();
-        const cpf = limparCPF(document.getElementById('loginCPF').value);
-        const senha = document.getElementById('loginSenha').value.trim();
-        
-        if (!nome || !cpf || !senha) return alert('⚠️ Preencha todos os campos!');
-        if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
-        
-        showLoading();
-        
-        const { data, error } = await supabaseClient.rpc('login_painel_admin', {
-            p_cpf: cpf,
-            p_senha: senha
+    // ========== BOTÕES DE NAVEGAÇÃO ==========
+    const btnEsqueciSenha = document.getElementById('btnEsqueciSenha');
+    if (btnEsqueciSenha) {
+        btnEsqueciSenha.addEventListener('click', function() {
+            showScreen('screenReset');
         });
-        
-        hideLoading();
-        
-        if (error || !data || !data.success) {
-            return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
-        }
-        
-        usuarioLogado = data;
-        
-        const { data: userData } = await supabaseClient.from('usuarios').select('*').eq('id', usuarioLogado.id).maybeSingle();
-        if (userData) {
-            usuarioLogado.unidade_saude = userData.unidade_saude || '';
-            usuarioLogado.email = userData.email || '';
-            usuarioLogado.telefone = userData.telefone || '';
-            usuarioLogado.nome_mae = userData.nome_mae || '';
-            usuarioLogado.cidade_natal = userData.cidade_natal || '';
-        }
-        
-        document.getElementById('screenLogin').style.display = 'none';
-        document.getElementById('screenLogin').classList.remove('active');
-        document.getElementById('screenSistema').classList.add('active');
-        document.getElementById('screenSistema').style.display = 'flex';
-        
-        document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Admin';
-        document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'A')[0].toUpperCase();
-        document.getElementById('sidebarTipo').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário Comum';
-        
-        const adminSection = document.getElementById('sidebarAdminSection');
-        if (adminSection) adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
-        
-        atualizarTudo();
-    });
+    }
 
-    
-    // ========== REDEFINIR SENHA (ESTILO PORTAL - ETAPA ÚNICA) ==========
+    const btnVoltarLogin = document.getElementById('btnVoltarLogin');
+    if (btnVoltarLogin) {
+        btnVoltarLogin.addEventListener('click', function() {
+            showScreen('screenLogin');
+        });
+    }
+
+    // ========== LOGIN ==========
+    const btnLogin = document.getElementById('btnLogin');
+    if (btnLogin) {
+        btnLogin.addEventListener('click', async () => {
+            const nome = document.getElementById('loginNome').value.trim();
+            const cpf = limparCPF(document.getElementById('loginCPF').value);
+            const senha = document.getElementById('loginSenha').value.trim();
+            
+            if (!nome || !cpf || !senha) return alert('⚠️ Preencha todos os campos!');
+            if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
+            
+            showLoading();
+            
+            const { data, error } = await supabaseClient.rpc('login_painel_admin', {
+                p_cpf: cpf,
+                p_senha: senha
+            });
+            
+            hideLoading();
+            
+            if (error || !data || !data.success) {
+                return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
+            }
+            
+            usuarioLogado = data;
+            
+            const { data: userData } = await supabaseClient.from('usuarios').select('*').eq('id', usuarioLogado.id).maybeSingle();
+            if (userData) {
+                usuarioLogado.unidade_saude = userData.unidade_saude || '';
+                usuarioLogado.email = userData.email || '';
+                usuarioLogado.telefone = userData.telefone || '';
+                usuarioLogado.nome_mae = userData.nome_mae || '';
+                usuarioLogado.cidade_natal = userData.cidade_natal || '';
+            }
+            
+            // ✅ USA A FUNÇÃO showScreen
+            showScreen('screenSistema');
+            
+            document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Admin';
+            document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'A')[0].toUpperCase();
+            document.getElementById('sidebarTipo').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário Comum';
+            
+            const adminSection = document.getElementById('sidebarAdminSection');
+            if (adminSection) adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
+            
+            atualizarTudo();
+        });
+    }
+
+    // ========== REDEFINIR SENHA ==========
     const btnResetConfirmar = document.getElementById('btnResetConfirmar');
     if (btnResetConfirmar) {
         btnResetConfirmar.addEventListener('click', async () => {
-            const cpf = (document.getElementById('resetCPF').value || '').replace(/\D/g, '');
+            const cpf = limparCPF(document.getElementById('resetCPF').value);
             const nomeMae = document.getElementById('resetNomeMae').value.trim();
             const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
             const codigo = document.getElementById('resetCodigo').value.trim();
@@ -2786,53 +2785,63 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!cidadeNatal) return alert('❌ Informe sua cidade natal!');
             if (!codigo || codigo.length !== 6) return alert('❌ Informe o código de 6 dígitos!');
             if (!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
-            if (novaSenha !== confirma) return alert('❌ As senhas não conferem!');
+            if (novaSenha !== confirma) return alert('❌ Senhas não conferem!');
             
             showLoading();
             
-            try {
-                const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
-                    p_cpf: cpf,
-                    p_nome_mae: nomeMae || '',
-                    p_cidade_natal: cidadeNatal,
-                    p_codigo: codigo,
-                    p_nova_senha: novaSenha
-                });
-                
-                hideLoading();
-                
-                if (error || !data || !data.success) {
-                    return alert('❌ ' + (data?.message || error?.message || 'Erro ao redefinir senha!'));
-                }
-                
-                alert('✅ Senha redefinida com sucesso! Faça login com sua nova senha.');
-                
-                ['resetCPF', 'resetNomeMae', 'resetCidadeNatal', 'resetCodigo', 'resetNovaSenha', 'resetConfirmaSenha'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.value = '';
-                });
-                
-                showScreen('screenLogin');
-            } catch (err) {
-                hideLoading();
-                console.error(err);
-                alert('❌ Ocorreu um erro inesperado.');
+            const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
+                p_cpf: cpf,
+                p_nome_mae: nomeMae || '',
+                p_cidade_natal: cidadeNatal,
+                p_codigo: codigo,
+                p_nova_senha: novaSenha
+            });
+            
+            hideLoading();
+            
+            if (error || !data || !data.success) {
+                return alert('❌ ' + (data?.message || error?.message || 'Erro ao redefinir senha!'));
             }
+            
+            alert('✅ Senha redefinida com sucesso! Faça login com sua nova senha.');
+            
+            // Limpa os campos
+            document.getElementById('resetCPF').value = '';
+            document.getElementById('resetNomeMae').value = '';
+            document.getElementById('resetCidadeNatal').value = '';
+            document.getElementById('resetCodigo').value = '';
+            document.getElementById('resetNovaSenha').value = '';
+            document.getElementById('resetConfirmaSenha').value = '';
+            
+            showScreen('screenLogin');
         });
     }
 
     // ========== ENTER NO LOGIN ==========
-    document.getElementById('loginSenha').addEventListener('keydown', (e) => { 
-        if (e.key === 'Enter') document.getElementById('btnLogin').click(); 
-    });
+    const loginSenha = document.getElementById('loginSenha');
+    if (loginSenha) {
+        loginSenha.addEventListener('keydown', (e) => { 
+            if (e.key === 'Enter') {
+                const btn = document.getElementById('btnLogin');
+                if (btn) btn.click();
+            }
+        });
+    }
 
     // ========== FECHAR MODAIS CLICANDO FORA ==========
-    document.getElementById('modalAdmin').addEventListener('click', function(e) { 
-        if (e.target === this) fecharModalAdmin(); 
-    });
-    document.getElementById('modalEditarUsuario').addEventListener('click', function(e) { 
-        if (e.target === this) fecharModal('modalEditarUsuario'); 
-    });
+    const modalAdmin = document.getElementById('modalAdmin');
+    if (modalAdmin) {
+        modalAdmin.addEventListener('click', function(e) { 
+            if (e.target === this) fecharModalAdmin(); 
+        });
+    }
+    
+    const modalEditarUsuario = document.getElementById('modalEditarUsuario');
+    if (modalEditarUsuario) {
+        modalEditarUsuario.addEventListener('click', function(e) { 
+            if (e.target === this) fecharModal('modalEditarUsuario'); 
+        });
+    }
 
     // ========== ATUALIZAÇÃO AUTOMÁTICA A CADA 30 SEGUNDOS ==========
     setInterval(() => { 
