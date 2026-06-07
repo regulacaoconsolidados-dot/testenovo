@@ -62,7 +62,6 @@
 </head>
 <body class="h-screen flex overflow-hidden">
 
-<!-- ============ FUNÇÕES GLOBAIS PRECISAM SER DEFINIDAS ANTES DO HTML QUE AS CHAMA ============ -->
 <script>
 function mascaraCPF(input){
     let v = input.value.replace(/\D/g,'');
@@ -92,6 +91,18 @@ function toggleSenha(id, btn){
         input.type = 'password';
         icon.classList.remove('fa-eye-slash');
         icon.classList.add('fa-eye');
+    }
+}
+
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+        screen.style.display = 'none';
+    });
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+        targetScreen.classList.add('active');
+        targetScreen.style.display = 'flex';
     }
 }
 </script>
@@ -1148,19 +1159,6 @@ try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ============================================
 // FUNÇÃO MOSTRAR TELA
 // ============================================
-function showScreen(screenId) {
-    // Esconde todas as telas
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-        screen.style.display = 'none';
-    });
-    
-    // Mostra a tela selecionada
-    const targetScreen = document.getElementById(screenId);
-    if (targetScreen) {
-        targetScreen.classList.add('active');
-        targetScreen.style.display = 'flex';
-    }
     
     // Se for a tela de redefinição, reseta os campos
     if (screenId === 'screenReset') {
@@ -2778,53 +2776,54 @@ document.addEventListener('DOMContentLoaded', () => {
     // ========== REDEFINIR SENHA - ETAPA 1: VERIFICAR DADOS ==========
 
     // ========== REDEFINIR SENHA (ESTILO PORTAL - ETAPA ÚNICA) ==========
-    document.getElementById('btnResetConfirmar').addEventListener('click', async () => {
-        const cpf = limparCPF(document.getElementById('resetCPF').value);
-        const nomeMae = document.getElementById('resetNomeMae').value.trim();
-        const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
-        const codigo = document.getElementById('resetCodigo').value.trim();
-        const novaSenha = document.getElementById('resetNovaSenha').value.trim();
-        const confirma = document.getElementById('resetConfirmaSenha').value.trim();
-        
-        if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
-        if (!cidadeNatal) return alert('❌ Informe sua cidade natal!');
-        if (!codigo || codigo.length !== 6) return alert('❌ Informe o código de 6 dígitos!');
-        if (!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
-        if (novaSenha !== confirma) return alert('❌ As senhas não conferem!');
-        
-        showLoading();
-        
-        try {
-            // ✅ USA A RPC DO SUPABASE (igual ao Portal do Paciente)
-            const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
-                p_cpf: cpf,
-                p_nome_mae: nomeMae || '',
-                p_cidade_natal: cidadeNatal,
-                p_codigo: codigo,
-                p_nova_senha: novaSenha
-            });
+    const btnResetConfirmar = document.getElementById('btnResetConfirmar');
+    if (btnResetConfirmar) {
+        btnResetConfirmar.addEventListener('click', async () => {
+            const cpf = limparCPF(document.getElementById('resetCPF').value);
+            const nomeMae = document.getElementById('resetNomeMae').value.trim();
+            const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
+            const codigo = document.getElementById('resetCodigo').value.trim();
+            const novaSenha = document.getElementById('resetNovaSenha').value.trim();
+            const confirma = document.getElementById('resetConfirmaSenha').value.trim();
             
-            hideLoading();
+            if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
+            if (!cidadeNatal) return alert('❌ Informe sua cidade natal!');
+            if (!codigo || codigo.length !== 6) return alert('❌ Informe o código de 6 dígitos!');
+            if (!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
+            if (novaSenha !== confirma) return alert('❌ As senhas não conferem!');
             
-            if (error || !data || !data.success) {
-                return alert('❌ ' + (data?.message || error?.message || 'Erro ao redefinir senha!'));
+            showLoading();
+            
+            try {
+                const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
+                    p_cpf: cpf,
+                    p_nome_mae: nomeMae || '',
+                    p_cidade_natal: cidadeNatal,
+                    p_codigo: codigo,
+                    p_nova_senha: novaSenha
+                });
+                
+                hideLoading();
+                
+                if (error || !data || !data.success) {
+                    return alert('❌ ' + (data?.message || error?.message || 'Erro ao redefinir senha!'));
+                }
+                
+                alert('✅ Senha redefinida com sucesso! Faça login com sua nova senha.');
+                
+                ['resetCPF', 'resetNomeMae', 'resetCidadeNatal', 'resetCodigo', 'resetNovaSenha', 'resetConfirmaSenha'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+                
+                showScreen('screenLogin');
+            } catch (err) {
+                hideLoading();
+                console.error(err);
+                alert('❌ Ocorreu um erro inesperado.');
             }
-            
-            alert('✅ Senha redefinida com sucesso! Faça login com sua nova senha.');
-            
-            // Limpa os campos
-            ['resetCPF', 'resetNomeMae', 'resetCidadeNatal', 'resetCodigo', 'resetNovaSenha', 'resetConfirmaSenha'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
-            });
-            
-            showScreen('screenLogin');
-        } catch (err) {
-            hideLoading();
-            console.error(err);
-            alert('❌ Ocorreu um erro inesperado.');
-        }
-    });
+        });
+    }
 
     // ========== ENTER NO LOGIN ==========
     document.getElementById('loginSenha').addEventListener('keydown', (e) => { 
