@@ -1147,15 +1147,14 @@ function showScreen(screenId) {
     </main>
 </div>
 
-<script>    
-<script>    
+<script>               
 // ============================================
 // 🏥 FERRAMENTA OCI v7.0 - JAVASCRIPT PRINCIPAL
 // ============================================
 const SUPABASE_URL = 'https://hheuvkyhwujdrvjvtryg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe';
-let supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-console.log('✅ Supabase conectado');
+window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+console.log('✅ Supabase conectado', window.supabaseClient);
 
 // ============================================
 // FUNÇÃO MOSTRAR TELA (CORRETA)
@@ -1460,7 +1459,7 @@ function switchAdminTab(tabId) {
 
 async function renderizarListaUsuarios() {
     showLoading();
-    const { data: usuarios, error } = await supabaseClient
+    const { data: usuarios, error } = await window.supabaseClient
         .from('usuarios')
         .select('id, nome, cpf, email, telefone, unidade_saude, tipo')
         .order('nome');
@@ -1523,7 +1522,7 @@ async function cadastrarUsuarioAdmin() {
     showLoading();
     
     // 🔥 USA A FUNÇÃO RPC, NÃO INSERT DIRETO
-    const { data, error } = await supabaseClient.rpc('cadastrar_usuario_painel', {
+    const { data, error } = await window.supabaseClient.rpc('cadastrar_usuario_painel', {
         p_nome: nome,
         p_cpf: cpf,
         p_email: email,
@@ -1579,7 +1578,7 @@ async function salvarEdicaoUsuario() {
     if (novaSenha && novaSenha.length === 6) updateData.senha_hash = novaSenha;
     
     showLoading();
-    const { error } = await supabaseClient.from('usuarios').update(updateData).eq('id', id);
+    const { error } = await window.supabaseClient.from('usuarios').update(updateData).eq('id', id);
     hideLoading();
     if (error) return alert('❌ Erro: ' + error.message);
     alert('✅ Usuário atualizado!');
@@ -1591,7 +1590,7 @@ async function excluirUsuario(id) {
     if (id === usuarioLogado?.id) return alert('❌ Não pode excluir a si mesmo!');
     if (!confirm('Excluir este usuário permanentemente?')) return;
     showLoading();
-    await supabaseClient.from('usuarios').delete().eq('id', id);
+    await window.supabaseClient.from('usuarios').delete().eq('id', id);
     hideLoading();
     alert('✅ Excluído!');
     renderizarListaUsuarios();
@@ -1683,19 +1682,19 @@ function getProgressoDinamico(consulta) {
 // CARREGAR DADOS DO SUPABASE
 // ============================================
 async function carregarDadosSupabase() {
-    if (!supabaseClient) return;
+    if (!window.supabaseClient) return;
     try {
-        const { data: pacientesDB } = await supabaseClient.from('pacientes').select('*');
+        const { data: pacientesDB } = await window.supabaseClient.from('pacientes').select('*');
         if (pacientesDB && pacientesDB.length > 0) {
             pacientes.length = 0;
             pacientesDB.forEach(p => pacientes.push(p));
             console.log('📥 Pacientes carregados:', pacientes.length);
         }
 
-        let query = supabaseClient.from('linha_cuidado').select('*').order('created_at', { ascending: false });
+        let query = window.supabaseClient.from('linha_cuidado').select('*').order('created_at', { ascending: false });
         
         if (usuarioLogado && usuarioLogado.tipo !== 'admin' && usuarioLogado.unidade_saude) {
-            query = supabaseClient.from('linha_cuidado')
+            query = window.supabaseClient.from('linha_cuidado')
                 .select('*')
                 .eq('unidade_basica_saude', usuarioLogado.unidade_saude)
                 .order('created_at', { ascending: false });
@@ -1744,7 +1743,7 @@ async function carregarDadosSupabase() {
             console.log('📥 Linha do Cuidado carregada:', consultas.length, 'registros');
         }
 
-        const { data: espDB } = await supabaseClient.from('especialidades_oci').select('*');
+        const { data: espDB } = await window.supabaseClient.from('especialidades_oci').select('*');
         if (espDB && espDB.length > 0) {
             espDB.forEach(e => {
                 const existente = especialidades.find(x => x.id === e.id);
@@ -2683,7 +2682,7 @@ async function gerarTokenRedefinicao(cpf) {
     
     try {
         // 🔥 USA A RPC DO SUPABASE (igual ao Portal do Paciente)
-        const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin_oci', {
+        const { data, error } = await window.supabaseClient.rpc('gerar_codigo_redefinicao_admin_oci', {
             p_cpf: cpf
         });
         
@@ -2736,7 +2735,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         showLoading();
         
-        const { data, error } = await supabaseClient.rpc('login_painel_admin', {
+        const { data, error } = await window.supabaseClient.rpc('login_painel_admin', {
             p_cpf: cpf,
             p_senha: senha
         });
@@ -2749,7 +2748,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         usuarioLogado = data;
         
-        const { data: userData } = await supabaseClient.from('usuarios').select('*').eq('id', usuarioLogado.id).maybeSingle();
+        const { data: userData } = await window.supabaseClient.from('usuarios').select('*').eq('id', usuarioLogado.id).maybeSingle();
         if (userData) {
             usuarioLogado.unidade_saude = userData.unidade_saude || '';
             usuarioLogado.email = userData.email || '';
@@ -2795,7 +2794,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showLoading();
             
             try {
-                const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
+                const { data, error } = await window.supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
                     p_cpf: cpf,
                     p_nome_mae: nomeMae || '',
                     p_cidade_natal: cidadeNatal,
