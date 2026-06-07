@@ -2722,24 +2722,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ========== LOGIN ==========
-const btnLogin = document.getElementById('btnLogin');
-if (btnLogin) {
-    btnLogin.addEventListener('click', async () => {
-        const nome = document.getElementById('loginNome').value.trim();
-        const cpf = limparCPF(document.getElementById('loginCPF').value);
-        const senha = document.getElementById('loginSenha').value.trim();
-        
-        // Validações
-        if (!nome) return alert('⚠️ Informe seu nome completo!');
-        if (!cpf) return alert('⚠️ Informe seu CPF!');
-        if (!senha) return alert('⚠️ Informe sua senha!');
-        if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
-        if (senha.length !== 6) return alert('❌ Senha deve ter 6 dígitos!');
-        
-        showLoading();
-        
-        try {
-            // 🔥 CHAMAR A FUNÇÃO CORRETA DO SUPABASE
+    const btnLogin = document.getElementById('btnLogin');
+    if (btnLogin) {
+        btnLogin.addEventListener('click', async () => {
+            const nome = document.getElementById('loginNome').value.trim();
+            const cpf = limparCPF(document.getElementById('loginCPF').value);
+            const senha = document.getElementById('loginSenha').value.trim();
+            
+            if (!nome || !cpf || !senha) return alert('⚠️ Preencha todos os campos!');
+            if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
+            
+            showLoading();
+            
             const { data, error } = await supabaseClient.rpc('login_painel_admin', {
                 p_cpf: cpf,
                 p_senha: senha
@@ -2747,30 +2741,13 @@ if (btnLogin) {
             
             hideLoading();
             
-            if (error) {
-                console.error('Erro na RPC:', error);
-                return alert('❌ Erro ao conectar com o servidor: ' + error.message);
+            if (error || !data || !data.success) {
+                return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
             }
             
-            if (!data || !data.success) {
-                return alert('❌ ' + (data?.message || 'Usuário ou senha incorretos!'));
-            }
-            
-            // Login bem sucedido
             usuarioLogado = data;
-            console.log('✅ Login realizado:', usuarioLogado.nome);
             
-            // Buscar dados completos do usuário
-            const { data: userData, error: userError } = await supabaseClient
-                .from('usuarios')
-                .select('*')
-                .eq('id', usuarioLogado.id)
-                .maybeSingle();
-            
-            if (userError) {
-                console.warn('Erro ao buscar dados do usuário:', userError);
-            }
-            
+            const { data: userData } = await supabaseClient.from('usuarios').select('*').eq('id', usuarioLogado.id).maybeSingle();
             if (userData) {
                 usuarioLogado.unidade_saude = userData.unidade_saude || '';
                 usuarioLogado.email = userData.email || '';
@@ -2779,54 +2756,39 @@ if (btnLogin) {
                 usuarioLogado.cidade_natal = userData.cidade_natal || '';
             }
             
-            // Mostrar sistema principal - USANDO showScreen
+            // ✅ USA A FUNÇÃO showScreen
             showScreen('screenSistema');
             
-            // Atualizar sidebar
-            const sidebarNome = document.getElementById('sidebarNome');
-            const sidebarAvatar = document.getElementById('sidebarAvatar');
-            const sidebarTipo = document.getElementById('sidebarTipo');
+            document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Admin';
+            document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'A')[0].toUpperCase();
+            document.getElementById('sidebarTipo').textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário Comum';
             
-            if (sidebarNome) sidebarNome.textContent = usuarioLogado.nome || 'Admin';
-            if (sidebarAvatar) sidebarAvatar.textContent = (usuarioLogado.nome || 'A')[0].toUpperCase();
-            if (sidebarTipo) sidebarTipo.textContent = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : '👤 Usuário Comum';
-            
-            // Mostrar ou esconder menu admin
             const adminSection = document.getElementById('sidebarAdminSection');
             if (adminSection) adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
             
-            // Carregar dados
-            await atualizarTudo();
-            
-        } catch (err) {
-            hideLoading();
-            console.error('Erro inesperado:', err);
-            alert('❌ Ocorreu um erro inesperado. Tente novamente.');
-        }
-    });
-}
+            atualizarTudo();
+        });
+    }
+
     // ========== REDEFINIR SENHA ==========
-const btnResetConfirmar = document.getElementById('btnResetConfirmar');
-if (btnResetConfirmar) {
-    btnResetConfirmar.addEventListener('click', async () => {
-        const cpf = limparCPF(document.getElementById('resetCPF').value);
-        const nomeMae = document.getElementById('resetNomeMae').value.trim();
-        const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
-        const codigo = document.getElementById('resetCodigo').value.trim();
-        const novaSenha = document.getElementById('resetNovaSenha').value.trim();
-        const confirma = document.getElementById('resetConfirmaSenha').value.trim();
-        
-        // Validações
-        if (!cpf) return alert('⚠️ Informe seu CPF!');
-        if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
-        if (!cidadeNatal) return alert('⚠️ Informe sua cidade natal!');
-        if (!codigo || codigo.length !== 6) return alert('⚠️ Informe o código de 6 dígitos!');
-        if (!novaSenha || novaSenha.length !== 6) return alert('⚠️ Nova senha deve ter 6 dígitos!');
-        if (novaSenha !== confirma) return alert('❌ As senhas não conferem!');
-        
-        showLoading();
-        
-        try {
+    const btnResetConfirmar = document.getElementById('btnResetConfirmar');
+    if (btnResetConfirmar) {
+        btnResetConfirmar.addEventListener('click', async () => {
+            const cpf = limparCPF(document.getElementById('resetCPF').value);
+            const nomeMae = document.getElementById('resetNomeMae').value.trim();
+            const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
+            const codigo = document.getElementById('resetCodigo').value.trim();
+            const novaSenha = document.getElementById('resetNovaSenha').value.trim();
+            const confirma = document.getElementById('resetConfirmaSenha').value.trim();
+            
+            if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
+            if (!cidadeNatal) return alert('❌ Informe sua cidade natal!');
+            if (!codigo || codigo.length !== 6) return alert('❌ Informe o código de 6 dígitos!');
+            if (!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
+            if (novaSenha !== confirma) return alert('❌ Senhas não conferem!');
+            
+            showLoading();
+            
             const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
                 p_cpf: cpf,
                 p_nome_mae: nomeMae || '',
@@ -2837,13 +2799,8 @@ if (btnResetConfirmar) {
             
             hideLoading();
             
-            if (error) {
-                console.error('Erro na RPC:', error);
-                return alert('❌ Erro ao conectar: ' + error.message);
-            }
-            
-            if (!data || !data.success) {
-                return alert('❌ ' + (data?.message || 'Código inválido ou expirado!'));
+            if (error || !data || !data.success) {
+                return alert('❌ ' + (data?.message || error?.message || 'Erro ao redefinir senha!'));
             }
             
             alert('✅ Senha redefinida com sucesso! Faça login com sua nova senha.');
@@ -2857,14 +2814,9 @@ if (btnResetConfirmar) {
             document.getElementById('resetConfirmaSenha').value = '';
             
             showScreen('screenLogin');
-            
-        } catch (err) {
-            hideLoading();
-            console.error('Erro inesperado:', err);
-            alert('❌ Ocorreu um erro inesperado. Tente novamente.');
-        }
-    });
-}
+        });
+    }
+
     // ========== ENTER NO LOGIN ==========
     const loginSenha = document.getElementById('loginSenha');
     if (loginSenha) {
