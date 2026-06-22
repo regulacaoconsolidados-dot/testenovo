@@ -128,8 +128,6 @@ function showScreen(screenId) {
     </div>
 </div>
 
-<!-- ============ TELA DE REDEFINIR SENHA ============ -->
-
 <!-- ============ TELA DE REDEFINIR SENHA (ESTILO PORTAL) ============ -->
 <div id="screenReset" class="screen fixed inset-0 z-[9999]" style="background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%);">
     <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
@@ -1155,29 +1153,6 @@ const SUPABASE_URL = 'https://hheuvkyhwujdrvjvtryg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable__YOfe8p2KexVxAe5ovSS5w_SOnqpuoe';
 let supabaseClient = null;
 try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.warn('Supabase offline'); }
-
-// ============================================
-// FUNÇÃO MOSTRAR TELA
-// ============================================
-    
-    // Se for a tela de redefinição, reseta os campos
-    if (screenId === 'screenReset') {
-        const step1 = document.getElementById('resetStep1');
-        const step2 = document.getElementById('resetStep2');
-        if (step1) step1.classList.remove('hidden');
-        if (step2) step2.classList.add('hidden');
-        
-        // Limpa os campos
-        const campos = ['resetCPF', 'resetNomeMae', 'resetCidadeNatal', 'resetCodigo', 'resetNovaSenha', 'resetConfirmaSenha'];
-        campos.forEach(campo => {
-            const el = document.getElementById(campo);
-            if (el) el.value = '';
-        });
-        
-        const title = document.getElementById('resetStepTitle');
-        if (title) title.textContent = 'Etapa 1: Verificar identidade';
-    }
-}
 
 // ============================================
 // LISTA GLOBAL DE UBS
