@@ -2658,7 +2658,7 @@ async function gerarTokenRedefinicao(cpf) {
     
     try {
         // 🔥 CORREÇÃO: Usar a RPC correta para a Ferramenta OCI
-        const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin_oci', {
+        const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin', {
             p_cpf: cpf
         });
         
@@ -2710,7 +2710,7 @@ document.getElementById('btnLogin').addEventListener('click', async () => {
     showLoading();
     
     // 🔥 CORREÇÃO: Usar a RPC correta para a Ferramenta OCI
-    const { data, error } = await supabaseClient.rpc('login_painel_oci', {
+    const { data, error } = await supabaseClient.rpc('login_painel_admin', {
         p_cpf: cpf,
         p_senha: senha
     });
@@ -2769,7 +2769,7 @@ if (btnResetConfirmar) {
         
         try {
             // 🔥 CORREÇÃO: Usar a RPC correta para a Ferramenta OCI
-            const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_oci', {
+            const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
                 p_cpf: cpf,
                 p_nome_mae: nomeMae || '',
                 p_cidade_natal: cidadeNatal,
