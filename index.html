@@ -1594,17 +1594,73 @@ function abbreviateEspName(esp, maxLength = 30) {
     }
     
    function buildTop(mes){
-     destroy("cTop");
-     const canvas = el("cTop"); if(!canvas) return;
-     const ctx=canvas.getContext("2d");
-     const source = mes ? getOciDataForMonth(mes) : dataF;
-     const map=new Map(); source.forEach(x=>{ const k=x.especialidade; if(!map.has(k)) map.set(k,{rec:0,fat:0,esp:k}); const o=map.get(k); o.rec+=x.recepcionado; o.fat+=x.faturado; });
-     const arr=[...map.values()].sort((a,b)=>b.rec-a.rec);
-     const dynamicH=Math.max(500,arr.length*42+80); if(el("cTopWrap")) el("cTopWrap").style.height=dynamicH+"px";
-     charts["cTop"]=new Chart(ctx,{ type:"bar", data:{ labels:arr.map(x=>abbreviateEspName(x.esp, 30)), datasets:[ {label:"Recepcionado",data:arr.map(x=>x.rec),backgroundColor:"#059669",borderRadius:6,barThickness:20}, {label:"Faturado",data:arr.map(x=>x.fat),backgroundColor:"#b91c1c",borderRadius:6,barThickness:20} ] }, options:{ responsive:true, maintainAspectRatio:false, // indexAxis: "y",  // <--- REMOVA ou COMENTE esta linha
-    plugins:{ legend:{position:"top",labels:{font:{size:13,weight:"800"},padding:18}}, datalabels:{ display:true, anchor:"end", align:"right", color:"#0f172a", font:{size:11,weight:"800"}, padding:{right:4}, formatter:(v)=>v?v.toLocaleString("pt-BR"):"" }, tooltip:{titleFont:{size:12,weight:"800"},bodyFont:{size:12},callbacks:{title:(items)=>{ const i=items[0]?.dataIndex; return i!==undefined?arr[i]?.esp||"":""; }}} }, scales:{ x:{beginAtZero:true,ticks:{font:{size:11,weight:"700"}},grid:{display:false}}, y:{ticks:{font:{size:12,weight:"700"},padding:6},grid:{display:false}} } } });
-    if(el("subTop")) el("subTop").textContent = mes ? `Todas as especialidades — Mês: ${labelMes(mes)} (ordenado pelo maior Recepcionado).` : "Todas as especialidades no período selecionado (do maior para o menor Recepcionado).";
-   }
+  destroy("cTop");
+  const canvas = el("cTop"); if(!canvas) return;
+  const ctx=canvas.getContext("2d");
+  const source = mes ? getOciDataForMonth(mes) : dataF;
+  const map=new Map(); 
+  source.forEach(x=>{ 
+    const k=x.especialidade; 
+    if(!map.has(k)) map.set(k,{rec:0,fat:0,esp:k}); 
+    const o=map.get(k); 
+    o.rec+=x.recepcionado; 
+    o.fat+=x.faturado; 
+  });
+  const arr=[...map.values()].sort((a,b)=>b.rec-a.rec);
+  
+  // Limita a 15 itens para não ficar muito poluído
+  const topItems = arr.slice(0, 15);
+  const dynamicH=Math.max(420, topItems.length * 28 + 80); 
+  if(el("cTopWrap")) el("cTopWrap").style.height=dynamicH+"px";
+  
+  charts["cTop"]=new Chart(ctx,{ 
+    type:"bar", 
+    data:{ 
+      labels:topItems.map(x=>abbreviateEspName(x.esp, 25)), 
+      datasets:[ 
+        {label:"Recepcionado", data:topItems.map(x=>x.rec), backgroundColor:"#059669", borderRadius:6, barThickness:30},
+        {label:"Faturado", data:topItems.map(x=>x.fat), backgroundColor:"#b91c1c", borderRadius:6, barThickness:30}
+      ] 
+    }, 
+    options:{ 
+      responsive:true, 
+      maintainAspectRatio:false,
+      plugins:{ 
+        legend:{position:"top",labels:{font:{size:13,weight:"800"},padding:18}}, 
+        datalabels:{ 
+          display:true, 
+          anchor:"end", 
+          align:"top",  // ALTERADO de "right" para "top" (barras verticais)
+          color:"#0f172a", 
+          font:{size:10,weight:"800"}, 
+          formatter:(v)=>v?v.toLocaleString("pt-BR"):"" 
+        }, 
+        tooltip:{
+          titleFont:{size:12,weight:"800"},
+          bodyFont:{size:12},
+          callbacks:{
+            title:(items)=>{ 
+              const i=items[0]?.dataIndex; 
+              return i!==undefined?topItems[i]?.esp||"":""; 
+            }
+          }
+        } 
+      }, 
+      scales:{ 
+        x:{ 
+          ticks:{font:{size:10,weight:"700"}, maxRotation:45, minRotation:45}, 
+          grid:{display:false} 
+        }, 
+        y:{ 
+          beginAtZero:true,
+          ticks:{font:{size:11,weight:"700"}}, 
+          grid:{display:false} 
+        } 
+      } 
+    } 
+  });
+  if(el("subTop")) el("subTop").textContent = mes ? `Todas as especialidades — Mês: ${labelMes(mes)} (ordenado pelo maior Recepcionado).` : "Todas as especialidades no período selecionado (do maior para o menor Recepcionado).";
+}
     
     function buildReceita(){
       destroy("cReceita");
