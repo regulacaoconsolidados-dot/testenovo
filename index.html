@@ -2717,9 +2717,35 @@ document.getElementById('btnLogin').addEventListener('click', async () => {
     
     hideLoading();
     
-    if (error || !data || !data.success) {
-        return alert('❌ ' + (data?.message || error?.message || 'Usuário não encontrado!'));
+console.log('📌 Resposta do login:', data, error);
+
+if (error) {
+    console.error('❌ Erro na RPC:', error);
+    return alert('❌ Erro ao tentar fazer login: ' + error.message);
+}
+
+// Verifica se data existe
+if (!data) {
+    return alert('❌ Resposta vazia do servidor');
+}
+
+// Se a resposta for uma string JSON, converte para objeto
+let resultado = data;
+if (typeof data === 'string') {
+    try {
+        resultado = JSON.parse(data);
+        console.log('📌 JSON parseado:', resultado);
+    } catch(e) {
+        console.error('❌ Erro ao parsear JSON:', e);
+        return alert('❌ Erro ao processar resposta do servidor');
     }
+}
+
+if (!resultado.success) {
+    return alert('❌ ' + (resultado.message || 'Usuário não encontrado!'));
+}
+
+usuarioLogado = resultado;
     
     usuarioLogado = data;
     
