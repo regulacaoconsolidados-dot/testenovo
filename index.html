@@ -308,19 +308,21 @@
       display:flex; align-items:center; justify-content:space-between;
       gap:10px; margin-bottom:10px;
       position:relative;
+      flex-wrap:wrap;
     }
     .chartHead h3{margin:0; font-size:13px; color:var(--text); font-weight:900;}
     .chartSub{font-size:11px; color:var(--muted); font-weight:700; margin-top:4px;}
 
     .chartWrap{position:relative; height:360px;}
-    .row2eq{
+
+    .grid-2cols {
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
       align-items:stretch;
     }
-    .fullrow{display:grid; grid-template-columns:1fr; gap:14px;}
-    .bottom-charts{
+    .grid-1col{display:grid; grid-template-columns:1fr; gap:14px;}
+    .grid-2cols-bottom{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
@@ -557,8 +559,8 @@
       .fg{grid-column:span 12;}
       .header{flex-wrap:wrap; padding:16px 18px;}
       .h-actions{width:100%; justify-content:flex-start}
-      .row2eq{grid-template-columns:1fr}
-      .bottom-charts{grid-template-columns:1fr}
+      .grid-2cols{grid-template-columns:1fr}
+      .grid-2cols-bottom{grid-template-columns:1fr}
       .fin-header{flex-wrap:wrap;}
       .fin-header-right{width:100%;}
       .chart-filter-popup { right:auto; left:0; }
@@ -607,7 +609,8 @@
   <div class="toastBox" id="toastBox"></div>
 
   <main class="wrap">
-    <div class="card filters">
+
+        <div class="card filters">
       <div class="filtersTop">
         <div class="filtersTitle"><i class="fa-solid fa-filter" style="color:var(--accent)"></i> Filtros</div>
         <button class="btn-clear" id="btnClear"><i class="fa-solid fa-xmark"></i> Limpar</button>
@@ -625,6 +628,8 @@
                 <option value="04">04 - Atenção em Otorrinolaringologia</option>
                 <option value="05">05 - Atenção em Oftalmologia</option>
                 <option value="06">06 - Atenção em Saúde da Mulher</option>
+                <option value="07">07 - Atenção em Saúde Bucal</option>
+                <option value="08">08 - Atenção em Infectologia</option>
               </select>
             </div>
             <div class="subgrupo-container" id="subgrupoContainer">
@@ -713,7 +718,7 @@
       <button class="tab" onclick="switchTab('ranking-financeiro', this)"><i class="fa-solid fa-sack-dollar"></i> Ranking Financeiro</button>
     </div>
 
-    <section class="tabContent active" id="tab-visao" style="margin-top:14px;">
+        <section class="tabContent active" id="tab-visao" style="margin-top:14px;">
       <div class="card section">
         <div class="sectionTitle">
           <span style="display:flex;align-items:center;gap:10px;">
@@ -722,7 +727,7 @@
           </span>
         </div>
 
-        <div class="row2eq" style="margin-bottom:14px;">
+        <div class="grid-2cols" style="margin-bottom:14px;">
           <div class="gauge-card">
             <div class="gauge-head">
               <h3><i class="fa-solid fa-circle-dollar-to-slot" style="color:#059669"></i> Taxa de Faturamento</h3>
@@ -776,7 +781,8 @@
           </div>
         </div>
 
-        <div class="fullrow">
+        <!-- GRÁFICO EVOLUÇÃO MENSAL (PRIMEIRO) -->
+        <div class="grid-1col">
           <div class="chartCard">
             <div class="chartHead">
               <div>
@@ -784,30 +790,36 @@
                 <div class="chartSub" id="subEvolucao">Selecione filtros para detalhar</div>
               </div>
             </div>
-            <div class="chartWrap" style="height:450px;"><canvas id="cEvolucao"></canvas></div>
+            <div class="chartWrap" style="height:420px;"><canvas id="cEvolucao"></canvas></div>
           </div>
         </div>
 
-        <div class="row2eq align-start" style="margin-top:14px;">
+        <!-- GRÁFICO TOP ESPECIALIDADES (SEGUNDO, ABAIXO) -->
+        <div class="grid-1col" style="margin-top:14px;">
           <div class="chartCard">
             <div class="chartHead">
               <div><h3>Top Especialidades (por Recepcionado e Faturado)</h3><div class="chartSub" id="subTop">Procedimentos com maior volume no período</div></div>
             </div>
-            <div id="cTopWrap" class="chartWrap" style="height:480px;"><canvas id="cTop"></canvas></div>
+            <div id="cTopWrap" class="chartWrap" style="height:500px;"><canvas id="cTop"></canvas></div>
           </div>
+        </div>
+
+        <!-- GRÁFICOS RECEITA E DISTRIBUIÇÃO (AO LADO) -->
+        <div class="grid-2cols" style="margin-top:14px;">
           <div class="chartCard">
             <div class="chartHead">
               <div><h3>Receita Financeira por Especialidade</h3><div class="chartSub" id="subReceita">Faturamento total (R$) por especialidade no período</div></div>
             </div>
-            <div class="chartWrap" style="height:480px;"><canvas id="cReceita"></canvas></div>
+            <div class="chartWrap" style="height:450px;"><canvas id="cReceita"></canvas></div>
+          </div>
+          <div class="chartCard">
+            <div class="chartHead"><div><h3><i class="fa-solid fa-chart-pie"></i> Distribuição no Período</h3><div class="chartSub">Participação percentual de cada métrica no total</div></div></div>
+            <div class="chartWrap" style="height:450px;"><canvas id="cDistribuicao"></canvas></div>
           </div>
         </div>
 
-        <div class="bottom-charts" style="margin-top:14px;">
-          <div class="chartCard">
-            <div class="chartHead"><div><h3><i class="fa-solid fa-chart-pie"></i> Distribuição no Período</h3><div class="chartSub">Participação percentual de cada métrica no total</div></div></div>
-            <div class="chartWrap" style="height:400px;"><canvas id="cDistribuicao"></canvas></div>
-          </div>
+        <!-- POSIÇÃO DE CONTAGEM -->
+        <div class="grid-1col" style="margin-top:14px;">
           <div class="chartCard" style="background:linear-gradient(135deg, #f8fafc, #fff);">
             <div class="chartHead"><div><h3><i class="fa-solid fa-location-dot"></i> Posição de Contagem</h3><div class="chartSub">Comparativo físico vs financeiro (último mês disponível)</div></div></div>
             <div style="display:flex; gap:20px; justify-content:center; margin:20px 0;">
@@ -843,7 +855,7 @@
       </div>
     </section>
 
-    <section class="tabContent" id="tab-financeiro" style="margin-top:14px;">
+        <section class="tabContent" id="tab-financeiro" style="margin-top:14px;">
       <div class="fin-header">
         <div class="fin-header-icon"><i class="fa-solid fa-coins"></i></div>
         <div class="fin-header-body"><div class="fin-header-title">Painel Financeiro — OCI Faturamento por Competência</div></div>
@@ -857,13 +869,13 @@
       </div>
       <div class="card section" style="margin-top:14px;">
         <div class="sectionTitle"><i class="fa-solid fa-chart-area" style="color:#0ea5e9"></i> Análise Financeira Detalhada</div>
-        <div class="fullrow"><div class="chartCard"><div class="chartHead"><div><h3>Evolução do Faturamento Mensal (Total Geral)</h3><div class="chartSub">• Ponto dourado = melhor mês • Ponto vermelho = menor mês</div></div></div><div class="chartWrap" style="height:320px;"><canvas id="cFinEvolucao"></canvas></div><div class="fin-mom-bar" id="finMomBar"></div></div></div>
-        <div class="row2eq align-start" style="margin-top:14px;">
+        <div class="grid-1col"><div class="chartCard"><div class="chartHead"><div><h3>Evolução do Faturamento Mensal (Total Geral)</h3><div class="chartSub">• Ponto dourado = melhor mês • Ponto vermelho = menor mês</div></div></div><div class="chartWrap" style="height:320px;"><canvas id="cFinEvolucao"></canvas></div><div class="fin-mom-bar" id="finMomBar"></div></div></div>
+        <div class="grid-2cols" style="margin-top:14px;">
           <div class="chartCard"><div class="chartHead"><div><h3>Receita por Especialidade — Total do Período</h3></div><div class="chart-filter-wrapper"><div class="chart-filter-badge" onclick="toggleChartFilter('receitaEspFilter', event)"><i class="fa-solid fa-filter"></i> Filtrar por mês</div><div id="receitaEspFilter" class="chart-filter-popup"><select id="receitaEspMesSelect"><option value="">Todos os meses</option></select><div class="filter-actions"><button class="btn-filter-apply" onclick="applyReceitaEspFilter()">Aplicar</button><button class="btn-filter-clear" onclick="clearReceitaEspFilter()">Limpar</button></div></div></div></div><div class="chartWrap" style="height:360px;"><canvas id="cFinBarEsp"></canvas></div></div>
           <div class="chartCard"><div class="chartHead"><div><h3>Participação das Especialidades no Total</h3><div class="chartSub">Fatia % de cada especialidade sobre a receita total acumulada</div></div><div class="chart-filter-wrapper"><div class="chart-filter-badge" onclick="toggleChartFilter('finDonutFilter', event)"><i class="fa-solid fa-filter"></i> Filtrar por mês</div><div id="finDonutFilter" class="chart-filter-popup"><select id="finDonutMesSelect"><option value="">Todos os meses</option></select><div class="filter-actions"><button class="btn-filter-apply" onclick="applyFinDonutFilter()">Aplicar</button><button class="btn-filter-clear" onclick="clearFinDonutFilter()">Limpar</button></div></div></div></div><div class="chartWrap" style="height:360px;"><canvas id="cFinDonut"></canvas></div></div>
         </div>
-        <div class="fullrow" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><div><h3>Composição Mensal por Especialidade (Barras Agrupadas)</h3><div class="chartSub">Contribuição de cada especialidade na receita de cada competência</div></div></div><div class="chartWrap" style="height:400px;"><canvas id="cFinStack"></canvas></div></div></div>
-        <div class="fullrow" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><div><h3>Tabela Financeira — Faturamento por Especialidade × Competência</h3><div class="chartSub"><span>Valores em Reais (R$)</span><span class="fin-nt-legend"><b>NT</b> = Não Transferido</span></div></div></div><div id="finTableWrap" style="overflow:auto;border-radius:12px;border:1px solid var(--border);margin-top:4px;max-height:460px;"><div style="padding:20px;text-align:center;">Carregando tabela financeira…</div></div></div></div>
+        <div class="grid-1col" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><div><h3>Composição Mensal por Especialidade (Barras Agrupadas)</h3><div class="chartSub">Contribuição de cada especialidade na receita de cada competência</div></div></div><div class="chartWrap" style="height:400px;"><canvas id="cFinStack"></canvas></div></div></div>
+        <div class="grid-1col" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><div><h3>Tabela Financeira — Faturamento por Especialidade × Competência</h3><div class="chartSub"><span>Valores em Reais (R$)</span><span class="fin-nt-legend"><b>NT</b> = Não Transferido</span></div></div></div><div id="finTableWrap" style="overflow:auto;border-radius:12px;border:1px solid var(--border);margin-top:4px;max-height:460px;"><div style="padding:20px;text-align:center;">Carregando tabela financeira…</div></div></div></div>
         <div id="finColumnFilterPopup" class="chart-filter-popup" style="position:fixed;z-index:2000;"><select id="finColFilterSelect" multiple size="5"></select><div class="filter-actions"><button class="btn-filter-apply" onclick="applyFinColumnFilter()">Aplicar</button><button class="btn-filter-clear" onclick="clearFinColumnFilter()">Limpar</button></div></div>
       </div>
     </section>
@@ -899,7 +911,7 @@
         <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-chart-line"></i></div><div><div class="label">Total de Procedimentos</div><div class="val" id="fisicoTotal">0</div><div class="sub" id="fisicoTotalSub">Contagem</div></div></div>
         <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-percent"></i></div><div><div class="label">Participação</div><div class="val" id="fisicoParticipacao">0%</div><div class="sub" id="fisicoParticipacaoSub">do total geral</div></div></div>
       </div>
-      <div class="row2eq" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoEvolucao"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Total Acumulado)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoBarras"></canvas></div></div></div>
+      <div class="grid-2cols" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoEvolucao"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Total Acumulado)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoBarras"></canvas></div></div></div>
       <div class="card section" style="margin-top:14px;"><div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Ranking Completo - Físico</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearchFisico" placeholder="Buscar município..." /></div></div><div style="overflow:auto; max-height:400px;"><table id="tabelaFisico"><thead><tr id="cabecalhoFisico"></tr></thead><tbody id="tBodyFisico"></tbody></table></div></div>
     </section>
 
@@ -910,12 +922,12 @@
         <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-coins"></i></div><div><div class="label">Total Financeiro</div><div class="val" id="financeiroTotal">R$ 0</div><div class="sub" id="financeiroTotalSub">Contagem</div></div></div>
         <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-percent"></i></div><div><div class="label">Participação</div><div class="val" id="financeiroParticipacao">0%</div><div class="sub" id="financeiroParticipacaoSub">do total geral</div></div></div>
       </div>
-      <div class="row2eq" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5 (R$)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroEvolucao"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Receita Total)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroBarras"></canvas></div></div></div>
+      <div class="grid-2cols" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5 (R$)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroEvolucao"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Receita Total)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroBarras"></canvas></div></div></div>
       <div class="card section" style="margin-top:14px;"><div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Ranking Completo - Financeiro (R$)</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearchFinanceiro" placeholder="Buscar município..." /></div></div><div style="overflow:auto; max-height:400px;"><table id="tabelaFinanceiro"><thead><tr id="cabecalhoFinanceiro"></tr></thead><tbody id="tBodyFinanceiro"></tbody></table></div></div>
     </section>
   </main>
 
-  <script>
+    <script>
     Chart.register(ChartDataLabels);
     
     const SHEET_ID = "1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo";
@@ -941,8 +953,8 @@
     { codigo: "09.01.01.009-0", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - I" },
     { codigo: "09.01.01.010-3", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - II" },
     { codigo: "09.01.01.011-1", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - I" },
-    { codigo: "09.01.01.012-0", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - II" }
-    { codigo: "09.01.01.013-8", nome: "OCI de Imunohistoquímica de Neoplasia Maligna de Mama" }
+    { codigo: "09.01.01.012-0", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - II" },
+    { codigo: "09.01.01.013-8", nome: "Oci de Imunohistoquímica de Neoplasia Maligna de Mama" }
   ] },
   "02": { nome: "02 - Atenção em Cardiologia", subgrupos: [
     { codigo: "09.02.01.001-8", nome: "OCI Avaliação de Risco Cirúrgico" },
@@ -950,8 +962,8 @@
     { codigo: "09.02.01.003-4", nome: "OCI Avaliação Diagnóstica Inicial - Síndrome Coronariana Crônica" },
     { codigo: "09.02.01.004-2", nome: "OCI Progressão da Avaliação Diagnóstica I - Síndrome Coronariana Crônica" },
     { codigo: "09.02.01.005-0", nome: "OCI Progressão da Avaliação Diagnóstica II - Síndrome Coronariana Crônica" },
-    { codigo: "09.02.01.006-9", nome: "OCI Avaliação Diagnóstica - Insuficiência Cardíaca" }
-    { codigo: "09.02.01.007-7", nome: "OCI Gestão do Pré-Operatório" }
+    { codigo: "09.02.01.006-9", nome: "OCI Avaliação Diagnóstica - Insuficiência Cardíaca" },
+    { codigo: "09.02.01.007-7", nome: "Oci Gestão do Pré-Operatório" }
   ] },
   "03": { nome: "03 - Atenção em Ortopedia", subgrupos: [
     { codigo: "09.03.01.001-1", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia" },
@@ -979,10 +991,6 @@
     { codigo: "09.06.01.003-9", nome: "OCI - GIN2 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Sangramento Uterino Anormal I" },
     { codigo: "09.06.01.004-7", nome: "OCI - GIN2 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Sangramento Uterino Anormal II" },
     { codigo: "09.06.01.005-5", nome: "OCI - GIN3 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Endometriose Profunda - Casos Complexos e Programação Cirúrgica" }
-  ] }
- "07": { nome: "07 - Atenção á Saúde Bucal", subgrupos: [
-  ] }
- "08": { nome: "08 - Atenção em Infectologia", subgrupos: [
   ] }
 };
     
@@ -1090,12 +1098,14 @@ function abbreviateEspName(esp, maxLength = 30) {
     "09.01.01.010-3": "CA Mama Prog II",
     "09.01.01.011-1": "CA Colo Terap I",
     "09.01.01.012-0": "CA Colo Terap II",
+    "09.01.01.013-8": "Imunohistoquímica Mama",
     "09.02.01.001-8": "Risco Cirúrgico",
     "09.02.01.002-6": "Avaliação Cardio",
     "09.02.01.003-4": "SCC Inicial",
     "09.02.01.004-2": "SCC Prog I",
     "09.02.01.005-0": "SCC Prog II",
     "09.02.01.006-9": "Insuf Cardíaca",
+    "09.02.01.007-7": "Gestão Pré-Operatório",
     "09.03.01.001-1": "Ortop c/ Radio",
     "09.03.01.002-0": "Ortop c/ Radio+USG",
     "09.03.01.003-8": "Ortop c/ Radio+TC",
@@ -1115,8 +1125,6 @@ function abbreviateEspName(esp, maxLength = 30) {
     "09.06.01.003-9": "GIN2 - SUA I",
     "09.06.01.004-7": "GIN2 - SUA II",
     "09.06.01.005-5": "GIN3 - Endometriose"
-    "09.01.01.013-8": "Imunohis-Mama"
-    "09.02.01.007-7": "Aval. Pré Operat."
   };
   for (const [codigo, abrev] of Object.entries(abbreviations)) {
     if (esp.includes(codigo)) return abrev;
@@ -1235,7 +1243,6 @@ function abbreviateEspName(esp, maxLength = 30) {
         window.ultimoMes = mesesDisponiveis[mesesDisponiveis.length - 1];
         rankingFisicoData = parsed.data.slice(2).filter(row => {
         const primeiroCampo = row[0]?.trim() || '';
-        // Ignora linhas de TOTAL e linhas vazias
         return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
         }).map(row => {
           const municipio = row[0]?.trim() || '';
@@ -1272,7 +1279,6 @@ function abbreviateEspName(esp, maxLength = 30) {
         window.ultimoMesFinanceiro = mesesDisponiveis[mesesDisponiveis.length - 1];
         rankingFinanceiroData = parsed.data.slice(2).filter(row => {
         const primeiroCampo = row[0]?.trim() || '';
-        // Ignora linhas de TOTAL e linhas vazias
         return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
         }).map(row => {
           const municipio = row[0]?.trim() || '';
@@ -1348,11 +1354,11 @@ function abbreviateEspName(esp, maxLength = 30) {
         const rotulos = window.mesesRanking.map(m => m.rotulo);
         const valoresContagem = window.mesesRanking.map(m => contagem ? (contagem[m.nome] || 0) : 0);
         const mediaTop5 = window.mesesRanking.map(m => { const soma = top5.reduce((acc, d) => acc + (d[m.nome] || 0), 0); return top5.length ? Math.round(soma / top5.length) : 0; });
-        charts['cRankFisicoEvolucao'] = new Chart(ctxEvol, { type: 'line', data: { labels: rotulos, datasets: [{ label: '📍 CONTAGEM', data: valoresContagem, borderColor: '#0f2f5f', backgroundColor: 'rgba(15,47,95,.1)', borderWidth: 4, tension: 0.3 }, { label: 'Média Top 5', data: mediaTop5, borderColor: '#94a3b8', borderDash: [5,5], borderWidth: 2, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false } } } });
+        charts['cRankFisicoEvolucao'] = new Chart(ctxEvol, { type: 'line', data: { labels: rotulos, datasets: [{ label: '📍 CONTAGEM', data: valoresContagem, borderColor: '#0f2f5f', backgroundColor: 'rgba(15,47,95,.1)', borderWidth: 4, tension: 0.3 }, { label: 'Média Top 5', data: mediaTop5, borderColor: '#94a3b8', borderDash: [5,5], borderWidth: 2, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } } });
       }
       destroy('cRankFisicoBarras');
       const ctxBar = el('cRankFisicoBarras')?.getContext('2d');
-      if (ctxBar) { const top10 = sorted.slice(0,10); charts['cRankFisicoBarras'] = new Chart(ctxBar, { type: 'bar', data: { labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), datasets: [{ data: top10.map(d => d.total), backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', formatter: (v) => v.toLocaleString('pt-BR') } } } }); }
+      if (ctxBar) { const top10 = sorted.slice(0,10); charts['cRankFisicoBarras'] = new Chart(ctxBar, { type: 'bar', data: { labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), datasets: [{ data: top10.map(d => d.total), backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', formatter: (v) => v.toLocaleString('pt-BR') } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } } }); }
     }
     
     function buildRankingFinanceiroGraficos(sorted) {
@@ -1364,11 +1370,11 @@ function abbreviateEspName(esp, maxLength = 30) {
         const rotulos = window.mesesRankingFinanceiro.map(m => m.rotulo);
         const valoresContagem = window.mesesRankingFinanceiro.map(m => contagem ? (contagem[m.nome] || 0) : 0);
         const mediaTop5 = window.mesesRankingFinanceiro.map(m => { const soma = top5.reduce((acc, d) => acc + (d[m.nome] || 0), 0); return top5.length ? soma / top5.length : 0; });
-        charts['cRankFinanceiroEvolucao'] = new Chart(ctxEvol, { type: 'line', data: { labels: rotulos, datasets: [{ label: '📍 CONTAGEM', data: valoresContagem, borderColor: '#0f2f5f', backgroundColor: 'rgba(15,47,95,.1)', borderWidth: 4, tension: 0.3 }, { label: 'Média Top 5', data: mediaTop5, borderColor: '#94a3b8', borderDash: [5,5], borderWidth: 2, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false } }, scales: { y: { ticks: { callback: (v) => formatBRL(v) } } } } });
+        charts['cRankFinanceiroEvolucao'] = new Chart(ctxEvol, { type: 'line', data: { labels: rotulos, datasets: [{ label: '📍 CONTAGEM', data: valoresContagem, borderColor: '#0f2f5f', backgroundColor: 'rgba(15,47,95,.1)', borderWidth: 4, tension: 0.3 }, { label: 'Média Top 5', data: mediaTop5, borderColor: '#94a3b8', borderDash: [5,5], borderWidth: 2, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false } }, scales: { x: { grid: { display: false } }, y: { ticks: { callback: (v) => formatBRL(v) }, grid: { display: false } } } } });
       }
       destroy('cRankFinanceiroBarras');
       const ctxBar = el('cRankFinanceiroBarras')?.getContext('2d');
-      if (ctxBar) { const top10 = sorted.slice(0,10); charts['cRankFinanceiroBarras'] = new Chart(ctxBar, { type: 'bar', data: { labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), datasets: [{ data: top10.map(d => d.total), backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', formatter: (v) => formatBRL(v) } }, scales: { x: { ticks: { callback: (v) => formatBRLCompact(v) } } } } }); }
+      if (ctxBar) { const top10 = sorted.slice(0,10); charts['cRankFinanceiroBarras'] = new Chart(ctxBar, { type: 'bar', data: { labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), datasets: [{ data: top10.map(d => d.total), backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', formatter: (v) => formatBRL(v) } }, scales: { x: { ticks: { callback: (v) => formatBRLCompact(v) }, grid: { display: false } }, y: { grid: { display: false } } } } }); }
     }
     
     function renderTabelaFisico(sorted) {
@@ -1424,7 +1430,7 @@ function abbreviateEspName(esp, maxLength = 30) {
       const monthTotals=finMonths.map(m=>({ label:m.shortLabel, total:finData.reduce((acc,r)=>acc+(r.monthValues[m.key]||0),0) }));
       const vals=monthTotals.map(m=>m.total);
       const maxVal=Math.max(...vals), minVal=Math.min(...vals.filter(v=>v>0));
-      charts["cFinEvolucao"]=new Chart(ctx,{ type:"line", data:{ labels:monthTotals.map(m=>m.label), datasets:[{ label:"Faturamento Mensal", data:vals, borderColor:"#0f2f5f", backgroundColor:"rgba(15,47,95,.12)", fill:true, tension:0.38, borderWidth:3, pointRadius:monthTotals.map(m=>m.total===maxVal||m.total===minVal?9:6), pointHoverRadius:11, pointBackgroundColor:monthTotals.map(m=>m.total===maxVal?"#d97706":m.total===minVal?"#b91c1c":"#0f2f5f"), pointBorderColor:"#fff", pointBorderWidth:2.5 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{ display:true, anchor:"top", align:"top", offset:6, color:(ctx)=>vals[ctx.dataIndex]===maxVal?"#92400e":vals[ctx.dataIndex]===minVal?"#b91c1c":"#0f172a", font:{size:12,weight:"900"}, formatter:(v)=>formatBRL(v) }, tooltip:{callbacks:{label:(ctx)=>` ${formatBRL(Number(ctx.raw||0))}`}} }, scales:{ x:{ticks:{font:{size:13,weight:"700"}},grid:{display:false}}, y:{ beginAtZero:true, ticks:{ font:{size:11,weight:"700"}, callback:(v)=>formatBRLCompact(v) }, grid:{color:"rgba(2,6,23,.06)"} } } } });
+      charts["cFinEvolucao"]=new Chart(ctx,{ type:"line", data:{ labels:monthTotals.map(m=>m.label), datasets:[{ label:"Faturamento Mensal", data:vals, borderColor:"#0f2f5f", backgroundColor:"rgba(15,47,95,.12)", fill:true, tension:0.38, borderWidth:3, pointRadius:monthTotals.map(m=>m.total===maxVal||m.total===minVal?9:6), pointHoverRadius:11, pointBackgroundColor:monthTotals.map(m=>m.total===maxVal?"#d97706":m.total===minVal?"#b91c1c":"#0f2f5f"), pointBorderColor:"#fff", pointBorderWidth:2.5 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{ display:true, anchor:"top", align:"top", offset:6, color:(ctx)=>vals[ctx.dataIndex]===maxVal?"#92400e":vals[ctx.dataIndex]===minVal?"#b91c1c":"#0f172a", font:{size:12,weight:"900"}, formatter:(v)=>formatBRL(v) }, tooltip:{callbacks:{label:(ctx)=>` ${formatBRL(Number(ctx.raw||0))}`}} }, scales:{ x:{ticks:{font:{size:13,weight:"700"}},grid:{display:false}}, y:{ beginAtZero:true, ticks:{ font:{size:11,weight:"700"}, callback:(v)=>formatBRLCompact(v) }, grid:{display:false} } } } });
       const momBar=el("finMomBar"); if(momBar){ const pills=monthTotals.map((m,i)=>{ const base=`<span class="fin-mom-pill-lbl">${m.label}</span><span class="fin-mom-pill-val">${formatBRLCompact(m.total)}</span>`; if(i===0) return `<div class="fin-mom-pill">${base}</div>`; const prev=monthTotals[i-1]; const delta=prev.total?((m.total-prev.total)/prev.total*100):0; const sign=delta>=0?"+":""; const col=delta>=0?"#059669":"#b91c1c"; const arr=delta>=0?"↑":"↓"; return `<div class="fin-mom-pill">${base}<span class="fin-mom-pill-delta" style="color:${col}">${arr} ${sign}${delta.toFixed(1)}%</span></div>`; }); momBar.innerHTML=pills.join(""); }
     }
     
@@ -1435,7 +1441,7 @@ function abbreviateEspName(esp, maxLength = 30) {
       let dataToUse = finData;
       if(receitaEspFilterMonth) { dataToUse = finData.map(r => ({ ...r, total: r.monthValues[receitaEspFilterMonth] || 0 })).filter(r => r.total > 0); }
       const sorted=[...dataToUse].sort((a,b)=>a.total-b.total);
-      charts["cFinBarEsp"]=new Chart(ctx,{ type:"bar", data:{ labels:sorted.map(r=>abbreviateEspName(r.esp, 25)), datasets:[{ label:"Receita", data:sorted.map(r=>r.total), backgroundColor:sorted.map((_,i)=>FIN_COLORS[i%FIN_COLORS.length]), borderRadius:8, barThickness:26 }] }, options:{ responsive:true, maintainAspectRatio:false, indexAxis:"y", plugins:{ legend:{display:false}, datalabels:{ display:true, anchor:"end", align:"right", color:"#0f172a", font:{size:11,weight:"800"}, formatter:(v)=>formatBRL(v) }, tooltip:{callbacks:{ title:(items)=>{ const i=items[0]?.dataIndex; return i!==undefined?(sorted[i]?.esp||""):""; }, label:(ctx)=>` ${formatBRL(Number(ctx.raw||0))}` }} }, scales:{ x:{ beginAtZero:true, ticks:{ font:{size:11,weight:"700"}, callback:(v)=>formatBRLCompact(v) }, grid:{color:"rgba(2,6,23,.05)"} }, y:{ticks:{font:{size:10,weight:"700"},padding:4},grid:{display:false}} } } });
+      charts["cFinBarEsp"]=new Chart(ctx,{ type:"bar", data:{ labels:sorted.map(r=>abbreviateEspName(r.esp, 25)), datasets:[{ label:"Receita", data:sorted.map(r=>r.total), backgroundColor:sorted.map((_,i)=>FIN_COLORS[i%FIN_COLORS.length]), borderRadius:8, barThickness:26 }] }, options:{ responsive:true, maintainAspectRatio:false, indexAxis:"y", plugins:{ legend:{display:false}, datalabels:{ display:true, anchor:"end", align:"right", color:"#0f172a", font:{size:11,weight:"800"}, formatter:(v)=>formatBRL(v) }, tooltip:{callbacks:{ title:(items)=>{ const i=items[0]?.dataIndex; return i!==undefined?(sorted[i]?.esp||""):""; }, label:(ctx)=>` ${formatBRL(Number(ctx.raw||0))}` }} }, scales:{ x:{ beginAtZero:true, ticks:{ font:{size:11,weight:"700"}, callback:(v)=>formatBRLCompact(v) }, grid:{display:false} }, y:{ticks:{font:{size:10,weight:"700"},padding:4},grid:{display:false}} } } });
     }
     
     function buildFinDonut(){
@@ -1454,7 +1460,7 @@ function abbreviateEspName(esp, maxLength = 30) {
       const canvas = el("cFinStack"); if(!canvas) return;
       const ctx=canvas.getContext("2d");
       const activeDatasets = finData.filter(r => r.total > 0).map((r,i) => ({ label: abbreviateEspName(r.esp, 15), data: finMonths.map(m => r.monthValues[m.key] || 0), backgroundColor: FIN_COLORS[i % FIN_COLORS.length], borderRadius: 6, borderSkipped: false, barPercentage: 0.9, categoryPercentage: 0.8 }));
-      charts["cFinStack"]=new Chart(ctx,{ type:"bar", data:{ labels:finMonths.map(m=>m.shortLabel), datasets: activeDatasets }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:"bottom", labels:{ font:{size:10,weight:"700"}, padding:10, boxWidth:12, filter: (legendItem, data) => { const dataset = data.datasets[legendItem.datasetIndex]; return dataset.data.some(v => v > 0); } } }, datalabels:{ display:false }, tooltip:{ mode: 'index', intersect: false, callbacks:{ label:(ctx)=>` ${ctx.dataset.label}: ${formatBRL(Number(ctx.raw||0))}` } } }, scales:{ x:{ stacked:false, ticks:{font:{size:13,weight:"700"}}, grid:{display:false} }, y:{ beginAtZero:true, ticks:{ font:{size:11,weight:"700"}, callback:(v)=>formatBRLCompact(v) }, grid:{color:"rgba(2,6,23,.06)"} } } } });
+      charts["cFinStack"]=new Chart(ctx,{ type:"bar", data:{ labels:finMonths.map(m=>m.shortLabel), datasets: activeDatasets }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:"bottom", labels:{ font:{size:10,weight:"700"}, padding:10, boxWidth:12, filter: (legendItem, data) => { const dataset = data.datasets[legendItem.datasetIndex]; return dataset.data.some(v => v > 0); } } }, datalabels:{ display:false }, tooltip:{ mode: 'index', intersect: false, callbacks:{ label:(ctx)=>` ${ctx.dataset.label}: ${formatBRL(Number(ctx.raw||0))}` } } }, scales:{ x:{ stacked:false, ticks:{font:{size:13,weight:"700"}}, grid:{display:false} }, y:{ beginAtZero:true, ticks:{ font:{size:11,weight:"700"}, callback:(v)=>formatBRLCompact(v) }, grid:{display:false} } } } });
     }
     
     function renderFinTable(){
@@ -1523,7 +1529,7 @@ function abbreviateEspName(esp, maxLength = 30) {
     }
     
     function destroy(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
-    function baseOptions(){ return { responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{font:{size:12,weight:"700"}}}, datalabels:{display:false}, tooltip:{titleFont:{size:12,weight:"800"},bodyFont:{size:12}} }, scales:{ x:{ticks:{font:{size:11,weight:"700"}},grid:{display:false}}, y:{ticks:{font:{size:11,weight:"700"}},grid:{color:"rgba(2,6,23,.06)"},beginAtZero:true} } }; }
+    function baseOptions(){ return { responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{font:{size:12,weight:"700"}}}, datalabels:{display:false}, tooltip:{titleFont:{size:12,weight:"800"},bodyFont:{size:12}} }, scales:{ x:{ticks:{font:{size:11,weight:"700"}},grid:{display:false}}, y:{ticks:{font:{size:11,weight:"700"}},grid:{display:false},beginAtZero:true} } }; }
     function labelMes(key){ const found=allData.find(x=>x.mesKey===key); return found?found.mesLabel:key; }
     function getOciDataForMonth(monthKey){ if(!monthKey) return dataF; return allData.filter(x=>{ if(selectedSubgrupos.size > 0) { let found = false; for (const codigo of selectedSubgrupos) { if (x.especialidade.includes(codigo)) { found = true; break; } } if (!found) return false; } return x.mesKey === monthKey; }); }
     
@@ -1594,8 +1600,8 @@ function abbreviateEspName(esp, maxLength = 30) {
       const source = mes ? getOciDataForMonth(mes) : dataF;
       const map=new Map(); source.forEach(x=>{ const k=x.especialidade; if(!map.has(k)) map.set(k,{rec:0,fat:0,esp:k}); const o=map.get(k); o.rec+=x.recepcionado; o.fat+=x.faturado; });
       const arr=[...map.values()].sort((a,b)=>b.rec-a.rec);
-      const dynamicH=Math.max(480,arr.length*48+80); if(el("cTopWrap")) el("cTopWrap").style.height=dynamicH+"px";
-      charts["cTop"]=new Chart(ctx,{ type:"bar", data:{ labels:arr.map(x=>abbreviateEspName(x.esp, 30)), datasets:[ {label:"Recepcionado",data:arr.map(x=>x.rec),backgroundColor:"#059669",borderRadius:6,barThickness:22}, {label:"Faturado",data:arr.map(x=>x.fat),backgroundColor:"#b91c1c",borderRadius:6,barThickness:22} ] }, options:{ responsive:true, maintainAspectRatio:false, indexAxis:"y", plugins:{ legend:{position:"top",labels:{font:{size:13,weight:"800"},padding:18}}, datalabels:{ display:true, anchor:"end", align:"right", color:"#0f172a", font:{size:11,weight:"800"}, padding:{right:4}, formatter:(v)=>v?v.toLocaleString("pt-BR"):"" }, tooltip:{titleFont:{size:12,weight:"800"},bodyFont:{size:12},callbacks:{title:(items)=>{ const i=items[0]?.dataIndex; return i!==undefined?arr[i]?.esp||"":""; }}} }, scales:{ x:{beginAtZero:true,ticks:{font:{size:11,weight:"700"}},grid:{color:"rgba(2,6,23,.05)"}}, y:{ticks:{font:{size:12,weight:"700"},padding:6},grid:{display:false}} } } });
+      const dynamicH=Math.max(500,arr.length*42+80); if(el("cTopWrap")) el("cTopWrap").style.height=dynamicH+"px";
+      charts["cTop"]=new Chart(ctx,{ type:"bar", data:{ labels:arr.map(x=>abbreviateEspName(x.esp, 30)), datasets:[ {label:"Recepcionado",data:arr.map(x=>x.rec),backgroundColor:"#059669",borderRadius:6,barThickness:20}, {label:"Faturado",data:arr.map(x=>x.fat),backgroundColor:"#b91c1c",borderRadius:6,barThickness:20} ] }, options:{ responsive:true, maintainAspectRatio:false, indexAxis:"y", plugins:{ legend:{position:"top",labels:{font:{size:13,weight:"800"},padding:18}}, datalabels:{ display:true, anchor:"end", align:"right", color:"#0f172a", font:{size:11,weight:"800"}, padding:{right:4}, formatter:(v)=>v?v.toLocaleString("pt-BR"):"" }, tooltip:{titleFont:{size:12,weight:"800"},bodyFont:{size:12},callbacks:{title:(items)=>{ const i=items[0]?.dataIndex; return i!==undefined?arr[i]?.esp||"":""; }}} }, scales:{ x:{beginAtZero:true,ticks:{font:{size:11,weight:"700"}},grid:{display:false}}, y:{ticks:{font:{size:12,weight:"700"},padding:6},grid:{display:false}} } } });
       if(el("subTop")) el("subTop").textContent = mes ? `Todas as especialidades — Mês: ${labelMes(mes)} (ordenado pelo maior Recepcionado).` : "Todas as especialidades no período selecionado (do maior para o menor Recepcionado).";
     }
     
@@ -1611,7 +1617,7 @@ function abbreviateEspName(esp, maxLength = 30) {
       const dadosLimitados = dadosArray.slice(0, 15);
       const labels = dadosLimitados.map(d => abbreviateEspName(d.esp, 30));
       const valores = dadosLimitados.map(d => d.valor);
-      charts["cReceita"] = new Chart(ctx, { type: "bar", data: { labels, datasets: [{ label: "Receita (R$)", data: valores, backgroundColor: "#059669", borderRadius: 6, barThickness: 22 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false }, datalabels: { display: true, anchor: "end", align: "right", color: "#0f172a", font: { size: 11, weight: "800" }, formatter: (v) => formatBRL(v) }, tooltip: { callbacks: { title: (items) => { const i = items[0]?.dataIndex; return i !== undefined ? dadosLimitados[i]?.esp || "" : ""; }, label: (ctx) => ` Receita: ${formatBRL(ctx.raw || 0)}` } } }, scales: { x: { beginAtZero: true, ticks: { font: { size: 12, weight: "700" }, callback: (v) => formatBRLCompact(v) }, grid: { color: "rgba(2,6,23,.05)" } }, y: { ticks: { font: { size: 12, weight: "700" }, padding: 4 }, grid: { display: false } } } } });
+      charts["cReceita"] = new Chart(ctx, { type: "bar", data: { labels, datasets: [{ label: "Receita (R$)", data: valores, backgroundColor: "#059669", borderRadius: 6, barThickness: 22 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false }, datalabels: { display: true, anchor: "end", align: "right", color: "#0f172a", font: { size: 11, weight: "800" }, formatter: (v) => formatBRL(v) }, tooltip: { callbacks: { title: (items) => { const i = items[0]?.dataIndex; return i !== undefined ? dadosLimitados[i]?.esp || "" : ""; }, label: (ctx) => ` Receita: ${formatBRL(ctx.raw || 0)}` } } }, scales: { x: { beginAtZero: true, ticks: { font: { size: 12, weight: "700" }, callback: (v) => formatBRLCompact(v) }, grid: { display: false } }, y: { ticks: { font: { size: 12, weight: "700" }, padding: 4 }, grid: { display: false } } } } });
       if(el("subReceita")) el("subReceita").textContent = mesFiltro && mesFiltro !== "" ? `Faturamento (R$) por especialidade • Mês: ${labelMes(mesFiltro)}` : "Faturamento total (R$) acumulado por especialidade";
     }
     
@@ -1699,3 +1705,5 @@ function abbreviateEspName(esp, maxLength = 30) {
   </script>
 </body>
 </html>
+    
+    
