@@ -1378,22 +1378,60 @@ function abbreviateEspName(esp, maxLength = 30) {
     }
     
     function renderTabelaFisico(sorted) {
-      const tbody = el('tBodyFisico');
-      const cabecalho = el('cabecalhoFisico');
-      if (!tbody || !window.mesesRanking) return;
-      const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
-      if (cabecalho) { let html = '<th>Posição</th><th>Município</th>'; window.mesesRanking.forEach(m => { html += `<th>${m.rotulo}</th>`; }); html += '<th>Total</th><th>%</th>'; cabecalho.innerHTML = html; }
-      tbody.innerHTML = sorted.map((d, i) => { const pct = ((d.total / totalGeral) * 100).toFixed(1); const isContagem = d.municipio.toLowerCase().includes('contagem'); let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; window.mesesRanking.forEach(m => { linha += `<td>${(d[m.nome] || 0).toLocaleString('pt-BR')}</td>`; }); linha += `<td><b>${d.total.toLocaleString('pt-BR')}</b></td><td>${pct}%</td></tr>`; return linha; }).join('');
-    }
+  const tbody = el('tBodyFisico');
+  const cabecalho = el('cabecalhoFisico');
+  if (!tbody || !window.mesesRanking) return;
+  const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+  if (cabecalho) { 
+    let html = '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Posição</th>'; 
+    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Município</th>'; 
+    window.mesesRanking.forEach(m => { 
+      html += `<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">${m.rotulo}</th>`; 
+    }); 
+    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Total</th>'; 
+    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">%</th>'; 
+    cabecalho.innerHTML = html; 
+  }
+  tbody.innerHTML = sorted.map((d, i) => { 
+    const pct = ((d.total / totalGeral) * 100).toFixed(1); 
+    const isContagem = d.municipio.toLowerCase().includes('contagem'); 
+    let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
+    linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
+    window.mesesRanking.forEach(m => { 
+      linha += `<td>${(d[m.nome] || 0).toLocaleString('pt-BR')}</td>`; 
+    }); 
+    linha += `<td><b>${d.total.toLocaleString('pt-BR')}</b></td><td>${pct}%</td></tr>`; 
+    return linha; 
+  }).join('');
+}
     
     function renderTabelaFinanceiro(sorted) {
-      const tbody = el('tBodyFinanceiro');
-      const cabecalho = el('cabecalhoFinanceiro');
-      if (!tbody || !window.mesesRankingFinanceiro) return;
-      const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
-      if (cabecalho) { let html = '<th>Posição</th><th>Município</th>'; window.mesesRankingFinanceiro.forEach(m => { html += `<th>${m.rotulo}</th>`; }); html += '<th>Total</th><th>%</th>'; cabecalho.innerHTML = html; }
-      tbody.innerHTML = sorted.map((d, i) => { const pct = ((d.total / totalGeral) * 100).toFixed(1); const isContagem = d.municipio.toLowerCase().includes('contagem'); let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; window.mesesRankingFinanceiro.forEach(m => { linha += `<td>${formatBRL(d[m.nome] || 0)}</td>`; }); linha += `<td><b>${formatBRL(d.total)}</b></td><td>${pct}%</td></tr>`; return linha; }).join('');
-    }
+  const tbody = el('tBodyFinanceiro');
+  const cabecalho = el('cabecalhoFinanceiro');
+  if (!tbody || !window.mesesRankingFinanceiro) return;
+  const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+  if (cabecalho) { 
+    let html = '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Posição</th>'; 
+    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Município</th>'; 
+    window.mesesRankingFinanceiro.forEach(m => { 
+      html += `<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">${m.rotulo}</th>`; 
+    }); 
+    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Total</th>'; 
+    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">%</th>'; 
+    cabecalho.innerHTML = html; 
+  }
+  tbody.innerHTML = sorted.map((d, i) => { 
+    const pct = ((d.total / totalGeral) * 100).toFixed(1); 
+    const isContagem = d.municipio.toLowerCase().includes('contagem'); 
+    let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
+    linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
+    window.mesesRankingFinanceiro.forEach(m => { 
+      linha += `<td>${formatBRL(d[m.nome] || 0)}</td>`; 
+    }); 
+    linha += `<td><b>${formatBRL(d.total)}</b></td><td>${pct}%</td></tr>`; 
+    return linha; 
+  }).join('');
+}
 
         
     function buildFinKPIs(){
