@@ -1383,13 +1383,11 @@ function abbreviateEspName(esp, maxLength = 30) {
   if (!tbody || !window.mesesRanking) return;
   const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
   if (cabecalho) { 
-    let html = '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Posição</th>'; 
-    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Município</th>'; 
+    let html = '<th>Posição</th><th>Município</th>';
     window.mesesRanking.forEach(m => { 
-      html += `<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">${m.rotulo}</th>`; 
+      html += `<th>${m.rotulo}</th>`; 
     }); 
-    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Total</th>'; 
-    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">%</th>'; 
+    html += '<th>Total</th><th>%</th>'; 
     cabecalho.innerHTML = html; 
   }
   tbody.innerHTML = sorted.map((d, i) => { 
@@ -1411,13 +1409,11 @@ function abbreviateEspName(esp, maxLength = 30) {
   if (!tbody || !window.mesesRankingFinanceiro) return;
   const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
   if (cabecalho) { 
-    let html = '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Posição</th>'; 
-    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Município</th>'; 
+    let html = '<th>Posição</th><th>Município</th>';
     window.mesesRankingFinanceiro.forEach(m => { 
-      html += `<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">${m.rotulo}</th>`; 
+      html += `<th>${m.rotulo}</th>`; 
     }); 
-    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">Total</th>'; 
-    html += '<th style="background:linear-gradient(135deg, #0b2246, #1a3a6b); color:#fff; padding:10px 12px; position:sticky; top:0; text-align:left; font-size:11px; letter-spacing:.35px; text-transform:uppercase; white-space:nowrap;">%</th>'; 
+    html += '<th>Total</th><th>%</th>'; 
     cabecalho.innerHTML = html; 
   }
   tbody.innerHTML = sorted.map((d, i) => { 
