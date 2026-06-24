@@ -1435,46 +1435,53 @@ function switchAdminTab(tabId) {
 
 async function renderizarListaUsuarios() {
     showLoading();
-    const { data: usuarios, error } = await supabaseClient
-        .from('usuarios')
-        .select('id, nome, cpf, email, telefone, unidade_saude, tipo')
-        .order('nome');
-    hideLoading();
-    
-    if (error) {
-        console.error('Erro ao buscar usuários:', error);
-        return;
-    }
-    
-    const busca = (document.getElementById('adminBuscaUsuario')?.value || '').toLowerCase();
-    let lista = (usuarios || []).filter(u => 
-        !busca || 
-        u.nome.toLowerCase().includes(busca) || 
-        (u.cpf || '').includes(busca)
-    );
-    
-    const tbody = document.getElementById('adminTabelaUsuarios');
-    if (!tbody) return;
-    
-    tbody.innerHTML = lista.map(u => `
-        <tr class="hover:bg-slate-50 border-t">
-            <td class="px-3 py-2 font-bold text-sm">${u.nome || ''}</td>
-            <td class="px-3 py-2 text-sm font-mono">${formatarCPF(u.cpf)}</td>
-            <td class="px-3 py-2 text-sm">${u.email || '—'}</td>
-            <td class="px-3 py-2 text-sm">${u.unidade_saude || '—'}</td>
-            <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">${u.tipo === 'admin' ? '👑 Admin' : '👤 Usuário'}</span></td>
-            <td class="px-3 py-2">
-                <div class="flex gap-2">
-                    <button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold" title="Editar usuário">✏️</button>
-                    <button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold" title="Excluir usuário">🗑️</button>
-                    <button onclick='gerarTokenRedefinicao("${u.cpf}")' class="text-amber-600 hover:text-amber-800 text-xs font-bold" title="Gerar código de redefinição de senha">🔑</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-    
-    if (!lista.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
+    try {
+        // 🔥 USAR RPC EM VEZ DE SELECT DIRETO
+        const { data: usuarios, error } = await supabaseClient
+            .rpc('listar_usuarios_seguro');
+        
+        hideLoading();
+        
+        if (error) {
+            console.error('Erro ao buscar usuários:', error);
+            alert('❌ Erro ao carregar lista de usuários: ' + error.message);
+            return;
+        }
+        
+        const busca = (document.getElementById('adminBuscaUsuario')?.value || '').toLowerCase();
+        let lista = (usuarios || []).filter(u => 
+            !busca || 
+            u.nome.toLowerCase().includes(busca) || 
+            (u.cpf || '').includes(busca)
+        );
+        
+        const tbody = document.getElementById('adminTabelaUsuarios');
+        if (!tbody) return;
+        
+        tbody.innerHTML = lista.map(u => `
+            <tr class="hover:bg-slate-50 border-t">
+                <td class="px-3 py-2 font-bold text-sm">${u.nome || ''}</td>
+                <td class="px-3 py-2 text-sm font-mono">${formatarCPF(u.cpf)}</td>
+                <td class="px-3 py-2 text-sm">${u.email || '—'}</td>
+                <td class="px-3 py-2 text-sm">${u.unidade_saude || '—'}</td>
+                <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}">${u.tipo === 'admin' ? '👑 Admin' : '👤 Usuário'}</span></td>
+                <td class="px-3 py-2">
+                    <div class="flex gap-2">
+                        <button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold" title="Editar usuário">✏️</button>
+                        <button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold" title="Excluir usuário">🗑️</button>
+                        <button onclick='gerarTokenRedefinicao("${u.cpf}")' class="text-amber-600 hover:text-amber-800 text-xs font-bold" title="Gerar código de redefinição de senha">🔑</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        
+        if (!lista.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
+        }
+    } catch (err) {
+        hideLoading();
+        console.error('Erro inesperado:', err);
+        alert('❌ Erro ao carregar lista de usuários. Tente novamente.');
     }
 }
 function preencherCPF(cpf) { const el = document.getElementById('adminNovoCPF'); if (el) el.value = cpf; }
