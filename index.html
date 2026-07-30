@@ -312,7 +312,7 @@
       display: block;
     }
 
-    /* ===== FILTER BUTTONS (abas estilo distritos) ===== */
+    /* ===== FILTER BUTTONS (abas) ===== */
     .filter-bar {
       display: flex;
       flex-wrap: wrap;
@@ -364,11 +364,95 @@
       font-weight: 600;
     }
 
-    /* ===== CARDS GRID ===== */
+    /* ===== CATEGORY SECTION ===== */
+    .category-section {
+      background: white;
+      border-radius: 24px;
+      padding: 1.8rem 2rem 2rem;
+      border: 1px solid #edf0f7;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      margin-bottom: 2rem;
+      transition: box-shadow 0.2s;
+    }
+
+    .category-section:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    .category-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0b2b4a;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .category-title i {
+      color: #1a5b7a;
+      font-size: 1.3rem;
+    }
+
+    /* ===== LINKS GRID (botões) ===== */
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .link-button {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.9rem 1.2rem;
+      background: #f8faff;
+      border-radius: 14px;
+      border: 1px solid #e9edf4;
+      color: #1e2a3e;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .link-button i {
+      width: 1.6rem;
+      text-align: center;
+      color: #1a5b7a;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .link-button:hover {
+      background: #f0f5ff;
+      border-color: #b0c6df;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 20, 40, 0.06);
+    }
+
+    .link-button.primary-button {
+      background: #0b2b4a;
+      border-color: #0b2b4a;
+      color: white;
+    }
+
+    .link-button.primary-button i {
+      color: #bfdbfe;
+    }
+
+    .link-button.primary-button:hover {
+      background: #1a3f62;
+      border-color: #1a3f62;
+    }
+
+    /* ===== CARDS GRID (contatos) ===== */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 1.5rem;
+      margin-top: 1.5rem;
     }
 
     .card {
@@ -420,11 +504,6 @@
       gap: 0.3rem;
     }
 
-    .card-address i {
-      opacity: 0.6;
-      margin-right: 0.2rem;
-    }
-
     .card-phone {
       font-size: 0.9rem;
       color: #1e3b5c;
@@ -464,16 +543,6 @@
       text-decoration: underline;
     }
 
-    .card-tag {
-      margin-top: 0.6rem;
-      font-size: 0.7rem;
-      color: #5b6f8a;
-      background: #f0f3fa;
-      padding: 0.1rem 0.9rem;
-      border-radius: 30px;
-      align-self: flex-start;
-    }
-
     .no-results {
       grid-column: 1 / -1;
       text-align: center;
@@ -499,7 +568,6 @@
     .icon-addr::before { content: "📍"; margin-right: 4px; opacity: 0.7; }
     .icon-phone::before { content: "📞"; margin-right: 4px; opacity: 0.7; }
 
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       .header {
         padding: 1.5rem;
@@ -527,11 +595,11 @@
         grid-template-columns: 1fr;
         gap: 1rem;
       }
+      .links-grid {
+        grid-template-columns: 1fr;
+      }
       .login-box {
         padding: 2rem 1.5rem 1.5rem;
-      }
-      .login-header h1 {
-        font-size: 1.1rem;
       }
       .search-wrapper {
         padding: 0.2rem 0.2rem 0.2rem 1.2rem;
@@ -540,20 +608,8 @@
         padding: 0.7rem 0;
         font-size: 0.9rem;
       }
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 0 1rem;
-      }
-      .header {
+      .category-section {
         padding: 1.2rem;
-      }
-      .card {
-        padding: 1.2rem;
-      }
-      .card-title {
-        font-size: 1rem;
       }
     }
   </style>
@@ -609,11 +665,11 @@
         <!-- SEARCH -->
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
-          <input type="text" id="globalSearch" placeholder="Digite para buscar unidades, endereço, telefone ou e-mail..." autofocus />
+          <input type="text" id="globalSearch" placeholder="Buscar ferramentas, painéis ou documentos..." autofocus />
           <button class="clear-btn" id="clearSearchBtn" aria-label="Limpar busca">✕</button>
         </div>
 
-        <!-- FILTER BAR (abas estilo distritos) -->
+        <!-- FILTER BAR (abas) -->
         <div class="filter-bar" id="filterBar">
           <button class="filter-btn active" data-tab="todos">📋 Todos</button>
           <button class="filter-btn" data-tab="consultas">👨‍⚕️ Consultas Especializadas</button>
@@ -624,10 +680,10 @@
         </div>
 
         <!-- RESULTS COUNTER -->
-        <div class="results-counter" id="resultsCounter">Mostrando <strong>0</strong> unidades</div>
+        <div class="results-counter" id="resultsCounter">Mostrando <strong>0</strong> itens</div>
 
-        <!-- CARDS GRID -->
-        <div class="cards-grid" id="cardsContainer"></div>
+        <!-- CONTEÚDO DINÂMICO -->
+        <div id="dynamicContent"></div>
       </div>
     </main>
 
@@ -681,62 +737,141 @@
       });
 
       // ============================================
-      // 2. DADOS
+      // 2. DADOS DOS LINKS (botões)
       // ============================================
-      const unidades = [
-        // ---- CONSULTAS ESPECIALIZADAS ----
-        { nome: "Distrito Sanitário Eldorado", endereco: "Rua Oliveira n° 362", telefones: ["3392-2137", "ZOONOSES 3392-2211", "EPIDEMIO 3392-2175", "2151", "ADM GC ADRIANA 3356-6270"], email: "marcacaodistritoeldorado@gmail.com", tab: "consultas" },
-        { nome: "UBS CSU Eldorado", endereco: "Rua Portugal nº 50", telefones: ["5548", "3352-5251", "3392-2171", "3353-3548", "3911-4748", "(99257-2635 Institucional)"], email: "marcacaocsu@gmail.com", tab: "consultas" },
-        { nome: "UBS Água Branca", endereco: "Rua Seis N°320", telefones: ["3394-8059", "3352-5245", "3394-8574"], email: "ubsaguabranca@gmail.com", tab: "consultas" },
-        { nome: "UBS Jardim Bandeirantes", endereco: "Avenida Água Branca N°317", telefones: ["3352-5248", "3353-2401", "2410"], email: "marcacaoadm@gmail.com", tab: "consultas" },
-        { nome: "UBS Novo Eldorado", endereco: "Rua Guilhermina de Oliveira n 60", telefones: ["3472-6397", "3363-5736"], email: "marcacaonovoeldorado@gmail.com", tab: "consultas" },
-        { nome: "UBS Santa Cruz", endereco: "Rua Tubira nº 173", telefones: ["3911-9423", "3911-9460", "(99257-1809 Institucional)"], email: "marcacaosantacruz@gmail.com", tab: "consultas" },
-        { nome: "UBS Unidade XV", endereco: "Rua Oliveira n° 362", telefones: ["3356-1214", "3352-5271"], email: "cmcusfxv@gmail.com", tab: "consultas" },
-        { nome: "USF Parque São João I (USF 73)", endereco: "Rua Sete N° 54", telefones: ["3352-5259", "3911-4852", "3352-2058", "ODONTO 3352-5846"], email: "marcacaopsaojoao@gmail.com", tab: "consultas" },
+      const dadosLinks = {
+        consultas: {
+          titulo: 'Consultas Especializadas',
+          icon: 'fa-user-md',
+          links: [
+            { texto: 'Fila de espera Ligações', url: 'https://docs.google.com/spreadsheets/d/1NrLJ7ulMx93VXse-k8C4PX7FkGPLEZ0yTQSIVQeNItg/edit?gid=175443153#gid=175443153', primario: true },
+            { texto: 'Controle de Agendamentos', url: 'https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=0#gid=0', primario: true },
+            { texto: 'Reaproveitamento', url: 'https://docs.google.com/spreadsheets/d/1_WJhJQQXcxn0Yucyr_rv_HuKs7wc3p4oeb69oyhoPU4/edit?usp=sharing', primario: true },
+            { texto: 'Consolidado', url: 'https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=1603937153#gid=1603937153', primario: true },
+            { texto: 'Fila de Espera Retorno de Neuro', url: 'https://docs.google.com/spreadsheets/d/1ZwzPVQAifNLfJJO1lFr1BvQd6e6G3yC5C2H4Ry2N43k/edit?gid=621702727#gid=621702727', primario: true },
+            { texto: 'Contatos das UBS', url: 'https://regulacaoconsolidados-dot.github.io/contatosdasubs/', primario: true },
+            { texto: 'Portal Feluma', url: 'https://portal-feluma.sydle.com/home', primario: true },
+            { texto: 'CadWEB', url: 'https://cadastro.saude.gov.br/segcartao/', primario: true },
+            { texto: 'Pendências Geral', url: 'https://compartilhacmc-commits.github.io/pendenciasgeral/', primario: false },
+            { texto: 'Agendamentos Geral', url: 'https://compartilhacmc-commits.github.io/consolidadoagendados/', primario: false },
+            { texto: 'Agendamentos Mês Atual e Próximo', url: 'https://compartilhacmc-commits.github.io/ofertacmc/', primario: false },
+            { texto: 'Profissional Médicos Ativos', url: 'https://compartilhacmc-commits.github.io/profissionaisnarede/', primario: false },
+            { texto: 'Listas das Especialidades', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/ESPECIALIDADES.html', primario: false },
+            { texto: 'Resumo dos Fluxos Especialidades', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/resumo_fluxos.html', primario: false },
+            { texto: 'Notas Técnicas Diretoria de Regulação', url: 'https://portal.contagem.mg.gov.br/nota-tecnica', primario: false },
+            { texto: 'Pendências Eldorado', url: 'https://compartilhacmc-commits.github.io/distritoeldorado/', primario: false },
+            { texto: 'Pendências Sede', url: 'https://compartilhacmc-commits.github.io/distritoeldorado/', primario: false },
+            { texto: 'Pendências Vargem das Flores', url: 'https://compartilhacmc-commits.github.io/distritovargemdasflores/', primario: false },
+            { texto: 'Pendências Nacional', url: 'https://compartilhacmc-commits.github.io/distritonacional/', primario: false },
+            { texto: 'Pendências Ressaca', url: 'https://compartilhacmc-commits.github.io/distritoressaca/', primario: false },
+            { texto: 'Pendências Industrial', url: 'https://compartilhacmc-commits.github.io/distritoindustrial/', primario: false },
+            { texto: 'Pendências Petrolândia', url: 'https://compartilhacmc-commits.github.io/distritopetrolandia/', primario: false },
+            { texto: 'Pendências Riacho', url: 'https://compartilhacmc-commits.github.io/distritoriacho/', primario: false },
+            { texto: 'Agendamentos Teleconsulta', url: 'https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=0#gid=0', primario: false },
+            { texto: 'Agendamentos Geral', url: 'https://docs.google.com/spreadsheets/d/14DiFK9EW36s8ntkukyhiRMJxcX0ghG5XTzWb1TwpI2Q/edit?gid=0#gid=0', primario: false },
+            { texto: 'Agendamentos Diários', url: 'https://docs.google.com/spreadsheets/d/1puNbYysRBj-5CY6fhnHNnYd9OH96cl7guMFBOLeYZV4/edit?gid=1698493941#gid=1698493941', primario: false },
+            { texto: 'Profissionais Médicos Ativos', url: 'https://docs.google.com/spreadsheets/d/16CXd1TVf2IfTDiPzRCxUNWk6rCRoEw6WDfcybVoarnA/edit?gid=1407399146#gid=1407399146', primario: false },
+            { texto: 'Pendências Eldorado', url: 'https://docs.google.com/spreadsheets/d/1r6NLcVkVLD5vp4UxPEa7TcreBpOd0qeNt-QREOG4Xr4/edit?gid=278071504#gid=278071504', primario: false },
+            { texto: 'Pendências Vargem das Flores', url: 'https://docs.google.com/spreadsheets/d/1IHknmxe3xAnfy5Bju_23B5ivIL-qMaaE6q_HuPaLBpk/edit?gid=278071504#gid=278071504', primario: false },
+            { texto: 'Pendências Sede', url: 'https://docs.google.com/spreadsheets/d/1RPf2bfQVoM1FqnyA-0P8uPTJ_PG4I2Ce6lXnk54ixfc/edit?gid=278071504#gid=278071504', primario: false },
+            { texto: 'Pendências Industrial', url: 'https://docs.google.com/spreadsheets/d/14eUVIsWPubMve4DhVjVwlh7gin-qVyN3PspkwQ1PZMg/edit?gid=278071504#gid=278071504', primario: false },
+            { texto: 'Pendências Ressaca', url: 'https://drive.google.com/drive/folders/1zRHfbI897ZRTBKLeRbiSfjMy8RmR_MJg', primario: false },
+            { texto: 'Pendências Petrolândia', url: 'https://docs.google.com/spreadsheets/d/1Z9Uf5MGm5tClVDR95SUpwOjivAdqEVUfDj7mIuRLf4s/edit?gid=278071504#gid=278071504', primario: false },
+            { texto: 'Pendências Nacional', url: 'https://docs.google.com/spreadsheets/d/1lMGO9Hh_qL9OKI270fPL7lxadr-BZN9x_ZtmQeX6OcA/edit?gid=278071504#gid=278071504', primario: false },
+            { texto: 'Pendências Riacho', url: 'https://docs.google.com/spreadsheets/d/1367XyjVDYyDWo3vUz6Hd_zEqLAJkH_c1MwlvtZnpmUc/edit?gid=278071504#gid=278071504', primario: false },
+            { texto: 'Plataforma Feluma', url: 'https://portal-feluma.sydle.com/home', primario: false },
+            { texto: 'NT-25/2025 – Teleconsultoria', url: 'https://portal.contagem.mg.gov.br/imgeditor/file/Regula%C3%A7%C3%A3o/Central%20de%20marca%C3%A7%C3%A3o/NT%2025%20-%202025%20-%20Regula%C3%A7%C3%A3o%20de%20Consultas%20Especializadas%20via%20sistema%20VIVVER.pdf', primario: false },
+            { texto: 'Notas Técnicas – Diretoria', url: 'https://portal.contagem.mg.gov.br/central-de-marcacao-de-consultas/', primario: false },
+            { texto: 'Tutorial – YouTube', url: 'https://www.youtube.com/watch?v=1UdBOCDlIvA', primario: false },
+            { texto: 'Cadastro Feluma', url: 'https://forms.office.com/pages/responsepage.aspx?id=6TkneO0BV0yBmaJIQh4A4v7lUCKmmeREvVUmW50PDW5UMzRaUlRFRjI0N01LMERVWjdPQlY5ODlUWS4u&route=shorturl', primario: false }
+          ]
+        },
+        oci: {
+          titulo: 'OCI',
+          icon: 'fa-stethoscope',
+          links: [
+            { texto: 'Painél OCI', url: 'https://regulacaoconsolidados-dot.github.io/ociconsolidado/', primario: true },
+            { texto: 'Banco de dados OCI', url: 'https://docs.google.com/spreadsheets/d/1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo/edit?gid=2108990586#gid=2108990586', primario: true },
+            { texto: 'Planilha OCI', url: 'https://prefeituracontagem-my.sharepoint.com/:x:/r/personal/hassan_zibaoui_contagem_mg_gov_br/_layouts/15/Doc.aspx?sourcedoc=%7Bd7b85dc9-61af-4ea9-bb7f-b542e5c4d850%7D&action=default&CID=6ac5c827-af01-49ea-9fa3-689fed995aa7&_SRM=2%3AE%3A10', primario: false },
+            { texto: 'OCI Cardiologia 1° versão', url: 'https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268', primario: false },
+            { texto: 'OCI Cardiologia 2026', url: 'https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268', primario: false },
+            { texto: 'OCI Mama 1° versão', url: 'https://docs.google.com/spreadsheets/d/1cQzwM6L9omcZVG7routPTSE3fZSQId31w-A6y4Sc24c/edit?gid=621858947#gid=621858947', primario: false },
+            { texto: 'OCI Mama 2026', url: 'https://docs.google.com/spreadsheets/d/1U14Nf5EOiz8PI5H6tnYZAUeZzfUM43unywXFEwWBTAQ/edit', primario: false },
+            { texto: 'OCI Utero 1° versão', url: 'https://docs.google.com/spreadsheets/d/1G1YHRyt4ILeYMAM-yK_eYZi4wtHaMqwnuQWDeihhmIA/edit', primario: false },
+            { texto: 'OCI Utero 2026', url: 'https://docs.google.com/spreadsheets/d/17ifFIdWqHq3COeEBJifq6keumcWz-ppr9d4uSPhCBow/edit', primario: false },
+            { texto: 'OCI Ortopedia', url: 'https://docs.google.com/spreadsheets/d/1PAaIUxgFU8CE3pFGzHG4OCAdtSHNrVIXc8suaPAXI50/edit', primario: false }
+          ]
+        },
+        cirurgia: {
+          titulo: 'Cirurgia Eletiva',
+          icon: 'fa-procedures',
+          links: [
+            { texto: 'Painél Cirurgia Eletiva', url: 'https://regulacaoconsolidados-dot.github.io/cirurgiaseletivas/', primario: true },
+            { texto: 'Painél Cirurgia Eletiva - Diretoria', url: 'https://regulacaoconsolidados-dot.github.io/cirurgiaeletivadiretoria/', primario: true }
+          ]
+        },
+        exames: {
+          titulo: 'Média Complexidade (Exames)',
+          icon: 'fa-microscope',
+          links: [
+            { texto: 'Exames sem prestador', url: 'https://docs.google.com/spreadsheets/d/1s_HDG2-eBdYVaHdw_4e2q2ORuUePdZuLJQmIT7Z-esI/edit?pli=1&gid=0#gid=0', primario: true }
+          ]
+        },
+        contatos: {
+          titulo: 'Telefones e Links Úteis',
+          icon: 'fa-address-book',
+          links: [
+            { texto: 'Telefones Ceaps', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/CEAPS_TELEFONES.html', primario: false },
+            { texto: 'Telefones Iria Diniz', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_IRIA_DINIZ.html', primario: false },
+            { texto: 'Telefones CCE´s e Outros', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_CCE_OUTROS.html', primario: false },
+            { texto: 'Telefones Diversos', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_DIVERSOS.html', primario: false },
+            { texto: 'Telefones – Todas as Unidades', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_UNIDADES_DE_CONTAGEM.html', primario: false },
+            { texto: 'Telefones Todos os Distritos', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/DISTRITOS_CONTATOS.html', primario: false },
+            { texto: 'Telefones Upas', url: 'https://compartilhacmc-commits.github.io/arquivosfixos/UPA_TELEFONES.html', primario: false },
+            { texto: 'Sistema Vivver', url: 'https://www.contagem-mg.vivver.com/desktop', primario: false },
+            { texto: 'Notas Técnicas Diretoria de Regulação', url: 'https://portal.contagem.mg.gov.br/nota-tecnica', primario: false },
+            { texto: 'Prefeitura de Contagem', url: 'https://portal.contagem.mg.gov.br/', primario: false },
+            { texto: 'Secretaria de Saúde Contagem', url: 'https://portal.contagem.mg.gov.br/secretaria-de-saude', primario: false },
+            { texto: 'Portal do Servidor', url: 'https://portal.contagem.mg.gov.br/portal/paginas-dinamicas-categoria/15/', primario: false },
+            { texto: 'Aplicativos Contagem', url: 'https://geoprocessamento.contagem.mg.gov.br/portal/apps/sites/#/geocontagem', primario: false },
+            { texto: 'Aqui tem Remédio', url: 'https://geoprocessamento.contagem.mg.gov.br/portal/apps/experiencebuilder/experience/?id=1cc51ed1bb7546e092ecad2935cc425d', primario: false },
+            { texto: 'Endereço das Unidades', url: 'https://portal.contagem.mg.gov.br/atencao-primaria', primario: false },
+            { texto: 'Equipamentos da Saúde', url: 'https://geoprocessamento.contagem.mg.gov.br/portal/apps/webappviewer/index.html?id=a29dd6c9d5944c51998c3ffa1efe0c70', primario: false },
+            { texto: 'CadWeb', url: 'https://cadastro.saude.gov.br/segcartao/', primario: false },
+            { texto: 'Pesquisa do CNS', url: 'https://cnesadm.datasus.gov.br/cnesadm/publico/usuarios/cadastro', primario: false },
+            { texto: 'Pesquisa por endereço', url: 'https://app.powerbi.com/view?r=eyJrIjoiYTRiZDcyZWYtMzAwNS00NmYyLTk3N2EtYWEwYTk2NTFhMmY1IiwidCI6ImFlODYzMzdlLTU3NWUtNDMzMC05NDc2LTkzZGU2ODJiMDAyMCJ9', primario: false },
+            { texto: 'E gestor', url: 'https://egestoraps.saude.gov.br/', primario: false },
+            { texto: 'Cnes', url: 'https://cnes.datasus.gov.br/pages/estabelecimentos/consulta.jsp', primario: false },
+            { texto: 'Tabela Sigtap', url: 'http://sigtap.datasus.gov.br/tabela-unificada/app/sec/inicio.jsp', primario: false },
+            { texto: 'Siscan', url: 'https://siscan.saude.gov.br/login.jsf', primario: false },
+            { texto: 'Esus Notifica', url: 'https://notifica.saude.gov.br/login', primario: false },
+            { texto: 'CRM', url: 'https://crmmg.org.br/', primario: false }
+          ]
+        }
+      };
 
-        // ---- OCI ----
-        { nome: "Painél OCI", endereco: "Sistema de Regulação", telefones: ["3352-5720", "3352-5863"], email: "oci@contagem.mg.gov.br", tab: "oci" },
-        { nome: "Banco de Dados OCI", endereco: "Planilha Consolidada", telefones: ["3352-5794", "3352-5267"], email: "oci.dados@contagem.mg.gov.br", tab: "oci" },
-
-        // ---- CIRURGIA ELETIVA ----
-        { nome: "Painél Cirurgia Eletiva", endereco: "Central de Cirurgias", telefones: ["3352-5259", "3911-4852"], email: "cirurgia@contagem.mg.gov.br", tab: "cirurgia" },
-        { nome: "Cirurgia Eletiva - Diretoria", endereco: "Diretoria de Regulação", telefones: ["3352-5259", "3911-4852"], email: "cirurgia.diretoria@contagem.mg.gov.br", tab: "cirurgia" },
-
-        // ---- MÉDIA COMPLEXIDADE ----
-        { nome: "Exames sem prestador", endereco: "Central de Exames", telefones: ["3352-5259", "3911-4852"], email: "exames@contagem.mg.gov.br", tab: "exames" },
-
-        // ---- CONTATOS (Telefones) ----
-        { nome: "Telefones Ceaps", endereco: "Central de Atendimento", telefones: ["3352-5720", "3352-5863"], email: "ceaps@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Telefones Iria Diniz", endereco: "Unidade Iria Diniz", telefones: ["3352-5794", "3352-5267"], email: "iria.diniz@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Telefones CCE´s e Outros", endereco: "CCE Contagem", telefones: ["3352-5720", "3352-5863"], email: "cce@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Telefones Diversos", endereco: "Central de Atendimento", telefones: ["3352-5259", "3911-4852"], email: "diversos@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Telefones – Todas as Unidades", endereco: "Rede de Saúde", telefones: ["3352-5720", "3352-5863"], email: "unidades@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Telefones Todos os Distritos", endereco: "Distritos Sanitários", telefones: ["3352-5794", "3352-5267"], email: "distritos@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Telefones Upas", endereco: "Unidades de Pronto Atendimento", telefones: ["3352-5259", "3911-4852"], email: "upas@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Sistema Vivver", endereco: "Plataforma de Regulação", telefones: ["3352-5720", "3352-5863"], email: "vivver@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Notas Técnicas Diretoria", endereco: "Diretoria de Regulação", telefones: ["3352-5794", "3352-5267"], email: "notas@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Prefeitura de Contagem", endereco: "Sede Administrativa", telefones: ["3352-5259", "3911-4852"], email: "prefeitura@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Secretaria de Saúde", endereco: "SMS Contagem", telefones: ["3352-5720", "3352-5863"], email: "sms@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Portal do Servidor", endereco: "RH Contagem", telefones: ["3352-5794", "3352-5267"], email: "servidor@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Aplicativos Contagem", endereco: "Geoprocessamento", telefones: ["3352-5259", "3911-4852"], email: "geo@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Aqui tem Remédio", endereco: "Farmácia Popular", telefones: ["3352-5720", "3352-5863"], email: "remedio@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Endereço das Unidades", endereco: "Atenção Primária", telefones: ["3352-5794", "3352-5267"], email: "atencao@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Equipamentos da Saúde", endereco: "Rede SUS", telefones: ["3352-5259", "3911-4852"], email: "equipamentos@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "CadWeb", endereco: "Cadastro Nacional", telefones: ["3352-5720", "3352-5863"], email: "cadweb@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Pesquisa do CNS", endereco: "Cartão SUS", telefones: ["3352-5794", "3352-5267"], email: "cns@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Pesquisa por endereço", endereco: "Power BI", telefones: ["3352-5259", "3911-4852"], email: "powerbi@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "E gestor", endereco: "Sistema de Gestão", telefones: ["3352-5720", "3352-5863"], email: "gestor@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Cnes", endereco: "Cadastro Nacional", telefones: ["3352-5794", "3352-5267"], email: "cnes@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Tabela Sigtap", endereco: "Sistema de Gestão", telefones: ["3352-5259", "3911-4852"], email: "sigtap@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Siscan", endereco: "Sistema de Câncer", telefones: ["3352-5720", "3352-5863"], email: "siscan@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "Esus Notifica", endereco: "Notificação de Doenças", telefones: ["3352-5794", "3352-5267"], email: "notifica@contagem.mg.gov.br", tab: "contatos" },
-        { nome: "CRM", endereco: "Conselho Regional", telefones: ["3352-5259", "3911-4852"], email: "crm@contagem.mg.gov.br", tab: "contatos" }
+      // ============================================
+      // 3. DADOS DOS CARDS (contatos UBS)
+      // ============================================
+      const cardsUBS = [
+        { nome: "Distrito Sanitário Eldorado", endereco: "Rua Oliveira n° 362", telefones: ["3392-2137", "ZOONOSES 3392-2211", "EPIDEMIO 3392-2175", "2151", "ADM GC ADRIANA 3356-6270"], email: "marcacaodistritoeldorado@gmail.com" },
+        { nome: "UBS CSU Eldorado", endereco: "Rua Portugal nº 50", telefones: ["5548", "3352-5251", "3392-2171", "3353-3548", "3911-4748", "(99257-2635 Institucional)"], email: "marcacaocsu@gmail.com" },
+        { nome: "UBS Água Branca", endereco: "Rua Seis N°320", telefones: ["3394-8059", "3352-5245", "3394-8574"], email: "ubsaguabranca@gmail.com" },
+        { nome: "UBS Jardim Bandeirantes", endereco: "Avenida Água Branca N°317", telefones: ["3352-5248", "3353-2401", "2410"], email: "marcacaoadm@gmail.com" },
+        { nome: "UBS Novo Eldorado", endereco: "Rua Guilhermina de Oliveira n 60", telefones: ["3472-6397", "3363-5736"], email: "marcacaonovoeldorado@gmail.com" },
+        { nome: "UBS Santa Cruz", endereco: "Rua Tubira nº 173", telefones: ["3911-9423", "3911-9460", "(99257-1809 Institucional)"], email: "marcacaosantacruz@gmail.com" },
+        { nome: "UBS Unidade XV", endereco: "Rua Oliveira n° 362", telefones: ["3356-1214", "3352-5271"], email: "cmcusfxv@gmail.com" },
+        { nome: "USF Parque São João I (USF 73)", endereco: "Rua Sete N° 54", telefones: ["3352-5259", "3911-4852", "3352-2058", "ODONTO 3352-5846"], email: "marcacaopsaojoao@gmail.com" },
+        { nome: "USF Parque São João II (USF 76)", endereco: "Rua Sete N° 54", telefones: ["3352-5259", "3911-4852", "3352-2058", "ODONTO 3352-5846"], email: "marcacaopsaojoao@gmail.com" },
+        { nome: "USF Parque São João III (USF 85)", endereco: "Rua Sete N° 54", telefones: ["3352-5259", "3911-4852", "3352-2058", "ODONTO 3352-5846"], email: "marcacaopsaojoao@gmail.com" },
+        { nome: "USF Jardim Eldorado I (USF 74)", endereco: "Rua Canafistula N° 245", telefones: ["3351-6735", "3352-5254"], email: "usfjardimeldorado@gmail.com" },
+        { nome: "USF Jardim Eldorado II (USF 75)", endereco: "Rua Canafistula N° 245", telefones: ["3351-6735", "3352-5254"], email: "usfjardimeldorado@gmail.com" }
       ];
 
       // ============================================
-      // 3. RENDERIZAÇÃO
+      // 4. RENDERIZAÇÃO
       // ============================================
-      const container = document.getElementById('cardsContainer');
+      const container = document.getElementById('dynamicContent');
       const searchInput = document.getElementById('globalSearch');
       const clearBtn = document.getElementById('clearSearchBtn');
       const filterBtns = document.querySelectorAll('.filter-btn');
@@ -745,40 +880,50 @@
       let currentFilter = 'todos';
       let currentSearch = '';
 
-      function getDistritoLabel(tab) {
-        const labels = {
-          'consultas': 'Consultas Especializadas',
-          'oci': 'OCI',
-          'cirurgia': 'Cirurgia Eletiva',
-          'exames': 'Média Complexidade',
-          'contatos': 'Contatos'
-        };
-        return labels[tab] || tab;
+      function renderizarLinks(tab) {
+        const dados = dadosLinks[tab];
+        if (!dados) return '';
+
+        let html = `
+          <div class="category-section">
+            <h2 class="category-title"><i class="fas ${dados.icon}"></i> ${dados.titulo}</h2>
+            <div class="links-grid">
+        `;
+
+        dados.links.forEach(link => {
+          const classe = link.primario ? 'link-button primary-button' : 'link-button';
+          html += `
+            <a href="${link.url}" class="${classe}" target="_blank" rel="noopener">
+              <i class="fas fa-external-link-alt"></i>
+              <span>${link.texto}</span>
+            </a>
+          `;
+        });
+
+        html += `</div></div>`;
+        return html;
       }
 
-      function render() {
-        const filtered = unidades.filter(item => {
-          if (currentFilter !== 'todos' && item.tab !== currentFilter) return false;
-          if (currentSearch.trim() !== '') {
-            const q = currentSearch.trim().toLowerCase();
+      function renderizarCards(filtroCards) {
+        let cardsFiltrados = cardsUBS;
+
+        if (currentSearch.trim() !== '') {
+          const q = currentSearch.trim().toLowerCase();
+          cardsFiltrados = cardsUBS.filter(item => {
             const nomeMatch = item.nome.toLowerCase().includes(q);
             const endMatch = item.endereco.toLowerCase().includes(q);
             const telMatch = item.telefones.some(t => t.toLowerCase().includes(q));
             const emailMatch = item.email.toLowerCase().includes(q);
-            if (!(nomeMatch || endMatch || telMatch || emailMatch)) return false;
-          }
-          return true;
-        });
-
-        counter.innerHTML = `Mostrando <strong>${filtered.length}</strong> unidade${filtered.length !== 1 ? 's' : ''}`;
-
-        if (filtered.length === 0) {
-          container.innerHTML = `<div class="no-results">🔎 Nenhuma unidade encontrada com esse filtro ou busca.</div>`;
-          return;
+            return nomeMatch || endMatch || telMatch || emailMatch;
+          });
         }
 
-        let html = '';
-        filtered.forEach(item => {
+        if (cardsFiltrados.length === 0) {
+          return `<div class="no-results">🔎 Nenhum contato encontrado.</div>`;
+        }
+
+        let html = `<div class="cards-grid">`;
+        cardsFiltrados.forEach(item => {
           const telefonesHtml = item.telefones.length
             ? item.telefones.map(t => `<span>${t}</span>`).join(' ')
             : '<span style="opacity:0.6;">—</span>';
@@ -787,12 +932,10 @@
             ? `<div class="card-email">📧 <a href="mailto:${item.email}">${item.email}</a></div>`
             : '';
 
-          const distritoLabel = getDistritoLabel(item.tab);
-
           html += `
             <div class="card">
               <div class="card-title">${item.nome}</div>
-              <div class="card-distrito">🏷️ ${distritoLabel}</div>
+              <div class="card-distrito">🏷️ Contatos</div>
               <div class="card-address"><span class="icon-addr"></span> ${item.endereco}</div>
               <div class="card-phone"><span class="icon-phone"></span> ${telefonesHtml}</div>
               ${emailHtml}
@@ -800,11 +943,79 @@
           `;
         });
 
-        container.innerHTML = html;
+        html += `</div>`;
+        return html;
       }
 
-      function applyFilters() {
-        render();
+      function render() {
+        let html = '';
+        let totalItens = 0;
+
+        // Se for "todos", mostra todas as abas
+        if (currentFilter === 'todos') {
+          const abas = ['consultas', 'oci', 'cirurgia', 'exames', 'contatos'];
+          abas.forEach(tab => {
+            html += renderizarLinks(tab);
+            // Conta os links visíveis
+            const dados = dadosLinks[tab];
+            if (dados) {
+              dados.links.forEach(link => {
+                if (currentSearch.trim() === '' || 
+                    link.texto.toLowerCase().includes(currentSearch.trim().toLowerCase())) {
+                  totalItens++;
+                }
+              });
+            }
+          });
+          // Adiciona os cards de contatos no final
+          html += renderizarCards();
+          // Conta os cards visíveis
+          if (currentSearch.trim() === '') {
+            totalItens += cardsUBS.length;
+          } else {
+            const q = currentSearch.trim().toLowerCase();
+            cardsUBS.forEach(item => {
+              const nomeMatch = item.nome.toLowerCase().includes(q);
+              const endMatch = item.endereco.toLowerCase().includes(q);
+              const telMatch = item.telefones.some(t => t.toLowerCase().includes(q));
+              const emailMatch = item.email.toLowerCase().includes(q);
+              if (nomeMatch || endMatch || telMatch || emailMatch) totalItens++;
+            });
+          }
+        } else {
+          // Mostra apenas a aba selecionada
+          html += renderizarLinks(currentFilter);
+          // Conta os links visíveis
+          const dados = dadosLinks[currentFilter];
+          if (dados) {
+            dados.links.forEach(link => {
+              if (currentSearch.trim() === '' || 
+                  link.texto.toLowerCase().includes(currentSearch.trim().toLowerCase())) {
+                totalItens++;
+              }
+            });
+          }
+          // Adiciona os cards de contatos em TODAS as abas
+          html += renderizarCards();
+          // Conta os cards visíveis
+          if (currentSearch.trim() === '') {
+            totalItens += cardsUBS.length;
+          } else {
+            const q = currentSearch.trim().toLowerCase();
+            cardsUBS.forEach(item => {
+              const nomeMatch = item.nome.toLowerCase().includes(q);
+              const endMatch = item.endereco.toLowerCase().includes(q);
+              const telMatch = item.telefones.some(t => t.toLowerCase().includes(q));
+              const emailMatch = item.email.toLowerCase().includes(q);
+              if (nomeMatch || endMatch || telMatch || emailMatch) totalItens++;
+            });
+          }
+        }
+
+        counter.innerHTML = `Mostrando <strong>${totalItens}</strong> item${totalItens !== 1 ? 's' : ''}`;
+        container.innerHTML = html;
+
+        // Mostra/oculta botão limpar
         if (searchInput.value.length > 0) {
           clearBtn.classList.add('visible');
         } else {
@@ -812,8 +1023,12 @@
         }
       }
 
+      function applyFilters() {
+        render();
+      }
+
       // ============================================
-      // 4. EVENTOS
+      // 5. EVENTOS
       // ============================================
       searchInput.addEventListener('input', function() {
         currentSearch = this.value;
@@ -837,7 +1052,7 @@
       });
 
       // ============================================
-      // 5. INICIALIZAÇÃO
+      // 6. INICIALIZAÇÃO
       // ============================================
       function initApp() {
         applyFilters();
