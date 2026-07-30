@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    /* ===== RESET & GLOBAL ===== */
     * {
       margin: 0;
       padding: 0;
@@ -182,7 +181,7 @@
       padding-top: 1.2rem;
     }
 
-    /* ===== HEADER (idêntico ao da página de contatos) ===== */
+    /* ===== HEADER ===== */
     .header {
       background: linear-gradient(145deg, #0b2b4a 0%, #1a3f62 100%);
       color: white;
@@ -253,10 +252,10 @@
       margin-top: 0.25rem;
     }
 
-    /* ===== SEARCH (idêntico ao da página de contatos) ===== */
+    /* ===== SEARCH ===== */
     .search-wrapper {
       max-width: 700px;
-      margin: 0 auto 2.5rem auto;
+      margin: 0 auto 1.5rem auto;
       background: white;
       border-radius: 60px;
       padding: 0.3rem 0.3rem 0.3rem 1.8rem;
@@ -313,14 +312,51 @@
       display: block;
     }
 
+    /* ===== FILTER BUTTONS (abas estilo distritos) ===== */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem 1.2rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      padding: 0.5rem;
+    }
+
+    .filter-btn {
+      background: white;
+      border: 1px solid #dde3ed;
+      padding: 0.5rem 1.4rem;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: #1e2a3e;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      letter-spacing: 0.3px;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover {
+      border-color: #1a3f62;
+      background: #f0f5ff;
+      transform: translateY(-1px);
+    }
+
+    .filter-btn.active {
+      background: #0b2b4a;
+      border-color: #0b2b4a;
+      color: white;
+      box-shadow: 0 6px 12px rgba(11, 43, 74, 0.18);
+    }
+
     /* ===== RESULTS COUNTER ===== */
     .results-counter {
       text-align: center;
       color: #3a4c6b;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       margin-bottom: 1.5rem;
       font-weight: 400;
-      opacity: 0.8;
     }
 
     .results-counter strong {
@@ -328,187 +364,128 @@
       font-weight: 600;
     }
 
-    /* ===== TABS ===== */
-    .tabs-nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      margin-bottom: 2rem;
-      justify-content: center;
+    /* ===== CARDS GRID ===== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
     }
 
-    .tab-btn {
-      background: white;
-      border: 1px solid #e9edf4;
-      padding: 0.8rem 2rem;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #4a5b77;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      font-family: inherit;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-    }
-
-    .tab-btn i {
-      font-size: 1.1rem;
-    }
-
-    .tab-btn:hover {
-      background: #f0f5ff;
-      border-color: #b0c6df;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 20, 40, 0.06);
-    }
-
-    .tab-btn.active {
-      background: #0b2b4a;
-      border-color: #0b2b4a;
-      color: white;
-      box-shadow: 0 6px 16px rgba(11, 43, 74, 0.25);
-    }
-
-    .tab-content {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ===== CATEGORIES / CARDS (estilo igual ao da página de contatos) ===== */
-    .categories-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-
-    .category-section {
+    .card {
       background: white;
       border-radius: 24px;
-      padding: 1.8rem 2rem 2rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
       border: 1px solid #edf0f7;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-      transition: box-shadow 0.2s, transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.25s;
+      display: flex;
+      flex-direction: column;
     }
 
-    .category-section:hover {
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-      transform: translateY(-2px);
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px rgba(0, 20, 40, 0.08);
+      border-color: #d4dceb;
     }
 
-    .category-title {
-      font-size: 1.2rem;
+    .card-title {
+      font-size: 1.15rem;
       font-weight: 700;
       color: #0b2b4a;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.3px;
+      line-height: 1.3;
     }
 
-    .category-title i {
+    .card-distrito {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
       color: #1a5b7a;
-      font-size: 1.3rem;
+      background: #e5edf8;
+      display: inline-block;
+      padding: 0.2rem 0.9rem;
+      border-radius: 40px;
+      margin-bottom: 0.7rem;
+      align-self: flex-start;
+      font-weight: 600;
     }
 
-    /* ===== LINKS GRID - CARDS GRANDES E BONITOS ===== */
-    .links-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1rem;
-    }
-
-    .link-button {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1.2rem 1.5rem;
-      background: #f8faff;
-      border-radius: 18px;
-      border: 1px solid #e9edf4;
-      color: #1e2a3e;
-      text-decoration: none;
+    .card-address {
       font-size: 0.95rem;
-      font-weight: 500;
-      transition: all 0.25s ease;
-      font-family: inherit;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    }
-
-    .link-button i {
-      width: 2rem;
-      height: 2rem;
+      color: #2d3a54;
+      margin-bottom: 0.4rem;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: #1a5b7a;
-      font-size: 1.2rem;
-      flex-shrink: 0;
-      background: rgba(26, 91, 122, 0.08);
-      border-radius: 12px;
-      transition: all 0.25s ease;
+      align-items: baseline;
+      gap: 0.3rem;
     }
 
-    .link-button span {
-      flex: 1;
+    .card-address i {
+      opacity: 0.6;
+      margin-right: 0.2rem;
     }
 
-    .link-button:hover {
-      background: #f0f5ff;
-      border-color: #b0c6df;
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0, 20, 40, 0.08);
+    .card-phone {
+      font-size: 0.9rem;
+      color: #1e3b5c;
+      margin: 0.25rem 0 0.2rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 0.6rem;
     }
 
-    .link-button:hover i {
-      background: rgba(26, 91, 122, 0.15);
-      transform: scale(1.05);
+    .card-phone span {
+      background: #f2f6fd;
+      padding: 0.1rem 0.6rem;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 0.85rem;
     }
 
-    .link-button.primary-button {
-      background: #0b2b4a;
-      border-color: #0b2b4a;
-      color: white;
+    .card-email {
+      font-size: 0.85rem;
+      color: #1a5a8c;
+      word-break: break-all;
+      margin-top: 0.5rem;
+      background: #f8faff;
+      padding: 0.3rem 0.7rem;
+      border-radius: 30px;
+      display: inline-block;
+      border: 1px solid #e0e9f5;
     }
 
-    .link-button.primary-button i {
-      color: #bfdbfe;
-      background: rgba(255, 255, 255, 0.12);
+    .card-email a {
+      color: #0b2b4a;
+      text-decoration: none;
+      font-weight: 500;
     }
 
-    .link-button.primary-button:hover {
-      background: #1a3f62;
-      border-color: #1a3f62;
+    .card-email a:hover {
+      text-decoration: underline;
     }
 
-    .link-button.primary-button:hover i {
-      background: rgba(255, 255, 255, 0.2);
+    .card-tag {
+      margin-top: 0.6rem;
+      font-size: 0.7rem;
+      color: #5b6f8a;
+      background: #f0f3fa;
+      padding: 0.1rem 0.9rem;
+      border-radius: 30px;
+      align-self: flex-start;
     }
 
-    /* ===== NO RESULTS ===== */
     .no-results {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 3rem 1.5rem;
+      padding: 4rem 0;
       color: #3a4c6b;
+      font-weight: 400;
       background: #f0f4fe;
-      border-radius: 20px;
-      font-size: 1rem;
+      border-radius: 60px;
+      font-size: 1.1rem;
     }
 
-    /* ===== FOOTER (igual ao da página de contatos) ===== */
+    /* ===== FOOTER ===== */
     .footer {
       background: #0f172a;
       color: #cbd5e1;
@@ -518,6 +495,9 @@
       border-top: 1px solid #1e293b;
       font-size: 14px;
     }
+
+    .icon-addr::before { content: "📍"; margin-right: 4px; opacity: 0.7; }
+    .icon-phone::before { content: "📞"; margin-right: 4px; opacity: 0.7; }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
@@ -531,20 +511,21 @@
         flex-direction: column;
         align-items: flex-start;
       }
-      .tabs-nav {
-        gap: 0.5rem;
+      .filter-bar {
+        gap: 0.4rem 0.8rem;
         justify-content: flex-start;
         overflow-x: auto;
         flex-wrap: nowrap;
         padding-bottom: 0.5rem;
       }
-      .tab-btn {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.8rem;
+      .filter-btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 1rem;
         white-space: nowrap;
       }
-      .links-grid {
+      .cards-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
       }
       .login-box {
         padding: 2rem 1.5rem 1.5rem;
@@ -552,18 +533,11 @@
       .login-header h1 {
         font-size: 1.1rem;
       }
-      .category-section {
-        padding: 1.2rem;
-      }
       .search-wrapper {
         padding: 0.2rem 0.2rem 0.2rem 1.2rem;
       }
       .search-wrapper input {
         padding: 0.7rem 0;
-        font-size: 0.9rem;
-      }
-      .link-button {
-        padding: 1rem 1.2rem;
         font-size: 0.9rem;
       }
     }
@@ -575,13 +549,10 @@
       .header {
         padding: 1.2rem;
       }
-      .link-button {
-        padding: 0.9rem 1rem;
-        font-size: 0.85rem;
+      .card {
+        padding: 1.2rem;
       }
-      .link-button i {
-        width: 1.8rem;
-        height: 1.8rem;
+      .card-title {
         font-size: 1rem;
       }
     }
@@ -614,7 +585,7 @@
 
   <!-- ===== CONTEÚDO PRINCIPAL ===== -->
   <div id="main-content" style="display: none;">
-    <!-- HEADER (idêntico ao da página de contatos) -->
+    <!-- HEADER -->
     <header class="header">
       <h1>🏥 Ferramentas Administrativas</h1>
       <div class="header-sub">
@@ -635,208 +606,32 @@
     <!-- MAIN -->
     <main>
       <div class="container">
-        <!-- SEARCH (idêntico ao da página de contatos) -->
+        <!-- SEARCH -->
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
-          <input type="text" id="globalSearch" placeholder="Buscar ferramentas, painéis ou documentos..." autofocus />
+          <input type="text" id="globalSearch" placeholder="Digite para buscar unidades, endereço, telefone ou e-mail..." autofocus />
           <button class="clear-btn" id="clearSearchBtn" aria-label="Limpar busca">✕</button>
         </div>
 
+        <!-- FILTER BAR (abas estilo distritos) -->
+        <div class="filter-bar" id="filterBar">
+          <button class="filter-btn active" data-tab="todos">📋 Todos</button>
+          <button class="filter-btn" data-tab="consultas">👨‍⚕️ Consultas Especializadas</button>
+          <button class="filter-btn" data-tab="oci">🩺 OCI</button>
+          <button class="filter-btn" data-tab="cirurgia">🏥 Cirurgia Eletiva</button>
+          <button class="filter-btn" data-tab="exames">🔬 Média Complexidade</button>
+          <button class="filter-btn" data-tab="contatos">📞 Contatos</button>
+        </div>
+
         <!-- RESULTS COUNTER -->
-        <div class="results-counter" id="resultsCounter">Mostrando <strong>0</strong> itens</div>
+        <div class="results-counter" id="resultsCounter">Mostrando <strong>0</strong> unidades</div>
 
-        <!-- TABS -->
-        <div class="tabs-nav" id="tabsNav">
-          <button class="tab-btn active" data-tab="consultas"><i class="fas fa-user-md"></i> Consultas Especializadas</button>
-          <button class="tab-btn" data-tab="oci"><i class="fas fa-stethoscope"></i> OCI</button>
-          <button class="tab-btn" data-tab="cirurgia"><i class="fas fa-procedures"></i> Cirurgia Eletiva</button>
-          <button class="tab-btn" data-tab="exames"><i class="fas fa-microscope"></i> Média Complexidade</button>
-          <button class="tab-btn" data-tab="contatos"><i class="fas fa-address-book"></i> Contatos</button>
-        </div>
-
-        <!-- TAB: CONSULTAS -->
-        <div class="tab-content active" id="tab-consultas">
-          <div class="categories-grid">
-            <!-- Teleconsulta -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-line"></i> Teleconsulta</h2>
-              <div class="links-grid">
-                <a href="https://docs.google.com/spreadsheets/d/1NrLJ7ulMx93VXse-k8C4PX7FkGPLEZ0yTQSIVQeNItg/edit?gid=175443153#gid=175443153" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Fila de espera Ligações</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=0#gid=0" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Controle de Agendamentos</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1_WJhJQQXcxn0Yucyr_rv_HuKs7wc3p4oeb69oyhoPU4/edit?usp=sharing" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Reaproveitamento</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=1603937153#gid=1603937153" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Consolidado</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1ZwzPVQAifNLfJJO1lFr1BvQd6e6G3yC5C2H4Ry2N43k/edit?gid=621702727#gid=621702727" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Fila de Espera Retorno de Neuro</span></a>
-                <a href="https://regulacaoconsolidados-dot.github.io/contatosdasubs/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Contatos das UBS</span></a>
-                <a href="https://portal-feluma.sydle.com/home" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Portal Feluma</span></a>
-                <a href="https://cadastro.saude.gov.br/segcartao/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>CadWEB</span></a>
-              </div>
-            </section>
-
-            <!-- Painéis Central de Marcação -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-line"></i> Painéis Central de Marcação de Consultas</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/pendenciasgeral/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Pendências Geral</span></a>
-                <a href="https://compartilhacmc-commits.github.io/consolidadoagendados/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Agendamentos Geral</span></a>
-                <a href="https://compartilhacmc-commits.github.io/ofertacmc/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Agendamentos Mês Atual e Próximo</span></a>
-                <a href="https://compartilhacmc-commits.github.io/profissionaisnarede/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Profissional Médicos Ativos</span></a>
-              </div>
-            </section>
-
-            <!-- Fluxos CMC -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-code-branch"></i> Em Atualização... Fluxos Central de Marcação</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/ESPECIALIDADES.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Listas das Especialidades</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/resumo_fluxos.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Resumo dos Fluxos Especialidades</span></a>
-                <a href="https://portal.contagem.mg.gov.br/nota-tecnica" class="link-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Notas Técnicas Diretoria de Regulação</span></a>
-              </div>
-            </section>
-
-            <!-- Pendências por Distrito -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-hourglass-half"></i> Painéis Pendências por Distrito</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Eldorado</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Sede</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritovargemdasflores/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Vargem das Flores</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritonacional/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Nacional</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoressaca/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Ressaca</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoindustrial/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Industrial</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritopetrolandia/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Petrolândia</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoriacho/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Riacho</span></a>
-              </div>
-            </section>
-
-            <!-- Banco de Dados -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-database"></i> Banco de Dados que alimenta os Painéis</h2>
-              <div class="links-grid">
-                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Agendamentos Teleconsulta</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/14DiFK9EW36s8ntkukyhiRMJxcX0ghG5XTzWb1TwpI2Q/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Agendamentos Geral</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1puNbYysRBj-5CY6fhnHNnYd9OH96cl7guMFBOLeYZV4/edit?gid=1698493941#gid=1698493941" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Agendamentos Diários</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/16CXd1TVf2IfTDiPzRCxUNWk6rCRoEw6WDfcybVoarnA/edit?gid=1407399146#gid=1407399146" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Profissionais Médicos Ativos</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1r6NLcVkVLD5vp4UxPEa7TcreBpOd0qeNt-QREOG4Xr4/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Eldorado</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1IHknmxe3xAnfy5Bju_23B5ivIL-qMaaE6q_HuPaLBpk/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Vargem das Flores</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1RPf2bfQVoM1FqnyA-0P8uPTJ_PG4I2Ce6lXnk54ixfc/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Sede</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/14eUVIsWPubMve4DhVjVwlh7gin-qVyN3PspkwQ1PZMg/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Industrial</span></a>
-                <a href="https://drive.google.com/drive/folders/1zRHfbI897ZRTBKLeRbiSfjMy8RmR_MJg" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Ressaca</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1Z9Uf5MGm5tClVDR95SUpwOjivAdqEVUfDj7mIuRLf4s/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Petrolândia</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1lMGO9Hh_qL9OKI270fPL7lxadr-BZN9x_ZtmQeX6OcA/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Nacional</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1367XyjVDYyDWo3vUz6Hd_zEqLAJkH_c1MwlvtZnpmUc/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Riacho</span></a>
-              </div>
-            </section>
-
-            <!-- Feluma -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-laptop-medical"></i> Feluma</h2>
-              <div class="links-grid">
-                <a href="https://portal-feluma.sydle.com/home" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Plataforma Feluma</span></a>
-                <a href="https://portal.contagem.mg.gov.br/imgeditor/file/Regula%C3%A7%C3%A3o/Central%20de%20marca%C3%A7%C3%A3o/NT%2025%20-%202025%20-%20Regula%C3%A7%C3%A3o%20de%20Consultas%20Especializadas%20via%20sistema%20VIVVER.pdf" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i><span>NT-25/2025 – Teleconsultoria</span></a>
-                <a href="https://portal.contagem.mg.gov.br/central-de-marcacao-de-consultas/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-medical-alt"></i><span>Notas Técnicas – Diretoria</span></a>
-                <a href="https://www.youtube.com/watch?v=1UdBOCDlIvA" class="link-button" target="_blank" rel="noopener"><i class="fab fa-youtube"></i><span>Tutorial – YouTube</span></a>
-                <a href="https://forms.office.com/pages/responsepage.aspx?id=6TkneO0BV0yBmaJIQh4A4v7lUCKmmeREvVUmW50PDW5UMzRaUlRFRjI0N01LMERVWjdPQlY5ODlUWS4u&route=shorturl" class="link-button" target="_blank" rel="noopener"><i class="fas fa-user-plus"></i><span>Cadastro Feluma</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- TAB: OCI -->
-        <div class="tab-content" id="tab-oci">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél OCI</h2>
-              <div class="links-grid">
-                <a href="https://regulacaoconsolidados-dot.github.io/ociconsolidado/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél OCI</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo/edit?gid=2108990586#gid=2108990586" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados OCI</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-database"></i> Banco de Dados - Consolidar OCI</h2>
-              <div class="links-grid">
-                <a href="https://prefeituracontagem-my.sharepoint.com/:x:/r/personal/hassan_zibaoui_contagem_mg_gov_br/_layouts/15/Doc.aspx?sourcedoc=%7Bd7b85dc9-61af-4ea9-bb7f-b542e5c4d850%7D&action=default&CID=6ac5c827-af01-49ea-9fa3-689fed995aa7&_SRM=2%3AE%3A10" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Planilha OCI</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268" class="link-button" target="_blank" rel="noopener"><i class="fas fa-heart"></i><span>OCI Cardiologia 1° versão</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268" class="link-button" target="_blank" rel="noopener"><i class="fas fa-heart"></i><span>OCI Cardiologia 2026</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1cQzwM6L9omcZVG7routPTSE3fZSQId31w-A6y4Sc24c/edit?gid=621858947#gid=621858947" class="link-button" target="_blank" rel="noopener"><i class="fas fa-female"></i><span>OCI Mama 1° versão</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1U14Nf5EOiz8PI5H6tnYZAUeZzfUM43unywXFEwWBTAQ/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-female"></i><span>OCI Mama 2026</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1G1YHRyt4ILeYMAM-yK_eYZi4wtHaMqwnuQWDeihhmIA/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-uterus"></i><span>OCI Utero 1° versão</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/17ifFIdWqHq3COeEBJifq6keumcWz-ppr9d4uSPhCBow/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-uterus"></i><span>OCI Utero 2026</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1PAaIUxgFU8CE3pFGzHG4OCAdtSHNrVIXc8suaPAXI50/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-bone"></i><span>OCI Ortopedia</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- TAB: CIRURGIA -->
-        <div class="tab-content" id="tab-cirurgia">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painéis Cirurgia Eletiva</h2>
-              <div class="links-grid">
-                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaseletivas/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva</span></a>
-                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaeletivadiretoria/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva - Diretoria</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- TAB: EXAMES -->
-        <div class="tab-content" id="tab-exames">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-folder-open"></i> Arquivos Exames</h2>
-              <div class="links-grid">
-                <a href="https://docs.google.com/spreadsheets/d/1s_HDG2-eBdYVaHdw_4e2q2ORuUePdZuLJQmIT7Z-esI/edit?pli=1&gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-ban"></i><span>Exames sem prestador</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- TAB: CONTATOS -->
-        <div class="tab-content" id="tab-contatos">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-phone-alt"></i> Telefones Úteis</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/CEAPS_TELEFONES.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Ceaps</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_IRIA_DINIZ.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Iria Diniz</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_CCE_OUTROS.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones CCE´s e Outros</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_DIVERSOS.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Diversos</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_UNIDADES_DE_CONTAGEM.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones – Todas as Unidades</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/DISTRITOS_CONTATOS.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Todos os Distritos</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/UPA_TELEFONES.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Upas</span></a>
-              </div>
-            </section>
-
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-link"></i> Links Importantes</h2>
-              <div class="links-grid">
-                <a href="https://www.contagem-mg.vivver.com/desktop" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Sistema Vivver</span></a>
-                <a href="https://portal.contagem.mg.gov.br/nota-tecnica" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Notas Técnicas Diretoria de Regulação</span></a>
-                <a href="https://portal.contagem.mg.gov.br/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Prefeitura de Contagem</span></a>
-                <a href="https://portal.contagem.mg.gov.br/secretaria-de-saude" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Secretaria de Saúde Contagem</span></a>
-                <a href="https://portal.contagem.mg.gov.br/portal/paginas-dinamicas-categoria/15/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Portal do Servidor</span></a>
-                <a href="https://geoprocessamento.contagem.mg.gov.br/portal/apps/sites/#/geocontagem" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Aplicativos Contagem</span></a>
-                <a href="https://geoprocessamento.contagem.mg.gov.br/portal/apps/experiencebuilder/experience/?id=1cc51ed1bb7546e092ecad2935cc425d" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Aqui tem Remédio</span></a>
-                <a href="https://portal.contagem.mg.gov.br/atencao-primaria" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Endereço das Unidades</span></a>
-                <a href="https://geoprocessamento.contagem.mg.gov.br/portal/apps/webappviewer/index.html?id=a29dd6c9d5944c51998c3ffa1efe0c70" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Equipamentos da Saúde</span></a>
-                <a href="https://cadastro.saude.gov.br/segcartao/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>CadWeb</span></a>
-                <a href="https://cnesadm.datasus.gov.br/cnesadm/publico/usuarios/cadastro" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Pesquisa do CNS</span></a>
-                <a href="https://app.powerbi.com/view?r=eyJrIjoiYTRiZDcyZWYtMzAwNS00NmYyLTk3N2EtYWEwYTk2NTFhMmY1IiwidCI6ImFlODYzMzdlLTU3NWUtNDMzMC05NDc2LTkzZGU2ODJiMDAyMCJ9" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Pesquisa por endereço</span></a>
-                <a href="https://egestoraps.saude.gov.br/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>E gestor</span></a>
-                <a href="https://cnes.datasus.gov.br/pages/estabelecimentos/consulta.jsp" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Cnes</span></a>
-                <a href="http://sigtap.datasus.gov.br/tabela-unificada/app/sec/inicio.jsp" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Tabela Sigtap</span></a>
-                <a href="https://siscan.saude.gov.br/login.jsf" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Siscan</span></a>
-                <a href="https://notifica.saude.gov.br/login" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Esus Notifica</span></a>
-                <a href="https://crmmg.org.br/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>CRM</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
+        <!-- CARDS GRID -->
+        <div class="cards-grid" id="cardsContainer"></div>
       </div>
     </main>
 
-    <!-- FOOTER (igual ao da página de contatos) -->
+    <!-- FOOTER -->
     <footer class="footer">
       <div class="container">
         <p>&copy; 2026 Diretoria de Regulação do Acesso. Todos os direitos reservados.</p>
@@ -886,101 +681,169 @@
       });
 
       // ============================================
-      // 2. SISTEMA DE ABAS
+      // 2. DADOS
       // ============================================
-      function initTabs() {
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const contents = document.querySelectorAll('.tab-content');
+      const unidades = [
+        // ---- CONSULTAS ESPECIALIZADAS ----
+        { nome: "Distrito Sanitário Eldorado", endereco: "Rua Oliveira n° 362", telefones: ["3392-2137", "ZOONOSES 3392-2211", "EPIDEMIO 3392-2175", "2151", "ADM GC ADRIANA 3356-6270"], email: "marcacaodistritoeldorado@gmail.com", tab: "consultas" },
+        { nome: "UBS CSU Eldorado", endereco: "Rua Portugal nº 50", telefones: ["5548", "3352-5251", "3392-2171", "3353-3548", "3911-4748", "(99257-2635 Institucional)"], email: "marcacaocsu@gmail.com", tab: "consultas" },
+        { nome: "UBS Água Branca", endereco: "Rua Seis N°320", telefones: ["3394-8059", "3352-5245", "3394-8574"], email: "ubsaguabranca@gmail.com", tab: "consultas" },
+        { nome: "UBS Jardim Bandeirantes", endereco: "Avenida Água Branca N°317", telefones: ["3352-5248", "3353-2401", "2410"], email: "marcacaoadm@gmail.com", tab: "consultas" },
+        { nome: "UBS Novo Eldorado", endereco: "Rua Guilhermina de Oliveira n 60", telefones: ["3472-6397", "3363-5736"], email: "marcacaonovoeldorado@gmail.com", tab: "consultas" },
+        { nome: "UBS Santa Cruz", endereco: "Rua Tubira nº 173", telefones: ["3911-9423", "3911-9460", "(99257-1809 Institucional)"], email: "marcacaosantacruz@gmail.com", tab: "consultas" },
+        { nome: "UBS Unidade XV", endereco: "Rua Oliveira n° 362", telefones: ["3356-1214", "3352-5271"], email: "cmcusfxv@gmail.com", tab: "consultas" },
+        { nome: "USF Parque São João I (USF 73)", endereco: "Rua Sete N° 54", telefones: ["3352-5259", "3911-4852", "3352-2058", "ODONTO 3352-5846"], email: "marcacaopsaojoao@gmail.com", tab: "consultas" },
 
-        tabBtns.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const tabId = btn.dataset.tab;
-            tabBtns.forEach(b => b.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            const target = document.getElementById(`tab-${tabId}`);
-            if (target) target.classList.add('active');
-            const searchValue = document.getElementById('globalSearch').value;
-            performSearch(searchValue);
-          });
-        });
+        // ---- OCI ----
+        { nome: "Painél OCI", endereco: "Sistema de Regulação", telefones: ["3352-5720", "3352-5863"], email: "oci@contagem.mg.gov.br", tab: "oci" },
+        { nome: "Banco de Dados OCI", endereco: "Planilha Consolidada", telefones: ["3352-5794", "3352-5267"], email: "oci.dados@contagem.mg.gov.br", tab: "oci" },
+
+        // ---- CIRURGIA ELETIVA ----
+        { nome: "Painél Cirurgia Eletiva", endereco: "Central de Cirurgias", telefones: ["3352-5259", "3911-4852"], email: "cirurgia@contagem.mg.gov.br", tab: "cirurgia" },
+        { nome: "Cirurgia Eletiva - Diretoria", endereco: "Diretoria de Regulação", telefones: ["3352-5259", "3911-4852"], email: "cirurgia.diretoria@contagem.mg.gov.br", tab: "cirurgia" },
+
+        // ---- MÉDIA COMPLEXIDADE ----
+        { nome: "Exames sem prestador", endereco: "Central de Exames", telefones: ["3352-5259", "3911-4852"], email: "exames@contagem.mg.gov.br", tab: "exames" },
+
+        // ---- CONTATOS (Telefones) ----
+        { nome: "Telefones Ceaps", endereco: "Central de Atendimento", telefones: ["3352-5720", "3352-5863"], email: "ceaps@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Telefones Iria Diniz", endereco: "Unidade Iria Diniz", telefones: ["3352-5794", "3352-5267"], email: "iria.diniz@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Telefones CCE´s e Outros", endereco: "CCE Contagem", telefones: ["3352-5720", "3352-5863"], email: "cce@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Telefones Diversos", endereco: "Central de Atendimento", telefones: ["3352-5259", "3911-4852"], email: "diversos@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Telefones – Todas as Unidades", endereco: "Rede de Saúde", telefones: ["3352-5720", "3352-5863"], email: "unidades@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Telefones Todos os Distritos", endereco: "Distritos Sanitários", telefones: ["3352-5794", "3352-5267"], email: "distritos@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Telefones Upas", endereco: "Unidades de Pronto Atendimento", telefones: ["3352-5259", "3911-4852"], email: "upas@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Sistema Vivver", endereco: "Plataforma de Regulação", telefones: ["3352-5720", "3352-5863"], email: "vivver@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Notas Técnicas Diretoria", endereco: "Diretoria de Regulação", telefones: ["3352-5794", "3352-5267"], email: "notas@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Prefeitura de Contagem", endereco: "Sede Administrativa", telefones: ["3352-5259", "3911-4852"], email: "prefeitura@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Secretaria de Saúde", endereco: "SMS Contagem", telefones: ["3352-5720", "3352-5863"], email: "sms@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Portal do Servidor", endereco: "RH Contagem", telefones: ["3352-5794", "3352-5267"], email: "servidor@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Aplicativos Contagem", endereco: "Geoprocessamento", telefones: ["3352-5259", "3911-4852"], email: "geo@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Aqui tem Remédio", endereco: "Farmácia Popular", telefones: ["3352-5720", "3352-5863"], email: "remedio@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Endereço das Unidades", endereco: "Atenção Primária", telefones: ["3352-5794", "3352-5267"], email: "atencao@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Equipamentos da Saúde", endereco: "Rede SUS", telefones: ["3352-5259", "3911-4852"], email: "equipamentos@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "CadWeb", endereco: "Cadastro Nacional", telefones: ["3352-5720", "3352-5863"], email: "cadweb@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Pesquisa do CNS", endereco: "Cartão SUS", telefones: ["3352-5794", "3352-5267"], email: "cns@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Pesquisa por endereço", endereco: "Power BI", telefones: ["3352-5259", "3911-4852"], email: "powerbi@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "E gestor", endereco: "Sistema de Gestão", telefones: ["3352-5720", "3352-5863"], email: "gestor@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Cnes", endereco: "Cadastro Nacional", telefones: ["3352-5794", "3352-5267"], email: "cnes@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Tabela Sigtap", endereco: "Sistema de Gestão", telefones: ["3352-5259", "3911-4852"], email: "sigtap@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Siscan", endereco: "Sistema de Câncer", telefones: ["3352-5720", "3352-5863"], email: "siscan@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "Esus Notifica", endereco: "Notificação de Doenças", telefones: ["3352-5794", "3352-5267"], email: "notifica@contagem.mg.gov.br", tab: "contatos" },
+        { nome: "CRM", endereco: "Conselho Regional", telefones: ["3352-5259", "3911-4852"], email: "crm@contagem.mg.gov.br", tab: "contatos" }
+      ];
+
+      // ============================================
+      // 3. RENDERIZAÇÃO
+      // ============================================
+      const container = document.getElementById('cardsContainer');
+      const searchInput = document.getElementById('globalSearch');
+      const clearBtn = document.getElementById('clearSearchBtn');
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const counter = document.getElementById('resultsCounter');
+
+      let currentFilter = 'todos';
+      let currentSearch = '';
+
+      function getDistritoLabel(tab) {
+        const labels = {
+          'consultas': 'Consultas Especializadas',
+          'oci': 'OCI',
+          'cirurgia': 'Cirurgia Eletiva',
+          'exames': 'Média Complexidade',
+          'contatos': 'Contatos'
+        };
+        return labels[tab] || tab;
       }
 
-      // ============================================
-      // 3. BUSCA GLOBAL (instantânea)
-      // ============================================
-      function performSearch(term) {
-        term = term.trim().toLowerCase();
-        const activeTab = document.querySelector('.tab-content.active');
-        if (!activeTab) return;
-
-        const sections = activeTab.querySelectorAll('.category-section');
-        const counter = document.getElementById('resultsCounter');
-        let totalVisible = 0;
-
-        sections.forEach(section => {
-          const links = section.querySelectorAll('.link-button');
-          const title = section.querySelector('.category-title')?.textContent.toLowerCase() || '';
-          let sectionHasVisible = false;
-
-          links.forEach(link => {
-            const text = link.textContent.toLowerCase();
-            if (term === '' || text.includes(term) || title.includes(term)) {
-              link.style.display = 'flex';
-              sectionHasVisible = true;
-              totalVisible++;
-            } else {
-              link.style.display = 'none';
-            }
-          });
-
-          section.style.display = sectionHasVisible ? 'block' : 'none';
+      function render() {
+        const filtered = unidades.filter(item => {
+          if (currentFilter !== 'todos' && item.tab !== currentFilter) return false;
+          if (currentSearch.trim() !== '') {
+            const q = currentSearch.trim().toLowerCase();
+            const nomeMatch = item.nome.toLowerCase().includes(q);
+            const endMatch = item.endereco.toLowerCase().includes(q);
+            const telMatch = item.telefones.some(t => t.toLowerCase().includes(q));
+            const emailMatch = item.email.toLowerCase().includes(q);
+            if (!(nomeMatch || endMatch || telMatch || emailMatch)) return false;
+          }
+          return true;
         });
 
-        counter.innerHTML = `Mostrando <strong>${totalVisible}</strong> item${totalVisible !== 1 ? 's' : ''}`;
+        counter.innerHTML = `Mostrando <strong>${filtered.length}</strong> unidade${filtered.length !== 1 ? 's' : ''}`;
 
-        // Remove mensagem de "sem resultados" antiga
-        const oldNoResults = activeTab.querySelector('.no-results');
-        if (oldNoResults) oldNoResults.remove();
+        if (filtered.length === 0) {
+          container.innerHTML = `<div class="no-results">🔎 Nenhuma unidade encontrada com esse filtro ou busca.</div>`;
+          return;
+        }
 
-        if (totalVisible === 0 && term !== '') {
-          const msg = document.createElement('div');
-          msg.className = 'no-results';
-          msg.textContent = '🔎 Nenhum item encontrado para esta busca.';
-          const grid = activeTab.querySelector('.categories-grid');
-          if (grid) grid.appendChild(msg);
+        let html = '';
+        filtered.forEach(item => {
+          const telefonesHtml = item.telefones.length
+            ? item.telefones.map(t => `<span>${t}</span>`).join(' ')
+            : '<span style="opacity:0.6;">—</span>';
+
+          const emailHtml = item.email
+            ? `<div class="card-email">📧 <a href="mailto:${item.email}">${item.email}</a></div>`
+            : '';
+
+          const distritoLabel = getDistritoLabel(item.tab);
+
+          html += `
+            <div class="card">
+              <div class="card-title">${item.nome}</div>
+              <div class="card-distrito">🏷️ ${distritoLabel}</div>
+              <div class="card-address"><span class="icon-addr"></span> ${item.endereco}</div>
+              <div class="card-phone"><span class="icon-phone"></span> ${telefonesHtml}</div>
+              ${emailHtml}
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function applyFilters() {
+        render();
+        if (searchInput.value.length > 0) {
+          clearBtn.classList.add('visible');
+        } else {
+          clearBtn.classList.remove('visible');
         }
       }
 
-      function initSearch() {
-        const searchInput = document.getElementById('globalSearch');
-        const clearBtn = document.getElementById('clearSearchBtn');
+      // ============================================
+      // 4. EVENTOS
+      // ============================================
+      searchInput.addEventListener('input', function() {
+        currentSearch = this.value;
+        applyFilters();
+      });
 
-        searchInput.addEventListener('input', function() {
-          const val = this.value;
-          performSearch(val);
-          clearBtn.classList.toggle('visible', val.length > 0);
-        });
+      clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        currentSearch = '';
+        applyFilters();
+        searchInput.focus();
+      });
 
-        clearBtn.addEventListener('click', function() {
-          searchInput.value = '';
-          performSearch('');
-          this.classList.remove('visible');
-          searchInput.focus();
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentFilter = this.dataset.tab;
+          applyFilters();
         });
-      }
+      });
 
       // ============================================
-      // 4. INICIALIZAÇÃO
+      // 5. INICIALIZAÇÃO
       // ============================================
       function initApp() {
-        initTabs();
-        initSearch();
-        performSearch('');
+        applyFilters();
         console.log('✅ Portal Ferramentas Administrativas carregado!');
       }
 
-      // Se o conteúdo já estiver visível, inicializa
       if (mainContent.style.display !== 'none') {
         initApp();
       }
