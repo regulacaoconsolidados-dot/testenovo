@@ -15,30 +15,29 @@
     }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f8fafc;
-      color: #1f2937;
-      line-height: 1.5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f7fc;
+      color: #1e2a3e;
+      min-height: 100vh;
     }
 
     .container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 1.5rem;
     }
 
     /* ===== LOGIN OVERLAY ===== */
     #login-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #0f2b5e, #1e3a8a);
+      inset: 0;
+      background: rgba(11, 43, 74, 0.92);
+      backdrop-filter: blur(8px);
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       z-index: 9999;
+      padding: 1.5rem;
       transition: opacity 0.4s ease;
     }
 
@@ -50,12 +49,11 @@
     .login-box {
       background: white;
       border-radius: 32px;
-      padding: 50px 40px 35px;
-      max-width: 420px;
-      width: 90%;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
-      text-align: center;
-      animation: fadeUp 0.5s ease;
+      padding: 2.5rem 2.5rem 2rem;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 32px 64px rgba(0, 0, 0, 0.25);
+      animation: fadeUp 0.4s ease;
     }
 
     @keyframes fadeUp {
@@ -64,96 +62,103 @@
     }
 
     .login-header {
-      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.5rem;
     }
 
     .login-header i {
-      font-size: 56px;
-      color: #1e3a8a;
-      margin-bottom: 8px;
+      font-size: 2.2rem;
+      color: #0b2b4a;
+      background: #e5edf8;
+      padding: 0.5rem;
+      border-radius: 16px;
     }
 
     .login-header h1 {
-      font-size: 22px;
-      color: #0f2b5e;
+      font-size: 1.3rem;
       font-weight: 700;
+      color: #0b2b4a;
+      line-height: 1.2;
     }
 
     .login-subtitle {
-      color: #475569;
-      font-size: 14px;
-      margin-bottom: 28px;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 20px;
-    }
-
-    .login-form {
-      text-align: left;
+      color: #5b6f8a;
+      font-size: 0.9rem;
+      margin-bottom: 1.8rem;
+      font-weight: 400;
     }
 
     .login-form label {
       display: block;
       font-weight: 600;
-      color: #1e293b;
-      margin-bottom: 6px;
-      font-size: 14px;
+      font-size: 0.85rem;
+      color: #1e2a3e;
+      margin-bottom: 0.4rem;
     }
 
     .login-form label i {
-      margin-right: 8px;
-      color: #3b82f6;
+      margin-right: 0.4rem;
+      color: #1a5b7a;
     }
 
     .password-wrapper {
       display: flex;
       align-items: center;
-      background: #f1f5f9;
-      border-radius: 12px;
-      border: 2px solid #e2e8f0;
-      transition: border-color 0.3s;
-      margin-bottom: 20px;
+      background: #f0f4fe;
+      border-radius: 14px;
+      border: 1px solid #dde3ed;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      overflow: hidden;
     }
 
     .password-wrapper:focus-within {
-      border-color: #3b82f6;
+      border-color: #0b2b4a;
+      box-shadow: 0 0 0 3px rgba(11, 43, 74, 0.1);
     }
 
     .password-wrapper input {
-      flex: 1;
       border: none;
+      padding: 0.9rem 1.2rem;
+      font-size: 1rem;
+      width: 100%;
       background: transparent;
-      padding: 14px 16px;
-      font-size: 16px;
       outline: none;
-      font-family: 'Inter', sans-serif;
+      font-family: inherit;
     }
 
     .password-wrapper button {
-      background: transparent;
+      background: none;
       border: none;
-      padding: 0 16px;
+      padding: 0 1.2rem;
+      font-size: 1.1rem;
+      color: #7a8aa0;
       cursor: pointer;
-      color: #94a3b8;
-      font-size: 18px;
+      transition: color 0.2s;
+    }
+
+    .password-wrapper button:hover {
+      color: #0b2b4a;
     }
 
     .login-btn {
       width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      padding: 0.9rem;
+      background: #0b2b4a;
       color: white;
       border: none;
-      border-radius: 12px;
-      font-size: 17px;
+      border-radius: 14px;
+      font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s;
-      font-family: 'Inter', sans-serif;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 1.2rem;
+      font-family: inherit;
     }
 
     .login-btn:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 25px rgba(30,58,138,0.3);
+      background: #1a3f62;
     }
 
     .login-btn:active {
@@ -161,186 +166,208 @@
     }
 
     .login-error {
-      color: #dc2626;
-      font-size: 14px;
-      margin-top: 12px;
-      min-height: 24px;
+      color: #c0392b;
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+      min-height: 1.5rem;
+      text-align: center;
     }
 
     .login-footer {
-      margin-top: 25px;
-      padding-top: 18px;
-      border-top: 1px solid #e2e8f0;
-      font-size: 12px;
-      color: #94a3b8;
+      margin-top: 1.8rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #9aa6b9;
+      border-top: 1px solid #edf0f7;
+      padding-top: 1.2rem;
     }
 
     /* ===== HEADER ===== */
     .header {
-      background: linear-gradient(135deg, #0f2b5e, #1e3a8a);
+      background: linear-gradient(145deg, #0b2b4a 0%, #1a3f62 100%);
       color: white;
-      padding: 30px 0;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 2rem 0;
+      border-radius: 0 0 28px 28px;
+      box-shadow: 0 8px 28px rgba(0, 20, 40, 0.2);
+      margin-bottom: 2rem;
     }
 
     .header-content {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 20px;
+      gap: 1.5rem;
     }
 
     .logo-section {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 1rem;
     }
 
-    .logo-section i {
-      font-size: 52px;
-      color: #60a5fa;
+    .logo-section > i {
+      font-size: 2.4rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.6rem;
+      border-radius: 18px;
     }
 
-    .main-title {
-      font-size: 28px;
+    .title-section .main-title {
+      font-size: 1.6rem;
       font-weight: 700;
-      margin-bottom: 8px;
       letter-spacing: -0.5px;
     }
 
-    .subtitle {
-      font-size: 18px;
+    .title-section .subtitle {
+      font-size: 0.95rem;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    .title-section .h-meta {
+      font-size: 0.8rem;
+      opacity: 0.75;
+      margin-top: 0.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 0.8rem;
+    }
+
+    .title-section .h-meta b {
       color: #bfdbfe;
-      margin-bottom: 8px;
+      font-weight: 600;
     }
 
-    .h-meta {
-      font-size: 14px;
-      color: #e2e8f0;
-    }
-
-    .right-section {
-      text-align: right;
-    }
-
-    .slogan {
+    .right-section .slogan {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
       font-style: italic;
-      font-size: 18px;
-      color: #fef9c3;
-      max-width: 400px;
-      font-weight: 500;
+      font-weight: 300;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     /* ===== SEARCH ===== */
-    .global-search-section {
-      margin: 30px 0 20px;
-      display: flex;
-      justify-content: center;
-    }
-
-    .search-box {
-      display: flex;
-      align-items: center;
+    .search-wrapper {
+      max-width: 700px;
+      margin: 0 auto 2.5rem auto;
       background: white;
       border-radius: 60px;
-      padding: 5px 5px 5px 24px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      border: 1px solid #e2e8f0;
-      transition: all 0.3s ease;
-      max-width: 600px;
-      width: 100%;
+      padding: 0.3rem 0.3rem 0.3rem 1.8rem;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      border: 1px solid #e9edf4;
+      transition: box-shadow 0.25s, border-color 0.2s;
     }
 
-    .search-box:focus-within {
-      box-shadow: 0 8px 25px rgba(30,58,138,0.15);
-      border-color: #3b82f6;
-      transform: scale(1.01);
+    .search-wrapper:focus-within {
+      box-shadow: 0 8px 24px rgba(0, 70, 150, 0.12);
+      border-color: #1a3f62;
     }
 
-    .search-box i {
-      color: #94a3b8;
-      font-size: 18px;
-      margin-right: 12px;
-    }
-
-    .search-box input {
-      flex: 1;
+    .search-wrapper input {
       border: none;
-      outline: none;
-      font-size: 16px;
-      padding: 14px 0;
+      padding: 0.9rem 0;
+      font-size: 1rem;
+      width: 100%;
       background: transparent;
-      font-family: 'Inter', sans-serif;
+      outline: none;
+      color: #1e2a3e;
+      font-family: inherit;
     }
 
-    .search-box input::placeholder {
-      color: #94a3b8;
+    .search-wrapper input::placeholder {
+      color: #9aa6b9;
+      font-weight: 400;
     }
 
-    .search-box .clear-btn {
+    .search-wrapper .search-icon {
+      color: #6b7f9a;
+      font-size: 1.2rem;
+      margin-right: 0.5rem;
+    }
+
+    .search-wrapper .clear-btn {
       background: none;
       border: none;
-      color: #94a3b8;
-      font-size: 20px;
+      color: #9aa6b9;
+      font-size: 1.3rem;
       cursor: pointer;
-      padding: 0 16px;
+      padding: 0 0.8rem;
       display: none;
       transition: color 0.2s;
     }
 
-    .search-box .clear-btn:hover {
-      color: #1e3a8a;
+    .search-wrapper .clear-btn:hover {
+      color: #1a3f62;
     }
 
-    .search-box .clear-btn.visible {
+    .search-wrapper .clear-btn.visible {
       display: block;
+    }
+
+    /* ===== RESULTS COUNTER ===== */
+    .results-counter {
+      text-align: center;
+      color: #3a4c6b;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    .results-counter strong {
+      color: #0b2b4a;
+      font-weight: 600;
     }
 
     /* ===== TABS ===== */
     .tabs-nav {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin: 30px 0 30px;
-      padding-bottom: 0;
-      border-bottom: 2px solid #e2e8f0;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      background: white;
+      padding: 0.6rem 1rem;
+      border-radius: 60px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      border: 1px solid #edf0f7;
     }
 
     .tab-btn {
       background: transparent;
       border: none;
-      padding: 12px 28px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #475569;
-      cursor: pointer;
+      padding: 0.6rem 1.4rem;
       border-radius: 40px;
-      transition: all 0.25s ease;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: #4a5b77;
+      cursor: pointer;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-family: 'Inter', sans-serif;
+      gap: 0.5rem;
+      font-family: inherit;
     }
 
     .tab-btn i {
-      font-size: 18px;
+      font-size: 1rem;
     }
 
     .tab-btn:hover {
-      background-color: #eef2ff;
-      color: #1e3a8a;
-      transform: translateY(-2px);
+      background: #f0f5ff;
+      color: #0b2b4a;
     }
 
     .tab-btn.active {
-      background: #1e3a8a;
+      background: #0b2b4a;
       color: white;
-      box-shadow: 0 6px 14px rgba(30,58,138,0.3);
+      box-shadow: 0 4px 12px rgba(11, 43, 74, 0.2);
     }
 
-    /* ===== TAB CONTENT ===== */
     .tab-content {
       display: none;
       animation: fadeIn 0.3s ease;
@@ -351,137 +378,112 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ===== CATEGORIES ===== */
+    /* ===== CATEGORIES / CARDS ===== */
     .categories-grid {
       display: flex;
       flex-direction: column;
-      gap: 32px;
-      margin-bottom: 50px;
+      gap: 2rem;
     }
 
     .category-section {
       background: white;
       border-radius: 24px;
-      padding: 28px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-      border: 1px solid #eef2ff;
-      transition: all 0.3s ease;
+      padding: 1.5rem 1.8rem 1.8rem;
+      border: 1px solid #edf0f7;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      transition: box-shadow 0.2s, transform 0.2s;
     }
 
     .category-section:hover {
-      box-shadow: 0 15px 35px -10px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
       transform: translateY(-2px);
     }
 
     .category-title {
-      font-size: 22px;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: #0f2b5e;
-      margin-bottom: 24px;
-      padding-bottom: 14px;
-      border-bottom: 3px solid #e0e7ff;
+      color: #0b2b4a;
+      margin-bottom: 1.2rem;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 0.6rem;
     }
 
     .category-title i {
-      font-size: 24px;
-      color: #2563eb;
+      color: #1a5b7a;
+      font-size: 1.2rem;
     }
 
-    /* ===== LINKS GRID ===== */
     .links-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.8rem;
     }
 
     .link-button {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 16px 20px;
-      background-color: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 18px;
-      color: #1e293b;
+      gap: 0.7rem;
+      padding: 0.7rem 1.2rem;
+      background: #f8faff;
+      border-radius: 14px;
+      border: 1px solid #e9edf4;
+      color: #1e2a3e;
       text-decoration: none;
-      transition: all 0.25s ease;
-      font-size: 14px;
+      font-size: 0.85rem;
       font-weight: 500;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-      font-family: 'Inter', sans-serif;
-    }
-
-    .link-button:hover {
-      background-color: #f8fafc;
-      transform: translateY(-3px);
-      box-shadow: 0 12px 20px -12px rgba(0,0,0,0.15);
-      border-color: #cbd5e1;
+      transition: all 0.2s;
+      font-family: inherit;
     }
 
     .link-button i {
-      font-size: 20px;
-      width: 26px;
+      width: 1.6rem;
       text-align: center;
-      color: #3b82f6;
+      color: #1a5b7a;
+      font-size: 1rem;
+      flex-shrink: 0;
     }
 
-    .link-button:hover i {
-      color: #1e3a8a;
+    .link-button:hover {
+      background: #f0f5ff;
+      border-color: #b0c6df;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 20, 40, 0.06);
     }
 
     .link-button.primary-button {
-      background: linear-gradient(105deg, #1e3a8a 0%, #1e40af 100%);
-      border: none;
-      color: white !important;
-      font-weight: 700;
-      box-shadow: 0 6px 14px rgba(30,58,138,0.25);
-    }
-
-    .link-button.primary-button i {
-      color: white !important;
-    }
-
-    .link-button.primary-button:hover {
-      background: linear-gradient(105deg, #172554 0%, #1e3a8a 100%);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 22px -10px rgba(30,58,138,0.4);
+      background: #0b2b4a;
+      border-color: #0b2b4a;
       color: white;
     }
 
-    /* ===== RESULTS COUNTER ===== */
-    .results-counter {
-      text-align: center;
-      color: #475569;
-      font-size: 14px;
-      margin-bottom: 20px;
-      font-weight: 400;
+    .link-button.primary-button i {
+      color: #bfdbfe;
     }
 
-    .results-counter strong {
-      color: #1e3a8a;
-      font-weight: 700;
+    .link-button.primary-button:hover {
+      background: #1a3f62;
+      border-color: #1a3f62;
     }
 
+    /* ===== NO RESULTS ===== */
     .no-results {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 40px 20px;
-      color: #475569;
-      background: #f1f5f9;
+      padding: 3rem 1.5rem;
+      color: #3a4c6b;
+      background: #f0f4fe;
       border-radius: 20px;
-      font-size: 16px;
+      font-size: 1rem;
     }
 
     /* ===== FOOTER ===== */
     .footer {
-      background-color: #0f172a;
+      background: #0f172a;
       color: #cbd5e1;
       text-align: center;
       padding: 28px 0;
@@ -494,67 +496,64 @@
     @media (max-width: 768px) {
       .header-content {
         flex-direction: column;
-        text-align: center;
+        align-items: flex-start;
       }
-      .logo-section {
-        flex-direction: column;
-        text-align: center;
+
+      .right-section .slogan {
+        align-self: flex-start;
       }
-      .right-section {
-        text-align: center;
+
+      .tabs-nav {
+        border-radius: 24px;
+        padding: 0.5rem;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        gap: 0.3rem;
       }
-      .slogan {
-        margin: 0 auto;
+
+      .tab-btn {
+        font-size: 0.75rem;
+        padding: 0.4rem 1rem;
+        white-space: nowrap;
       }
+
       .links-grid {
         grid-template-columns: 1fr;
       }
-      .tabs-nav {
-        justify-content: center;
-        gap: 8px;
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        padding-bottom: 8px;
-      }
-      .tab-btn {
-        padding: 10px 18px;
-        font-size: 13px;
-        white-space: nowrap;
-      }
-      .search-box {
-        padding: 5px 5px 5px 16px;
-      }
-      .search-box input {
-        min-width: 120px;
-        font-size: 15px;
-      }
-      .category-title {
-        font-size: 18px;
-      }
+
       .login-box {
-        padding: 30px 20px 25px;
+        padding: 2rem 1.5rem 1.5rem;
       }
-      .main-title {
-        font-size: 22px;
+
+      .login-header h1 {
+        font-size: 1.1rem;
       }
-      .subtitle {
-        font-size: 15px;
+
+      .category-section {
+        padding: 1.2rem;
+      }
+
+      .search-wrapper {
+        padding: 0.2rem 0.2rem 0.2rem 1.2rem;
+      }
+
+      .search-wrapper input {
+        padding: 0.7rem 0;
+        font-size: 0.9rem;
       }
     }
 
     @media (max-width: 480px) {
       .container {
-        padding: 0 12px;
+        padding: 0 1rem;
       }
+
       .header {
-        padding: 20px 0;
+        padding: 1.2rem 0;
       }
-      .category-section {
-        padding: 18px 16px;
-      }
-      .tab-btn {
-        padding: 8px 14px;
-        font-size: 12px;
+
+      .title-section .main-title {
+        font-size: 1.3rem;
       }
     }
   </style>
@@ -592,13 +591,13 @@
         <div class="header-content">
           <div class="logo-section">
             <i class="fas fa-hospital"></i>
-            <div>
+            <div class="title-section">
               <h1 class="main-title">Ferramentas Administrativas</h1>
               <p class="subtitle">Diretoria de Regulação do Acesso</p>
               <div class="h-meta">
-                Superintendente: <b style="color:#bfdbfe">Yara Ariane M.S.Souza</b>
-                &nbsp;•&nbsp; Diretora: <b style="color:#bfdbfe">Paloma Morais</b>
-                &nbsp;•&nbsp; Desenvolvido por <b style="color:#bfdbfe">Ana P. A. Silva — Matric. 201704</b>
+                Superintendente: <b>Yara Ariane M.S.Souza</b>
+                &nbsp;•&nbsp; Diretora: <b>Paloma Morais</b>
+                &nbsp;•&nbsp; Desenvolvido por <b>Ana P. A. Silva — Matric. 201704</b>
               </div>
             </div>
           </div>
@@ -615,12 +614,10 @@
     <main>
       <div class="container">
         <!-- SEARCH -->
-        <div class="global-search-section">
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" class="global-search-input" placeholder="Buscar ferramentas, painéis ou documentos..." id="globalSearch" />
-            <button class="clear-btn" id="clearSearchBtn" aria-label="Limpar busca">✕</button>
-          </div>
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="globalSearch" placeholder="Buscar ferramentas, painéis ou documentos..." autofocus />
+          <button class="clear-btn" id="clearSearchBtn" aria-label="Limpar busca">✕</button>
         </div>
 
         <!-- RESULTS COUNTER -->
@@ -773,7 +770,7 @@
           </div>
         </div>
 
-        <!-- TAB: CONTATOS (telefones fixos) -->
+        <!-- TAB: CONTATOS -->
         <div class="tab-content" id="tab-contatos">
           <div class="categories-grid">
             <section class="category-section">
@@ -847,7 +844,6 @@
           mainContent.style.display = 'block';
           loginError.textContent = '';
           senhaInput.value = '';
-          // Inicializa após login
           initApp();
         } else {
           loginError.textContent = '❌ Senha incorreta. Tente novamente.';
@@ -882,7 +878,6 @@
             btn.classList.add('active');
             const target = document.getElementById(`tab-${tabId}`);
             if (target) target.classList.add('active');
-            // Reaplicar busca na nova aba
             const searchValue = document.getElementById('globalSearch').value;
             performSearch(searchValue);
           });
@@ -894,11 +889,14 @@
       // ============================================
       function performSearch(term) {
         term = term.trim().toLowerCase();
-        const allSections = document.querySelectorAll('.tab-content.active .category-section');
+        const activeTab = document.querySelector('.tab-content.active');
+        if (!activeTab) return;
+
+        const sections = activeTab.querySelectorAll('.category-section');
         const counter = document.getElementById('resultsCounter');
         let totalVisible = 0;
 
-        allSections.forEach(section => {
+        sections.forEach(section => {
           const links = section.querySelectorAll('.link-button');
           const title = section.querySelector('.category-title')?.textContent.toLowerCase() || '';
           let sectionHasVisible = false;
@@ -917,20 +915,18 @@
           section.style.display = sectionHasVisible ? 'block' : 'none';
         });
 
-        // Atualiza contador
         counter.innerHTML = `Mostrando <strong>${totalVisible}</strong> item${totalVisible !== 1 ? 's' : ''}`;
 
-        // Mostrar mensagem se nenhum resultado
-        const noResults = document.querySelector('.no-results');
+        // Remove mensagem de "sem resultados" antiga
+        const oldNoResults = activeTab.querySelector('.no-results');
+        if (oldNoResults) oldNoResults.remove();
+
         if (totalVisible === 0 && term !== '') {
-          if (!noResults) {
-            const msg = document.createElement('div');
-            msg.className = 'no-results';
-            msg.textContent = '🔎 Nenhum item encontrado para esta busca.';
-            document.querySelector('.tab-content.active .categories-grid').appendChild(msg);
-          }
-        } else {
-          if (noResults) noResults.remove();
+          const msg = document.createElement('div');
+          msg.className = 'no-results';
+          msg.textContent = '🔎 Nenhum item encontrado para esta busca.';
+          const grid = activeTab.querySelector('.categories-grid');
+          if (grid) grid.appendChild(msg);
         }
       }
 
@@ -958,12 +954,11 @@
       function initApp() {
         initTabs();
         initSearch();
-        // Força busca inicial vazia para mostrar todos
         performSearch('');
         console.log('✅ Portal Ferramentas Administrativas carregado!');
       }
 
-      // Se o conteúdo já estiver visível (login bypass), inicializa direto
+      // Se o conteúdo já estiver visível, inicializa
       if (mainContent.style.display !== 'none') {
         initApp();
       }
