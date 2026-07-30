@@ -182,74 +182,78 @@
       padding-top: 1.2rem;
     }
 
-    /* ===== HEADER ===== */
+    /* ===== HEADER (idêntico ao da página de contatos) ===== */
     .header {
       background: linear-gradient(145deg, #0b2b4a 0%, #1a3f62 100%);
       color: white;
-      padding: 2rem 0;
-      border-radius: 0 0 28px 28px;
-      box-shadow: 0 8px 28px rgba(0, 20, 40, 0.2);
+      padding: 2rem 2rem 1.5rem 2rem;
+      border-radius: 28px;
+      box-shadow: 0 12px 28px rgba(0, 20, 40, 0.25);
       margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
     }
 
-    .header-content {
+    .header::after {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 280px;
+      height: 280px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .header h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .header-sub {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    .logo-section {
-      display: flex;
-      align-items: center;
+      align-items: flex-end;
       gap: 1rem;
+      margin-top: 0.4rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 0.9rem;
     }
 
-    .logo-section > i {
-      font-size: 2.4rem;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 0.6rem;
-      border-radius: 18px;
-    }
-
-    .title-section .main-title {
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .title-section .subtitle {
+    .header-sub .org {
       font-size: 0.95rem;
       opacity: 0.85;
-      font-weight: 400;
+      line-height: 1.5;
     }
 
-    .title-section .h-meta {
-      font-size: 0.8rem;
-      opacity: 0.75;
-      margin-top: 0.2rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem 0.8rem;
+    .header-sub .org strong {
+      opacity: 1;
+      color: #ffd966;
     }
 
-    .title-section .h-meta b {
-      color: #bfdbfe;
-      font-weight: 600;
-    }
-
-    .right-section .slogan {
-      background: rgba(255, 255, 255, 0.06);
-      padding: 0.5rem 1.2rem;
+    .header-sub .dev {
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.3rem 1rem;
       border-radius: 40px;
+      backdrop-filter: blur(2px);
+    }
+
+    .header-sub .motto {
+      width: 100%;
       font-style: italic;
       font-weight: 300;
+      letter-spacing: 0.3px;
       font-size: 0.9rem;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      opacity: 0.8;
+      margin-top: 0.25rem;
     }
 
-    /* ===== SEARCH ===== */
+    /* ===== SEARCH (idêntico ao da página de contatos) ===== */
     .search-wrapper {
       max-width: 700px;
       margin: 0 auto 2.5rem auto;
@@ -382,7 +386,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ===== CATEGORIES / CARDS ===== */
+    /* ===== CATEGORIES / CARDS (estilo igual ao da página de contatos) ===== */
     .categories-grid {
       display: flex;
       flex-direction: column;
@@ -418,9 +422,10 @@
       font-size: 1.2rem;
     }
 
+    /* ===== LINKS GRID (estilo igual ao da página de contatos) ===== */
     .links-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 0.8rem;
     }
 
@@ -428,7 +433,7 @@
       display: flex;
       align-items: center;
       gap: 0.7rem;
-      padding: 0.7rem 1.2rem;
+      padding: 0.9rem 1.2rem;
       background: #f8faff;
       border-radius: 14px;
       border: 1px solid #e9edf4;
@@ -481,7 +486,7 @@
       font-size: 1rem;
     }
 
-    /* ===== FOOTER ===== */
+    /* ===== FOOTER (igual ao da página de contatos) ===== */
     .footer {
       background: #0f172a;
       color: #cbd5e1;
@@ -494,15 +499,16 @@
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
-      .header-content {
+      .header {
+        padding: 1.5rem;
+      }
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      .header-sub {
         flex-direction: column;
         align-items: flex-start;
       }
-
-      .right-section .slogan {
-        align-self: flex-start;
-      }
-
       .tabs-nav {
         border-radius: 24px;
         padding: 0.5rem;
@@ -510,33 +516,26 @@
         flex-wrap: nowrap;
         gap: 0.3rem;
       }
-
       .tab-btn {
         font-size: 0.75rem;
         padding: 0.4rem 1rem;
         white-space: nowrap;
       }
-
       .links-grid {
         grid-template-columns: 1fr;
       }
-
       .login-box {
         padding: 2rem 1.5rem 1.5rem;
       }
-
       .login-header h1 {
         font-size: 1.1rem;
       }
-
       .category-section {
         padding: 1.2rem;
       }
-
       .search-wrapper {
         padding: 0.2rem 0.2rem 0.2rem 1.2rem;
       }
-
       .search-wrapper input {
         padding: 0.7rem 0;
         font-size: 0.9rem;
@@ -547,13 +546,8 @@
       .container {
         padding: 0 1rem;
       }
-
       .header {
-        padding: 1.2rem 0;
-      }
-
-      .title-section .main-title {
-        font-size: 1.3rem;
+        padding: 1.2rem;
       }
     }
   </style>
@@ -585,27 +579,20 @@
 
   <!-- ===== CONTEÚDO PRINCIPAL ===== -->
   <div id="main-content" style="display: none;">
-    <!-- HEADER -->
+    <!-- HEADER (idêntico ao da página de contatos) -->
     <header class="header">
-      <div class="container">
-        <div class="header-content">
-          <div class="logo-section">
-            <i class="fas fa-hospital"></i>
-            <div class="title-section">
-              <h1 class="main-title">Ferramentas Administrativas</h1>
-              <p class="subtitle">Diretoria de Regulação do Acesso</p>
-              <div class="h-meta">
-                Superintendente: <b>Yara Ariane M.S.Souza</b>
-                &nbsp;•&nbsp; Diretora: <b>Paloma Morais</b>
-                &nbsp;•&nbsp; Desenvolvido por <b>Ana P. A. Silva — Matric. 201704</b>
-              </div>
-            </div>
-          </div>
-          <div class="right-section">
-            <div class="slogan">
-              <p>"Nenhum de nós é tão bom quanto todos nós juntos!"</p>
-            </div>
-          </div>
+      <h1>🏥 Ferramentas Administrativas</h1>
+      <div class="header-sub">
+        <div class="org">
+          <strong>Diretoria de Regulação do Acesso</strong><br>
+          Superintendente: Yara Ariane M.S.Souza<br>
+          Diretora: Paloma Morais
+        </div>
+        <div class="dev">
+          Desenvolvido por Ana P. A. Silva — Matric. 201704
+        </div>
+        <div class="motto">
+          “Nenhum de nós é tão bom quanto todos nós juntos!”
         </div>
       </div>
     </header>
@@ -613,7 +600,7 @@
     <!-- MAIN -->
     <main>
       <div class="container">
-        <!-- SEARCH -->
+        <!-- SEARCH (idêntico ao da página de contatos) -->
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
           <input type="text" id="globalSearch" placeholder="Buscar ferramentas, painéis ou documentos..." autofocus />
@@ -814,7 +801,7 @@
       </div>
     </main>
 
-    <!-- FOOTER -->
+    <!-- FOOTER (igual ao da página de contatos) -->
     <footer class="footer">
       <div class="container">
         <p>&copy; 2026 Diretoria de Regulação do Acesso. Todos os direitos reservados.</p>
