@@ -6,74 +6,730 @@
   <title>Ferramentas Administrativas - Diretoria de Regulação do Acesso</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ===== RESET & GLOBAL ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ===== LOGIN OVERLAY ===== */
+    #login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f2b5e, #1e3a8a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
+
+    #login-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .login-box {
+      background: white;
+      border-radius: 32px;
+      padding: 50px 40px 35px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      text-align: center;
+      animation: fadeUp 0.5s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-header {
+      margin-bottom: 10px;
+    }
+
+    .login-header i {
+      font-size: 56px;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .login-header h1 {
+      font-size: 22px;
+      color: #0f2b5e;
+      font-weight: 700;
+    }
+
+    .login-subtitle {
+      color: #475569;
+      font-size: 14px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 20px;
+    }
+
+    .login-form {
+      text-align: left;
+    }
+
+    .login-form label {
+      display: block;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .login-form label i {
+      margin-right: 8px;
+      color: #3b82f6;
+    }
+
+    .password-wrapper {
+      display: flex;
+      align-items: center;
+      background: #f1f5f9;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      transition: border-color 0.3s;
+      margin-bottom: 20px;
+    }
+
+    .password-wrapper:focus-within {
+      border-color: #3b82f6;
+    }
+
+    .password-wrapper input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 14px 16px;
+      font-size: 16px;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .password-wrapper button {
+      background: transparent;
+      border: none;
+      padding: 0 16px;
+      cursor: pointer;
+      color: #94a3b8;
+      font-size: 18px;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .login-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 25px rgba(30,58,138,0.3);
+    }
+
+    .login-btn:active {
+      transform: scale(0.97);
+    }
+
+    .login-error {
+      color: #dc2626;
+      font-size: 14px;
+      margin-top: 12px;
+      min-height: 24px;
+    }
+
+    .login-footer {
+      margin-top: 25px;
+      padding-top: 18px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: linear-gradient(135deg, #0f2b5e, #1e3a8a);
+      color: white;
+      padding: 30px 0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo-section i {
+      font-size: 52px;
+      color: #60a5fa;
+    }
+
+    .main-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #bfdbfe;
+      margin-bottom: 8px;
+    }
+
+    .h-meta {
+      font-size: 14px;
+      color: #e2e8f0;
+    }
+
+    .right-section {
+      text-align: right;
+    }
+
+    .slogan {
+      font-style: italic;
+      font-size: 18px;
+      color: #fef9c3;
+      max-width: 400px;
+      font-weight: 500;
+    }
+
+    /* ===== SEARCH ===== */
+    .global-search-section {
+      margin: 30px 0 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 60px;
+      padding: 5px 5px 5px 24px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .search-box:focus-within {
+      box-shadow: 0 8px 25px rgba(30,58,138,0.15);
+      border-color: #3b82f6;
+      transform: scale(1.01);
+    }
+
+    .search-box i {
+      color: #94a3b8;
+      font-size: 18px;
+      margin-right: 12px;
+    }
+
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      padding: 14px 0;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .search-box input::placeholder {
+      color: #94a3b8;
+    }
+
+    .search-box .clear-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 0 16px;
+      display: none;
+      transition: color 0.2s;
+    }
+
+    .search-box .clear-btn:hover {
+      color: #1e3a8a;
+    }
+
+    .search-box .clear-btn.visible {
+      display: block;
+    }
+
+    /* ===== TABS ===== */
+    .tabs-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 30px 0 30px;
+      padding-bottom: 0;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      border-radius: 40px;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tab-btn i {
+      font-size: 18px;
+    }
+
+    .tab-btn:hover {
+      background-color: #eef2ff;
+      color: #1e3a8a;
+      transform: translateY(-2px);
+    }
+
+    .tab-btn.active {
+      background: #1e3a8a;
+      color: white;
+      box-shadow: 0 6px 14px rgba(30,58,138,0.3);
+    }
+
+    /* ===== TAB CONTENT ===== */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== CATEGORIES ===== */
+    .categories-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-bottom: 50px;
+    }
+
+    .category-section {
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      border: 1px solid #eef2ff;
+      transition: all 0.3s ease;
+    }
+
+    .category-section:hover {
+      box-shadow: 0 15px 35px -10px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .category-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0f2b5e;
+      margin-bottom: 24px;
+      padding-bottom: 14px;
+      border-bottom: 3px solid #e0e7ff;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .category-title i {
+      font-size: 24px;
+      color: #2563eb;
+    }
+
+    /* ===== LINKS GRID ===== */
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .link-button {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      color: #1e293b;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .link-button:hover {
+      background-color: #f8fafc;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 20px -12px rgba(0,0,0,0.15);
+      border-color: #cbd5e1;
+    }
+
+    .link-button i {
+      font-size: 20px;
+      width: 26px;
+      text-align: center;
+      color: #3b82f6;
+    }
+
+    .link-button:hover i {
+      color: #1e3a8a;
+    }
+
+    .link-button.primary-button {
+      background: linear-gradient(105deg, #1e3a8a 0%, #1e40af 100%);
+      border: none;
+      color: white !important;
+      font-weight: 700;
+      box-shadow: 0 6px 14px rgba(30,58,138,0.25);
+    }
+
+    .link-button.primary-button i {
+      color: white !important;
+    }
+
+    .link-button.primary-button:hover {
+      background: linear-gradient(105deg, #172554 0%, #1e3a8a 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 22px -10px rgba(30,58,138,0.4);
+      color: white;
+    }
+
+    /* ===== RESULTS COUNTER ===== */
+    .results-counter {
+      text-align: center;
+      color: #475569;
+      font-size: 14px;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    .results-counter strong {
+      color: #1e3a8a;
+      font-weight: 700;
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 20px;
+      color: #475569;
+      background: #f1f5f9;
+      border-radius: 20px;
+      font-size: 16px;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background-color: #0f172a;
+      color: #cbd5e1;
+      text-align: center;
+      padding: 28px 0;
+      margin-top: 60px;
+      border-top: 1px solid #1e293b;
+      font-size: 14px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+      }
+      .logo-section {
+        flex-direction: column;
+        text-align: center;
+      }
+      .right-section {
+        text-align: center;
+      }
+      .slogan {
+        margin: 0 auto;
+      }
+      .links-grid {
+        grid-template-columns: 1fr;
+      }
+      .tabs-nav {
+        justify-content: center;
+        gap: 8px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 8px;
+      }
+      .tab-btn {
+        padding: 10px 18px;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .search-box {
+        padding: 5px 5px 5px 16px;
+      }
+      .search-box input {
+        min-width: 120px;
+        font-size: 15px;
+      }
+      .category-title {
+        font-size: 18px;
+      }
+      .login-box {
+        padding: 30px 20px 25px;
+      }
+      .main-title {
+        font-size: 22px;
+      }
+      .subtitle {
+        font-size: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 0 12px;
+      }
+      .header {
+        padding: 20px 0;
+      }
+      .category-section {
+        padding: 18px 16px;
+      }
+      .tab-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <div class="logo-section">
-          <i class="fas fa-hospital"></i>
-          <div class="title-section">
-            <h1 class="main-title">Ferramentas Administrativas</h1>
-            <p class="subtitle">Diretoria de Regulação do Acesso</p>
-            <div class="h-meta">
-              Superintendente: <b style="color:#bfdbfe">Yara Ariane M.S.Souza</b>
-              &nbsp;•&nbsp; Diretora: <b style="color:#bfdbfe">Paloma Morais</b>
-              &nbsp;•&nbsp; Desenvolvido por <b style="color:#bfdbfe">Ana P. A. Silva — Matric. 201704</b>
+
+  <!-- ===== LOGIN OVERLAY ===== -->
+  <div id="login-overlay">
+    <div class="login-box">
+      <div class="login-header">
+        <i class="fas fa-hospital"></i>
+        <h1>Diretoria de Regulação do Acesso</h1>
+      </div>
+      <p class="login-subtitle">Acesso para atalho a links com Painéis e Consolidados</p>
+      <div class="login-form">
+        <label for="senha-input"><i class="fas fa-lock"></i> Senha</label>
+        <div class="password-wrapper">
+          <input type="password" id="senha-input" placeholder="Digite a senha" />
+          <button id="toggle-senha" type="button"><i class="fas fa-eye-slash"></i></button>
+        </div>
+        <button id="btn-login" class="login-btn">Acessar</button>
+        <div id="login-error" class="login-error"></div>
+      </div>
+      <div class="login-footer">
+        <span>Desenvolvido por Ana P. A. Silva — Matric. 201704</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+  <div id="main-content" style="display: none;">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo-section">
+            <i class="fas fa-hospital"></i>
+            <div>
+              <h1 class="main-title">Ferramentas Administrativas</h1>
+              <p class="subtitle">Diretoria de Regulação do Acesso</p>
+              <div class="h-meta">
+                Superintendente: <b style="color:#bfdbfe">Yara Ariane M.S.Souza</b>
+                &nbsp;•&nbsp; Diretora: <b style="color:#bfdbfe">Paloma Morais</b>
+                &nbsp;•&nbsp; Desenvolvido por <b style="color:#bfdbfe">Ana P. A. Silva — Matric. 201704</b>
+              </div>
+            </div>
+          </div>
+          <div class="right-section">
+            <div class="slogan">
+              <p>"Nenhum de nós é tão bom quanto todos nós juntos!"</p>
             </div>
           </div>
         </div>
-        <div class="right-section">
-          <div class="slogan">
-            <p>"Nenhum de nós é tão bom quanto todos nós juntos!"</p>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+      <div class="container">
+        <!-- SEARCH -->
+        <div class="global-search-section">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" class="global-search-input" placeholder="Buscar ferramentas, painéis ou documentos..." id="globalSearch" />
+            <button class="clear-btn" id="clearSearchBtn" aria-label="Limpar busca">✕</button>
           </div>
         </div>
-      </div>
-    </div>
-  </header>
 
-  <main class="main-content">
-    <div class="container">
-      <!-- SEÇÃO DE PESQUISA CENTRALIZADA -->
-      <div class="global-search-section">
-        <div class="search-box centered-search">
-          <i class="fas fa-search"></i>
-          <input type="text" class="global-search-input" placeholder="Buscar ferramentas, painéis ou documentos...">
-        </div>
-      </div>
+        <!-- RESULTS COUNTER -->
+        <div class="results-counter" id="resultsCounter">Mostrando <strong>0</strong> itens</div>
 
-      <div class="tabs-container">
-        <div class="tabs-nav">
-          <button class="tab-btn active" data-tab="oci">
-            <i class="fas fa-stethoscope"></i> OCI
-          </button>
-          <button class="tab-btn" data-tab="consultas">
-            <i class="fas fa-user-md"></i> Consultas Especializadas
-          </button>
-          <button class="tab-btn" data-tab="cirurgia">
-            <i class="fas fa-procedures"></i> Cirurgia Eletiva
-          </button>
-          <button class="tab-btn" data-tab="exames">
-            <i class="fas fa-microscope"></i> Média Complexidade (Exames)
-          </button>
-          <button class="tab-btn" data-tab="cardiologia">
-            <i class="fas fa-heartbeat"></i> Cardiologia
-          </button>
+        <!-- TABS -->
+        <div class="tabs-nav" id="tabsNav">
+          <button class="tab-btn active" data-tab="consultas"><i class="fas fa-user-md"></i> Consultas Especializadas</button>
+          <button class="tab-btn" data-tab="oci"><i class="fas fa-stethoscope"></i> OCI</button>
+          <button class="tab-btn" data-tab="cirurgia"><i class="fas fa-procedures"></i> Cirurgia Eletiva</button>
+          <button class="tab-btn" data-tab="exames"><i class="fas fa-microscope"></i> Média Complexidade</button>
+          <button class="tab-btn" data-tab="contatos"><i class="fas fa-address-book"></i> Contatos</button>
         </div>
 
-        <!-- ABA OCI -->
-        <div class="tab-content active" id="tab-oci">
+        <!-- TAB: CONSULTAS -->
+        <div class="tab-content active" id="tab-consultas">
+          <div class="categories-grid">
+            <!-- Teleconsulta -->
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-chart-line"></i> Teleconsulta</h2>
+              <div class="links-grid">
+                <a href="https://docs.google.com/spreadsheets/d/1NrLJ7ulMx93VXse-k8C4PX7FkGPLEZ0yTQSIVQeNItg/edit?gid=175443153#gid=175443153" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Fila de espera Ligações</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=0#gid=0" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Controle de Agendamentos</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1_WJhJQQXcxn0Yucyr_rv_HuKs7wc3p4oeb69oyhoPU4/edit?usp=sharing" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Reaproveitamento</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=1603937153#gid=1603937153" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Consolidado</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1ZwzPVQAifNLfJJO1lFr1BvQd6e6G3yC5C2H4Ry2N43k/edit?gid=621702727#gid=621702727" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Fila de Espera Retorno de Neuro</span></a>
+                <a href="https://regulacaoconsolidados-dot.github.io/contatosdasubs/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Contatos das UBS</span></a>
+                <a href="https://portal-feluma.sydle.com/home" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Portal Feluma</span></a>
+                <a href="https://cadastro.saude.gov.br/segcartao/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>CadWEB</span></a>
+              </div>
+            </section>
+
+            <!-- Painéis Central de Marcação -->
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-chart-line"></i> Painéis Central de Marcação de Consultas</h2>
+              <div class="links-grid">
+                <a href="https://compartilhacmc-commits.github.io/pendenciasgeral/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Pendências Geral</span></a>
+                <a href="https://compartilhacmc-commits.github.io/consolidadoagendados/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Agendamentos Geral</span></a>
+                <a href="https://compartilhacmc-commits.github.io/ofertacmc/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Agendamentos Mês Atual e Próximo</span></a>
+                <a href="https://compartilhacmc-commits.github.io/profissionaisnarede/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Profissional Médicos Ativos</span></a>
+              </div>
+            </section>
+
+            <!-- Fluxos CMC -->
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-code-branch"></i> Em Atualização... Fluxos Central de Marcação</h2>
+              <div class="links-grid">
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/ESPECIALIDADES.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Listas das Especialidades</span></a>
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/resumo_fluxos.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Resumo dos Fluxos Especialidades</span></a>
+                <a href="https://portal.contagem.mg.gov.br/nota-tecnica" class="link-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Notas Técnicas Diretoria de Regulação</span></a>
+              </div>
+            </section>
+
+            <!-- Pendências por Distrito -->
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-hourglass-half"></i> Painéis Pendências por Distrito</h2>
+              <div class="links-grid">
+                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Eldorado</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Sede</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritovargemdasflores/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Vargem das Flores</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritonacional/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Nacional</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritoressaca/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Ressaca</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritoindustrial/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Industrial</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritopetrolandia/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Petrolândia</span></a>
+                <a href="https://compartilhacmc-commits.github.io/distritoriacho/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Riacho</span></a>
+              </div>
+            </section>
+
+            <!-- Banco de Dados -->
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-database"></i> Banco de Dados que alimenta os Painéis</h2>
+              <div class="links-grid">
+                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Agendamentos Teleconsulta</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/14DiFK9EW36s8ntkukyhiRMJxcX0ghG5XTzWb1TwpI2Q/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Agendamentos Geral</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1puNbYysRBj-5CY6fhnHNnYd9OH96cl7guMFBOLeYZV4/edit?gid=1698493941#gid=1698493941" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Agendamentos Diários</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/16CXd1TVf2IfTDiPzRCxUNWk6rCRoEw6WDfcybVoarnA/edit?gid=1407399146#gid=1407399146" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Profissionais Médicos Ativos</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1r6NLcVkVLD5vp4UxPEa7TcreBpOd0qeNt-QREOG4Xr4/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Eldorado</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1IHknmxe3xAnfy5Bju_23B5ivIL-qMaaE6q_HuPaLBpk/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Vargem das Flores</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1RPf2bfQVoM1FqnyA-0P8uPTJ_PG4I2Ce6lXnk54ixfc/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Sede</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/14eUVIsWPubMve4DhVjVwlh7gin-qVyN3PspkwQ1PZMg/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Industrial</span></a>
+                <a href="https://drive.google.com/drive/folders/1zRHfbI897ZRTBKLeRbiSfjMy8RmR_MJg" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Ressaca</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1Z9Uf5MGm5tClVDR95SUpwOjivAdqEVUfDj7mIuRLf4s/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Petrolândia</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1lMGO9Hh_qL9OKI270fPL7lxadr-BZN9x_ZtmQeX6OcA/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Nacional</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1367XyjVDYyDWo3vUz6Hd_zEqLAJkH_c1MwlvtZnpmUc/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Riacho</span></a>
+              </div>
+            </section>
+
+            <!-- Feluma -->
+            <section class="category-section">
+              <h2 class="category-title"><i class="fas fa-laptop-medical"></i> Feluma</h2>
+              <div class="links-grid">
+                <a href="https://portal-feluma.sydle.com/home" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Plataforma Feluma</span></a>
+                <a href="https://portal.contagem.mg.gov.br/imgeditor/file/Regula%C3%A7%C3%A3o/Central%20de%20marca%C3%A7%C3%A3o/NT%2025%20-%202025%20-%20Regula%C3%A7%C3%A3o%20de%20Consultas%20Especializadas%20via%20sistema%20VIVVER.pdf" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i><span>NT-25/2025 – Teleconsultoria</span></a>
+                <a href="https://portal.contagem.mg.gov.br/central-de-marcacao-de-consultas/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-medical-alt"></i><span>Notas Técnicas – Diretoria</span></a>
+                <a href="https://www.youtube.com/watch?v=1UdBOCDlIvA" class="link-button" target="_blank" rel="noopener"><i class="fab fa-youtube"></i><span>Tutorial – YouTube</span></a>
+                <a href="https://forms.office.com/pages/responsepage.aspx?id=6TkneO0BV0yBmaJIQh4A4v7lUCKmmeREvVUmW50PDW5UMzRaUlRFRjI0N01LMERVWjdPQlY5ODlUWS4u&route=shorturl" class="link-button" target="_blank" rel="noopener"><i class="fas fa-user-plus"></i><span>Cadastro Feluma</span></a>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- TAB: OCI -->
+        <div class="tab-content" id="tab-oci">
           <div class="categories-grid">
             <section class="category-section">
               <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél OCI</h2>
               <div class="links-grid">
-                <a href="https://regulacaoconsolidados-dot.github.io/ociconsolidado/" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Painél OCI</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo/edit?gid=2108990586#gid=2108990586" class="link-button" target="_blank" rel="noopener">
-                  <i class="fas fa-database"></i><span>Banco de dados que alimenta o Painél</span>
-                </a>
+                <a href="https://regulacaoconsolidados-dot.github.io/ociconsolidado/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél OCI</span></a>
+                <a href="https://docs.google.com/spreadsheets/d/1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo/edit?gid=2108990586#gid=2108990586" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados OCI</span></a>
               </div>
             </section>
             <section class="category-section">
@@ -92,129 +748,20 @@
           </div>
         </div>
 
-        <!-- ABA CONSULTAS ESPECIALIZADAS -->
-        <div class="tab-content" id="tab-consultas">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-code-branch"></i> Fluxos CMC</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/profissionaisnarede/"  class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Profissionais Médicos</span>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/ESPECIALIDADES.html"  class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Listas das Especialidades</span>
-                </a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/resumo_fluxos.html" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Resumo dos Fluxos Especialidades</span>
-                </a>
-                <a href="https://portal.contagem.mg.gov.br/nota-tecnica" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Notas Técnicas Diretoria de Regulação</span>
-                </a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-hourglass-half"></i> Painéis Pendências</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/pendenciasgeral/" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Pendências Geral</span>
-                </a>
-                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Eldorado</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Sede</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritovargemdasflores/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Vargem das Flores</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritonacional/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Nacional</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoressaca/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Ressaca</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoindustrial/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Industrial</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritopetrolandia/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Petrolândia</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoriacho/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Riacho</span></a>
-              </div>
-              </section>
-              <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-calendar-check"></i> Painél Teleconsulta</h2>
-              <div class="info-note">
-                <i class="fas fa-sync-alt"></i>
-                <span>Atualizado conforme o fluxo de agendamento realizado.</span>
-              </div>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/consolidadoagendados/" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Painél Teleconsulta em construção</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-calendar-check"></i> Painél Agendamentos Geral</h2>
-              <div class="info-note">
-                <i class="fas fa-sync-alt"></i>
-                <span>Atualizado sempre após o dia 11 de cada mês - Agendamento da Fila para o próximo Mês.</span>
-              </div>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/consolidadoagendados/" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Painél Agendamentos Geral</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/14DiFK9EW36s8ntkukyhiRMJxcX0ghG5XTzWb1TwpI2Q/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-calendar-alt"></i> Painél Agendamentos Mês Atual e Próximo Mês.</h2>
-              <div class="info-note">
-                <i class="fas fa-sync-alt"></i>
-                <span>Atualizado diariamente, com os agendamentos realizados por dia, Data corte para organizar os dados Dia 11 de cada mês - Após o Agendamento da Fila para o próximo Mês.</span>
-              </div>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/ofertacmc/" class="link-button primary-button" target="_blank" rel="noopener">
-                  <i class="fas fa-chart-bar"></i><span>Painél Controle Agendamentos Diários</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1puNbYysRBj-5CY6fhnHNnYd9OH96cl7guMFBOLeYZV4/edit?gid=1698493941#gid=1698493941" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-sitemap"></i> Páginas CMC - Versão para os Distritos</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/p-ginadistritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Eldorado</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritonacional/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Nacional</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritopetrolandia/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Petrolândia</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginasede/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Sede</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritoressaca/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Ressaca</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritoriacho/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Riacho</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritoindustrial/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Industrial</span></a>
-                <a href="https://compartilhacmc-commits.github.io/paginadistritovargem/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Distrito Vargem</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-laptop-medical"></i> Feluma</h2>
-              <div class="links-grid">
-                <a href="https://portal.contagem.mg.gov.br/imgeditor/file/Regula%C3%A7%C3%A3o/Central%20de%20marca%C3%A7%C3%A3o/NT%2025%20-%202025%20-%20Regula%C3%A7%C3%A3o%20de%20Consultas%20Especializadas%20via%20sistema%20VIVVER.pdf" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i><span>NT-25/2025 – Teleconsultoria Regulação</span></a>
-                <a href="https://portal.contagem.mg.gov.br/central-de-marcacao-de-consultas/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-medical-alt"></i><span>Notas Técnicas – Diretoria de Regulação</span></a>
-                <a href="https://portal-feluma.sydle.com/home" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Para Acessar a Plataforma – Clique Aqui</span></a>
-                <a href="https://www.youtube.com/watch?v=1UdBOCDlIvA" class="link-button" target="_blank" rel="noopener"><i class="fab fa-youtube"></i><span>Para Assistir o Tutorial – Youtube (3min.)</span></a>
-                <a href="https://forms.office.com/pages/responsepage.aspx?id=6TkneO0BV0yBmaJIQh4A4v7lUCKmmeREvVUmW50PDW5UMzRaUlRFRjI0N01LMERVWjdPQlY5ODlUWS4u&route=shorturl" class="link-button" target="_blank" rel="noopener"><i class="fas fa-user-plus"></i><span>Ainda sem cadastro? Preencha – Clique Aqui</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- ABA CIRURGIA ELETIVA -->
+        <!-- TAB: CIRURGIA -->
         <div class="tab-content" id="tab-cirurgia">
           <div class="categories-grid">
             <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél Cirurgia Eletiva</h2>
+              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painéis Cirurgia Eletiva</h2>
               <div class="links-grid">
                 <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaseletivas/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva</span></a>
-                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaeletivadiretoria/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva Diretoria</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1yX5uIgoUNqXJDG6hYxOLjZfYueviAa6M/edit?gid=1716569787#gid=1716569787" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél cirurgias eletivas</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1ax8ZpVRSZnDkTm_T1GY37ybSgrlP_8Rk/edit?gid=1716569787#gid=1716569787" class="link-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél cirurgias eletivas diretoria</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-table"></i> Planilhas para Consolidar os Dados</h2>
-              <div class="links-grid">
-                <a href="https://docs.google.com/spreadsheets/d/1QE3yWrmgUm_EyzOG5zC7GB_XOH5k2IXEO9r0XabW4Bo/edit?gid=537625325#gid=537625325" class="link-button" target="_blank" rel="noopener"><i class="fas fa-list-ol"></i><span>Fila de espera cirurgia eletiva</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1ainEQfcuZxWGBgWfjJpzh6TbljRMkgKAvrNOJSyTLls/edit?gid=1545210975#gid=1545210975" class="link-button" target="_blank" rel="noopener"><i class="fas fa-calendar"></i><span>Consolidado 2025</span></a>
+                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaeletivadiretoria/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva - Diretoria</span></a>
               </div>
             </section>
           </div>
         </div>
 
-        <!-- ABA EXAMES MÉDIA COMPLEXIDADE -->
+        <!-- TAB: EXAMES -->
         <div class="tab-content" id="tab-exames">
           <div class="categories-grid">
             <section class="category-section">
@@ -226,34 +773,202 @@
           </div>
         </div>
 
-        <!-- ABA CARDIOLOGIA -->
-        <div class="tab-content" id="tab-cardiologia">
+        <!-- TAB: CONTATOS (telefones fixos) -->
+        <div class="tab-content" id="tab-contatos">
           <div class="categories-grid">
             <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél Cardiologia</h2>
+              <h2 class="category-title"><i class="fas fa-phone-alt"></i> Telefones Úteis</h2>
               <div class="links-grid">
-                <a href="#" class="link-button disabled" target="_blank" rel="noopener" onclick="return false;"><i class="fas fa-chart-bar"></i><span>Painél Cardiologia (em construção)</span></a>
-                <a href="#" class="link-button disabled" target="_blank" rel="noopener" onclick="return false;"><i class="fas fa-database"></i><span>Banco de dados que alimenta o painél (em construção)</span></a>
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/CEAPS_TELEFONES.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Ceaps</span></a>
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_IRIA_DINIZ.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Iria Diniz</span></a>
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_CCE_OUTROS.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones CCE´s e Outros</span></a>
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_DIVERSOS.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Diversos</span></a>
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_UNIDADES_DE_CONTAGEM.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones – Todas as Unidades</span></a>
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/DISTRITOS_CONTATOS.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Todos os Distritos</span></a>
+                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/UPA_TELEFONES.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Upas</span></a>
               </div>
             </section>
+
             <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-table"></i> Planilhas para Consolidar os Dados</h2>
+              <h2 class="category-title"><i class="fas fa-link"></i> Links Importantes</h2>
               <div class="links-grid">
-                <a href="#" class="link-button disabled" target="_blank" rel="noopener" onclick="return false;"><i class="fas fa-spinner"></i><span>Em breve</span></a>
+                <a href="https://www.contagem-mg.vivver.com/desktop" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Sistema Vivver</span></a>
+                <a href="https://portal.contagem.mg.gov.br/nota-tecnica" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Notas Técnicas Diretoria de Regulação</span></a>
+                <a href="https://portal.contagem.mg.gov.br/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Prefeitura de Contagem</span></a>
+                <a href="https://portal.contagem.mg.gov.br/secretaria-de-saude" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Secretaria de Saúde Contagem</span></a>
+                <a href="https://portal.contagem.mg.gov.br/portal/paginas-dinamicas-categoria/15/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Portal do Servidor</span></a>
+                <a href="https://geoprocessamento.contagem.mg.gov.br/portal/apps/sites/#/geocontagem" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Aplicativos Contagem</span></a>
+                <a href="https://geoprocessamento.contagem.mg.gov.br/portal/apps/experiencebuilder/experience/?id=1cc51ed1bb7546e092ecad2935cc425d" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Aqui tem Remédio</span></a>
+                <a href="https://portal.contagem.mg.gov.br/atencao-primaria" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Endereço das Unidades</span></a>
+                <a href="https://geoprocessamento.contagem.mg.gov.br/portal/apps/webappviewer/index.html?id=a29dd6c9d5944c51998c3ffa1efe0c70" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Equipamentos da Saúde</span></a>
+                <a href="https://cadastro.saude.gov.br/segcartao/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>CadWeb</span></a>
+                <a href="https://cnesadm.datasus.gov.br/cnesadm/publico/usuarios/cadastro" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Pesquisa do CNS</span></a>
+                <a href="https://app.powerbi.com/view?r=eyJrIjoiYTRiZDcyZWYtMzAwNS00NmYyLTk3N2EtYWEwYTk2NTFhMmY1IiwidCI6ImFlODYzMzdlLTU3NWUtNDMzMC05NDc2LTkzZGU2ODJiMDAyMCJ9" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Pesquisa por endereço</span></a>
+                <a href="https://egestoraps.saude.gov.br/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>E gestor</span></a>
+                <a href="https://cnes.datasus.gov.br/pages/estabelecimentos/consulta.jsp" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Cnes</span></a>
+                <a href="http://sigtap.datasus.gov.br/tabela-unificada/app/sec/inicio.jsp" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Tabela Sigtap</span></a>
+                <a href="https://siscan.saude.gov.br/login.jsf" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Siscan</span></a>
+                <a href="https://notifica.saude.gov.br/login" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Esus Notifica</span></a>
+                <a href="https://crmmg.org.br/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>CRM</span></a>
               </div>
             </section>
           </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 Diretoria de Regulação do Acesso. Todos os direitos reservados.</p>
-    </div>
-  </footer>
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2026 Diretoria de Regulação do Acesso. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+  </div>
 
-  <script src="script.js"></script>
+  <script>
+    (function() {
+      'use strict';
+
+      // ============================================
+      // 1. SISTEMA DE LOGIN
+      // ============================================
+      const SENHA_CODIFICADA = 'NjM5MTI0OQ==';
+      const loginOverlay = document.getElementById('login-overlay');
+      const mainContent = document.getElementById('main-content');
+      const senhaInput = document.getElementById('senha-input');
+      const btnLogin = document.getElementById('btn-login');
+      const loginError = document.getElementById('login-error');
+      const toggleSenha = document.getElementById('toggle-senha');
+
+      function fazerLogin() {
+        const senha = senhaInput.value.trim();
+        if (btoa(senha) === SENHA_CODIFICADA) {
+          loginOverlay.classList.add('hidden');
+          mainContent.style.display = 'block';
+          loginError.textContent = '';
+          senhaInput.value = '';
+          // Inicializa após login
+          initApp();
+        } else {
+          loginError.textContent = '❌ Senha incorreta. Tente novamente.';
+          senhaInput.value = '';
+          senhaInput.focus();
+        }
+      }
+
+      btnLogin.addEventListener('click', fazerLogin);
+      senhaInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') fazerLogin();
+      });
+
+      toggleSenha.addEventListener('click', () => {
+        const isPassword = senhaInput.type === 'password';
+        senhaInput.type = isPassword ? 'text' : 'password';
+        toggleSenha.querySelector('i').className = isPassword ? 'fas fa-eye' : 'fas fa-eye-slash';
+      });
+
+      // ============================================
+      // 2. SISTEMA DE ABAS
+      // ============================================
+      function initTabs() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const tabId = btn.dataset.tab;
+            tabBtns.forEach(b => b.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.add('active');
+            // Reaplicar busca na nova aba
+            const searchValue = document.getElementById('globalSearch').value;
+            performSearch(searchValue);
+          });
+        });
+      }
+
+      // ============================================
+      // 3. BUSCA GLOBAL (instantânea)
+      // ============================================
+      function performSearch(term) {
+        term = term.trim().toLowerCase();
+        const allSections = document.querySelectorAll('.tab-content.active .category-section');
+        const counter = document.getElementById('resultsCounter');
+        let totalVisible = 0;
+
+        allSections.forEach(section => {
+          const links = section.querySelectorAll('.link-button');
+          const title = section.querySelector('.category-title')?.textContent.toLowerCase() || '';
+          let sectionHasVisible = false;
+
+          links.forEach(link => {
+            const text = link.textContent.toLowerCase();
+            if (term === '' || text.includes(term) || title.includes(term)) {
+              link.style.display = 'flex';
+              sectionHasVisible = true;
+              totalVisible++;
+            } else {
+              link.style.display = 'none';
+            }
+          });
+
+          section.style.display = sectionHasVisible ? 'block' : 'none';
+        });
+
+        // Atualiza contador
+        counter.innerHTML = `Mostrando <strong>${totalVisible}</strong> item${totalVisible !== 1 ? 's' : ''}`;
+
+        // Mostrar mensagem se nenhum resultado
+        const noResults = document.querySelector('.no-results');
+        if (totalVisible === 0 && term !== '') {
+          if (!noResults) {
+            const msg = document.createElement('div');
+            msg.className = 'no-results';
+            msg.textContent = '🔎 Nenhum item encontrado para esta busca.';
+            document.querySelector('.tab-content.active .categories-grid').appendChild(msg);
+          }
+        } else {
+          if (noResults) noResults.remove();
+        }
+      }
+
+      function initSearch() {
+        const searchInput = document.getElementById('globalSearch');
+        const clearBtn = document.getElementById('clearSearchBtn');
+
+        searchInput.addEventListener('input', function() {
+          const val = this.value;
+          performSearch(val);
+          clearBtn.classList.toggle('visible', val.length > 0);
+        });
+
+        clearBtn.addEventListener('click', function() {
+          searchInput.value = '';
+          performSearch('');
+          this.classList.remove('visible');
+          searchInput.focus();
+        });
+      }
+
+      // ============================================
+      // 4. INICIALIZAÇÃO
+      // ============================================
+      function initApp() {
+        initTabs();
+        initSearch();
+        // Força busca inicial vazia para mostrar todos
+        performSearch('');
+        console.log('✅ Portal Ferramentas Administrativas carregado!');
+      }
+
+      // Se o conteúdo já estiver visível (login bypass), inicializa direto
+      if (mainContent.style.display !== 'none') {
+        initApp();
+      }
+
+    })();
+  </script>
 </body>
 </html>
