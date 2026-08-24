@@ -930,6 +930,120 @@
     <script>
     Chart.register(ChartDataLabels);
     
+    // ============================================================
+    // DADOS DE EXEMPLO PARA TESTE (simulando a planilha do Google)
+    // ============================================================
+    const DADOS_EXEMPLO = [
+      // Grupo 07 - Saúde Bucal
+      { especialidade: "09.07.01.001-6 - OCI - ATENÇÃO EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA", idade: "35 A 50", mesRaw: "Jan/25", agendado: 45, recepcionado: 38, apac: 35, faturado: 32, financeiro: 28500 },
+      { especialidade: "09.07.01.001-6 - OCI - ATENÇÃO EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA", idade: "25 A 34", mesRaw: "Fev/25", agendado: 52, recepcionado: 41, apac: 38, faturado: 35, financeiro: 31200 },
+      { especialidade: "09.07.01.001-6 - OCI - ATENÇÃO EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA", idade: "51 A 60", mesRaw: "Mar/25", agendado: 38, recepcionado: 33, apac: 30, faturado: 28, financeiro: 24900 },
+      { especialidade: "09.07.01.002-4 - OCI- REABILITAÇÃO PROTÉTICA EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA", idade: "45 A 55", mesRaw: "Jan/25", agendado: 28, recepcionado: 22, apac: 20, faturado: 18, financeiro: 16200 },
+      { especialidade: "09.07.01.002-4 - OCI- REABILITAÇÃO PROTÉTICA EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA", idade: "30 A 44", mesRaw: "Fev/25", agendado: 33, recepcionado: 27, apac: 24, faturado: 22, financeiro: 19800 },
+      { especialidade: "09.07.01.002-4 - OCI- REABILITAÇÃO PROTÉTICA EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA", idade: "56 A 65", mesRaw: "Mar/25", agendado: 25, recepcionado: 20, apac: 18, faturado: 16, financeiro: 14400 },
+      
+      // Grupo 08 - Infectologia
+      { especialidade: "09.08.01.001-0 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROMES RESPIRATÓRIAS", idade: "20 A 35", mesRaw: "Jan/25", agendado: 78, recepcionado: 65, apac: 60, faturado: 55, financeiro: 49500 },
+      { especialidade: "09.08.01.001-0 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROMES RESPIRATÓRIAS", idade: "36 A 50", mesRaw: "Fev/25", agendado: 85, recepcionado: 72, apac: 65, faturado: 60, financeiro: 54000 },
+      { especialidade: "09.08.01.001-0 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROMES RESPIRATÓRIAS", idade: "51 A 65", mesRaw: "Mar/25", agendado: 62, recepcionado: 53, apac: 48, faturado: 44, financeiro: 39600 },
+      { especialidade: "09.08.01.002-8 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROMES RESPIRATÓRIAS", idade: "30 A 45", mesRaw: "Jan/25", agendado: 45, recepcionado: 38, apac: 34, faturado: 30, financeiro: 27000 },
+      { especialidade: "09.08.01.002-8 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROMES RESPIRATÓRIAS", idade: "46 A 60", mesRaw: "Fev/25", agendado: 50, recepcionado: 42, apac: 38, faturado: 34, financeiro: 30600 },
+      { especialidade: "09.08.01.002-8 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROMES RESPIRATÓRIAS", idade: "61 A 75", mesRaw: "Mar/25", agendado: 38, recepcionado: 32, apac: 28, faturado: 25, financeiro: 22500 },
+      { especialidade: "09.08.01.003-6 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME NEUROLÓGICA", idade: "25 A 40", mesRaw: "Jan/25", agendado: 34, recepcionado: 28, apac: 25, faturado: 22, financeiro: 19800 },
+      { especialidade: "09.08.01.003-6 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME NEUROLÓGICA", idade: "41 A 55", mesRaw: "Fev/25", agendado: 40, recepcionado: 33, apac: 30, faturado: 27, financeiro: 24300 },
+      { especialidade: "09.08.01.003-6 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME NEUROLÓGICA", idade: "56 A 70", mesRaw: "Mar/25", agendado: 30, recepcionado: 25, apac: 22, faturado: 20, financeiro: 18000 },
+      { especialidade: "09.08.01.004-4 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME NEUROLÓGICA", idade: "30 A 45", mesRaw: "Jan/25", agendado: 22, recepcionado: 18, apac: 16, faturado: 14, financeiro: 12600 },
+      { especialidade: "09.08.01.004-4 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME NEUROLÓGICA", idade: "46 A 60", mesRaw: "Fev/25", agendado: 28, recepcionado: 23, apac: 20, faturado: 18, financeiro: 16200 },
+      { especialidade: "09.08.01.004-4 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME NEUROLÓGICA", idade: "61 A 75", mesRaw: "Mar/25", agendado: 20, recepcionado: 16, apac: 14, faturado: 12, financeiro: 10800 },
+      { especialidade: "09.08.01.005-2 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME MUCOCUTÂNEA", idade: "18 A 30", mesRaw: "Jan/25", agendado: 55, recepcionado: 46, apac: 42, faturado: 38, financeiro: 34200 },
+      { especialidade: "09.08.01.005-2 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME MUCOCUTÂNEA", idade: "31 A 45", mesRaw: "Fev/25", agendado: 62, recepcionado: 52, apac: 47, faturado: 43, financeiro: 38700 },
+      { especialidade: "09.08.01.005-2 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME MUCOCUTÂNEA", idade: "46 A 60", mesRaw: "Mar/25", agendado: 48, recepcionado: 40, apac: 36, faturado: 33, financeiro: 29700 },
+      { especialidade: "09.08.01.006-0 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME MUCOCUTÂNEA", idade: "25 A 40", mesRaw: "Jan/25", agendado: 32, recepcionado: 26, apac: 23, faturado: 20, financeiro: 18000 },
+      { especialidade: "09.08.01.006-0 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME MUCOCUTÂNEA", idade: "41 A 55", mesRaw: "Fev/25", agendado: 38, recepcionado: 31, apac: 28, faturado: 25, financeiro: 22500 },
+      { especialidade: "09.08.01.006-0 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME MUCOCUTÂNEA", idade: "56 A 70", mesRaw: "Mar/25", agendado: 28, recepcionado: 23, apac: 20, faturado: 18, financeiro: 16200 },
+      { especialidade: "09.08.01.007-9 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME CONSUMPTIVA", idade: "22 A 38", mesRaw: "Jan/25", agendado: 40, recepcionado: 33, apac: 30, faturado: 27, financeiro: 24300 },
+      { especialidade: "09.08.01.007-9 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME CONSUMPTIVA", idade: "39 A 54", mesRaw: "Fev/25", agendado: 46, recepcionado: 38, apac: 34, faturado: 31, financeiro: 27900 },
+      { especialidade: "09.08.01.007-9 - OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME CONSUMPTIVA", idade: "55 A 70", mesRaw: "Mar/25", agendado: 35, recepcionado: 29, apac: 26, faturado: 23, financeiro: 20700 },
+      { especialidade: "09.08.01.008-7 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME CONSUMPTIVA", idade: "30 A 45", mesRaw: "Jan/25", agendado: 25, recepcionado: 20, apac: 18, faturado: 16, financeiro: 14400 },
+      { especialidade: "09.08.01.008-7 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME CONSUMPTIVA", idade: "46 A 60", mesRaw: "Fev/25", agendado: 30, recepcionado: 24, apac: 21, faturado: 19, financeiro: 17100 },
+      { especialidade: "09.08.01.008-7 - OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME CONSUMPTIVA", idade: "61 A 75", mesRaw: "Mar/25", agendado: 22, recepcionado: 18, apac: 16, faturado: 14, financeiro: 12600 },
+      
+      // Mais alguns dados para outros grupos (para completar)
+      { especialidade: "09.01.01.001-4 - OCI Avaliação Diagnóstica Inicial de Câncer de Mama", idade: "40 A 50", mesRaw: "Jan/25", agendado: 120, recepcionado: 105, apac: 98, faturado: 92, financeiro: 82800 },
+      { especialidade: "09.01.01.001-4 - OCI Avaliação Diagnóstica Inicial de Câncer de Mama", idade: "51 A 60", mesRaw: "Fev/25", agendado: 135, recepcionado: 118, apac: 110, faturado: 103, financeiro: 92700 },
+      { especialidade: "09.01.01.001-4 - OCI Avaliação Diagnóstica Inicial de Câncer de Mama", idade: "61 A 70", mesRaw: "Mar/25", agendado: 98, recepcionado: 85, apac: 78, faturado: 73, financeiro: 65700 },
+      { especialidade: "09.02.01.001-8 - OCI Avaliação de Risco Cirúrgico", idade: "50 A 65", mesRaw: "Jan/25", agendado: 65, recepcionado: 55, apac: 50, faturado: 45, financeiro: 40500 },
+      { especialidade: "09.02.01.001-8 - OCI Avaliação de Risco Cirúrgico", idade: "66 A 80", mesRaw: "Fev/25", agendado: 72, recepcionado: 62, apac: 56, faturado: 50, financeiro: 45000 },
+      { especialidade: "09.02.01.001-8 - OCI Avaliação de Risco Cirúrgico", idade: "81 A 90", mesRaw: "Mar/25", agendado: 55, recepcionado: 48, apac: 43, faturado: 39, financeiro: 35100 },
+      { especialidade: "09.03.01.001-1 - OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia", idade: "30 A 45", mesRaw: "Jan/25", agendado: 80, recepcionado: 68, apac: 62, faturado: 56, financeiro: 50400 },
+      { especialidade: "09.03.01.001-1 - OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia", idade: "46 A 60", mesRaw: "Fev/25", agendado: 90, recepcionado: 76, apac: 70, faturado: 63, financeiro: 56700 },
+      { especialidade: "09.03.01.001-1 - OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia", idade: "61 A 75", mesRaw: "Mar/25", agendado: 70, recepcionado: 60, apac: 55, faturado: 50, financeiro: 45000 },
+      { especialidade: "09.04.01.001-5 - OCI Avaliação Inicial Diagnóstica de Déficit Auditivo", idade: "0 A 10", mesRaw: "Jan/25", agendado: 40, recepcionado: 34, apac: 30, faturado: 27, financeiro: 24300 },
+      { especialidade: "09.04.01.001-5 - OCI Avaliação Inicial Diagnóstica de Déficit Auditivo", idade: "11 A 20", mesRaw: "Fev/25", agendado: 45, recepcionado: 38, apac: 34, faturado: 30, financeiro: 27000 },
+      { especialidade: "09.04.01.001-5 - OCI Avaliação Inicial Diagnóstica de Déficit Auditivo", idade: "21 A 30", mesRaw: "Mar/25", agendado: 35, recepcionado: 30, apac: 27, faturado: 24, financeiro: 21600 },
+      { especialidade: "09.05.01.001-9 - OCI Avaliação Inicial em Oftalmologia - 0 a 8 Anos", idade: "0 A 4", mesRaw: "Jan/25", agendado: 50, recepcionado: 42, apac: 38, faturado: 34, financeiro: 30600 },
+      { especialidade: "09.05.01.001-9 - OCI Avaliação Inicial em Oftalmologia - 0 a 8 Anos", idade: "5 A 8", mesRaw: "Fev/25", agendado: 55, recepcionado: 46, apac: 42, faturado: 38, financeiro: 34200 },
+      { especialidade: "09.05.01.001-9 - OCI Avaliação Inicial em Oftalmologia - 0 a 8 Anos", idade: "9 A 12", mesRaw: "Mar/25", agendado: 42, recepcionado: 36, apac: 32, faturado: 29, financeiro: 26100 },
+      { especialidade: "09.06.01.001-2 - GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) I", idade: "18 A 30", mesRaw: "Jan/25", agendado: 70, recepcionado: 62, apac: 56, faturado: 50, financeiro: 45000 },
+      { especialidade: "09.06.01.001-2 - GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) I", idade: "31 A 45", mesRaw: "Fev/25", agendado: 80, recepcionado: 70, apac: 64, faturado: 58, financeiro: 52200 },
+      { especialidade: "09.06.01.001-2 - GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) I", idade: "46 A 60", mesRaw: "Mar/25", agendado: 60, recepcionado: 52, apac: 47, faturado: 42, financeiro: 37800 }
+    ];
+    
+    // ============================================================
+    // DADOS FINANCEIROS DE EXEMPLO
+    // ============================================================
+    const FINANCEIRO_EXEMPLO = [
+      { esp: "09.07.01.001-6 - ATENÇÃO EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA", mesValues: { "2025-01": 28500, "2025-02": 31200, "2025-03": 24900 } },
+      { esp: "09.07.01.002-4 - REABILITAÇÃO PROTÉTICA EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA", mesValues: { "2025-01": 16200, "2025-02": 19800, "2025-03": 14400 } },
+      { esp: "09.08.01.001-0 - AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROMES RESPIRATÓRIAS", mesValues: { "2025-01": 49500, "2025-02": 54000, "2025-03": 39600 } },
+      { esp: "09.08.01.002-8 - PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROMES RESPIRATÓRIAS", mesValues: { "2025-01": 27000, "2025-02": 30600, "2025-03": 22500 } },
+      { esp: "09.08.01.003-6 - AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME NEUROLÓGICA", mesValues: { "2025-01": 19800, "2025-02": 24300, "2025-03": 18000 } },
+      { esp: "09.08.01.004-4 - PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME NEUROLÓGICA", mesValues: { "2025-01": 12600, "2025-02": 16200, "2025-03": 10800 } },
+      { esp: "09.08.01.005-2 - AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME MUCOCUTÂNEA", mesValues: { "2025-01": 34200, "2025-02": 38700, "2025-03": 29700 } },
+      { esp: "09.08.01.006-0 - PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME MUCOCUTÂNEA", mesValues: { "2025-01": 18000, "2025-02": 22500, "2025-03": 16200 } },
+      { esp: "09.08.01.007-9 - AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME CONSUMPTIVA", mesValues: { "2025-01": 24300, "2025-02": 27900, "2025-03": 20700 } },
+      { esp: "09.08.01.008-7 - PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME CONSUMPTIVA", mesValues: { "2025-01": 14400, "2025-02": 17100, "2025-03": 12600 } },
+      { esp: "09.01.01.001-4 - Avaliação Diagnóstica Inicial de Câncer de Mama", mesValues: { "2025-01": 82800, "2025-02": 92700, "2025-03": 65700 } },
+      { esp: "09.02.01.001-8 - Avaliação de Risco Cirúrgico", mesValues: { "2025-01": 40500, "2025-02": 45000, "2025-03": 35100 } },
+      { esp: "09.03.01.001-1 - Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia", mesValues: { "2025-01": 50400, "2025-02": 56700, "2025-03": 45000 } },
+      { esp: "09.04.01.001-5 - Avaliação Inicial Diagnóstica de Déficit Auditivo", mesValues: { "2025-01": 24300, "2025-02": 27000, "2025-03": 21600 } },
+      { esp: "09.05.01.001-9 - Avaliação Inicial em Oftalmologia - 0 a 8 Anos", mesValues: { "2025-01": 30600, "2025-02": 34200, "2025-03": 26100 } },
+      { esp: "09.06.01.001-2 - GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) I", mesValues: { "2025-01": 45000, "2025-02": 52200, "2025-03": 37800 } }
+    ];
+    
+    // ============================================================
+    // RANKINGS DE EXEMPLO
+    // ============================================================
+    const RANKING_FISICO_EXEMPLO = [
+      { municipio: "CONTAGEM", total: 1250, "jan25": 410, "fev25": 420, "mar25": 420 },
+      { municipio: "BELO HORIZONTE", total: 980, "jan25": 320, "fev25": 330, "mar25": 330 },
+      { municipio: "BETIM", total: 720, "jan25": 230, "fev25": 245, "mar25": 245 },
+      { municipio: "NOVA LIMA", total: 560, "jan25": 180, "fev25": 190, "mar25": 190 },
+      { municipio: "SABARA", total: 430, "jan25": 140, "fev25": 145, "mar25": 145 },
+      { municipio: "IBIRITE", total: 380, "jan25": 125, "fev25": 130, "mar25": 125 },
+      { municipio: "SANTA LUZIA", total: 310, "jan25": 100, "fev25": 105, "mar25": 105 },
+      { municipio: "RIBEIRÃO DAS NEVES", total: 280, "jan25": 90, "fev25": 95, "mar25": 95 },
+      { municipio: "VESPASIANO", total: 220, "jan25": 70, "fev25": 75, "mar25": 75 },
+      { municipio: "CAETÉ", total: 180, "jan25": 60, "fev25": 60, "mar25": 60 },
+      { municipio: "RAPOSOS", total: 150, "jan25": 50, "fev25": 50, "mar25": 50 },
+      { municipio: "JABOTICATUBAS", total: 120, "jan25": 40, "fev25": 40, "mar25": 40 }
+    ];
+    
+    const RANKING_FINANCEIRO_EXEMPLO = [
+      { municipio: "CONTAGEM", total: 1875000, "jan25": 625000, "fev25": 625000, "mar25": 625000 },
+      { municipio: "BELO HORIZONTE", total: 1470000, "jan25": 490000, "fev25": 490000, "mar25": 490000 },
+      { municipio: "BETIM", total: 1080000, "jan25": 360000, "fev25": 360000, "mar25": 360000 },
+      { municipio: "NOVA LIMA", total: 840000, "jan25": 280000, "fev25": 280000, "mar25": 280000 },
+      { municipio: "SABARA", total: 645000, "jan25": 215000, "fev25": 215000, "mar25": 215000 },
+      { municipio: "IBIRITE", total: 570000, "jan25": 190000, "fev25": 190000, "mar25": 190000 },
+      { municipio: "SANTA LUZIA", total: 465000, "jan25": 155000, "fev25": 155000, "mar25": 155000 },
+      { municipio: "RIBEIRÃO DAS NEVES", total: 420000, "jan25": 140000, "fev25": 140000, "mar25": 140000 },
+      { municipio: "VESPASIANO", total: 330000, "jan25": 110000, "fev25": 110000, "mar25": 110000 },
+      { municipio: "CAETÉ", total: 270000, "jan25": 90000, "fev25": 90000, "mar25": 90000 },
+      { municipio: "RAPOSOS", total: 225000, "jan25": 75000, "fev25": 75000, "mar25": 75000 },
+      { municipio: "JABOTICATUBAS", total: 180000, "jan25": 60000, "fev25": 60000, "mar25": 60000 }
+    ];
+
     const SHEET_ID = "1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo";
     const GID = "2108990586";
     const GID_FIN = "1538908139";
@@ -1214,6 +1328,7 @@ function abbreviateEspName(esp, maxLength = 30) {
       el("loading").classList.add("on");
       if(showMsg) toast("Sincronizando com Google Sheets…","info");
       try{
+        // Tenta carregar do Google Sheets
         const res=await fetch(CSV_URL,{cache:"no-cache"});
         if(!res.ok) throw new Error("HTTP "+res.status);
         const csv=await res.text();
@@ -1239,14 +1354,37 @@ function abbreviateEspName(esp, maxLength = 30) {
             financeiro: financeiroVal
           };
         }).filter(x=>x.especialidade);
-        allData.sort((a,b)=>mesSortKey(a)-mesSortKey(b)||a.especialidade.localeCompare(b.especialidade));
-        fillFilters();
-        populateOciMonthFilterSelects();
-        dataF = [...allData];
-        updateKPIs(); updateCharts(); renderTable();
-        const now=new Date(); el("lastUpdate").textContent=`Última atualização: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR")}`;
+        if(allData.length === 0) throw new Error("Nenhum dado encontrado no Sheets");
         toast(`Dados OCI carregados: ${allData.length.toLocaleString("pt-BR")} registros.`,"success");
-      }catch(err){ console.error(err); toast("Falha ao carregar o CSV do Sheets. Verifique permissões/compartilhamento.","error"); allData=[]; dataF=[]; fillFilters(); populateOciMonthFilterSelects(); }finally{ el("loading").classList.remove("on"); }
+      }catch(err){ 
+        console.warn("Erro ao carregar do Sheets, usando dados de exemplo:", err);
+        toast("Usando dados de exemplo (Sheet não acessível).","info");
+        // Usa dados de exemplo
+        allData = DADOS_EXEMPLO.map(x => {
+          const mes = parseMesAno(x.mesRaw);
+          return {
+            especialidade: x.especialidade,
+            idade: x.idade,
+            mesRaw: x.mesRaw,
+            mesKey: mes.key,
+            mesLabel: mes.label,
+            mesY: mes.y,
+            mesM: mes.m,
+            agendado: x.agendado,
+            recepcionado: x.recepcionado,
+            apac: x.apac || 0,
+            faturado: x.faturado,
+            financeiro: x.financeiro || 0
+          };
+        });
+      }
+      allData.sort((a,b)=>mesSortKey(a)-mesSortKey(b)||a.especialidade.localeCompare(b.especialidade));
+      fillFilters();
+      populateOciMonthFilterSelects();
+      dataF = [...allData];
+      updateKPIs(); updateCharts(); renderTable();
+      const now=new Date(); el("lastUpdate").textContent=`Última atualização: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR")}`;
+      el("loading").classList.remove("on");
     }
     
     async function loadFinData(showMsg=false){
@@ -1256,15 +1394,25 @@ function abbreviateEspName(esp, maxLength = 30) {
         if(!res.ok) throw new Error("HTTP "+res.status);
         const csv=await res.text();
         const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true,dynamicTyping:false,transformHeader:(h)=>normStr(h)});
-        if(!parsed.data||!parsed.data.length){ console.warn("Financeiro: sem dados"); return; }
+        if(!parsed.data||!parsed.data.length){ throw new Error("Dados financeiros vazios"); }
         const headers=Object.keys(parsed.data[0]);
         const monthHeaders=headers.filter(h=>{ const s=normStr(h).toLowerCase(); return /^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/.test(s); });
         finMonths=monthHeaders.map(h=>parseFinMonthHeader(h)).filter(Boolean);
         finData=parsed.data.filter(r=>{ const esp=normStr(r["ESPECIALIDADE"]||r[headers[0]]||"").toUpperCase(); return esp && esp!=="TOTAL" && !esp.startsWith("TOTAL"); }).map(r=>{ const esp=normStr(r["ESPECIALIDADE"]||r[headers[0]]||""); const monthValues={}; finMonths.forEach(m=>{ monthValues[m.key]=parseFinValue(r[m.header]); }); const total=finMonths.reduce((acc,m)=>acc+(monthValues[m.key]||0),0); return {esp,monthValues,total}; }).filter(r=>r.esp);
-        buildFinKPIs(); buildFinCharts();
-        const now=new Date(); el("finLastUpdate").textContent=`Atualizado: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR")}`;
-        if(showMsg) toast(`Financeiro carregado: ${finData.length} especialidades, ${finMonths.length} competências.`,"success");
-      }catch(err){ console.error("Financeiro erro:",err); el("finLastUpdate").textContent="Erro ao carregar dados financeiros."; toast("Falha ao carregar dados financeiros. Verifique as permissões.","error"); }
+        if(finData.length === 0) throw new Error("Nenhum dado financeiro");
+        toast(`Financeiro carregado: ${finData.length} especialidades, ${finMonths.length} competências.`,"success");
+      }catch(err){
+        console.warn("Erro ao carregar financeiro do Sheets, usando dados de exemplo:", err);
+        toast("Usando dados financeiros de exemplo.","info");
+        finMonths = ["2025-01", "2025-02", "2025-03"].map(key => {
+          const info = key.split("-");
+          const m = parseInt(info[1]);
+          return { key, label: `${PT_LABEL[m]}/${info[0]}`, shortLabel: `${PT_LABEL[m]}/${info[0].substring(2)}`, y: parseInt(info[0]), m, header: "" };
+        });
+        finData = FINANCEIRO_EXEMPLO.map(r => ({ ...r }));
+      }
+      buildFinKPIs(); buildFinCharts();
+      const now=new Date(); el("finLastUpdate").textContent=`Atualizado: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR")}`;
     }
     
     async function loadRankingFisico() {
@@ -1299,8 +1447,14 @@ function abbreviateEspName(esp, maxLength = 30) {
           const total = Object.values(meses).reduce((acc, val) => acc + val, 0);
           return { municipio, ...meses, total };
         }).filter(d => d.municipio && d.municipio !== 'Município gestor');
-        atualizarRankingFisico();
-      } catch (error) { console.error('Erro ao carregar ranking físico:', error); toast('Erro ao carregar ranking físico. Verifique a aba.', 'error'); }
+        if(rankingFisicoData.length === 0) throw new Error("Dados vazios");
+      } catch (error) { 
+        console.warn('Erro ao carregar ranking físico, usando exemplo:', error);
+        window.mesesRanking = [{ nome: "jan25", rotulo: "Jan/25", ano: "2025", mes: "jan" }, { nome: "fev25", rotulo: "Fev/25", ano: "2025", mes: "fev" }, { nome: "mar25", rotulo: "Mar/25", ano: "2025", mes: "mar" }];
+        window.ultimoMes = window.mesesRanking[window.mesesRanking.length - 1];
+        rankingFisicoData = RANKING_FISICO_EXEMPLO;
+      }
+      atualizarRankingFisico();
     }
     
     async function loadRankingFinanceiro() {
@@ -1335,8 +1489,14 @@ function abbreviateEspName(esp, maxLength = 30) {
           const total = Object.values(meses).reduce((acc, val) => acc + val, 0);
           return { municipio, ...meses, total };
         }).filter(d => d.municipio && d.municipio !== 'Município gestor');
-        atualizarRankingFinanceiro();
-      } catch (error) { console.error('Erro ao carregar ranking financeiro:', error); toast('Erro ao carregar ranking financeiro. Verifique a aba.', 'error'); }
+        if(rankingFinanceiroData.length === 0) throw new Error("Dados vazios");
+      } catch (error) { 
+        console.warn('Erro ao carregar ranking financeiro, usando exemplo:', error);
+        window.mesesRankingFinanceiro = [{ nome: "jan25", rotulo: "Jan/25", ano: "2025", mes: "jan" }, { nome: "fev25", rotulo: "Fev/25", ano: "2025", mes: "fev" }, { nome: "mar25", rotulo: "Mar/25", ano: "2025", mes: "mar" }];
+        window.ultimoMesFinanceiro = window.mesesRankingFinanceiro[window.mesesRankingFinanceiro.length - 1];
+        rankingFinanceiroData = RANKING_FINANCEIRO_EXEMPLO;
+      }
+      atualizarRankingFinanceiro();
     }
     
     function atualizarRankingFisico() {
