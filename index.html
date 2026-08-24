@@ -2,968 +2,1811 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ferramentas Administrativas - Diretoria de Regulação do Acesso</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel OCI — Diretoria de Regulação do Acesso</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
   <style>
-    /* ===== RESET & GLOBAL ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f5f7fc;
-      color: #1e2a3e;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 1.5rem;
-    }
-
-    /* ===== LOGIN OVERLAY ===== */
-    #login-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(11, 43, 74, 0.92);
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      padding: 1.5rem;
-      transition: opacity 0.4s ease;
-    }
-
-    #login-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .login-box {
-      background: white;
-      border-radius: 32px;
-      padding: 2.5rem 2.5rem 2rem;
-      max-width: 440px;
-      width: 100%;
-      box-shadow: 0 32px 64px rgba(0, 0, 0, 0.25);
-      animation: fadeUp 0.4s ease;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .login-header {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .login-header i {
-      font-size: 2.2rem;
-      color: #0b2b4a;
-      background: #e5edf8;
-      padding: 0.5rem;
-      border-radius: 16px;
-    }
-
-    .login-header h1 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #0b2b4a;
-      line-height: 1.2;
-    }
-
-    .login-subtitle {
-      color: #5b6f8a;
-      font-size: 0.9rem;
-      margin-bottom: 1.8rem;
-      font-weight: 400;
-    }
-
-    .login-form label {
-      display: block;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #1e2a3e;
-      margin-bottom: 0.4rem;
-    }
-
-    .login-form label i {
-      margin-right: 0.4rem;
-      color: #1a5b7a;
-    }
-
-    .password-wrapper {
-      display: flex;
-      align-items: center;
-      background: #f0f4fe;
-      border-radius: 14px;
-      border: 1px solid #dde3ed;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      overflow: hidden;
-    }
-
-    .password-wrapper:focus-within {
-      border-color: #0b2b4a;
-      box-shadow: 0 0 0 3px rgba(11, 43, 74, 0.1);
-    }
-
-    .password-wrapper input {
-      border: none;
-      padding: 0.9rem 1.2rem;
-      font-size: 1rem;
-      width: 100%;
-      background: transparent;
-      outline: none;
-      font-family: inherit;
-    }
-
-    .password-wrapper button {
-      background: none;
-      border: none;
-      padding: 0 1.2rem;
-      font-size: 1.1rem;
-      color: #7a8aa0;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    .password-wrapper button:hover {
-      color: #0b2b4a;
-    }
-
-    .login-btn {
-      width: 100%;
-      padding: 0.9rem;
-      background: #0b2b4a;
-      color: white;
-      border: none;
-      border-radius: 14px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      margin-top: 1.2rem;
-      font-family: inherit;
-    }
-
-    .login-btn:hover {
-      background: #1a3f62;
-    }
-
-    .login-btn:active {
-      transform: scale(0.97);
-    }
-
-    .login-error {
-      color: #c0392b;
-      font-size: 0.85rem;
-      margin-top: 0.8rem;
-      min-height: 1.5rem;
-      text-align: center;
-    }
-
-    .login-footer {
-      margin-top: 1.8rem;
-      text-align: center;
-      font-size: 0.75rem;
-      color: #9aa6b9;
-      border-top: 1px solid #edf0f7;
-      padding-top: 1.2rem;
-    }
-
-    /* ===== HEADER ===== */
-    .header {
-      background: linear-gradient(145deg, #0b2b4a 0%, #1a3f62 100%);
-      color: white;
-      padding: 2rem 0;
-      border-radius: 0 0 28px 28px;
-      box-shadow: 0 8px 28px rgba(0, 20, 40, 0.2);
-      margin-bottom: 2rem;
-    }
-
-    .header-content {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .logo-section > i {
-      font-size: 2.4rem;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 0.6rem;
-      border-radius: 18px;
-    }
-
-    .title-section .main-title {
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .title-section .subtitle {
-      font-size: 0.95rem;
-      opacity: 0.85;
-      font-weight: 400;
-    }
-
-    .title-section .h-meta {
-      font-size: 0.8rem;
-      opacity: 0.75;
-      margin-top: 0.2rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem 0.8rem;
-    }
-
-    .title-section .h-meta b {
-      color: #bfdbfe;
-      font-weight: 600;
-    }
-
-    .right-section .slogan {
-      background: rgba(255, 255, 255, 0.06);
-      padding: 0.5rem 1.2rem;
-      border-radius: 40px;
-      font-style: italic;
-      font-weight: 300;
-      font-size: 0.9rem;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    /* ===== SEARCH ===== */
-    .search-wrapper {
-      max-width: 700px;
-      margin: 0 auto 2.5rem auto;
-      background: white;
-      border-radius: 60px;
-      padding: 0.3rem 0.3rem 0.3rem 1.8rem;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-      display: flex;
-      align-items: center;
-      border: 1px solid #e9edf4;
-      transition: box-shadow 0.25s, border-color 0.2s;
-    }
-
-    .search-wrapper:focus-within {
-      box-shadow: 0 8px 24px rgba(0, 70, 150, 0.12);
-      border-color: #1a3f62;
-    }
-
-    .search-wrapper input {
-      border: none;
-      padding: 0.9rem 0;
-      font-size: 1rem;
-      width: 100%;
-      background: transparent;
-      outline: none;
-      color: #1e2a3e;
-      font-family: inherit;
-    }
-
-    .search-wrapper input::placeholder {
-      color: #9aa6b9;
-      font-weight: 400;
-    }
-
-    .search-wrapper .search-icon {
-      color: #6b7f9a;
-      font-size: 1.2rem;
-      margin-right: 0.5rem;
-    }
-
-    .search-wrapper .clear-btn {
-      background: none;
-      border: none;
-      color: #9aa6b9;
-      font-size: 1.3rem;
-      cursor: pointer;
-      padding: 0 0.8rem;
-      display: none;
-      transition: color 0.2s;
-    }
-
-    .search-wrapper .clear-btn:hover {
-      color: #1a3f62;
-    }
-
-    .search-wrapper .clear-btn.visible {
-      display: block;
-    }
-
-    /* ===== RESULTS COUNTER ===== */
-    .results-counter {
-      text-align: center;
-      color: #3a4c6b;
-      font-size: 0.9rem;
-      margin-bottom: 1.5rem;
-      font-weight: 400;
-      opacity: 0.8;
-    }
-
-    .results-counter strong {
-      color: #0b2b4a;
-      font-weight: 600;
-    }
-
-    /* ===== TABS ===== */
-    .tabs-nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-      background: white;
-      padding: 0.6rem 1rem;
-      border-radius: 60px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-      border: 1px solid #edf0f7;
-    }
-
-    .tab-btn {
-      background: transparent;
-      border: none;
-      padding: 0.6rem 1.4rem;
-      border-radius: 40px;
-      font-weight: 500;
-      font-size: 0.85rem;
-      color: #4a5b77;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: inherit;
-    }
-
-    .tab-btn i {
-      font-size: 1rem;
-    }
-
-    .tab-btn:hover {
-      background: #f0f5ff;
-      color: #0b2b4a;
-    }
-
-    .tab-btn.active {
-      background: #0b2b4a;
-      color: white;
-      box-shadow: 0 4px 12px rgba(11, 43, 74, 0.2);
-    }
-
-    .tab-content {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ===== CATEGORIES / CARDS ===== */
-    .categories-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-
-    .category-section {
-      background: white;
-      border-radius: 24px;
-      padding: 1.5rem 1.8rem 1.8rem;
-      border: 1px solid #edf0f7;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-      transition: box-shadow 0.2s, transform 0.2s;
-    }
-
-    .category-section:hover {
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-      transform: translateY(-2px);
-    }
-
-    .category-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #0b2b4a;
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .category-title i {
-      color: #1a5b7a;
-      font-size: 1.2rem;
-    }
-
-    .links-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 0.8rem;
-    }
-
-    .link-button {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      padding: 0.7rem 1.2rem;
-      background: #f8faff;
-      border-radius: 14px;
-      border: 1px solid #e9edf4;
-      color: #1e2a3e;
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-
-    .link-button i {
-      width: 1.6rem;
-      text-align: center;
-      color: #1a5b7a;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    .link-button:hover {
-      background: #f0f5ff;
-      border-color: #b0c6df;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 20, 40, 0.06);
-    }
-
-    .link-button.primary-button {
-      background: #0b2b4a;
-      border-color: #0b2b4a;
-      color: white;
-    }
-
-    .link-button.primary-button i {
-      color: #bfdbfe;
-    }
-
-    .link-button.primary-button:hover {
-      background: #1a3f62;
-      border-color: #1a3f62;
-    }
-
-    /* ===== NO RESULTS ===== */
-    .no-results {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 3rem 1.5rem;
-      color: #3a4c6b;
-      background: #f0f4fe;
-      border-radius: 20px;
-      font-size: 1rem;
-    }
-
-    /* ===== FOOTER ===== */
-    .footer {
-      background: #0f172a;
-      color: #cbd5e1;
-      text-align: center;
-      padding: 28px 0;
-      margin-top: 60px;
-      border-top: 1px solid #1e293b;
-      font-size: 14px;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      .header-content {
-        flex-direction: column;
-        align-items: flex-start;
+    :root{
+      --primary:#0f2f5f;
+      --primary2:#1a3a6b;
+      --accent:#3b82f6;
+      --success:#059669;
+      --warning:#d97706;
+      --danger:#991b1b;
+      --bg:#f3f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+      --shadow2: 0 8px 20px rgba(2,6,23,.10);
+      --r:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:var(--bg);
+      color:var(--text);
+      font-size:14px;
+    }
+
+    .header{
+      position:sticky; top:0; z-index:50;
+      background:linear-gradient(135deg, #081a36 0%, var(--primary) 40%, #2a5298 100%);
+      color:#fff;
+      box-shadow: 0 10px 24px rgba(0,0,0,.22);
+      padding:22px 28px;
+      display:flex; gap:20px; align-items:center;
+      min-height:100px;
+    }
+    .h-icon{
+      width:72px; height:72px;
+      border-radius:18px;
+      background:rgba(255,255,255,.14);
+      border:1.5px solid rgba(255,255,255,.22);
+      display:flex; align-items:center; justify-content:center;
+      font-size:32px;
+      flex:0 0 auto;
+    }
+    .h-info{flex:1; min-width:240px}
+    .h-title{
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:.3px;
+      line-height:1.15;
+    }
+    .h-sub{
+      margin-top:7px;
+      font-size:16px;
+      opacity:.92;
+      font-weight:600;
+    }
+    .h-meta{
+      margin-top:7px;
+      font-size:13px;
+      opacity:.80;
+      font-weight:500;
+    }
+    .h-actions{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .btn{
+      border:none;
+      cursor:pointer;
+      border-radius:12px;
+      padding:12px 16px;
+      font-weight:700;
+      font-size:13px;
+      display:inline-flex; align-items:center; gap:9px;
+      transition:.18s ease;
+      white-space:nowrap;
+    }
+    .btn-primary{
+      background:rgba(59,130,246,.18);
+      color:#dbeafe;
+      border:1px solid rgba(59,130,246,.35);
+    }
+    .btn-primary:hover{background:rgba(59,130,246,.28)}
+    .btn-excel{
+      background:rgba(5,150,105,.16);
+      color:#d1fae5;
+      border:1px solid rgba(5,150,105,.35);
+    }
+    .btn-excel:hover{background:rgba(5,150,105,.26)}
+    .pill{
+      display:inline-flex; align-items:center; gap:9px;
+      padding:12px 16px;
+      border-radius:999px;
+      font-size:13px;
+      background:rgba(5,150,105,.14);
+      border:1px solid rgba(5,150,105,.32);
+      color:#bbf7d0;
+      font-weight:800;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background:var(--success);
+      box-shadow:0 0 10px rgba(5,150,105,.9);
+    }
+    .lastUpdate{margin-top:5px; font-size:12px; opacity:.72}
+
+    .wrap{max-width:1600px; margin:0 auto; padding:18px 22px;}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+    }
+    .filters{padding:14px 16px;}
+    .filtersTop{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .filtersTitle{
+      display:flex; align-items:center; gap:10px;
+      font-weight:900; color:var(--primary2);
+      font-size:14px;
+    }
+    .filtersGrid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:12px;
+    }
+    .fg{grid-column: span 6;}
+    .fg label{
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      font-weight:800;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+    select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1.5px solid var(--border);
+      background:#f8fafc;
+      font-weight:700;
+      color:var(--text);
+      outline:none;
+    }
+    select:focus{
+      border-color:rgba(59,130,246,.65);
+      box-shadow:0 0 0 3px rgba(59,130,246,.14);
+      background:#fff;
+    }
+    .btn-clear{
+      background:#fff;
+      border:1px solid var(--border);
+      color:var(--muted);
+      padding:9px 12px;
+      border-radius:10px;
+      font-weight:900;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .btn-clear:hover{
+      border-color:#fecaca;
+      color:#b91c1c;
+      background:#fff5f5;
+    }
+
+    .multiselect-wrapper{position:relative;width:100%;}
+    .ms-trigger{
+      width:100%;padding:10px 12px;border-radius:12px;
+      border:1.5px solid var(--border);background:#f8fafc;
+      font-weight:700;color:var(--text);cursor:pointer;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:8px;user-select:none;transition:.15s ease;
+    }
+    .ms-trigger:hover{border-color:rgba(59,130,246,.65);background:#fff;}
+    .ms-trigger.open{border-color:rgba(59,130,246,.65);box-shadow:0 0 0 3px rgba(59,130,246,.14);background:#fff;}
+    .ms-arrow{font-size:11px;color:var(--muted);transition:transform .2s;flex-shrink:0;}
+    .ms-trigger.open .ms-arrow{transform:rotate(180deg);}
+    .ms-label-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+    .ms-dropdown{
+      display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;
+      background:#fff;border:1.5px solid var(--border);border-radius:14px;
+      box-shadow:0 8px 28px rgba(2,6,23,.13);z-index:200;overflow:hidden;
+    }
+    .ms-dropdown.open{display:block;}
+    .ms-actions{display:flex;gap:6px;padding:10px 10px 8px;border-bottom:1px solid var(--border);}
+    .ms-btn-all,.ms-btn-clr{
+      flex:1;padding:7px 10px;border-radius:8px;border:none;
+      font-weight:800;font-size:12px;cursor:pointer;transition:.15s ease;
+    }
+    .ms-btn-all{background:rgba(59,130,246,.12);color:var(--accent);border:1px solid rgba(59,130,246,.28);}
+    .ms-btn-all:hover{background:rgba(59,130,246,.22);}
+    .ms-btn-clr{background:rgba(185,28,28,.09);color:#b91c1c;border:1px solid rgba(185,28,28,.25);}
+    .ms-btn-clr:hover{background:rgba(185,28,28,.18);}
+    .ms-search-box{padding:8px 10px;border-bottom:1px solid var(--border);}
+    .ms-search-box input{
+      width:100%;padding:7px 10px;border-radius:9px;border:1.5px solid var(--border);
+      font-weight:600;font-size:12px;outline:none;background:#f8fafc;
+    }
+    .ms-search-box input:focus{border-color:rgba(59,130,246,.55);background:#fff;}
+    .ms-list{max-height:220px;overflow-y:auto;padding:6px 4px;}
+    .ms-list::-webkit-scrollbar{width:5px;}
+    .ms-list::-webkit-scrollbar-track{background:transparent;}
+    .ms-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:99px;}
+    .ms-item{
+      display:flex;align-items:center;gap:9px;padding:7px 10px;
+      border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;transition:.12s ease;
+    }
+    .ms-item:hover{background:#f0f7ff;}
+    .ms-item input[type="checkbox"]{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+    .ms-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .ms-empty{padding:12px 14px;color:var(--muted);font-size:12px;font-weight:700;text-align:center;}
+
+    .grupo-filter-container {
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .grupo-selector {
+      flex:1.2;
+      min-width:220px;
+    }
+    .subgrupo-container {
+      flex:3;
+      min-width:450px;
+    }
+    .subgrupo-container .ms-trigger {
+      background:linear-gradient(135deg, #f8fafc, #fff);
+      white-space: normal;
+      min-height: 42px;
+    }
+    .mes-container {
+      flex:1;
+      min-width:180px;
+    }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:14px;
+    }
+    .kpi{
+      padding:16px;
+      border-radius:var(--r);
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      box-shadow:var(--shadow);
+      display:flex; gap:12px; align-items:center;
+      min-height:96px;
+    }
+    .kpiIcon{
+      width:52px; height:52px; border-radius:14px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px;
+      flex:0 0 auto;
+    }
+    .kpi .label{font-size:11px; color:var(--muted); font-weight:900; letter-spacing:.45px; text-transform:uppercase;}
+    .kpi .val{font-size:28px; font-weight:900; margin-top:3px; line-height:1;}
+    .kpi .sub{font-size:11px; color:var(--muted); margin-top:6px; font-weight:700;}
+    .kpi.ag .kpiIcon{background:rgba(59,130,246,.12); color:var(--accent)}
+    .kpi.rec .kpiIcon{background:rgba(5,150,105,.12); color:var(--success)}
+    .kpi.apac .kpiIcon{background:rgba(217,119,6,.12); color:var(--warning)}
+    .kpi.fat .kpiIcon{background:rgba(185,28,28,.10); color:var(--danger)}
+
+    .kpi.fin1 .kpiIcon{background:rgba(14,165,233,.12); color:#0ea5e9;}
+    .kpi.fin2 .kpiIcon{background:rgba(5,150,105,.12); color:var(--success);}
+    .kpi.fin3 .kpiIcon{background:rgba(139,92,246,.12); color:#8b5cf6;}
+    .kpi.fin4 .kpiIcon{background:rgba(217,119,6,.12); color:var(--warning);}
+    .kpi .val.fin-val{font-size:22px;}
+
+    .section{padding:16px;}
+    .sectionTitle{
+      display:flex; align-items:center; gap:10px;
+      font-weight:900; color:var(--primary2);
+      margin-bottom:12px; font-size:14px;
+      flex-wrap:wrap;
+    }
+    .chartCard{
+      padding:14px;
+      border-radius:var(--r);
+      border:1px solid var(--border);
+      background:var(--card);
+      box-shadow:var(--shadow);
+      position:relative;
+    }
+    .chartHead{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; margin-bottom:10px;
+      position:relative;
+      flex-wrap:wrap;
+    }
+    .chartHead h3{margin:0; font-size:13px; color:var(--text); font-weight:900;}
+    .chartSub{font-size:11px; color:var(--muted); font-weight:700; margin-top:4px;}
+
+    .chartWrap{position:relative; height:360px;}
+
+    .grid-2cols {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      align-items:stretch;
+    }
+    .grid-1col{display:grid; grid-template-columns:1fr; gap:14px;}
+    .grid-2cols-bottom{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .tabs{
+      display:flex; gap:6px; padding:6px;
+      border-radius:999px; border:1px solid var(--border);
+      background:var(--card); box-shadow:var(--shadow); overflow:auto;
+    }
+    .tab{
+      border:none; background:transparent; cursor:pointer;
+      padding:10px 14px; border-radius:999px;
+      font-weight:900; color:var(--muted); font-size:12px;
+      display:flex; align-items:center; gap:8px; white-space:nowrap;
+    }
+    .tab.active{background:var(--primary2); color:#fff; box-shadow:var(--shadow);}
+    .tabContent{display:none}
+    .tabContent.active{display:block}
+
+    .tableTop{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap; margin-bottom:10px;
+    }
+    .search{
+      display:flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:12px;
+      border:1.5px solid var(--border); background:#f8fafc; min-width:260px;
+    }
+    .search input{border:none; outline:none; background:transparent; width:100%; font-weight:700;}
+    table{width:100%; border-collapse:collapse; font-size:12px;}
+    thead th{
+      text-align:left; padding:10px 12px;
+      background:linear-gradient(135deg, #0b2246, #1a3a6b);
+      color:#fff;
+      position:sticky; top:0;
+      font-size:11px; letter-spacing:.35px; text-transform:uppercase;
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
+    }
+    thead th:hover{background:linear-gradient(135deg, #0d2b52, #1f4580);}
+    thead th .sort-icon{margin-left:6px; opacity:.65; font-size:10px;}
+    thead th.sort-asc .sort-icon::after{content:"▲"; opacity:1;}
+    thead th.sort-desc .sort-icon::after{content:"▼"; opacity:1;}
+    thead th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:"⇅";}
+    tbody td{
+      padding:10px 12px; border-bottom:1px solid var(--border);
+      font-weight:650; white-space:nowrap;
+    }
+    tbody tr:hover{background:#f2f7ff}
+    .muted{color:var(--muted); font-weight:800; font-size:12px}
+
+    .toastBox{position:fixed; right:18px; top:110px; z-index:999; display:flex; flex-direction:column; gap:8px;}
+    .toast{
+      background:#0b1d3a; color:#fff;
+      border-left:4px solid var(--accent);
+      padding:10px 12px; border-radius:12px;
+      box-shadow:var(--shadow2); font-weight:750; font-size:12px;
+      max-width:340px; display:flex; gap:10px; align-items:flex-start;
+    }
+    .toast.success{border-left-color:var(--success)}
+    .toast.error{border-left-color:var(--danger)}
+
+    .loading{
+      height:3px;
+      background:linear-gradient(90deg, var(--accent), #60a5fa, var(--accent));
+      background-size:200% 100%;
+      animation:shimmer 1.2s infinite linear;
+      display:none;
+    }
+    .loading.on{display:block}
+    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+    .gauge-card{
+      padding:18px 16px 16px;border-radius:var(--r);border:1px solid var(--border);
+      background:var(--card);box-shadow:var(--shadow);
+      display:flex;flex-direction:column;align-items:center;
+    }
+    .gauge-head{width:100%;margin-bottom:6px;}
+    .gauge-head h3{margin:0;font-size:13px;color:var(--text);font-weight:900;display:flex;align-items:center;gap:8px;}
+    .gauge-head .gauge-sub{font-size:11px;color:var(--muted);font-weight:700;margin-top:4px;}
+    .gauge-chart-wrap{position:relative;width:100%;max-width:300px;height:160px;margin:0 auto;}
+    .gauge-chart-wrap canvas{display:block;}
+    .gauge-overlay{
+      position:absolute;bottom:0px;left:50%;transform:translateX(-50%);
+      text-align:center;pointer-events:none;white-space:nowrap;
+    }
+    .gauge-pct-big{font-size:40px;font-weight:900;line-height:1;letter-spacing:-1px;transition:color .45s ease;font-family:Inter,system-ui;}
+    .gauge-pct-label{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.55px;margin-top:3px;}
+    .gauge-divider{width:100%;height:1px;background:var(--border);margin:14px 0 12px;}
+    .gauge-stats-row{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;width:100%;}
+    .gauge-stat-item{display:flex;flex-direction:column;align-items:center;gap:3px;}
+    .gauge-stat-num{font-size:22px;font-weight:900;color:var(--text);line-height:1;}
+    .gauge-stat-desc{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.45px;text-align:center;}
+    .gauge-zones-row{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;justify-content:center;width:100%;}
+    .gauge-zone-item{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--muted);}
+    .zone-circle{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+    .gauge-badge{
+      display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;
+      font-size:11px;font-weight:900;margin-top:10px;transition:background .4s,color .4s,border .4s;
+    }
+
+    .fin-header{
+      background:linear-gradient(135deg, #0a1c3a 0%, #0f2f5f 40%, #1e3a6b 100%);
+      border-radius:var(--r);padding:18px 22px;
+      display:flex;align-items:center;gap:16px;color:#fff;
+      box-shadow:0 4px 18px rgba(15,47,95,.28);
+    }
+    .fin-header-icon{
+      width:58px;height:58px;border-radius:14px;
+      background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.26);
+      display:flex;align-items:center;justify-content:center;font-size:28px;flex:0 0 auto;
+    }
+    .fin-header-body{flex:1;min-width:0;}
+    .fin-header-title{font-size:20px;font-weight:800;letter-spacing:.2px;line-height:1.2;}
+    .fin-header-sub{font-size:13px;opacity:.88;font-weight:600;margin-top:5px;}
+    .fin-header-right{text-align:right;flex-shrink:0;}
+    .fin-header-update{font-size:11px;opacity:.78;font-weight:700;}
+    .fin-header-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+      border-radius:999px;padding:5px 12px;font-size:11px;font-weight:800;
+      margin-top:6px;color:#dbeafe;
+    }
+
+    .fin-mom-bar{
+      display:flex;flex-wrap:wrap;gap:8px;
+      margin-top:14px;justify-content:center;
+    }
+    .fin-mom-pill{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:7px 14px;border-radius:999px;
+      background:#f0f9ff;border:1px solid #bae6fd;
+      font-size:11px;font-weight:700;
+    }
+    .fin-mom-pill-lbl{color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;}
+    .fin-mom-pill-val{color:var(--text);font-weight:900;}
+    .fin-mom-pill-delta{font-size:10px;font-weight:900;}
+
+    .fin-nt-legend{
+      display:inline-flex;align-items:center;gap:5px;
+      font-size:10px;color:var(--muted);font-weight:700;
+      padding:3px 10px;border-radius:999px;
+      background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.2);
+    }
+
+    .chart-filter-wrapper {
+      position:relative;
+      display:inline-block;
+    }
+    .chart-filter-badge {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,47,95,.08);
+      border:1px solid rgba(15,47,95,.15);
+      border-radius:999px;
+      padding:5px 12px;
+      font-size:11px;
+      font-weight:700;
+      color:var(--primary2);
+      cursor:pointer;
+      transition:.15s ease;
+      white-space:nowrap;
+    }
+    .chart-filter-badge:hover { background:rgba(15,47,95,.15); }
+    .chart-filter-badge i { font-size:12px; }
+    .chart-filter-popup {
+      position:absolute;
+      top:calc(100% + 8px);
+      right:0;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      box-shadow:0 8px 28px rgba(2,6,23,.2);
+      z-index:1000;
+      min-width:220px;
+      padding:12px;
+      display:none;
+    }
+    .chart-filter-popup.show { display:block; }
+    .chart-filter-popup select {
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1.5px solid var(--border);
+      font-weight:700;
+      font-size:12px;
+      margin-bottom:10px;
+    }
+    .chart-filter-popup select[multiple] { height:120px; }
+    .filter-actions { display:flex; gap:8px; }
+    .filter-actions button {
+      flex:1;
+      padding:8px 10px;
+      border-radius:8px;
+      border:none;
+      font-weight:800;
+      font-size:11px;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    .btn-filter-apply { background:var(--primary2); color:#fff; }
+    .btn-filter-apply:hover { background:var(--primary); }
+    .btn-filter-clear {
+      background:rgba(185,28,28,.09);
+      color:#b91c1c;
+      border:1px solid rgba(185,28,28,.25);
+    }
+    .btn-filter-clear:hover { background:rgba(185,28,28,.18); }
+
+    .th-filter-wrapper {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      width:100%;
+      gap:8px;
+    }
+    .th-filter-icon {
+      font-size:10px;
+      cursor:pointer;
+      opacity:.8;
+      padding:4px;
+    }
+    .th-filter-icon:hover {
+      opacity:1;
+      color:#ff0;
+    }
+
+    @media(max-width:900px){
+      .kpis{grid-template-columns:1fr 1fr}
+      .fg{grid-column:span 12;}
+      .header{flex-wrap:wrap; padding:16px 18px;}
+      .h-actions{width:100%; justify-content:flex-start}
+      .grid-2cols{grid-template-columns:1fr}
+      .grid-2cols-bottom{grid-template-columns:1fr}
+      .fin-header{flex-wrap:wrap;}
+      .fin-header-right{width:100%;}
+      .chart-filter-popup { right:auto; left:0; }
+      .grupo-selector, .subgrupo-container, .mes-container {
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
       }
-
-      .right-section .slogan {
-        align-self: flex-start;
-      }
-
-      .tabs-nav {
-        border-radius: 24px;
-        padding: 0.5rem;
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        gap: 0.3rem;
-      }
-
-      .tab-btn {
-        font-size: 0.75rem;
-        padding: 0.4rem 1rem;
-        white-space: nowrap;
-      }
-
-      .links-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .login-box {
-        padding: 2rem 1.5rem 1.5rem;
-      }
-
-      .login-header h1 {
-        font-size: 1.1rem;
-      }
-
-      .category-section {
-        padding: 1.2rem;
-      }
-
-      .search-wrapper {
-        padding: 0.2rem 0.2rem 0.2rem 1.2rem;
-      }
-
-      .search-wrapper input {
-        padding: 0.7rem 0;
-        font-size: 0.9rem;
-      }
+    }
+    @media(max-width:560px){
+      .kpis{grid-template-columns:1fr}
+      .wrap{padding:14px 14px;}
+      .h-title{font-size:20px}
+      .h-sub{font-size:14px}
     }
 
-    @media (max-width: 480px) {
-      .container {
-        padding: 0 1rem;
-      }
-
-      .header {
-        padding: 1.2rem 0;
-      }
-
-      .title-section .main-title {
-        font-size: 1.3rem;
-      }
+    .fin-header-ranking {
+      background: linear-gradient(135deg, #0a3a2a, #0f4a35) !important;
+    }
+    .fin-header-ranking .fin-header-icon {
+      background: rgba(255,255,255,.16);
+      border: 1.5px solid rgba(255,255,255,.26);
     }
   </style>
 </head>
 <body>
+  <header class="header">
+    <div class="h-icon"><i class="fa-solid fa-hospital-user"></i></div>
+    <div class="h-info">
+      <div class="h-title">DIRETORIA DE REGULAÇÃO DO ACESSO</div>
+      <div class="h-sub">Painel Análise de Dados/OCI</div>
+      <div class="h-meta">
+        Superintendente: <b style="color:#bfdbfe">Yara Ariane M.S.Souza</b>
+        &nbsp;•&nbsp; Diretora: <b style="color:#bfdbfe">Paloma Morais</b>
+        &nbsp;•&nbsp; Desenvolvido por <b style="color:#bfdbfe">Ana P. A. Silva — Matric. 201704</b>
+      </div>
+      <div class="lastUpdate" id="lastUpdate">Carregando dados…</div>
+    </div>
+    <div class="h-actions">
+      <div class="pill"><span class="dot"></span> Conectado</div>
+      <button class="btn btn-primary" id="btnRefresh"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+      <button class="btn btn-excel" id="btnExcel"><i class="fa-solid fa-file-excel"></i> Excel</button>
+    </div>
+  </header>
 
-  <!-- ===== LOGIN OVERLAY ===== -->
-  <div id="login-overlay">
-    <div class="login-box">
-      <div class="login-header">
-        <i class="fas fa-hospital"></i>
-        <h1>Diretoria de Regulação do Acesso</h1>
+  <div class="loading" id="loading"></div>
+  <div class="toastBox" id="toastBox"></div>
+
+  <main class="wrap">
+
+        <div class="card filters">
+      <div class="filtersTop">
+        <div class="filtersTitle"><i class="fa-solid fa-filter" style="color:var(--accent)"></i> Filtros</div>
+        <button class="btn-clear" id="btnClear"><i class="fa-solid fa-xmark"></i> Limpar</button>
       </div>
-      <p class="login-subtitle">Acesso para atalho a links com Painéis e Consolidados</p>
-      <div class="login-form">
-        <label for="senha-input"><i class="fas fa-lock"></i> Senha</label>
-        <div class="password-wrapper">
-          <input type="password" id="senha-input" placeholder="Digite a senha" />
-          <button id="toggle-senha" type="button"><i class="fas fa-eye-slash"></i></button>
+      <div class="filtersGrid">
+        <div class="fg" style="grid-column: span 12;">
+          <div class="grupo-filter-container">
+            <div class="grupo-selector">
+              <label><i class="fa-solid fa-layer-group"></i> GRUPO</label>
+              <select id="grupoSelect" onchange="handleGrupoChange()">
+                <option value="">Todos os Grupos</option>
+                <option value="01">01 - Atenção em Oncologia</option>
+                <option value="02">02 - Atenção em Cardiologia</option>
+                <option value="03">03 - Atenção em Ortopedia</option>
+                <option value="04">04 - Atenção em Otorrinolaringologia</option>
+                <option value="05">05 - Atenção em Oftalmologia</option>
+                <option value="06">06 - Atenção em Saúde da Mulher</option>
+                <option value="07">07 - Atenção em Saúde Bucal</option>
+                <option value="08">08 - Atenção em Infectologia</option>
+              </select>
+            </div>
+            <div class="subgrupo-container" id="subgrupoContainer">
+              <label><i class="fa-solid fa-code-branch"></i> SUBGRUPOS COM CÓDIGOS TUSS</label>
+              <div class="multiselect-wrapper" id="msWrapperSub">
+                <div class="ms-trigger" id="msTriggerSub" onclick="toggleMsDropdownSub(event)">
+                  <span class="ms-label-text" id="msLabelSub">Todos os subgrupos</span>
+                  <i class="fa-solid fa-chevron-down ms-arrow" id="msArrowSub"></i>
+                </div>
+                <div class="ms-dropdown" id="msDropdownSub">
+                  <div class="ms-actions">
+                    <button class="ms-btn-all" onclick="selectAllSub(event)"><i class="fa-solid fa-check-double"></i> Selecionar Todos</button>
+                    <button class="ms-btn-clr" onclick="clearSubSelection(event)"><i class="fa-solid fa-xmark"></i> Limpar</button>
+                  </div>
+                  <div class="ms-search-box">
+                    <input type="text" id="msSearchSub" placeholder="Buscar por código ou nome…" oninput="filterMsListSub()" autocomplete="off"/>
+                  </div>
+                  <div class="ms-list" id="msListSub" style="max-height: 300px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mes-container">
+              <label><i class="fa-solid fa-calendar-days"></i> MÊS/ANO</label>
+              <div class="multiselect-wrapper" id="msWrapperMes">
+                <div class="ms-trigger" id="msTriggerMes" onclick="toggleMsDropdownMes(event)">
+                  <span class="ms-label-text" id="msLabelMes">Todos</span>
+                  <i class="fa-solid fa-chevron-down ms-arrow" id="msArrowMes"></i>
+                </div>
+                <div class="ms-dropdown" id="msDropdownMes">
+                  <div class="ms-actions">
+                    <button class="ms-btn-all" onclick="selectAllMes(event)"><i class="fa-solid fa-check-double"></i> Selecionar Todos</button>
+                    <button class="ms-btn-clr" onclick="clearMesSelection(event)"><i class="fa-solid fa-xmark"></i> Limpar</button>
+                  </div>
+                  <div class="ms-search-box">
+                    <input type="text" id="msSearchMes" placeholder="Buscar mês…" oninput="filterMsListMes()" autocomplete="off"/>
+                  </div>
+                  <div class="ms-list" id="msListMes"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <button id="btn-login" class="login-btn">Acessar</button>
-        <div id="login-error" class="login-error"></div>
-      </div>
-      <div class="login-footer">
-        <span>Desenvolvido por Ana P. A. Silva — Matric. 201704</span>
       </div>
     </div>
-  </div>
 
-  <!-- ===== CONTEÚDO PRINCIPAL ===== -->
-  <div id="main-content" style="display: none;">
-    <!-- HEADER -->
-    <header class="header">
-      <div class="container">
-        <div class="header-content">
-          <div class="logo-section">
-            <i class="fas fa-hospital"></i>
-            <div class="title-section">
-              <h1 class="main-title">Ferramentas Administrativas</h1>
-              <p class="subtitle">Diretoria de Regulação do Acesso</p>
-              <div class="h-meta">
-                Superintendente: <b>Yara Ariane M.S.Souza</b>
-                &nbsp;•&nbsp; Diretora: <b>Paloma Morais</b>
-                &nbsp;•&nbsp; Desenvolvido por <b>Ana P. A. Silva — Matric. 201704</b>
+    <div class="kpis" style="margin-top:14px;">
+      <div class="kpi ag">
+        <div class="kpiIcon"><i class="fa-solid fa-calendar-check"></i></div>
+        <div>
+          <div class="label">Total Agendados</div>
+          <div class="val" id="kAg">0</div>
+          <div class="sub" id="kAgSub">—</div>
+        </div>
+      </div>
+      <div class="kpi rec">
+        <div class="kpiIcon"><i class="fa-solid fa-user-check"></i></div>
+        <div>
+          <div class="label">Total Recepcionados</div>
+          <div class="val" id="kRec">0</div>
+          <div class="sub" id="kRecSub">—</div>
+        </div>
+      </div>
+      <div class="kpi apac">
+        <div class="kpiIcon"><i class="fa-solid fa-file-medical"></i></div>
+        <div>
+          <div class="label">Total APAC Autorizadas</div>
+          <div class="val" id="kApac">0</div>
+          <div class="sub" id="kApacSub">—</div>
+        </div>
+      </div>
+      <div class="kpi fat">
+        <div class="kpiIcon"><i class="fa-solid fa-money-bill-wave"></i></div>
+        <div>
+          <div class="label">Total Faturados</div>
+          <div class="val" id="kFat">0</div>
+          <div class="sub" id="kFatSub">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs" style="margin-top:14px;">
+      <button class="tab active" onclick="switchTab('visao', this)"><i class="fa-solid fa-chart-line"></i> Visão Geral</button>
+      <button class="tab" onclick="switchTab('financeiro', this)"><i class="fa-solid fa-coins"></i> Financeiro</button>
+      <button class="tab" onclick="switchTab('tabela', this)"><i class="fa-solid fa-table"></i> Tabela OCI</button>
+      <button class="tab" onclick="switchTab('ranking-fisico', this)"><i class="fa-solid fa-trophy"></i> Ranking Físico</button>
+      <button class="tab" onclick="switchTab('ranking-financeiro', this)"><i class="fa-solid fa-sack-dollar"></i> Ranking Financeiro</button>
+    </div>
+
+        <section class="tabContent active" id="tab-visao" style="margin-top:14px;">
+      <div class="card section">
+        <div class="sectionTitle">
+          <span style="display:flex;align-items:center;gap:10px;">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent)"></i>
+            Indicadores (adaptam conforme o filtro)
+          </span>
+        </div>
+
+        <div class="grid-2cols" style="margin-bottom:14px;">
+          <div class="gauge-card">
+            <div class="gauge-head">
+              <h3><i class="fa-solid fa-circle-dollar-to-slot" style="color:#059669"></i> Taxa de Faturamento</h3>
+              <div class="gauge-sub">% de Recepcionados que foram Faturados</div>
+            </div>
+            <div class="gauge-chart-wrap">
+              <canvas id="cGaugeFatRec"></canvas>
+              <div class="gauge-overlay">
+                <div class="gauge-pct-big" id="gaugeFatRecPct">—</div>
+                <div class="gauge-pct-label">Fat. / Recep.</div>
               </div>
             </div>
+            <div id="gaugeFatRecBadge" class="gauge-badge">—</div>
+            <div class="gauge-divider"></div>
+            <div class="gauge-stats-row">
+              <div class="gauge-stat-item"><span class="gauge-stat-num" id="gFatRecRec">0</span><span class="gauge-stat-desc">Recepcionado</span></div>
+              <div class="gauge-stat-item"><span class="gauge-stat-num" id="gFatRecFat">0</span><span class="gauge-stat-desc">Faturado</span></div>
+              <div class="gauge-stat-item"><span class="gauge-stat-num" id="gFatRecDiff">0</span><span class="gauge-stat-desc">Não faturado</span></div>
+            </div>
+            <div class="gauge-zones-row">
+              <span class="gauge-zone-item"><span class="zone-circle" style="background:#2ebd89"></span>≥ 80% Ótimo</span>
+              <span class="gauge-zone-item"><span class="zone-circle" style="background:#FABA5F"></span>50–79% Regular</span>
+              <span class="gauge-zone-item"><span class="zone-circle" style="background:#d35454"></span>&lt; 50% crítico</span>
+            </div>
           </div>
-          <div class="right-section">
-            <div class="slogan">
-              <p>"Nenhum de nós é tão bom quanto todos nós juntos!"</p>
+          <div class="gauge-card">
+            <div class="gauge-head">
+              <h3><i class="fa-solid fa-user-xmark" style="color:#b91c1c"></i> Índice de Absenteísmo</h3>
+              <div class="gauge-sub">% de Agendados que não compareceram</div>
+            </div>
+            <div class="gauge-chart-wrap">
+              <canvas id="cGaugeAbs"></canvas>
+              <div class="gauge-overlay">
+                <div class="gauge-pct-big" id="gaugeAbsPct">—</div>
+                <div class="gauge-pct-label">Absenteísmo</div>
+              </div>
+            </div>
+            <div id="gaugeAbsBadge" class="gauge-badge">—</div>
+            <div class="gauge-divider"></div>
+            <div class="gauge-stats-row">
+              <div class="gauge-stat-item"><span class="gauge-stat-num" id="gAbsAg">0</span><span class="gauge-stat-desc">Agendado</span></div>
+              <div class="gauge-stat-item"><span class="gauge-stat-num" id="gAbsRec">0</span><span class="gauge-stat-desc">Recepcionado</span></div>
+              <div class="gauge-stat-item"><span class="gauge-stat-num" id="gAbsAus">0</span><span class="gauge-stat-desc">Ausências</span></div>
+            </div>
+            <div class="gauge-zones-row">
+              <span class="gauge-zone-item"><span class="zone-circle" style="background:#2ebd89"></span>≤ 10% Excelente</span>
+              <span class="gauge-zone-item"><span class="zone-circle" style="background:#5793F7"></span>11–20% Bom</span>
+              <span class="gauge-zone-item"><span class="zone-circle" style="background:#FABA5F"></span>21–35% Atenção</span>
+              <span class="gauge-zone-item"><span class="zone-circle" style="background:#d35454"></span>&gt; 35% Crítico</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRÁFICO EVOLUÇÃO MENSAL (PRIMEIRO) -->
+        <div class="grid-1col">
+          <div class="chartCard">
+            <div class="chartHead">
+              <div>
+                <h3>Evolução Mensal (Agendado, Recepcionado, APAC, Faturado)</h3>
+                <div class="chartSub" id="subEvolucao">Selecione filtros para detalhar</div>
+              </div>
+            </div>
+            <div class="chartWrap" style="height:420px;"><canvas id="cEvolucao"></canvas></div>
+          </div>
+        </div>
+
+        <!-- GRÁFICO TOP ESPECIALIDADES (SEGUNDO, ABAIXO) -->
+        <div class="grid-1col" style="margin-top:14px;">
+          <div class="chartCard">
+            <div class="chartHead">
+              <div><h3>Top Especialidades (por Recepcionado e Faturado)</h3><div class="chartSub" id="subTop">Procedimentos com maior volume no período</div></div>
+            </div>
+            <div id="cTopWrap" class="chartWrap" style="height:500px;"><canvas id="cTop"></canvas></div>
+          </div>
+        </div>
+
+        <!-- GRÁFICOS RECEITA E DISTRIBUIÇÃO (AO LADO) -->
+        <div class="grid-2cols" style="margin-top:14px;">
+          <div class="chartCard">
+            <div class="chartHead">
+              <div><h3>Receita Financeira por Especialidade</h3><div class="chartSub" id="subReceita">Faturamento total (R$) por especialidade no período</div></div>
+            </div>
+            <div class="chartWrap" style="height:450px;"><canvas id="cReceita"></canvas></div>
+          </div>
+          <div class="chartCard">
+            <div class="chartHead"><div><h3><i class="fa-solid fa-chart-pie"></i> Distribuição no Período</h3><div class="chartSub">Participação percentual de cada métrica no total</div></div></div>
+            <div class="chartWrap" style="height:450px;"><canvas id="cDistribuicao"></canvas></div>
+          </div>
+        </div>
+
+        <!-- POSIÇÃO DE CONTAGEM -->
+        <div class="grid-1col" style="margin-top:14px;">
+          <div class="chartCard" style="background:linear-gradient(135deg, #f8fafc, #fff);">
+            <div class="chartHead"><div><h3><i class="fa-solid fa-location-dot"></i> Posição de Contagem</h3><div class="chartSub">Comparativo físico vs financeiro (último mês disponível)</div></div></div>
+            <div style="display:flex; gap:20px; justify-content:center; margin:20px 0;">
+              <div style="flex:1; text-align:center; padding:20px; background:rgba(15,47,95,.05); border-radius:20px;">
+                <div style="font-size:14px; font-weight:800; color:var(--muted); margin-bottom:10px;"><i class="fa-solid fa-dumbbell"></i> RANKING FÍSICO</div>
+                <div style="font-size:48px; font-weight:900; color:var(--primary); line-height:1;" id="rankFisicoPos">#0</div>
+                <div style="font-size:13px; margin-top:5px;" id="rankFisicoDetalhe">—</div>
+                <div style="margin-top:15px; padding:10px; background:rgba(5,150,105,.1); border-radius:12px;">
+                  <div style="font-size:11px; color:var(--muted);" id="rankFisicoLabel">Total do último mês</div>
+                  <div style="font-size:20px; font-weight:900; color:#059669;" id="rankFisicoTotal">0</div>
+                </div>
+              </div>
+              <div style="flex:1; text-align:center; padding:20px; background:rgba(5,150,105,.08); border-radius:20px;">
+                <div style="font-size:14px; font-weight:800; color:var(--muted); margin-bottom:10px;"><i class="fa-solid fa-coins"></i> RANKING FINANCEIRO</div>
+                <div style="font-size:48px; font-weight:900; color:#059669; line-height:1;" id="rankFinanceiroPos">#0</div>
+                <div style="font-size:13px; margin-top:5px;" id="rankFinanceiroDetalhe">—</div>
+                <div style="margin-top:15px; padding:10px; background:rgba(5,150,105,.1); border-radius:12px;">
+                  <div style="font-size:11px; color:var(--muted);" id="rankFinanceiroLabel">Total do último mês</div>
+                  <div style="font-size:20px; font-weight:900; color:#059669;" id="rankFinanceiroTotal">R$ 0</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-bottom:5px;"><span>Participação no total</span><span id="rankParticipacao">0%</span></div>
+              <div style="height:8px; background:#e2e8f0; border-radius:999px; overflow:hidden;"><div id="rankBarra" style="height:100%; width:0%; background:linear-gradient(90deg, #0f2f5f, #3b82f6); border-radius:999px;"></div></div>
+            </div>
+            <div style="margin-top:20px; background:rgba(0,0,0,.02); border-radius:12px; padding:15px;">
+              <div style="font-size:12px; font-weight:800; margin-bottom:10px;">📊 Top 5 vs Contagem</div>
+              <div id="miniRanking" style="font-size:11px;">Carregando...</div>
             </div>
           </div>
         </div>
       </div>
-    </header>
+    </section>
 
-    <!-- MAIN -->
-    <main>
-      <div class="container">
-        <!-- SEARCH -->
-        <div class="search-wrapper">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="globalSearch" placeholder="Buscar ferramentas, painéis ou documentos..." autofocus />
-          <button class="clear-btn" id="clearSearchBtn" aria-label="Limpar busca">✕</button>
-        </div>
-
-        <!-- RESULTS COUNTER -->
-        <div class="results-counter" id="resultsCounter">Mostrando <strong>0</strong> itens</div>
-
-        <!-- TABS -->
-        <div class="tabs-nav" id="tabsNav">
-          <button class="tab-btn active" data-tab="consultas"><i class="fas fa-user-md"></i> Consultas Especializadas</button>
-          <button class="tab-btn" data-tab="oci"><i class="fas fa-stethoscope"></i> OCI</button>
-          <button class="tab-btn" data-tab="cirurgia"><i class="fas fa-procedures"></i> Cirurgia Eletiva</button>
-          <button class="tab-btn" data-tab="exames"><i class="fas fa-microscope"></i> Média Complexidade</button>
-          <button class="tab-btn" data-tab="contatos"><i class="fas fa-address-book"></i> Contatos</button>
-        </div>
-
-        <!-- TAB: CONSULTAS -->
-        <div class="tab-content active" id="tab-consultas">
-          <div class="categories-grid">
-            <!-- Teleconsulta -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-line"></i> Teleconsulta</h2>
-              <div class="links-grid">
-                <a href="https://docs.google.com/spreadsheets/d/1NrLJ7ulMx93VXse-k8C4PX7FkGPLEZ0yTQSIVQeNItg/edit?gid=175443153#gid=175443153" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Fila de espera Ligações</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=0#gid=0" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Controle de Agendamentos</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1_WJhJQQXcxn0Yucyr_rv_HuKs7wc3p4oeb69oyhoPU4/edit?usp=sharing" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Reaproveitamento</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=1603937153#gid=1603937153" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Consolidado</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1ZwzPVQAifNLfJJO1lFr1BvQd6e6G3yC5C2H4Ry2N43k/edit?gid=621702727#gid=621702727" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Fila de Espera Retorno de Neuro</span></a>
-                <a href="https://regulacaoconsolidados-dot.github.io/contatosdasubs/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Contatos das UBS</span></a>
-                <a href="https://portal-feluma.sydle.com/home" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Portal Feluma</span></a>
-                <a href="https://cadastro.saude.gov.br/segcartao/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>CadWEB</span></a>
-              </div>
-            </section>
-
-            <!-- Painéis Central de Marcação -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-line"></i> Painéis Central de Marcação de Consultas</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/pendenciasgeral/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Pendências Geral</span></a>
-                <a href="https://compartilhacmc-commits.github.io/consolidadoagendados/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Agendamentos Geral</span></a>
-                <a href="https://compartilhacmc-commits.github.io/ofertacmc/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Agendamentos Mês Atual e Próximo</span></a>
-                <a href="https://compartilhacmc-commits.github.io/profissionaisnarede/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Profissional Médicos Ativos</span></a>
-              </div>
-            </section>
-
-            <!-- Fluxos CMC -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-code-branch"></i> Em Atualização... Fluxos Central de Marcação</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/ESPECIALIDADES.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Listas das Especialidades</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/resumo_fluxos.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Resumo dos Fluxos Especialidades</span></a>
-                <a href="https://portal.contagem.mg.gov.br/nota-tecnica" class="link-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Notas Técnicas Diretoria de Regulação</span></a>
-              </div>
-            </section>
-
-            <!-- Pendências por Distrito -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-hourglass-half"></i> Painéis Pendências por Distrito</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Eldorado</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoeldorado/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Sede</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritovargemdasflores/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Vargem das Flores</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritonacional/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Nacional</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoressaca/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Ressaca</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoindustrial/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Industrial</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritopetrolandia/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Petrolândia</span></a>
-                <a href="https://compartilhacmc-commits.github.io/distritoriacho/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-map-marker-alt"></i><span>Pendências Riacho</span></a>
-              </div>
-            </section>
-
-            <!-- Banco de Dados -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-database"></i> Banco de Dados que alimenta os Painéis</h2>
-              <div class="links-grid">
-                <a href="https://docs.google.com/spreadsheets/d/11X7DQcngdN51yFYodEWBmMCc8Pi-YFbgQ4IQ7Ca93IU/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Agendamentos Teleconsulta</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/14DiFK9EW36s8ntkukyhiRMJxcX0ghG5XTzWb1TwpI2Q/edit?gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Agendamentos Geral</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1puNbYysRBj-5CY6fhnHNnYd9OH96cl7guMFBOLeYZV4/edit?gid=1698493941#gid=1698493941" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Agendamentos Diários</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/16CXd1TVf2IfTDiPzRCxUNWk6rCRoEw6WDfcybVoarnA/edit?gid=1407399146#gid=1407399146" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Profissionais Médicos Ativos</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1r6NLcVkVLD5vp4UxPEa7TcreBpOd0qeNt-QREOG4Xr4/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Eldorado</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1IHknmxe3xAnfy5Bju_23B5ivIL-qMaaE6q_HuPaLBpk/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Vargem das Flores</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1RPf2bfQVoM1FqnyA-0P8uPTJ_PG4I2Ce6lXnk54ixfc/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Sede</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/14eUVIsWPubMve4DhVjVwlh7gin-qVyN3PspkwQ1PZMg/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Industrial</span></a>
-                <a href="https://drive.google.com/drive/folders/1zRHfbI897ZRTBKLeRbiSfjMy8RmR_MJg" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Ressaca</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1Z9Uf5MGm5tClVDR95SUpwOjivAdqEVUfDj7mIuRLf4s/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Petrolândia</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1lMGO9Hh_qL9OKI270fPL7lxadr-BZN9x_ZtmQeX6OcA/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Nacional</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1367XyjVDYyDWo3vUz6Hd_zEqLAJkH_c1MwlvtZnpmUc/edit?gid=278071504#gid=278071504" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Pendências Riacho</span></a>
-              </div>
-            </section>
-
-            <!-- Feluma -->
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-laptop-medical"></i> Feluma</h2>
-              <div class="links-grid">
-                <a href="https://portal-feluma.sydle.com/home" class="link-button" target="_blank" rel="noopener"><i class="fas fa-globe"></i><span>Plataforma Feluma</span></a>
-                <a href="https://portal.contagem.mg.gov.br/imgeditor/file/Regula%C3%A7%C3%A3o/Central%20de%20marca%C3%A7%C3%A3o/NT%2025%20-%202025%20-%20Regula%C3%A7%C3%A3o%20de%20Consultas%20Especializadas%20via%20sistema%20VIVVER.pdf" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i><span>NT-25/2025 – Teleconsultoria</span></a>
-                <a href="https://portal.contagem.mg.gov.br/central-de-marcacao-de-consultas/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-file-medical-alt"></i><span>Notas Técnicas – Diretoria</span></a>
-                <a href="https://www.youtube.com/watch?v=1UdBOCDlIvA" class="link-button" target="_blank" rel="noopener"><i class="fab fa-youtube"></i><span>Tutorial – YouTube</span></a>
-                <a href="https://forms.office.com/pages/responsepage.aspx?id=6TkneO0BV0yBmaJIQh4A4v7lUCKmmeREvVUmW50PDW5UMzRaUlRFRjI0N01LMERVWjdPQlY5ODlUWS4u&route=shorturl" class="link-button" target="_blank" rel="noopener"><i class="fas fa-user-plus"></i><span>Cadastro Feluma</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- TAB: OCI -->
-        <div class="tab-content" id="tab-oci">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painél OCI</h2>
-              <div class="links-grid">
-                <a href="https://regulacaoconsolidados-dot.github.io/ociconsolidado/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél OCI</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo/edit?gid=2108990586#gid=2108990586" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-database"></i><span>Banco de dados OCI</span></a>
-              </div>
-            </section>
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-database"></i> Banco de Dados - Consolidar OCI</h2>
-              <div class="links-grid">
-                <a href="https://prefeituracontagem-my.sharepoint.com/:x:/r/personal/hassan_zibaoui_contagem_mg_gov_br/_layouts/15/Doc.aspx?sourcedoc=%7Bd7b85dc9-61af-4ea9-bb7f-b542e5c4d850%7D&action=default&CID=6ac5c827-af01-49ea-9fa3-689fed995aa7&_SRM=2%3AE%3A10" class="link-button" target="_blank" rel="noopener"><i class="fas fa-table"></i><span>Planilha OCI</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268" class="link-button" target="_blank" rel="noopener"><i class="fas fa-heart"></i><span>OCI Cardiologia 1° versão</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1vjdotHMOE1gn4Wo45WURx0JCn7l8zP0BQpaVs3WDrw4/edit?gid=233267268#gid=233267268" class="link-button" target="_blank" rel="noopener"><i class="fas fa-heart"></i><span>OCI Cardiologia 2026</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1cQzwM6L9omcZVG7routPTSE3fZSQId31w-A6y4Sc24c/edit?gid=621858947#gid=621858947" class="link-button" target="_blank" rel="noopener"><i class="fas fa-female"></i><span>OCI Mama 1° versão</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1U14Nf5EOiz8PI5H6tnYZAUeZzfUM43unywXFEwWBTAQ/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-female"></i><span>OCI Mama 2026</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1G1YHRyt4ILeYMAM-yK_eYZi4wtHaMqwnuQWDeihhmIA/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-uterus"></i><span>OCI Utero 1° versão</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/17ifFIdWqHq3COeEBJifq6keumcWz-ppr9d4uSPhCBow/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-uterus"></i><span>OCI Utero 2026</span></a>
-                <a href="https://docs.google.com/spreadsheets/d/1PAaIUxgFU8CE3pFGzHG4OCAdtSHNrVIXc8suaPAXI50/edit" class="link-button" target="_blank" rel="noopener"><i class="fas fa-bone"></i><span>OCI Ortopedia</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- TAB: CIRURGIA -->
-        <div class="tab-content" id="tab-cirurgia">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-chart-pie"></i> Painéis Cirurgia Eletiva</h2>
-              <div class="links-grid">
-                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaseletivas/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva</span></a>
-                <a href="https://regulacaoconsolidados-dot.github.io/cirurgiaeletivadiretoria/" class="link-button primary-button" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i><span>Painél Cirurgia Eletiva - Diretoria</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- TAB: EXAMES -->
-        <div class="tab-content" id="tab-exames">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-folder-open"></i> Arquivos Exames</h2>
-              <div class="links-grid">
-                <a href="https://docs.google.com/spreadsheets/d/1s_HDG2-eBdYVaHdw_4e2q2ORuUePdZuLJQmIT7Z-esI/edit?pli=1&gid=0#gid=0" class="link-button" target="_blank" rel="noopener"><i class="fas fa-ban"></i><span>Exames sem prestador</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <!-- TAB: CONTATOS -->
-        <div class="tab-content" id="tab-contatos">
-          <div class="categories-grid">
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-phone-alt"></i> Telefones Úteis</h2>
-              <div class="links-grid">
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/CEAPS_TELEFONES.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Ceaps</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_IRIA_DINIZ.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Iria Diniz</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_CCE_OUTROS.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones CCE´s e Outros</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_DIVERSOS.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Diversos</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/TELEFONES_UNIDADES_DE_CONTAGEM.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones – Todas as Unidades</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/DISTRITOS_CONTATOS.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Todos os Distritos</span></a>
-                <a href="https://compartilhacmc-commits.github.io/arquivosfixos/UPA_TELEFONES.html" class="link-button" target="_blank" rel="noopener"><i class="fas fa-phone"></i><span>Telefones Upas</span></a>
-              </div>
-            </section>
-
-            <section class="category-section">
-              <h2 class="category-title"><i class="fas fa-link"></i> Links Importantes</h2>
-              <div class="links-grid">
-                <a href="https://www.contagem-mg.vivver.com/desktop" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Sistema Vivver</span></a>
-                <a href="https://portal.contagem.mg.gov.br/nota-tecnica" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Notas Técnicas Diretoria de Regulação</span></a>
-                <a href="https://portal.contagem.mg.gov.br/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Prefeitura de Contagem</span></a>
-                <a href="https://portal.contagem.mg.gov.br/secretaria-de-saude" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Secretaria de Saúde Contagem</span></a>
-                <a href="https://portal.contagem.mg.gov.br/portal/paginas-dinamicas-categoria/15/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Portal do Servidor</span></a>
-                <a href="https://geoprocessamento.contagem.mg.gov.br/portal/apps/sites/#/geocontagem" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Aplicativos Contagem</span></a>
-                <a href="https://geoprocessamento.contagem.mg.gov.br/portal/apps/experiencebuilder/experience/?id=1cc51ed1bb7546e092ecad2935cc425d" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Aqui tem Remédio</span></a>
-                <a href="https://portal.contagem.mg.gov.br/atencao-primaria" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Endereço das Unidades</span></a>
-                <a href="https://geoprocessamento.contagem.mg.gov.br/portal/apps/webappviewer/index.html?id=a29dd6c9d5944c51998c3ffa1efe0c70" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Equipamentos da Saúde</span></a>
-                <a href="https://cadastro.saude.gov.br/segcartao/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>CadWeb</span></a>
-                <a href="https://cnesadm.datasus.gov.br/cnesadm/publico/usuarios/cadastro" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Pesquisa do CNS</span></a>
-                <a href="https://app.powerbi.com/view?r=eyJrIjoiYTRiZDcyZWYtMzAwNS00NmYyLTk3N2EtYWEwYTk2NTFhMmY1IiwidCI6ImFlODYzMzdlLTU3NWUtNDMzMC05NDc2LTkzZGU2ODJiMDAyMCJ9" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Pesquisa por endereço</span></a>
-                <a href="https://egestoraps.saude.gov.br/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>E gestor</span></a>
-                <a href="https://cnes.datasus.gov.br/pages/estabelecimentos/consulta.jsp" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Cnes</span></a>
-                <a href="http://sigtap.datasus.gov.br/tabela-unificada/app/sec/inicio.jsp" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Tabela Sigtap</span></a>
-                <a href="https://siscan.saude.gov.br/login.jsf" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Siscan</span></a>
-                <a href="https://notifica.saude.gov.br/login" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>Esus Notifica</span></a>
-                <a href="https://crmmg.org.br/" class="link-button" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i><span>CRM</span></a>
-              </div>
-            </section>
-          </div>
-        </div>
+        <section class="tabContent" id="tab-financeiro" style="margin-top:14px;">
+      <div class="fin-header">
+        <div class="fin-header-icon"><i class="fa-solid fa-coins"></i></div>
+        <div class="fin-header-body"><div class="fin-header-title">Painel Financeiro — OCI Faturamento por Competência</div></div>
+        <div class="fin-header-right"><div class="fin-header-update" id="finLastUpdate">Carregando dados financeiros…</div><div class="fin-header-badge"><i class="fa-solid fa-circle-check"></i> Sincronizado com Google Sheets</div></div>
       </div>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-      <div class="container">
-        <p>&copy; 2026 Diretoria de Regulação do Acesso. Todos os direitos reservados.</p>
+      <div class="kpis" style="margin-top:14px;">
+        <div class="kpi fin1"><div class="kpiIcon"><i class="fa-solid fa-sack-dollar"></i></div><div><div class="label">Receita Total Acumulada</div><div class="val fin-val" id="fKTotal">—</div><div class="sub" id="fKTotalSub">—</div></div></div>
+        <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-arrow-trend-up"></i></div><div><div class="label">Melhor Competência</div><div class="val fin-val" id="fKBest">—</div><div class="sub" id="fKBestSub">—</div></div></div>
+        <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-chart-simple"></i></div><div><div class="label">Média Mensal</div><div class="val fin-val" id="fKAvg">—</div><div class="sub" id="fKAvgSub">—</div></div></div>
+        <div class="kpi fin4"><div class="kpiIcon"><i class="fa-solid fa-trophy"></i></div><div><div class="label">Especialidade Destaque</div><div class="val fin-val" id="fKTopEsp">—</div><div class="sub" id="fKTopEspSub">—</div></div></div>
       </div>
-    </footer>
-  </div>
+      <div class="card section" style="margin-top:14px;">
+        <div class="sectionTitle"><i class="fa-solid fa-chart-area" style="color:#0ea5e9"></i> Análise Financeira Detalhada</div>
+        <div class="grid-1col"><div class="chartCard"><div class="chartHead"><div><h3>Evolução do Faturamento Mensal (Total Geral)</h3><div class="chartSub">• Ponto dourado = melhor mês • Ponto vermelho = menor mês</div></div></div><div class="chartWrap" style="height:320px;"><canvas id="cFinEvolucao"></canvas></div><div class="fin-mom-bar" id="finMomBar"></div></div></div>
+        <div class="grid-2cols" style="margin-top:14px;">
+          <div class="chartCard"><div class="chartHead"><div><h3>Receita por Especialidade — Total do Período</h3></div><div class="chart-filter-wrapper"><div class="chart-filter-badge" onclick="toggleChartFilter('receitaEspFilter', event)"><i class="fa-solid fa-filter"></i> Filtrar por mês</div><div id="receitaEspFilter" class="chart-filter-popup"><select id="receitaEspMesSelect"><option value="">Todos os meses</option></select><div class="filter-actions"><button class="btn-filter-apply" onclick="applyReceitaEspFilter()">Aplicar</button><button class="btn-filter-clear" onclick="clearReceitaEspFilter()">Limpar</button></div></div></div></div><div class="chartWrap" style="height:360px;"><canvas id="cFinBarEsp"></canvas></div></div>
+          <div class="chartCard"><div class="chartHead"><div><h3>Participação das Especialidades no Total</h3><div class="chartSub">Fatia % de cada especialidade sobre a receita total acumulada</div></div><div class="chart-filter-wrapper"><div class="chart-filter-badge" onclick="toggleChartFilter('finDonutFilter', event)"><i class="fa-solid fa-filter"></i> Filtrar por mês</div><div id="finDonutFilter" class="chart-filter-popup"><select id="finDonutMesSelect"><option value="">Todos os meses</option></select><div class="filter-actions"><button class="btn-filter-apply" onclick="applyFinDonutFilter()">Aplicar</button><button class="btn-filter-clear" onclick="clearFinDonutFilter()">Limpar</button></div></div></div></div><div class="chartWrap" style="height:360px;"><canvas id="cFinDonut"></canvas></div></div>
+        </div>
+        <div class="grid-1col" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><div><h3>Composição Mensal por Especialidade (Barras Agrupadas)</h3><div class="chartSub">Contribuição de cada especialidade na receita de cada competência</div></div></div><div class="chartWrap" style="height:400px;"><canvas id="cFinStack"></canvas></div></div></div>
+        <div class="grid-1col" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><div><h3>Tabela Financeira — Faturamento por Especialidade × Competência</h3><div class="chartSub"><span>Valores em Reais (R$)</span><span class="fin-nt-legend"><b>NT</b> = Não Transferido</span></div></div></div><div id="finTableWrap" style="overflow:auto;border-radius:12px;border:1px solid var(--border);margin-top:4px;max-height:460px;"><div style="padding:20px;text-align:center;">Carregando tabela financeira…</div></div></div></div>
+        <div id="finColumnFilterPopup" class="chart-filter-popup" style="position:fixed;z-index:2000;"><select id="finColFilterSelect" multiple size="5"></select><div class="filter-actions"><button class="btn-filter-apply" onclick="applyFinColumnFilter()">Aplicar</button><button class="btn-filter-clear" onclick="clearFinColumnFilter()">Limpar</button></div></div>
+      </div>
+    </section>
 
-  <script>
-    (function() {
-      'use strict';
+    <section class="tabContent" id="tab-tabela" style="margin-top:14px;">
+      <div class="card section">
+        <div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Tabela filtrada (dados reais)</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearch" placeholder="Buscar..." /></div><div class="muted" id="tInfo">—</div></div>
+        <div style="overflow:auto; border-radius:12px; border:1px solid var(--border); max-height:520px;">
+          <table id="ociTable">
+            <thead>
+              <tr>
+                <th data-col="especialidade" onclick="sortTable('especialidade', this)"><div class="th-filter-wrapper"><span>Especialidade</span><span class="th-filter-icon" onclick="event.stopPropagation();toggleColumnFilter('especialidade', event)"><i class="fa-solid fa-filter"></i></span></div><span class="sort-icon"></span></th>
+                <th data-col="idade" onclick="sortTable('idade', this)"><div class="th-filter-wrapper"><span>Idade</span><span class="th-filter-icon" onclick="event.stopPropagation();toggleColumnFilter('idade', event)"><i class="fa-solid fa-filter"></i></span></div><span class="sort-icon"></span></th>
+                <th data-col="mesKey" onclick="sortTable('mesKey', this)"><div class="th-filter-wrapper"><span>Mês/Ano</span><span class="th-filter-icon" onclick="event.stopPropagation();toggleColumnFilter('mesKey', event)"><i class="fa-solid fa-filter"></i></span></div><span class="sort-icon"></span></th>
+                <th data-col="agendado" onclick="sortTable('agendado', this)"><div class="th-filter-wrapper"><span>Agendado</span><span class="th-filter-icon" onclick="event.stopPropagation();toggleColumnFilter('agendado', event)"><i class="fa-solid fa-filter"></i></span></div><span class="sort-icon"></span></th>
+                <th data-col="recepcionado" onclick="sortTable('recepcionado', this)"><div class="th-filter-wrapper"><span>Recepcionado</span><span class="th-filter-icon" onclick="event.stopPropagation();toggleColumnFilter('recepcionado', event)"><i class="fa-solid fa-filter"></i></span></div><span class="sort-icon"></span></th>
+                <th data-col="apac" onclick="sortTable('apac', this)"><div class="th-filter-wrapper"><span>APAC</span><span class="th-filter-icon" onclick="event.stopPropagation();toggleColumnFilter('apac', event)"><i class="fa-solid fa-filter"></i></span></div><span class="sort-icon"></span></th>
+                <th data-col="faturado" onclick="sortTable('faturado', this)"><div class="th-filter-wrapper"><span>Faturado</span><span class="th-filter-icon" onclick="event.stopPropagation();toggleColumnFilter('faturado', event)"><i class="fa-solid fa-filter"></i></span></div><span class="sort-icon"></span></th>
+                <th data-col="financeiro" onclick="sortTable('financeiro', this)"><div class="th-filter-wrapper"><span>Financeiro (R$)</span><span class="th-filter-icon" onclick="event.stopPropagation();toggleColumnFilter('financeiro', event)"><i class="fa-solid fa-filter"></i></span></div><span class="sort-icon"></span></th>
+              </tr>
+            </thead>
+            <tbody id="tBody"></tbody>
+          </table>
+        </div>
+        <div id="columnFilterPopup" class="chart-filter-popup" style="position:fixed;z-index:2000;"><select id="colFilterSelect" multiple size="5"></select><div class="filter-actions"><button class="btn-filter-apply" onclick="applyColumnFilter()">Aplicar</button><button class="btn-filter-clear" onclick="clearColumnFilter()">Limpar</button></div></div>
+      </div>
+    </section>
 
-      // ============================================
-      // 1. SISTEMA DE LOGIN
-      // ============================================
-      const SENHA_CODIFICADA = 'NjM5MTI0OQ==';
-      const loginOverlay = document.getElementById('login-overlay');
-      const mainContent = document.getElementById('main-content');
-      const senhaInput = document.getElementById('senha-input');
-      const btnLogin = document.getElementById('btn-login');
-      const loginError = document.getElementById('login-error');
-      const toggleSenha = document.getElementById('toggle-senha');
+    <section class="tabContent" id="tab-ranking-fisico" style="margin-top:14px;">
+      <div class="fin-header" style="background:linear-gradient(135deg, #0a3a2a, #0f4a35);"><div class="fin-header-icon"><i class="fa-solid fa-dumbbell"></i></div><div class="fin-header-body"><div class="fin-header-title">Ranking Físico por Município</div><div class="fin-header-sub">Procedimentos para Ofertas de Cuidados Integrados</div></div><div class="fin-header-right"><div class="fin-header-update" id="rankingFisicoUpdate">Carregando...</div></div></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:14px;">
+        <div class="kpi fin1"><div class="kpiIcon"><i class="fa-solid fa-crown"></i></div><div><div class="label">Posição de Contagem</div><div class="val" id="fisicoPosicao">#0</div><div class="sub" id="fisicoPosicaoSub">—</div></div></div>
+        <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-chart-line"></i></div><div><div class="label">Total de Procedimentos</div><div class="val" id="fisicoTotal">0</div><div class="sub" id="fisicoTotalSub">Contagem</div></div></div>
+        <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-percent"></i></div><div><div class="label">Participação</div><div class="val" id="fisicoParticipacao">0%</div><div class="sub" id="fisicoParticipacaoSub">do total geral</div></div></div>
+      </div>
+      <div class="grid-2cols" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoEvolucao"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Total Acumulado)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoBarras"></canvas></div></div></div>
+      <div class="card section" style="margin-top:14px;"><div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Ranking Completo - Físico</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearchFisico" placeholder="Buscar município..." /></div></div><div style="overflow:auto; max-height:400px;"><table id="tabelaFisico"><thead><tr id="cabecalhoFisico"></tr></thead><tbody id="tBodyFisico"></tbody></table></div></div>
+    </section>
 
-      function fazerLogin() {
-        const senha = senhaInput.value.trim();
-        if (btoa(senha) === SENHA_CODIFICADA) {
-          loginOverlay.classList.add('hidden');
-          mainContent.style.display = 'block';
-          loginError.textContent = '';
-          senhaInput.value = '';
-          initApp();
-        } else {
-          loginError.textContent = '❌ Senha incorreta. Tente novamente.';
-          senhaInput.value = '';
-          senhaInput.focus();
-        }
+    <section class="tabContent" id="tab-ranking-financeiro" style="margin-top:14px;">
+      <div class="fin-header fin-header-ranking" style="background:linear-gradient(135deg, #0a3a2a, #0f4a35);"><div class="fin-header-icon"><i class="fa-solid fa-sack-dollar"></i></div><div class="fin-header-body"><div class="fin-header-title">Ranking Financeiro por Município</div><div class="fin-header-sub">Valores em R$ - Procedimentos OCI</div></div><div class="fin-header-right"><div class="fin-header-update" id="rankingFinanceiroUpdate">Carregando...</div></div></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:14px;">
+        <div class="kpi fin1"><div class="kpiIcon"><i class="fa-solid fa-crown"></i></div><div><div class="label">Posição de Contagem</div><div class="val" id="financeiroPosicao">#0</div><div class="sub" id="financeiroPosicaoSub">—</div></div></div>
+        <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-coins"></i></div><div><div class="label">Total Financeiro</div><div class="val" id="financeiroTotal">R$ 0</div><div class="sub" id="financeiroTotalSub">Contagem</div></div></div>
+        <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-percent"></i></div><div><div class="label">Participação</div><div class="val" id="financeiroParticipacao">0%</div><div class="sub" id="financeiroParticipacaoSub">do total geral</div></div></div>
+      </div>
+      <div class="grid-2cols" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5 (R$)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroEvolucao"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Receita Total)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroBarras"></canvas></div></div></div>
+      <div class="card section" style="margin-top:14px;"><div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Ranking Completo - Financeiro (R$)</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearchFinanceiro" placeholder="Buscar município..." /></div></div><div style="overflow:auto; max-height:400px;"><table id="tabelaFinanceiro"><thead><tr id="cabecalhoFinanceiro"></tr></thead><tbody id="tBodyFinanceiro"></tbody></table></div></div>
+    </section>
+  </main>
+
+    <script>
+    Chart.register(ChartDataLabels);
+    
+    const SHEET_ID = "1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo";
+    const GID = "2108990586";
+    const GID_FIN = "1538908139";
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+    const CSV_FIN_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_FIN}`;
+    
+    const FIN_COLORS = ["#0f2f5f","#1a3a6b","#2a5298","#3b82f6","#059669","#d97706","#8b5cf6","#b91c1c","#0ea5e9","#7c3aed","#b45309","#be123c"];
+    const FIN_MONTH_MAP = {"jan":{m:1,label:"Jan"},"fev":{m:2,label:"Fev"},"mar":{m:3,label:"Mar"},"abr":{m:4,label:"Abr"},"mai":{m:5,label:"Mai"},"jun":{m:6,label:"Jun"},"jul":{m:7,label:"Jul"},"ago":{m:8,label:"Ago"},"set":{m:9,label:"Set"},"out":{m:10,label:"Out"},"nov":{m:11,label:"Nov"},"dez":{m:12,label:"Dez"}};
+
+        
+    const GRUPOS = {
+      "01": { nome: "01 - Atenção em Oncologia", subgrupos: [
+    { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama" },
+    { codigo: "09.01.01.002-2", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama" },
+    { codigo: "09.01.01.003-0", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Próstata" },
+    { codigo: "09.01.01.004-9", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Próstata" },
+    { codigo: "09.01.01.005-7", nome: "OCI Investigação Diagnóstica de Câncer de Colo do Útero" },
+    { codigo: "09.01.01.006-5", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero" },
+    { codigo: "09.01.01.007-3", nome: "OCI Avaliação Diagnóstica de Câncer Gástrico" },
+    { codigo: "09.01.01.008-1", nome: "OCI Avaliação Diagnóstica de Câncer Colorretal" },
+    { codigo: "09.01.01.009-0", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - I" },
+    { codigo: "09.01.01.010-3", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - II" },
+    { codigo: "09.01.01.011-1", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - I" },
+    { codigo: "09.01.01.012-0", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - II" },
+    { codigo: "09.01.01.013-8", nome: "Oci de Imunohistoquímica de Neoplasia Maligna de Mama" }
+  ] },
+  "02": { nome: "02 - Atenção em Cardiologia", subgrupos: [
+    { codigo: "09.02.01.001-8", nome: "OCI Avaliação de Risco Cirúrgico" },
+    { codigo: "09.02.01.002-6", nome: "OCI Avaliação Cardiológica" },
+    { codigo: "09.02.01.003-4", nome: "OCI Avaliação Diagnóstica Inicial - Síndrome Coronariana Crônica" },
+    { codigo: "09.02.01.004-2", nome: "OCI Progressão da Avaliação Diagnóstica I - Síndrome Coronariana Crônica" },
+    { codigo: "09.02.01.005-0", nome: "OCI Progressão da Avaliação Diagnóstica II - Síndrome Coronariana Crônica" },
+    { codigo: "09.02.01.006-9", nome: "OCI Avaliação Diagnóstica - Insuficiência Cardíaca" },
+    { codigo: "09.02.01.007-7", nome: "Oci Gestão do Pré-Operatório" }
+  ] },
+  "03": { nome: "03 - Atenção em Ortopedia", subgrupos: [
+    { codigo: "09.03.01.001-1", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia" },
+    { codigo: "09.03.01.002-0", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia e Ultrassonografia" },
+    { codigo: "09.03.01.003-8", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia e Tomografia Computadorizada" },
+    { codigo: "09.03.01.004-6", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia e Ressonância Magnética" }
+  ] },
+  "04": { nome: "04 - Atenção em Otorrinolaringologia", subgrupos: [
+    { codigo: "09.04.01.001-5", nome: "OCI Avaliação Inicial Diagnóstica de Déficit Auditivo" },
+    { codigo: "09.04.01.002-3", nome: "OCI Progressão da Avaliação Diagnóstica de Déficit Auditivo" },
+    { codigo: "09.04.01.003-1", nome: "OCI Avaliação Diagnóstica de Nasofaringe e de Orofaringe" }
+  ] },
+  "05": { nome: "05 - Atenção em Oftalmologia", subgrupos: [
+    { codigo: "09.05.01.001-9", nome: "OCI Avaliação Inicial em Oftalmologia - 0 a 8 Anos" },
+    { codigo: "09.05.01.002-7", nome: "OCI Avaliação de Estrabismo" },
+    { codigo: "09.05.01.003-5", nome: "OCI Avaliação Inicial em Oftalmologia - a Partir de 9 Anos" },
+    { codigo: "09.05.01.004-3", nome: "OCI Avaliação de Retinopatia Diabética" },
+    { codigo: "09.05.01.005-1", nome: "OCI Avaliação Inicial para Oncologia Oftalmológica" },
+    { codigo: "09.05.01.006-0", nome: "OCI Avaliação Diagnóstica em Neuro Oftalmologia" },
+    { codigo: "09.05.01.007-8", nome: "OCI Exames Oftalmológicos Sob Sedação" }
+  ] },
+  "06": { nome: "06 - Atenção em Saúde da Mulher", subgrupos: [
+    { codigo: "09.06.01.001-2", nome: "GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) I" },
+    { codigo: "09.06.01.002-0", nome: "OCI - GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) II" },
+    { codigo: "09.06.01.003-9", nome: "OCI - GIN2 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Sangramento Uterino Anormal I" },
+    { codigo: "09.06.01.004-7", nome: "OCI - GIN2 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Sangramento Uterino Anormal II" },
+    { codigo: "09.06.01.005-5", nome: "OCI - GIN3 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Endometriose Profunda - Casos Complexos e Programação Cirúrgica" }
+  ] },
+  "07": { nome: "07 - Atenção em Saúde Bucal", subgrupos: [
+    { codigo: "09.07.01.002-4", nome: "OCI - REABILITAÇÃO PROTÉTICA EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA" },
+    { codigo: "09.07.01.001-6", nome: "OCI - ATENÇÃO EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA" }
+  ] },
+  "08": { nome: "08 - Atenção em Infectologia", subgrupos: [
+    { codigo: "09.08.01.001-0", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROMES RESPIRATÓRIAS" },
+    { codigo: "09.08.01.002-8", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROMES RESPIRATÓRIAS" },
+    { codigo: "09.08.01.003-6", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME NEUROLÓGICA" },
+    { codigo: "09.08.01.004-4", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME NEUROLÓGICA" },
+    { codigo: "09.08.01.005-2", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME MUCOCUTÂNEA" },
+    { codigo: "09.08.01.006-0", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME MUCOCUTÂNEA" },
+    { codigo: "09.08.01.007-9", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME CONSUMPTIVA" },
+    { codigo: "09.08.01.008-7", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME CONSUMPTIVA" }
+  ] }
+};
+    
+    let allData = [], dataF = [], tableSort = { col: null, dir: "asc" };
+    let selectedSubgrupos = new Set(), selectedMeses = new Set(), allMeses = [];
+    let topEspFilterMonth = "", indicadoresFilterMonth = "", receitaFilterMonth = "", distribuicaoFilterMonth = "";
+    let receitaEspFilterMonth = "", finDonutFilterMonth = "";
+    let activeColumnFilter = null, columnFilterValues = [];
+    let activeFinColumnFilter = null, finColumnFilterValues = [], finColumnFilterType = null;
+    let finData = [], finMonths = [];
+    let rankingFisicoData = [], rankingFinanceiroData = [];
+    const charts = {};
+    const PT_MONTH = { jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12 };
+    const PT_LABEL = ["","Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+    const el = (id) => document.getElementById(id);
+
+        
+    function initEventListeners() {
+      el("btnRefresh").addEventListener("click", () => { loadData(true); loadFinData(true); loadRankingFisico(); loadRankingFinanceiro(); });
+      el("btnExcel").addEventListener("click", exportExcel);
+      el("btnClear").addEventListener("click", clearFilters);
+      el("tSearch").addEventListener("input", renderTable);
+    }
+    
+    document.addEventListener("click", function(e){
+      const wrapper = el("msWrapperSub");
+      if(wrapper && !wrapper.contains(e.target)) closeMsDropdownSub();
+      const wrapperMes = el("msWrapperMes");
+      if(wrapperMes && !wrapperMes.contains(e.target)) closeMsDropdownMes();
+      const colFilter = el("columnFilterPopup");
+      if(colFilter && !colFilter.contains(e.target) && !e.target.closest('.th-filter-icon')) colFilter.classList.remove('show');
+      const finColFilter = el("finColumnFilterPopup");
+      if(finColFilter && !finColFilter.contains(e.target) && !e.target.closest('.fin-filter-icon')) finColFilter.classList.remove('show');
+      document.querySelectorAll('.chart-filter-popup').forEach(popup => { if(!popup.contains(e.target) && !e.target.closest('.chart-filter-badge')) popup.classList.remove('show'); });
+    });
+    
+    function handleGrupoChange() {
+      const grupoSelect = el("grupoSelect");
+      const grupo = grupoSelect ? grupoSelect.value : "";
+      selectedSubgrupos.clear();
+      if (grupo && GRUPOS[grupo]) {
+        GRUPOS[grupo].subgrupos.forEach(sub => { selectedSubgrupos.add(sub.codigo); });
       }
-
-      btnLogin.addEventListener('click', fazerLogin);
-      senhaInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') fazerLogin();
+      buildSubgrupoList(grupo);
+      updateMsLabelSub();
+      applyFilters();
+    }
+    
+    function buildSubgrupoList(grupo) {
+      const list = el("msListSub");
+      if (!list) return;
+      list.innerHTML = "";
+      let subgrupos = [];
+      if (grupo && GRUPOS[grupo]) { subgrupos = GRUPOS[grupo].subgrupos; }
+      else { Object.values(GRUPOS).forEach(g => { subgrupos = subgrupos.concat(g.subgrupos); }); }
+      if (!subgrupos.length) { list.innerHTML = `<div class="ms-empty">Nenhum subgrupo disponível</div>`; return; }
+      subgrupos.forEach(item => {
+        const div = document.createElement("div"); div.className = "ms-item"; div.dataset.codigo = item.codigo; div.dataset.nome = item.nome;
+        const cb = document.createElement("input"); cb.type = "checkbox"; cb.value = item.codigo; cb.checked = selectedSubgrupos.has(item.codigo);
+        cb.addEventListener("change", (e) => { e.stopPropagation(); if (cb.checked) { selectedSubgrupos.add(item.codigo); } else { selectedSubgrupos.delete(item.codigo); } updateMsLabelSub(); applyFilters(); });
+        const span = document.createElement("span"); span.innerHTML = `<span style="color:var(--accent);font-weight:900;">${item.codigo}</span> — ${item.nome}`; span.title = item.nome;
+        div.appendChild(cb); div.appendChild(span);
+        div.addEventListener("click", (e) => { e.stopPropagation(); if (e.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event("change")); } });
+        list.appendChild(div);
       });
+    }
+    
+    function toggleMsDropdownSub(e) { e.stopPropagation(); const dd = el("msDropdownSub"), trigger = el("msTriggerSub"); if (dd.classList.contains("open")) { closeMsDropdownSub(); } else { dd.classList.add("open"); trigger.classList.add("open"); if (el("msSearchSub")) { el("msSearchSub").value = ""; filterMsListSub(); el("msSearchSub").focus(); } } }
+    function closeMsDropdownSub() { const dd = el("msDropdownSub"), trigger = el("msTriggerSub"); if (dd) dd.classList.remove("open"); if (trigger) trigger.classList.remove("open"); }
+    function filterMsListSub() { const q = (el("msSearchSub")?.value || "").toLowerCase().trim(); const items = el("msListSub")?.querySelectorAll(".ms-item"); if (!items) return; let visible = 0; items.forEach(item => { const codigo = item.dataset.codigo?.toLowerCase() || ""; const nome = item.dataset.nome?.toLowerCase() || ""; const match = codigo.includes(q) || nome.includes(q); item.style.display = match ? "" : "none"; if (match) visible++; }); let emptyEl = el("msListSub")?.querySelector(".ms-empty"); if (!visible) { if (!emptyEl) { emptyEl = document.createElement("div"); emptyEl.className = "ms-empty"; el("msListSub")?.appendChild(emptyEl); } emptyEl.textContent = "Nenhum subgrupo encontrado"; emptyEl.style.display = ""; } else if (emptyEl) { emptyEl.style.display = "none"; } }
+    function selectAllSub(e) { if (e) e.stopPropagation(); const items = el("msListSub")?.querySelectorAll(".ms-item"); if (!items) return; selectedSubgrupos.clear(); items.forEach(item => { const cb = item.querySelector("input[type='checkbox']"); if (cb) { cb.checked = true; selectedSubgrupos.add(cb.value); } }); const grupoSelect = el("grupoSelect"); if (grupoSelect) grupoSelect.value = ""; updateMsLabelSub(); applyFilters(); }
+    function clearSubSelection(e) { if (e) e.stopPropagation(); selectedSubgrupos.clear(); el("msListSub")?.querySelectorAll("input[type='checkbox']").forEach(cb => { cb.checked = false; }); const grupoSelect = el("grupoSelect"); if (grupoSelect) grupoSelect.value = ""; updateMsLabelSub(); applyFilters(); }
+    function updateMsLabelSub() { const lbl = el("msLabelSub"); if (!lbl) return; const n = selectedSubgrupos.size; const grupoSelect = el("grupoSelect"); const grupo = grupoSelect ? grupoSelect.value : ""; let total = 0; if (grupo && GRUPOS[grupo]) { total = GRUPOS[grupo].subgrupos.length; } else { total = Object.values(GRUPOS).reduce((acc, g) => acc + g.subgrupos.length, 0); } if (n === 0 || n === total) { lbl.textContent = "Todos os subgrupos"; } else if (n === 1) { const codigo = selectedSubgrupos.values().next().value; let nomeEncontrado = null; Object.values(GRUPOS).forEach(g => { g.subgrupos.forEach(s => { if (s.codigo === codigo) nomeEncontrado = s.nome; }); }); lbl.textContent = nomeEncontrado ? nomeEncontrado.substring(0, 60) + "..." : "1 selecionado"; } else { lbl.textContent = `${n} subgrupos selecionados`; } }
+    
+    function toggleMsDropdownMes(e){ e.stopPropagation(); const dd = el("msDropdownMes"), trigger = el("msTriggerMes"); if(dd.classList.contains("open")){ closeMsDropdownMes(); } else { dd.classList.add("open"); trigger.classList.add("open"); if(el("msSearchMes")) { el("msSearchMes").value = ""; filterMsListMes(); el("msSearchMes").focus(); } } }
+    function closeMsDropdownMes(){ const dd = el("msDropdownMes"), trigger = el("msTriggerMes"); if(dd) dd.classList.remove("open"); if(trigger) trigger.classList.remove("open"); }
+    function buildMsListMes(){ const list = el("msListMes"); if(!list) return; list.innerHTML = ""; if(!allMeses || !allMeses.length){ list.innerHTML=`<div class="ms-empty">Nenhum mês disponível</div>`; return; } allMeses.forEach(mes=>{ const item=document.createElement("div"); item.className="ms-item"; item.dataset.mes=mes.key; const cb=document.createElement("input"); cb.type="checkbox"; cb.value=mes.key; cb.checked=selectedMeses.has(mes.key); cb.addEventListener("change",(e)=>{ e.stopPropagation(); if(cb.checked) selectedMeses.add(mes.key); else selectedMeses.delete(mes.key); updateMsLabelMes(); applyFilters(); }); const span=document.createElement("span"); span.textContent=mes.label; span.title=mes.label; item.appendChild(cb); item.appendChild(span); item.addEventListener("click",(e)=>{ e.stopPropagation(); if(e.target!==cb){ cb.checked=!cb.checked; cb.dispatchEvent(new Event("change")); } }); list.appendChild(item); }); }
+    function filterMsListMes(){ const q=(el("msSearchMes")?.value||"").toLowerCase().trim(); const items=el("msListMes")?.querySelectorAll(".ms-item"); if(!items) return; let visible=0; items.forEach(item=>{ const match=item.dataset.mes.toLowerCase().includes(q); item.style.display=match?"":"none"; if(match) visible++; }); let emptyEl=el("msListMes")?.querySelector(".ms-empty"); if(!visible){ if(!emptyEl){ emptyEl=document.createElement("div"); emptyEl.className="ms-empty"; el("msListMes")?.appendChild(emptyEl); } emptyEl.textContent="Nenhum mês encontrado"; emptyEl.style.display=""; } else if(emptyEl){ emptyEl.style.display="none"; } }
+    function selectAllMes(e){ if(e) e.stopPropagation(); selectedMeses.clear(); allMeses.forEach(mes=>selectedMeses.add(mes.key)); el("msListMes")?.querySelectorAll("input[type='checkbox']").forEach(cb=>{cb.checked=true;}); updateMsLabelMes(); applyFilters(); }
+    function clearMesSelection(e){ if(e) e.stopPropagation(); selectedMeses.clear(); el("msListMes")?.querySelectorAll("input[type='checkbox']").forEach(cb=>{cb.checked=false;}); updateMsLabelMes(); applyFilters(); }
+    function updateMsLabelMes(){ const lbl=el("msLabelMes"); if(!lbl) return; const n=selectedMeses.size,total=allMeses.length; if(n===0||n===total) lbl.textContent="Todos"; else if(n===1) { const firstKey = selectedMeses.values().next().value; const firstMes = allMeses.find(m=>m.key===firstKey); lbl.textContent=firstMes ? firstMes.label : "1 selecionado"; } else lbl.textContent=`${n} meses selecionados`; }
+    
+    function toast(msg,type="info"){ const box=el("toastBox"),d=document.createElement("div"); const icon=type==="success"?"circle-check":type==="error"?"triangle-exclamation":"circle-info"; d.className="toast "+(type==="success"?"success":type==="error"?"error":""); d.innerHTML=`<i class="fa-solid fa-${icon}" style="margin-top:1px"></i><div>${msg}</div>`; box.appendChild(d); setTimeout(()=>{ d.style.opacity="0"; d.style.transition="opacity .35s"; setTimeout(()=>d.remove(),380); },3400); }
+    
+    function normStr(v){ if(v===null||v===undefined) return ""; return String(v).normalize("NFC").replace(/\s+/g," ").trim(); }
+    function normHeader(h){ return normStr(h).toUpperCase(); }
+    function toInt(v){ const s=normStr(v).toUpperCase(); if(!s||s==="SEM DADOS") return 0; const n=parseInt(s.replace(/[^\d-]/g,""),10); return Number.isFinite(n)?n:0; }
+    function parseFinanceiro(v){ const s=normStr(v).toUpperCase().trim(); if(!s||s==="NT"||s==="-"||s==="N/A"||s==="—"||s==="S/D"||s==="SEM DADOS") return 0; const clean=s.replace(/R\$\s*/g,"").replace(/\./g,"").replace(",",".").trim(); const n=parseFloat(clean); return isNaN(n)?0:n; }
+    function parseMesAno(raw){ const s=normStr(raw).toLowerCase(); if(!s) return {key:"",label:"",y:0,m:0}; const mon=(s.match(/(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/)||[])[1]; const yy=(s.match(/(\d{2})\b/)||[])[1]; const m=mon?(PT_MONTH[mon]||0):0; const y=yy?(2000+parseInt(yy,10)):0; if(!m||!y) return {key:s,label:raw,y:0,m:0}; return {key:`${y}-${String(m).padStart(2,"0")}`,label:`${PT_LABEL[m]}/${y}`,y,m}; }
+    function mesSortKey(d){ return (d.mesY*100)+d.mesM; }
+    function idadeKey(s){ const v=normStr(s).toUpperCase(); if(!v||v==="SEM DADOS") return 999999; let m=v.match(/(\d{1,3})\s*(A|Á|À)\s*(\d{1,3})/); if(m) return parseInt(m[1],10); m=v.match(/(\d{1,3})/); if(m) return parseInt(m[1],10); return 999998; }
+    
+function abbreviateEspName(esp, maxLength = 30) {
+  if (!esp) return "";
+  const abbreviations = {
+    "09.01.01.001-4": "CA Mama Inicial",
+    "09.01.01.002-2": "CA Mama Progressão",
+    "09.01.01.003-0": "CA Próstata Inicial",
+    "09.01.01.004-9": "CA Próstata Progressão",
+    "09.01.01.005-7": "CA Colo Investigação",
+    "09.01.01.006-5": "CA Colo Terapêutica",
+    "09.01.01.007-3": "CA Gástrico",
+    "09.01.01.008-1": "CA Colorretal",
+    "09.01.01.009-0": "CA Mama Prog I",
+    "09.01.01.010-3": "CA Mama Prog II",
+    "09.01.01.011-1": "CA Colo Terap I",
+    "09.01.01.012-0": "CA Colo Terap II",
+    "09.01.01.013-8": "Imunohistoquímica Mama",
+    "09.02.01.001-8": "Risco Cirúrgico",
+    "09.02.01.002-6": "Avaliação Cardio",
+    "09.02.01.003-4": "SCC Inicial",
+    "09.02.01.004-2": "SCC Prog I",
+    "09.02.01.005-0": "SCC Prog II",
+    "09.02.01.006-9": "Insuf Cardíaca",
+    "09.02.01.007-7": "Gestão Pré-Operatório",
+    "09.03.01.001-1": "Ortop c/ Radio",
+    "09.03.01.002-0": "Ortop c/ Radio+USG",
+    "09.03.01.003-8": "Ortop c/ Radio+TC",
+    "09.03.01.004-6": "Ortop c/ Radio+RM",
+    "09.04.01.001-5": "Déficit Auditivo Ini",
+    "09.04.01.002-3": "Déficit Auditivo Prog",
+    "09.04.01.003-1": "Naso/Orofaringe",
+    "09.05.01.001-9": "Oftalmo 0-8a",
+    "09.05.01.002-7": "Estrabismo",
+    "09.05.01.003-5": "Oftalmo 9a+",
+    "09.05.01.004-3": "Retinopatia Diab",
+    "09.05.01.005-1": "Onco Oftalmo",
+    "09.05.01.006-0": "Neuro Oftalmo",
+    "09.05.01.007-8": "Exames c/ Sedação",
+    "09.06.01.001-2": "GIN1 - Saúde Mulher I",
+    "09.06.01.002-0": "GIN1 - Saúde Mulher II",
+    "09.06.01.003-9": "GIN2 - SUA I",
+    "09.06.01.004-7": "GIN2 - SUA II",
+    "09.06.01.005-5": "GIN3 - Endometriose"
+  };
+  for (const [codigo, abrev] of Object.entries(abbreviations)) {
+    if (esp.includes(codigo)) return abrev;
+  }
+  let abbr = esp.replace(/^OCI\s*/i, "").replace(/AVALIAÇÃO\s*/gi, "AVAL. ").replace(/DIAGNÓSTICA\s*/gi, "DIAG. ").replace(/INICIAL\s*/gi, "INIC. ").replace(/PROGRESSÃO\s*/gi, "PROG. ").replace(/TERAPÊUTICA\s*/gi, "TERAP. ").replace(/CÂNCER DE\s*/gi, "CA ").replace(/\s+/g, " ").trim();
+  if (abbr.length <= maxLength) return abbr;
+  return abbr.substring(0, maxLength - 3) + "...";
+}
+    
+    function toggleChartFilter(id, event) { if(event) event.stopPropagation(); const popup = el(id); if(popup) { document.querySelectorAll('.chart-filter-popup').forEach(p => { if(p.id !== id) p.classList.remove('show'); }); popup.classList.toggle('show'); } }
+    function applyTopEspFilter() { topEspFilterMonth = el("topEspMesSelect")?.value || ""; if(el("topEspFilter")) el("topEspFilter").classList.remove('show'); (topEspFilterMonth || null); }
+    function clearTopEspFilter() { topEspFilterMonth = ""; if(el("topEspMesSelect")) el("topEspMesSelect").value = ""; if(el("topEspFilter")) el("topEspFilter").classList.remove('show'); buildTop(null); }
+    function applyIndicadoresFilter(){ indicadoresFilterMonth = el("indicadoresMesSelect")?.value || ""; if(el("indicadoresFilter")) el("indicadoresFilter").classList.remove('show'); updateCharts(); }
+    function clearIndicadoresFilter(){ indicadoresFilterMonth = ""; if(el("indicadoresMesSelect")) el("indicadoresMesSelect").value = ""; if(el("indicadoresFilter")) el("indicadoresFilter").classList.remove('show'); updateCharts(); }
+    function applyReceitaFilter() { receitaFilterMonth = el("receitaMesSelect")?.value || ""; if(el("receitaFilter")) el("receitaFilter").classList.remove('show'); buildReceita(); }
+    function clearReceitaFilter() { receitaFilterMonth = ""; if(el("receitaMesSelect")) el("receitaMesSelect").value = ""; if(el("receitaFilter")) el("receitaFilter").classList.remove('show'); buildReceita(); }
+    function applyDistribuicaoFilter() { distribuicaoFilterMonth = el("distribuicaoMesSelect")?.value || ""; if(el("distribuicaoFilter")) el("distribuicaoFilter").classList.remove('show'); buildDistribuicao(); }
+    function clearDistribuicaoFilter() { distribuicaoFilterMonth = ""; if(el("distribuicaoMesSelect")) el("distribuicaoMesSelect").value = ""; if(el("distribuicaoFilter")) el("distribuicaoFilter").classList.remove('show'); buildDistribuicao(); }
+    function applyReceitaEspFilter() { receitaEspFilterMonth = el("receitaEspMesSelect")?.value || ""; if(el("receitaEspFilter")) el("receitaEspFilter").classList.remove('show'); buildFinBarEsp(); }
+    function clearReceitaEspFilter() { receitaEspFilterMonth = ""; if(el("receitaEspMesSelect")) el("receitaEspMesSelect").value = ""; if(el("receitaEspFilter")) el("receitaEspFilter").classList.remove('show'); buildFinBarEsp(); }
+    function applyFinDonutFilter() { finDonutFilterMonth = el("finDonutMesSelect")?.value || ""; if(el("finDonutFilter")) el("finDonutFilter").classList.remove('show'); buildFinDonut(); }
+    function clearFinDonutFilter() { finDonutFilterMonth = ""; if(el("finDonutMesSelect")) el("finDonutMesSelect").value = ""; if(el("finDonutFilter")) el("finDonutFilter").classList.remove('show'); buildFinDonut(); }
+    
+    function toggleColumnFilter(col, event) { event.stopPropagation(); const popup = el("columnFilterPopup"); const select = el("colFilterSelect"); if(!dataF || !dataF.length) { toast("Sem dados para filtrar","info"); return; } let values = []; if(col === 'especialidade') { values = [...new Set(dataF.map(x => x.especialidade))].sort(); } else if(col === 'idade') { values = [...new Set(dataF.map(x => x.idade || "Não informado"))].sort(); } else if(col === 'mesKey') { values = [...new Set(dataF.map(x => x.mesLabel || x.mesRaw))].sort(); } else { toast("Filtro para colunas numéricas em desenvolvimento","info"); return; } select.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join(''); activeColumnFilter = col; const rect = event.target.getBoundingClientRect(); popup.style.top = (rect.bottom + window.scrollY + 5) + 'px'; popup.style.left = (rect.left + window.scrollX - 180) + 'px'; popup.classList.add('show'); }
+    function applyColumnFilter() { const select = el("colFilterSelect"); columnFilterValues = Array.from(select.selectedOptions).map(opt => opt.value); if(el("columnFilterPopup")) el("columnFilterPopup").classList.remove('show'); renderTable(); }
+    function clearColumnFilter() { columnFilterValues = []; if(el("colFilterSelect")) el("colFilterSelect").value = ""; if(el("columnFilterPopup")) el("columnFilterPopup").classList.remove('show'); renderTable(); }
+    
+    function toggleFinColumnFilter(type, event) { event.stopPropagation(); const popup = el("finColumnFilterPopup"); const select = el("finColFilterSelect"); if(!finData || !finData.length) { toast("Sem dados financeiros para filtrar","info"); return; } let options = []; if(type === 'esp') { options = finData.map(r => ({value:r.esp, label:r.esp})).sort((a,b)=>a.label.localeCompare(b.label,'pt-BR')); finColumnFilterType = 'esp'; activeFinColumnFilter = null; } else if(type.startsWith('month-')) { const monthKey = type.replace('month-', ''); options = [{value:"__POS__", label:"Somente com valor (≠ NT)"},{value:"__ZERO__", label:"Somente NT/zero"}]; finColumnFilterType = 'month'; activeFinColumnFilter = monthKey; } else if(type === 'total') { options = [{value:"__POS__", label:"Somente com valor (> 0)"},{value:"__ZERO__", label:"Somente NT/zero (= 0)"}]; finColumnFilterType = 'total'; activeFinColumnFilter = null; } select.innerHTML = options.map(o => `<option value="${o.value}">${o.label}</option>`).join(''); const rect = event.target.getBoundingClientRect(); popup.style.top = (rect.bottom + window.scrollY + 5) + 'px'; popup.style.left = (rect.left + window.scrollX - 180) + 'px'; popup.classList.add('show'); }
+    function applyFinColumnFilter() { const select = el("finColFilterSelect"); finColumnFilterValues = Array.from(select.selectedOptions).map(opt => opt.value); if(el("finColumnFilterPopup")) el("finColumnFilterPopup").classList.remove('show'); renderFinTable(); }
+    function clearFinColumnFilter() { finColumnFilterValues = []; finColumnFilterType = null; activeFinColumnFilter = null; if(el("finColFilterSelect")) el("finColFilterSelect").value = ""; if(el("finColumnFilterPopup")) el("finColumnFilterPopup").classList.remove('show'); renderFinTable(); }
+    
+    function parseFinMonthHeader(h){ const s=normStr(h).toLowerCase().trim(); const mon3=s.substring(0,3); const yyMatch=s.match(/(\d{2})/); if(!yyMatch) return null; const yy=parseInt(yyMatch[1],10), y=2000+yy; const info=FIN_MONTH_MAP[mon3]; if(!info) return null; return { key:`${y}-${String(info.m).padStart(2,"0")}`, label:`${info.label}/${y}`, shortLabel:`${info.label}/${String(yy).padStart(2,"0")}`, y, m:info.m, header:h }; }
+    function parseFinValue(v){ const s=normStr(v).toUpperCase().trim(); if(!s||s==="NT"||s==="-"||s==="N/A"||s==="—"||s==="S/D") return 0; const clean=s.replace(/R\$\s*/g,"").replace(/\./g,"").replace(",",".").trim(); const n=parseFloat(clean); return isNaN(n)?0:n; }
+    function formatBRL(v){ return "R$\u00a0"+Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    function formatBRLCompact(v){ v=Number(v||0); if(v>=1000000) return "R$\u00a0"+(v/1000000).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"M"; if(v>=1000) return "R$\u00a0"+(v/1000).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"K"; return formatBRL(v); }
 
-      toggleSenha.addEventListener('click', () => {
-        const isPassword = senhaInput.type === 'password';
-        senhaInput.type = isPassword ? 'text' : 'password';
-        toggleSenha.querySelector('i').className = isPassword ? 'fas fa-eye' : 'fas fa-eye-slash';
-      });
-
-      // ============================================
-      // 2. SISTEMA DE ABAS
-      // ============================================
-      function initTabs() {
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const contents = document.querySelectorAll('.tab-content');
-
-        tabBtns.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const tabId = btn.dataset.tab;
-            tabBtns.forEach(b => b.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            const target = document.getElementById(`tab-${tabId}`);
-            if (target) target.classList.add('active');
-            const searchValue = document.getElementById('globalSearch').value;
-            performSearch(searchValue);
-          });
-        });
-      }
-
-      // ============================================
-      // 3. BUSCA GLOBAL (instantânea)
-      // ============================================
-      function performSearch(term) {
-        term = term.trim().toLowerCase();
-        const activeTab = document.querySelector('.tab-content.active');
-        if (!activeTab) return;
-
-        const sections = activeTab.querySelectorAll('.category-section');
-        const counter = document.getElementById('resultsCounter');
-        let totalVisible = 0;
-
-        sections.forEach(section => {
-          const links = section.querySelectorAll('.link-button');
-          const title = section.querySelector('.category-title')?.textContent.toLowerCase() || '';
-          let sectionHasVisible = false;
-
-          links.forEach(link => {
-            const text = link.textContent.toLowerCase();
-            if (term === '' || text.includes(term) || title.includes(term)) {
-              link.style.display = 'flex';
-              sectionHasVisible = true;
-              totalVisible++;
-            } else {
-              link.style.display = 'none';
+        
+    async function loadData(showMsg=false){
+      el("loading").classList.add("on");
+      if(showMsg) toast("Sincronizando com Google Sheets…","info");
+      try{
+        const res=await fetch(CSV_URL,{cache:"no-cache"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        const csv=await res.text();
+        const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true,dynamicTyping:false,transformHeader:normHeader});
+        allData=(parsed.data||[]).map(r=>{
+          const especialidade=normStr(r["ESPECIALIDADE"]);
+          const idade=normStr(r["IDADE"]);
+          const mesRaw=normStr(r["MÊS/2025"]||r["MES/2025"]||r["MÊS"]||r["MES"]);
+          const mes=parseMesAno(mesRaw);
+          let financeiroVal = 0;
+          if(r["FINANCEIRO"] !== undefined) financeiroVal = parseFinanceiro(r["FINANCEIRO"]);
+          else if(r["VALOR"] !== undefined) financeiroVal = parseFinanceiro(r["VALOR"]);
+          else if(r["RECEITA"] !== undefined) financeiroVal = parseFinanceiro(r["RECEITA"]);
+          else if(r["R$"] !== undefined) financeiroVal = parseFinanceiro(r["R$"]);
+          else { const keys = Object.keys(r); if(keys.length > 0) { const lastKey = keys[keys.length - 1]; financeiroVal = parseFinanceiro(r[lastKey]); } }
+          return {
+            especialidade:especialidade.replace(/\s+/g," ").trim(),
+            idade,mesRaw,
+            mesKey:mes.key,mesLabel:mes.label,mesY:mes.y,mesM:mes.m,
+            agendado:toInt(r["AGENDADO"]),recepcionado:toInt(r["RECEPCIONADO"]),
+            apac:toInt(r["APAC GERADAS"]||r["APAC"]||r["APACGERADAS"]),
+            faturado:toInt(r["FATURADO"]),
+            financeiro: financeiroVal
+          };
+        }).filter(x=>x.especialidade);
+        allData.sort((a,b)=>mesSortKey(a)-mesSortKey(b)||a.especialidade.localeCompare(b.especialidade));
+        fillFilters();
+        populateOciMonthFilterSelects();
+        dataF = [...allData];
+        updateKPIs(); updateCharts(); renderTable();
+        const now=new Date(); el("lastUpdate").textContent=`Última atualização: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR")}`;
+        toast(`Dados OCI carregados: ${allData.length.toLocaleString("pt-BR")} registros.`,"success");
+      }catch(err){ console.error(err); toast("Falha ao carregar o CSV do Sheets. Verifique permissões/compartilhamento.","error"); allData=[]; dataF=[]; fillFilters(); populateOciMonthFilterSelects(); }finally{ el("loading").classList.remove("on"); }
+    }
+    
+    async function loadFinData(showMsg=false){
+      if(showMsg) toast("Sincronizando dados financeiros…","info");
+      try{
+        const res=await fetch(CSV_FIN_URL,{cache:"no-cache"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        const csv=await res.text();
+        const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true,dynamicTyping:false,transformHeader:(h)=>normStr(h)});
+        if(!parsed.data||!parsed.data.length){ console.warn("Financeiro: sem dados"); return; }
+        const headers=Object.keys(parsed.data[0]);
+        const monthHeaders=headers.filter(h=>{ const s=normStr(h).toLowerCase(); return /^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/.test(s); });
+        finMonths=monthHeaders.map(h=>parseFinMonthHeader(h)).filter(Boolean);
+        finData=parsed.data.filter(r=>{ const esp=normStr(r["ESPECIALIDADE"]||r[headers[0]]||"").toUpperCase(); return esp && esp!=="TOTAL" && !esp.startsWith("TOTAL"); }).map(r=>{ const esp=normStr(r["ESPECIALIDADE"]||r[headers[0]]||""); const monthValues={}; finMonths.forEach(m=>{ monthValues[m.key]=parseFinValue(r[m.header]); }); const total=finMonths.reduce((acc,m)=>acc+(monthValues[m.key]||0),0); return {esp,monthValues,total}; }).filter(r=>r.esp);
+        buildFinKPIs(); buildFinCharts();
+        const now=new Date(); el("finLastUpdate").textContent=`Atualizado: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR")}`;
+        if(showMsg) toast(`Financeiro carregado: ${finData.length} especialidades, ${finMonths.length} competências.`,"success");
+      }catch(err){ console.error("Financeiro erro:",err); el("finLastUpdate").textContent="Erro ao carregar dados financeiros."; toast("Falha ao carregar dados financeiros. Verifique as permissões.","error"); }
+    }
+    
+    async function loadRankingFisico() {
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1342049672`;
+        const res = await fetch(url, {cache:"no-cache"});
+        const csv = await res.text();
+        const parsed = Papa.parse(csv, {header:false, skipEmptyLines:true});
+        const cabecalho = parsed.data[1];
+        const mesesDisponiveis = [];
+        for (let i = 1; i < cabecalho.length; i++) {
+          if (cabecalho[i] && cabecalho[i].trim() !== '') {
+            const nomeMes = cabecalho[i].trim();
+            const partes = nomeMes.split('/');
+            if (partes.length === 2) {
+              const ano = partes[0].substring(2);
+              const mes = partes[1].substring(0,3);
+              mesesDisponiveis.push({ coluna: i, nome: `${mes}${ano}`, rotulo: nomeMes, ano: partes[0], mes: mes });
             }
-          });
-
-          section.style.display = sectionHasVisible ? 'block' : 'none';
-        });
-
-        counter.innerHTML = `Mostrando <strong>${totalVisible}</strong> item${totalVisible !== 1 ? 's' : ''}`;
-
-        // Remove mensagem de "sem resultados" antiga
-        const oldNoResults = activeTab.querySelector('.no-results');
-        if (oldNoResults) oldNoResults.remove();
-
-        if (totalVisible === 0 && term !== '') {
-          const msg = document.createElement('div');
-          msg.className = 'no-results';
-          msg.textContent = '🔎 Nenhum item encontrado para esta busca.';
-          const grid = activeTab.querySelector('.categories-grid');
-          if (grid) grid.appendChild(msg);
+          }
         }
+        mesesDisponiveis.sort((a, b) => { if (a.ano !== b.ano) return a.ano - b.ano; const meses = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12}; return meses[a.mes] - meses[b.mes]; });
+        window.mesesRanking = mesesDisponiveis;
+        window.ultimoMes = mesesDisponiveis[mesesDisponiveis.length - 1];
+        rankingFisicoData = parsed.data.slice(2).filter(row => {
+        const primeiroCampo = row[0]?.trim() || '';
+        return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
+        }).map(row => {
+          const municipio = row[0]?.trim() || '';
+          const meses = {};
+          mesesDisponiveis.forEach(m => { const valor = String(row[m.coluna] || '0').replace(/\./g, '').replace(',', '.'); meses[m.nome] = parseInt(valor) || 0; });
+          const total = Object.values(meses).reduce((acc, val) => acc + val, 0);
+          return { municipio, ...meses, total };
+        }).filter(d => d.municipio && d.municipio !== 'Município gestor');
+        atualizarRankingFisico();
+      } catch (error) { console.error('Erro ao carregar ranking físico:', error); toast('Erro ao carregar ranking físico. Verifique a aba.', 'error'); }
+    }
+    
+    async function loadRankingFinanceiro() {
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=960044663`;
+        const res = await fetch(url, {cache:"no-cache"});
+        const csv = await res.text();
+        const parsed = Papa.parse(csv, {header:false, skipEmptyLines:true});
+        const cabecalho = parsed.data[1];
+        const mesesDisponiveis = [];
+        for (let i = 1; i < cabecalho.length; i++) {
+          if (cabecalho[i] && cabecalho[i].trim() !== '') {
+            const nomeMes = cabecalho[i].trim();
+            const partes = nomeMes.split('/');
+            if (partes.length === 2) {
+              const ano = partes[0].substring(2);
+              const mes = partes[1].substring(0,3);
+              mesesDisponiveis.push({ coluna: i, nome: `${mes}${ano}`, rotulo: nomeMes, ano: partes[0], mes: mes });
+            }
+          }
+        }
+        mesesDisponiveis.sort((a, b) => { if (a.ano !== b.ano) return a.ano - b.ano; const meses = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12}; return meses[a.mes] - meses[b.mes]; });
+        window.mesesRankingFinanceiro = mesesDisponiveis;
+        window.ultimoMesFinanceiro = mesesDisponiveis[mesesDisponiveis.length - 1];
+        rankingFinanceiroData = parsed.data.slice(2).filter(row => {
+        const primeiroCampo = row[0]?.trim() || '';
+        return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
+        }).map(row => {
+          const municipio = row[0]?.trim() || '';
+          const meses = {};
+          mesesDisponiveis.forEach(m => { const valor = String(row[m.coluna] || '0').replace('R$', '').replace(/\./g, '').replace(',', '.'); meses[m.nome] = parseFloat(valor) || 0; });
+          const total = Object.values(meses).reduce((acc, val) => acc + val, 0);
+          return { municipio, ...meses, total };
+        }).filter(d => d.municipio && d.municipio !== 'Município gestor');
+        atualizarRankingFinanceiro();
+      } catch (error) { console.error('Erro ao carregar ranking financeiro:', error); toast('Erro ao carregar ranking financeiro. Verifique a aba.', 'error'); }
+    }
+    
+    function atualizarRankingFisico() {
+      if (!rankingFisicoData.length || !window.ultimoMes) return;
+      const sorted = [...rankingFisicoData].sort((a,b) => b.total - a.total);
+      const contagemIndex = sorted.findIndex(d => d.municipio.toLowerCase().includes('contagem'));
+      const contagem = sorted[contagemIndex];
+      if (contagem) {
+        const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+        const participacao = ((contagem.total / totalGeral) * 100).toFixed(1);
+        const ultimoMesValor = contagem[window.ultimoMes.nome] || 0;
+        if (el('fisicoPosicao')) el('fisicoPosicao').textContent = `#${contagemIndex + 1}`;
+        if (el('fisicoPosicaoSub')) el('fisicoPosicaoSub').textContent = `${sorted.length} municípios`;
+        if (el('fisicoTotal')) el('fisicoTotal').textContent = contagem.total.toLocaleString('pt-BR');
+        if (el('fisicoParticipacao')) el('fisicoParticipacao').textContent = `${participacao}%`;
+        if (el('rankFisicoPos')) el('rankFisicoPos').textContent = `#${contagemIndex + 1}`;
+        if (el('rankFisicoDetalhe')) el('rankFisicoDetalhe').textContent = `${contagemIndex + 1}º de ${sorted.length}`;
+        if (el('rankFisicoTotal')) el('rankFisicoTotal').textContent = ultimoMesValor.toLocaleString('pt-BR');
+        if (el('rankFisicoLabel')) el('rankFisicoLabel').textContent = `Total (${window.ultimoMes.rotulo})`;
       }
-
-      function initSearch() {
-        const searchInput = document.getElementById('globalSearch');
-        const clearBtn = document.getElementById('clearSearchBtn');
-
-        searchInput.addEventListener('input', function() {
-          const val = this.value;
-          performSearch(val);
-          clearBtn.classList.toggle('visible', val.length > 0);
-        });
-
-        clearBtn.addEventListener('click', function() {
-          searchInput.value = '';
-          performSearch('');
-          this.classList.remove('visible');
-          searchInput.focus();
-        });
+      buildRankingFisicoGraficos(sorted);
+      renderTabelaFisico(sorted);
+      if (el('rankingFisicoUpdate')) el('rankingFisicoUpdate').textContent = `Atualizado: ${new Date().toLocaleDateString('pt-BR')}`;
+    }
+    
+    function atualizarRankingFinanceiro() {
+      if (!rankingFinanceiroData.length || !window.ultimoMesFinanceiro) return;
+      const sorted = [...rankingFinanceiroData].sort((a,b) => b.total - a.total);
+      const contagemIndex = sorted.findIndex(d => d.municipio.toLowerCase().includes('contagem'));
+      const contagem = sorted[contagemIndex];
+      if (contagem) {
+        const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+        const participacao = ((contagem.total / totalGeral) * 100).toFixed(1);
+        const ultimoMesValor = contagem[window.ultimoMesFinanceiro.nome] || 0;
+        if (el('financeiroPosicao')) el('financeiroPosicao').textContent = `#${contagemIndex + 1}`;
+        if (el('financeiroPosicaoSub')) el('financeiroPosicaoSub').textContent = `${sorted.length} municípios`;
+        if (el('financeiroTotal')) el('financeiroTotal').textContent = formatBRL(contagem.total);
+        if (el('financeiroParticipacao')) el('financeiroParticipacao').textContent = `${participacao}%`;
+        if (el('rankFinanceiroPos')) el('rankFinanceiroPos').textContent = `#${contagemIndex + 1}`;
+        if (el('rankFinanceiroDetalhe')) el('rankFinanceiroDetalhe').textContent = `${contagemIndex + 1}º de ${sorted.length}`;
+        if (el('rankFinanceiroTotal')) el('rankFinanceiroTotal').textContent = formatBRL(ultimoMesValor);
+        if (el('rankFinanceiroLabel')) el('rankFinanceiroLabel').textContent = `Total (${window.ultimoMesFinanceiro.rotulo})`;
+        if (el('rankParticipacao')) el('rankParticipacao').textContent = `${participacao}%`;
+        if (el('rankBarra')) el('rankBarra').style.width = `${participacao}%`;
+        const top5SemContagem = sorted.filter((d, i) => !d.municipio.toLowerCase().includes('contagem')).slice(0, 5);
+        let miniHTML = '<div style="display:grid; grid-template-columns:30px 1fr 80px; gap:5px; font-weight:700;"><div>#</div><div>Município</div><div style="text-align:right">Total</div>';
+        top5SemContagem.forEach((m, i) => { miniHTML += `<div style="color:#64748b; font-weight:700">${i+1}</div><div style="color:inherit; font-weight:700">${m.municipio.substring(0,20)}</div><div style="text-align:right; font-weight:900;">${formatBRL(m.total)}</div>`; });
+        if (contagem) { miniHTML += `<div style="color:#0f2f5f; font-weight:900; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px;">📍</div><div style="color:#0f2f5f; font-weight:900; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px;">CONTAGEM</div><div style="color:#0f2f5f; font-weight:900; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px; text-align:right;">${formatBRL(contagem.total)}</div>`; }
+        miniHTML += '</div>';
+        if (el('miniRanking')) el('miniRanking').innerHTML = miniHTML;
       }
-
-      // ============================================
-      // 4. INICIALIZAÇÃO
-      // ============================================
-      function initApp() {
-        initTabs();
-        initSearch();
-        performSearch('');
-        console.log('✅ Portal Ferramentas Administrativas carregado!');
+      buildRankingFinanceiroGraficos(sorted);
+      renderTabelaFinanceiro(sorted);
+      if (el('rankingFinanceiroUpdate')) el('rankingFinanceiroUpdate').textContent = `Atualizado: ${new Date().toLocaleDateString('pt-BR')}`;
+    }
+    
+    function buildRankingFisicoGraficos(sorted) {
+      destroy('cRankFisicoEvolucao');
+      const ctxEvol = el('cRankFisicoEvolucao')?.getContext('2d');
+      if (ctxEvol && window.mesesRanking) {
+        const contagem = sorted.find(d => d.municipio.toLowerCase().includes('contagem'));
+        const top5 = sorted.slice(0,5).filter(d => !d.municipio.toLowerCase().includes('contagem'));
+        const rotulos = window.mesesRanking.map(m => m.rotulo);
+        const valoresContagem = window.mesesRanking.map(m => contagem ? (contagem[m.nome] || 0) : 0);
+        const mediaTop5 = window.mesesRanking.map(m => { const soma = top5.reduce((acc, d) => acc + (d[m.nome] || 0), 0); return top5.length ? Math.round(soma / top5.length) : 0; });
+        charts['cRankFisicoEvolucao'] = new Chart(ctxEvol, { type: 'line', data: { labels: rotulos, datasets: [{ label: '📍 CONTAGEM', data: valoresContagem, borderColor: '#0f2f5f', backgroundColor: 'rgba(15,47,95,.1)', borderWidth: 4, tension: 0.3 }, { label: 'Média Top 5', data: mediaTop5, borderColor: '#94a3b8', borderDash: [5,5], borderWidth: 2, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } } });
       }
-
-      // Se o conteúdo já estiver visível, inicializa
-      if (mainContent.style.display !== 'none') {
-        initApp();
+      destroy('cRankFisicoBarras');
+      const ctxBar = el('cRankFisicoBarras')?.getContext('2d');
+      if (ctxBar) { const top10 = sorted.slice(0,10); charts['cRankFisicoBarras'] = new Chart(ctxBar, { type: 'bar', data: { labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), datasets: [{ data: top10.map(d => d.total), backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', formatter: (v) => v.toLocaleString('pt-BR') } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } } }); }
+    }
+    
+    function buildRankingFinanceiroGraficos(sorted) {
+      destroy('cRankFinanceiroEvolucao');
+      const ctxEvol = el('cRankFinanceiroEvolucao')?.getContext('2d');
+      if (ctxEvol && window.mesesRankingFinanceiro) {
+        const contagem = sorted.find(d => d.municipio.toLowerCase().includes('contagem'));
+        const top5 = sorted.slice(0,5).filter(d => !d.municipio.toLowerCase().includes('contagem'));
+        const rotulos = window.mesesRankingFinanceiro.map(m => m.rotulo);
+        const valoresContagem = window.mesesRankingFinanceiro.map(m => contagem ? (contagem[m.nome] || 0) : 0);
+        const mediaTop5 = window.mesesRankingFinanceiro.map(m => { const soma = top5.reduce((acc, d) => acc + (d[m.nome] || 0), 0); return top5.length ? soma / top5.length : 0; });
+        charts['cRankFinanceiroEvolucao'] = new Chart(ctxEvol, { type: 'line', data: { labels: rotulos, datasets: [{ label: '📍 CONTAGEM', data: valoresContagem, borderColor: '#0f2f5f', backgroundColor: 'rgba(15,47,95,.1)', borderWidth: 4, tension: 0.3 }, { label: 'Média Top 5', data: mediaTop5, borderColor: '#94a3b8', borderDash: [5,5], borderWidth: 2, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false } }, scales: { x: { grid: { display: false } }, y: { ticks: { callback: (v) => formatBRL(v) }, grid: { display: false } } } } });
       }
+      destroy('cRankFinanceiroBarras');
+      const ctxBar = el('cRankFinanceiroBarras')?.getContext('2d');
+      if (ctxBar) { const top10 = sorted.slice(0,10); charts['cRankFinanceiroBarras'] = new Chart(ctxBar, { type: 'bar', data: { labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), datasets: [{ data: top10.map(d => d.total), backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', formatter: (v) => formatBRL(v) } }, scales: { x: { ticks: { callback: (v) => formatBRLCompact(v) }, grid: { display: false } }, y: { grid: { display: false } } } } }); }
+    }
+    
+    function renderTabelaFisico(sorted) {
+  const tbody = el('tBodyFisico');
+  const cabecalho = el('cabecalhoFisico');
+  if (!tbody || !window.mesesRanking) return;
+  const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+  if (cabecalho) { 
+    let html = '<th>Posição</th><th>Município</th>';
+    window.mesesRanking.forEach(m => { 
+      html += `<th>${m.rotulo}</th>`; 
+    }); 
+    html += '<th>Total</th><th>%</th>'; 
+    cabecalho.innerHTML = html; 
+  }
+  tbody.innerHTML = sorted.map((d, i) => { 
+    const pct = ((d.total / totalGeral) * 100).toFixed(1); 
+    const isContagem = d.municipio.toLowerCase().includes('contagem'); 
+    let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
+    linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
+    window.mesesRanking.forEach(m => { 
+      linha += `<td>${(d[m.nome] || 0).toLocaleString('pt-BR')}</td>`; 
+    }); 
+    linha += `<td><b>${d.total.toLocaleString('pt-BR')}</b></td><td>${pct}%</td></tr>`; 
+    return linha; 
+  }).join('');
+}
+    
+    function renderTabelaFinanceiro(sorted) {
+  const tbody = el('tBodyFinanceiro');
+  const cabecalho = el('cabecalhoFinanceiro');
+  if (!tbody || !window.mesesRankingFinanceiro) return;
+  const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+  if (cabecalho) { 
+    let html = '<th>Posição</th><th>Município</th>';
+    window.mesesRankingFinanceiro.forEach(m => { 
+      html += `<th>${m.rotulo}</th>`; 
+    }); 
+    html += '<th>Total</th><th>%</th>'; 
+    cabecalho.innerHTML = html; 
+  }
+  tbody.innerHTML = sorted.map((d, i) => { 
+    const pct = ((d.total / totalGeral) * 100).toFixed(1); 
+    const isContagem = d.municipio.toLowerCase().includes('contagem'); 
+    let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
+    linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
+    window.mesesRankingFinanceiro.forEach(m => { 
+      linha += `<td>${formatBRL(d[m.nome] || 0)}</td>`; 
+    }); 
+    linha += `<td><b>${formatBRL(d.total)}</b></td><td>${pct}%</td></tr>`; 
+    return linha; 
+  }).join('');
+}
 
-    })();
+        
+    function buildFinKPIs(){
+      if(!finData.length||!finMonths.length) return;
+      const totalGeral=finData.reduce((acc,r)=>acc+r.total,0);
+      const monthTotals=finMonths.map(m=>({ ...m, total:finData.reduce((acc,r)=>acc+(r.monthValues[m.key]||0),0) }));
+      const bestMonth=[...monthTotals].sort((a,b)=>b.total-a.total)[0];
+      const activeMths=monthTotals.filter(m=>m.total>0);
+      const avg=activeMths.length?activeMths.reduce((a,m)=>a+m.total,0)/activeMths.length:0;
+      const topEsp=[...finData].sort((a,b)=>b.total-a.total)[0];
+      const lastM=monthTotals[monthTotals.length-1];
+      const prevM=monthTotals.length>=2?monthTotals[monthTotals.length-2]:null;
+      if(el("fKTotal")) el("fKTotal").textContent=formatBRLCompact(totalGeral);
+      if(el("fKTotalSub")) el("fKTotalSub").textContent=`${finMonths.length} competências • ${finData.length} especialidades`;
+      if(el("fKBest")) el("fKBest").textContent=formatBRLCompact(bestMonth?.total||0);
+      if(el("fKBestSub")) el("fKBestSub").textContent=bestMonth?`Competência: ${bestMonth.shortLabel}`:"—";
+      if(el("fKAvg")) el("fKAvg").textContent=formatBRLCompact(avg);
+      if(prevM&&lastM && el("fKAvgSub")){ const delta=lastM.total-prevM.total; const pct=prevM.total?((delta/prevM.total)*100):0; const sign=delta>=0?"+":""; const arr=delta>=0?"↑":"↓"; el("fKAvgSub").textContent=`Último (${lastM.shortLabel}): ${arr} ${sign}${pct.toFixed(1)}% vs ${prevM.shortLabel}`; } else if(el("fKAvgSub")) { el("fKAvgSub").textContent=`Média de ${activeMths.length} meses ativos`; }
+      if(el("fKTopEsp")) el("fKTopEsp").textContent=formatBRLCompact(topEsp?.total||0); const espAbr=topEsp?abbreviateEspName(topEsp.esp, 38):"—"; if(el("fKTopEspSub")) el("fKTopEspSub").textContent=espAbr+" — maior receita";
+    }
+    
+    function buildFinCharts(){
+      if(!finData.length||!finMonths.length) return;
+      const monthOptions = finMonths.map(m => `<option value="${m.key}">${m.shortLabel}</option>`).join('');
+      if(el("receitaEspMesSelect")) el("receitaEspMesSelect").innerHTML = '<option value="">Todos os meses</option>' + monthOptions;
+      if(el("finDonutMesSelect")) el("finDonutMesSelect").innerHTML = '<option value="">Todos os meses</option>' + monthOptions;
+      buildFinEvolucao(); buildFinBarEsp(); buildFinDonut(); buildFinStack(); renderFinTable();
+    }
+    
+    function buildFinEvolucao(){
+      destroy("cFinEvolucao");
+      const canvas = el("cFinEvolucao"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      const monthTotals=finMonths.map(m=>({ label:m.shortLabel, total:finData.reduce((acc,r)=>acc+(r.monthValues[m.key]||0),0) }));
+      const vals=monthTotals.map(m=>m.total);
+      const maxVal=Math.max(...vals), minVal=Math.min(...vals.filter(v=>v>0));
+      charts["cFinEvolucao"]=new Chart(ctx,{ type:"line", data:{ labels:monthTotals.map(m=>m.label), datasets:[{ label:"Faturamento Mensal", data:vals, borderColor:"#0f2f5f", backgroundColor:"rgba(15,47,95,.12)", fill:true, tension:0.38, borderWidth:3, pointRadius:monthTotals.map(m=>m.total===maxVal||m.total===minVal?9:6), pointHoverRadius:11, pointBackgroundColor:monthTotals.map(m=>m.total===maxVal?"#d97706":m.total===minVal?"#b91c1c":"#0f2f5f"), pointBorderColor:"#fff", pointBorderWidth:2.5 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{ display:true, anchor:"top", align:"top", offset:6, color:(ctx)=>vals[ctx.dataIndex]===maxVal?"#92400e":vals[ctx.dataIndex]===minVal?"#b91c1c":"#0f172a", font:{size:12,weight:"900"}, formatter:(v)=>formatBRL(v) }, tooltip:{callbacks:{label:(ctx)=>` ${formatBRL(Number(ctx.raw||0))}`}} }, scales:{ x:{ticks:{font:{size:13,weight:"700"}},grid:{display:false}}, y:{ beginAtZero:true, ticks:{ font:{size:11,weight:"700"}, callback:(v)=>formatBRLCompact(v) }, grid:{display:false} } } } });
+      const momBar=el("finMomBar"); if(momBar){ const pills=monthTotals.map((m,i)=>{ const base=`<span class="fin-mom-pill-lbl">${m.label}</span><span class="fin-mom-pill-val">${formatBRLCompact(m.total)}</span>`; if(i===0) return `<div class="fin-mom-pill">${base}</div>`; const prev=monthTotals[i-1]; const delta=prev.total?((m.total-prev.total)/prev.total*100):0; const sign=delta>=0?"+":""; const col=delta>=0?"#059669":"#b91c1c"; const arr=delta>=0?"↑":"↓"; return `<div class="fin-mom-pill">${base}<span class="fin-mom-pill-delta" style="color:${col}">${arr} ${sign}${delta.toFixed(1)}%</span></div>`; }); momBar.innerHTML=pills.join(""); }
+    }
+    
+    function buildFinBarEsp(){
+      destroy("cFinBarEsp");
+      const canvas = el("cFinBarEsp"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      let dataToUse = finData;
+      if(receitaEspFilterMonth) { dataToUse = finData.map(r => ({ ...r, total: r.monthValues[receitaEspFilterMonth] || 0 })).filter(r => r.total > 0); }
+      const sorted=[...dataToUse].sort((a,b)=>a.total-b.total);
+      charts["cFinBarEsp"]=new Chart(ctx,{ type:"bar", data:{ labels:sorted.map(r=>abbreviateEspName(r.esp, 25)), datasets:[{ label:"Receita", data:sorted.map(r=>r.total), backgroundColor:sorted.map((_,i)=>FIN_COLORS[i%FIN_COLORS.length]), borderRadius:8, barThickness:26 }] }, options:{ responsive:true, maintainAspectRatio:false, indexAxis:"y", plugins:{ legend:{display:false}, datalabels:{ display:true, anchor:"end", align:"right", color:"#0f172a", font:{size:11,weight:"800"}, formatter:(v)=>formatBRL(v) }, tooltip:{callbacks:{ title:(items)=>{ const i=items[0]?.dataIndex; return i!==undefined?(sorted[i]?.esp||""):""; }, label:(ctx)=>` ${formatBRL(Number(ctx.raw||0))}` }} }, scales:{ x:{ beginAtZero:true, ticks:{ font:{size:11,weight:"700"}, callback:(v)=>formatBRLCompact(v) }, grid:{display:false} }, y:{ticks:{font:{size:10,weight:"700"},padding:4},grid:{display:false}} } } });
+    }
+    
+    function buildFinDonut(){
+      destroy("cFinDonut");
+      const canvas = el("cFinDonut"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      let dataToUse = finData;
+      if(finDonutFilterMonth){ dataToUse = finData.map(r => ({ esp: r.esp, total: r.monthValues[finDonutFilterMonth] || 0 })).filter(r => r.total > 0); } else { dataToUse = finData.map(r => ({esp:r.esp, total:r.total})).filter(r=>r.total>0); }
+      const labels = dataToUse.map(r=>abbreviateEspName(r.esp, 20));
+      const values = dataToUse.map(r=>r.total);
+      charts["cFinDonut"]=new Chart(ctx,{ type:"doughnut", data:{ labels, datasets:[{ data:values, backgroundColor:labels.map((_,i)=>FIN_COLORS[i%FIN_COLORS.length]), borderColor:"#fff", borderWidth:3, hoverOffset:10 }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:"58%", plugins:{ legend:{ position:"bottom", labels:{ font:{size:10,weight:"700"}, padding:10, boxWidth:12, generateLabels:(chart)=>{ const data=chart.data; if(!data.labels.length) return []; const total=data.datasets[0].data.reduce((a,b)=>a+b,0); return data.labels.map((label,i)=>{ const val=data.datasets[0].data[i]; const pct=total?((val/total)*100).toFixed(1):0; return {text:`${label} (${pct}%)`,fillStyle:data.datasets[0].backgroundColor[i],strokeStyle:"#fff",lineWidth:2,index:i}; }); } } }, datalabels:{ color:"#fff", font:{size:12,weight:"900"}, textShadowColor:"rgba(0,0,0,0.4)", textShadowBlur:4, formatter:(v,ctx)=>{ const t=ctx.dataset.data.reduce((a,b)=>a+b,0); if(!t||!v) return ""; const p=(v/t)*100; return p<6?"":p.toFixed(1)+"%"; } }, tooltip:{callbacks:{ title:(items)=>{ const i=items[0]?.dataIndex; return i!==undefined?(dataToUse[i]?.esp||""):""; }, label:(ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); const pct=total?((ctx.raw/total)*100).toFixed(1):0; return ` ${formatBRL(Number(ctx.raw||0))} (${pct}%)`; } } } } } });
+    }
+    
+    function buildFinStack(){
+      destroy("cFinStack");
+      const canvas = el("cFinStack"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      const activeDatasets = finData.filter(r => r.total > 0).map((r,i) => ({ label: abbreviateEspName(r.esp, 15), data: finMonths.map(m => r.monthValues[m.key] || 0), backgroundColor: FIN_COLORS[i % FIN_COLORS.length], borderRadius: 6, borderSkipped: false, barPercentage: 0.9, categoryPercentage: 0.8 }));
+      charts["cFinStack"]=new Chart(ctx,{ type:"bar", data:{ labels:finMonths.map(m=>m.shortLabel), datasets: activeDatasets }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:"bottom", labels:{ font:{size:10,weight:"700"}, padding:10, boxWidth:12, filter: (legendItem, data) => { const dataset = data.datasets[legendItem.datasetIndex]; return dataset.data.some(v => v > 0); } } }, datalabels:{ display:false }, tooltip:{ mode: 'index', intersect: false, callbacks:{ label:(ctx)=>` ${ctx.dataset.label}: ${formatBRL(Number(ctx.raw||0))}` } } }, scales:{ x:{ stacked:false, ticks:{font:{size:13,weight:"700"}}, grid:{display:false} }, y:{ beginAtZero:true, ticks:{ font:{size:11,weight:"700"}, callback:(v)=>formatBRLCompact(v) }, grid:{display:false} } } } });
+    }
+    
+    function renderFinTable(){
+      const wrap=el("finTableWrap"); if(!wrap) return;
+      if(!finData.length||!finMonths.length){ wrap.innerHTML=`<div style="padding:20px;text-align:center;color:var(--muted);font-weight:700;">Nenhum dado financeiro disponível.</div>`; return; }
+      let dataToShow = [...finData];
+      if(finColumnFilterValues.length > 0 && finColumnFilterType){
+        if(finColumnFilterType === 'esp'){ dataToShow = dataToShow.filter(r => finColumnFilterValues.includes(r.esp)); }
+        if(finColumnFilterType === 'month' && activeFinColumnFilter){ const wantPos = finColumnFilterValues.includes("__POS__"); const wantZero = finColumnFilterValues.includes("__ZERO__"); if(wantPos && !wantZero) dataToShow = dataToShow.filter(r => (r.monthValues[activeFinColumnFilter]||0) > 0); if(!wantPos && wantZero) dataToShow = dataToShow.filter(r => (r.monthValues[activeFinColumnFilter]||0) <= 0); if(!wantPos && !wantZero) dataToShow = []; }
+        if(finColumnFilterType === 'total'){ const wantPos = finColumnFilterValues.includes("__POS__"); const wantZero = finColumnFilterValues.includes("__ZERO__"); if(wantPos && !wantZero) dataToShow = dataToShow.filter(r => (r.total||0) > 0); if(!wantPos && wantZero) dataToShow = dataToShow.filter(r => (r.total||0) <= 0); if(!wantPos && !wantZero) dataToShow = []; }
+      }
+      const monthTotals={}; finMonths.forEach(m=>{ monthTotals[m.key]=finData.reduce((acc,r)=>acc+(r.monthValues[m.key]||0),0); });
+      const grandTotal=finData.reduce((acc,r)=>acc+r.total,0);
+      const thBase="padding:10px 14px;font-size:11px;letter-spacing:.35px;text-transform:uppercase;white-space:nowrap;position:sticky;top:0;";
+      const html=`<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr><th style="${thBase}text-align:left;background:linear-gradient(135deg,#081a36,#1a3a6b);color:#fff;z-index:3;"><div class="th-filter-wrapper"><span>Especialidade</span><span class="th-filter-icon fin-filter-icon" onclick="event.stopPropagation();toggleFinColumnFilter('esp', event)"><i class="fa-solid fa-filter"></i></span></div></th>${finMonths.map(m=>`<th style="${thBase}text-align:right;background:linear-gradient(135deg,#0c2348,#1a3a6b);color:#fff;z-index:2;"><div class="th-filter-wrapper"><span>${m.shortLabel}</span><span class="th-filter-icon fin-filter-icon" onclick="event.stopPropagation();toggleFinColumnFilter('month-${m.key}', event)"><i class="fa-solid fa-filter"></i></span></div></th>`).join("")}<th style="${thBase}text-align:right;background:linear-gradient(135deg,#065f46,#059669);color:#d1fae5;z-index:2;"><div class="th-filter-wrapper"><span>Total</span><span class="th-filter-icon fin-filter-icon" onclick="event.stopPropagation();toggleFinColumnFilter('total', event)"><i class="fa-solid fa-filter"></i></span></div></th></tr></thead><tbody>${dataToShow.map((r,ri)=>`<tr style="background:${ri%2===0?"#f9fafb":"#fff"};"><td style="padding:9px 14px;font-weight:700;font-size:11px;white-space:normal;max-width:280px;border-bottom:1px solid #e2e8f0;" title="${r.esp}">${r.esp}</td>${finMonths.map(m=>{ const v=r.monthValues[m.key]||0; return `<td style="padding:9px 14px;text-align:right;font-weight:700;white-space:nowrap;border-bottom:1px solid #e2e8f0;color:${v>0?"#0f172a":"#94a3b8"};">${v>0?formatBRL(v):"<span style='font-size:10px;color:#94a3b8;font-weight:800;'>NT</span>"}</td>`; }).join("")}<td style="padding:9px 14px;text-align:right;font-weight:900;white-space:nowrap;border-bottom:1px solid #e2e8f0;color:#047857;background:rgba(5,150,105,.07);">${formatBRL(r.total)}</td></tr>`).join("")}<tr style="background:linear-gradient(135deg,rgba(8,26,54,.96),rgba(26,58,107,.96));"><td style="padding:11px 14px;color:#fff;font-size:12px;font-weight:900;letter-spacing:.3px;text-transform:uppercase;">TOTAL GERAL</td>${finMonths.map(m=>`<td style="padding:11px 14px;text-align:right;color:#bfdbfe;font-weight:900;white-space:nowrap;">${formatBRL(monthTotals[m.key]||0)}</td>`).join("")}<td style="padding:11px 14px;text-align:right;color:#6ee7b7;font-weight:900;font-size:13px;white-space:nowrap;">${formatBRL(grandTotal)}</td></tr></tbody></table>`;
+      wrap.innerHTML=html;
+    }
+    
+    function fillFilters(){
+      const mesesMap=new Map(allData.filter(x=>x.mesKey).sort((a,b)=>mesSortKey(a)-mesSortKey(b)).map(x=>[x.mesKey, {key:x.mesKey, label:x.mesLabel}]));
+      allMeses = Array.from(mesesMap.values());
+      buildMsListMes(); updateMsLabelMes();
+      buildSubgrupoList(""); updateMsLabelSub();
+    }
+    
+    function populateOciMonthFilterSelects(){
+      const meses = allMeses.map(({key,label})=>({key,label}));
+      const html = `<option value="">Todos os meses</option>` + meses.map(m=>`<option value="${m.key}">${m.label}</option>`).join("");
+      if(el("topEspMesSelect")) el("topEspMesSelect").innerHTML = html;
+      if(el("indicadoresMesSelect")) el("indicadoresMesSelect").innerHTML = html;
+      if(el("receitaMesSelect")) el("receitaMesSelect").innerHTML = html;
+      if(el("distribuicaoMesSelect")) el("distribuicaoMesSelect").innerHTML = html;
+    }
+    
+    function clearFilters(){
+      selectedSubgrupos.clear();
+      el("msListSub")?.querySelectorAll("input[type='checkbox']").forEach(cb=>{cb.checked=false;});
+      updateMsLabelSub();
+      selectedMeses.clear();
+      el("msListMes")?.querySelectorAll("input[type='checkbox']").forEach(cb=>{cb.checked=false;});
+      updateMsLabelMes();
+      if(el("grupoSelect")) el("grupoSelect").value = "";
+      applyFilters();
+    }
+    
+    function applyFilters(){
+      if(!allData || !allData.length) { dataF = []; return; }
+      dataF = allData.filter(x=>{
+        if(selectedSubgrupos.size > 0) { let found = false; for (const codigo of selectedSubgrupos) { if (x.especialidade.includes(codigo)) { found = true; break; } } if (!found) return false; }
+        if(selectedMeses.size>0 && selectedMeses.size<allMeses.length){ if(!selectedMeses.has(x.mesKey)) return false; }
+        return true;
+      });
+      updateKPIs(); updateCharts(); renderTable();
+    }
+    
+    function sum(col, rows=dataF){ return rows.reduce((acc,x)=>acc+(x[col]||0),0); }
+    function pct(a,b){ if(!b) return 0; return (a/b)*100; }
+    function setNum(id,n){ const elem = el(id); if(elem) elem.textContent=(n||0).toLocaleString("pt-BR"); }
+    function updateKPIs(){
+      const ag=sum("agendado"),rec=sum("recepcionado"),apac=sum("apac"),fat=sum("faturado");
+      setNum("kAg",ag); setNum("kRec",rec); setNum("kApac",apac); setNum("kFat",fat);
+      if(el("kAgSub")) el("kAgSub").textContent=`Recepção: ${pct(rec,ag).toFixed(1)}%`;
+      if(el("kRecSub")) el("kRecSub").textContent=`APAC/Recep.: ${pct(apac,rec).toFixed(1)}%`;
+      if(el("kApacSub")) el("kApacSub").textContent=`Fat./Recep.: ${pct(fat,rec).toFixed(1)}%`;
+      if(el("kFatSub")) el("kFatSub").textContent=`Fat./Ag.: ${pct(fat,ag).toFixed(1)}%`;
+    }
+    
+    function destroy(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+    function baseOptions(){ return { responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{font:{size:12,weight:"700"}}}, datalabels:{display:false}, tooltip:{titleFont:{size:12,weight:"800"},bodyFont:{size:12}} }, scales:{ x:{ticks:{font:{size:11,weight:"700"}},grid:{display:false}}, y:{ticks:{font:{size:11,weight:"700"}},grid:{display:false},beginAtZero:true} }; }
+    function labelMes(key){ const found=allData.find(x=>x.mesKey===key); return found?found.mesLabel:key; }
+    function getOciDataForMonth(monthKey){ if(!monthKey) return dataF; return allData.filter(x=>{ if(selectedSubgrupos.size > 0) { let found = false; for (const codigo of selectedSubgrupos) { if (x.especialidade.includes(codigo)) { found = true; break; } } if (!found) return false; } return x.mesKey === monthKey; }); }
+    
+    function updateCharts(){
+      if(!allData || !allData.length) return;
+      buildEvolucao(); buildTop(topEspFilterMonth);
+      const indMes = indicadoresFilterMonth; buildGaugeFatRec(indMes); buildGaugeAbsenteismo(indMes);
+      buildReceita(); buildDistribuicao();
+      const mesLabels = selectedMeses.size === 1 ? `Mês: ${labelMes([...selectedMeses][0])}` : selectedMeses.size > 1 ? `${selectedMeses.size} meses selecionados` : "Todos os meses";
+      const subLabel = selectedSubgrupos.size === 1 ? `Subgrupo: ${[...selectedSubgrupos][0]}` : selectedSubgrupos.size > 0 ? `${selectedSubgrupos.size} subgrupos selecionados` : "Todos os subgrupos";
+      if(el("subEvolucao")) el("subEvolucao").textContent = `${subLabel} • ${mesLabels}`;
+    }
+    
+    function buildGaugeFatRec(monthKey){
+      destroy("cGaugeFatRec");
+      const canvas = el("cGaugeFatRec"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      const rows = monthKey ? getOciDataForMonth(monthKey) : dataF;
+      const rec=sum("recepcionado", rows), fat=sum("faturado", rows);
+      const pctVal=rec>0?Math.min((fat/rec)*100,100):0;
+      let color,badgeBg,badgeColor,badgeText;
+      if(pctVal>=80){color="#059669";badgeBg="rgba(5,150,105,.30)";badgeColor="#064e3b";badgeText="✓ Ótimo";}
+      else if(pctVal>=50){color="#d97706";badgeBg="rgba(217,119,6,.28)";badgeColor="#78350f";badgeText="⚠ Regular";}
+      else{color="#b91c1c";badgeBg="rgba(185,28,28,.26)";badgeColor="#7f1d1d";badgeText="✗ Crítico";}
+      if(el("gaugeFatRecPct")) { el("gaugeFatRecPct").textContent=pctVal.toFixed(1)+"%"; el("gaugeFatRecPct").style.color=color; }
+      const badge=el("gaugeFatRecBadge"); if(badge) { badge.textContent=badgeText; badge.style.background=badgeBg; badge.style.color=badgeColor; badge.style.border=`1px solid ${color}99`; }
+      if(el("gFatRecRec")) el("gFatRecRec").textContent=rec.toLocaleString("pt-BR");
+      if(el("gFatRecFat")) el("gFatRecFat").textContent=fat.toLocaleString("pt-BR");
+      if(el("gFatRecDiff")) el("gFatRecDiff").textContent=Math.max(0,rec-fat).toLocaleString("pt-BR");
+      charts["cGaugeFatRec"]=new Chart(ctx,{type:"doughnut",data:{datasets:[{data:[50,30,20],backgroundColor:["rgba(185,28,28,.50)","rgba(217,119,6,.50)","rgba(5,150,105,.50)"],borderWidth:0,hoverOffset:0,weight:1},{data:[pctVal,100-pctVal],backgroundColor:[color,"rgba(226,232,240,0.0)"],borderWidth:0,borderRadius:8,hoverOffset:0,weight:2}]},options:{rotation:-90,circumference:180,cutout:"68%",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false},datalabels:{display:false}},animation:{animateRotate:true,duration:900}}});
+    }
+    
+    function buildGaugeAbsenteismo(monthKey){
+      destroy("cGaugeAbs");
+      const canvas = el("cGaugeAbs"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      const rows = monthKey ? getOciDataForMonth(monthKey) : dataF;
+      const ag=sum("agendado", rows), rec=sum("recepcionado", rows), ausencias=Math.max(0,ag-rec);
+      const absPct=ag>0?Math.min((ausencias/ag)*100,100):0;
+      let color,badgeBg,badgeColor,badgeText;
+      if(absPct<=10){color="#059669";badgeBg="rgba(5,150,105,.30)";badgeColor="#064e3b";badgeText="✓ Excelente";}
+      else if(absPct<=20){color="#3b82f6";badgeBg="rgba(59,130,246,.28)";badgeColor="#1e3a8a";badgeText="✓ Bom";}
+      else if(absPct<=35){color="#d97706";badgeBg="rgba(217,119,6,.28)";badgeColor="#78350f";badgeText="⚠ Atenção";}
+      else{color="#b91c1c";badgeBg="rgba(185,28,28,.26)";badgeColor="#7f1d1d";badgeText="✗ Crítico";}
+      if(el("gaugeAbsPct")) { el("gaugeAbsPct").textContent=absPct.toFixed(1)+"%"; el("gaugeAbsPct").style.color=color; }
+      const badge=el("gaugeAbsBadge"); if(badge) { badge.textContent=badgeText; badge.style.background=badgeBg; badge.style.color=badgeColor; badge.style.border=`1px solid ${color}99`; }
+      if(el("gAbsAg")) el("gAbsAg").textContent=ag.toLocaleString("pt-BR");
+      if(el("gAbsRec")) el("gAbsRec").textContent=rec.toLocaleString("pt-BR");
+      if(el("gAbsAus")) el("gAbsAus").textContent=ausencias.toLocaleString("pt-BR");
+      charts["cGaugeAbs"]=new Chart(ctx,{type:"doughnut",data:{datasets:[{data:[10,10,15,65],backgroundColor:["rgba(5,150,105,.50)","rgba(59,130,246,.50)","rgba(217,119,6,.50)","rgba(185,28,28,.50)"],borderWidth:0,hoverOffset:0,weight:1},{data:[absPct,100-absPct],backgroundColor:[color,"rgba(226,232,240,0.0)"],borderWidth:0,borderRadius:8,hoverOffset:0,weight:2}]},options:{rotation:-90,circumference:180,cutout:"68%",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false},datalabels:{display:false}},animation:{animateRotate:true,duration:900}}});
+    }
+    
+    function buildEvolucao(){
+      destroy("cEvolucao");
+      const canvas = el("cEvolucao"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      let source = allData.filter(x=>{ if(selectedSubgrupos.size > 0) { let found = false; for (const codigo of selectedSubgrupos) { if (x.especialidade.includes(codigo)) { found = true; break; } } if (!found) return false; } if(selectedMeses.size>0 && selectedMeses.size<allMeses.length){ if(!selectedMeses.has(x.mesKey)) return false; } return true; });
+      const map=new Map(); source.forEach(x=>{ if(!x.mesKey) return; if(!map.has(x.mesKey)) map.set(x.mesKey,{label:x.mesLabel,y:x.mesY,m:x.mesM,ag:0,rec:0,apac:0,fat:0}); const o=map.get(x.mesKey); o.ag+=x.agendado; o.rec+=x.recepcionado; o.apac+=x.apac; o.fat+=x.faturado; });
+      const arr=[...map.entries()].map(([k,v])=>({key:k,...v})).sort((a,b)=>(a.y*100+a.m)-(b.y*100+b.m));
+      const datasetColors=["#3b82f6","#059669","#d97706","#b91c1c"];
+      charts["cEvolucao"]=new Chart(ctx,{ type:"line", data:{ labels:arr.map(x=>x.label), datasets:[ {label:"Agendado",data:arr.map(x=>x.ag),borderColor:"#3b82f6",backgroundColor:"rgba(59,130,246,.10)",tension:.35,fill:true,borderWidth:2.5,pointRadius:5,pointHoverRadius:7}, {label:"Recepcionado",data:arr.map(x=>x.rec),borderColor:"#059669",backgroundColor:"rgba(5,150,105,.08)",tension:.35,fill:false,borderWidth:2.5,pointRadius:5,pointHoverRadius:7}, {label:"APAC",data:arr.map(x=>x.apac),borderColor:"#d97706",backgroundColor:"rgba(217,119,6,.10)",tension:.35,fill:false,borderWidth:2.5,pointRadius:5,pointHoverRadius:7}, {label:"Faturado",data:arr.map(x=>x.fat),borderColor:"#b91c1c",backgroundColor:"rgba(185,28,28,.08)",tension:.35,fill:false,borderWidth:2.5,pointRadius:5,pointHoverRadius:7} ] }, options:{ ...baseOptions(), plugins:{ ...baseOptions().plugins, legend:{ position:"top", labels:{ font:{size:13,weight:"800"}, padding:10, usePointStyle: true, pointStyle: "circle" } }, datalabels:{ display:true, anchor:"end", align:"top", offset:6, color:(ctx)=>datasetColors[ctx.datasetIndex]||"#0f172a", font:{size:11,weight:"800"}, formatter:(v)=>v?v.toLocaleString("pt-BR"):"" } }, layout: { padding: { top: 10, bottom: 20 } } } });
+    }
+    
+   function buildTop(mes){
+  destroy("cTop");
+  const canvas = el("cTop"); if(!canvas) return;
+  const ctx=canvas.getContext("2d");
+  const source = mes ? getOciDataForMonth(mes) : dataF;
+  const map=new Map(); 
+  source.forEach(x=>{ 
+    const k=x.especialidade; 
+    if(!map.has(k)) map.set(k,{rec:0,fat:0,esp:k}); 
+    const o=map.get(k); 
+    o.rec+=x.recepcionado; 
+    o.fat+=x.faturado; 
+  });
+  const arr=[...map.values()].sort((a,b)=>b.rec-a.rec);
+  
+  // Limita a 15 itens para não ficar muito poluído
+  const topItems = arr.slice(0, 15);
+  const dynamicH=Math.max(420, topItems.length * 28 + 80); 
+  if(el("cTopWrap")) el("cTopWrap").style.height=dynamicH+"px";
+  
+  charts["cTop"]=new Chart(ctx,{ 
+    type:"bar", 
+    data:{ 
+      labels:topItems.map(x=>abbreviateEspName(x.esp, 25)), 
+      datasets:[ 
+        {label:"Recepcionado", data:topItems.map(x=>x.rec), backgroundColor:"#059669", borderRadius:6, barThickness:30},
+        {label:"Faturado", data:topItems.map(x=>x.fat), backgroundColor:"#b91c1c", borderRadius:6, barThickness:30}
+      ] 
+    }, 
+    options:{ 
+      responsive:true, 
+      maintainAspectRatio:false,
+      plugins:{ 
+        legend:{position:"top",labels:{font:{size:13,weight:"800"},padding:18}}, 
+        datalabels:{ 
+          display:true, 
+          anchor:"end", 
+          align:"top",  // ALTERADO de "right" para "top" (barras verticais)
+          color:"#0f172a", 
+          font:{size:10,weight:"800"}, 
+          formatter:(v)=>v?v.toLocaleString("pt-BR"):"" 
+        }, 
+        tooltip:{
+          titleFont:{size:12,weight:"800"},
+          bodyFont:{size:12},
+          callbacks:{
+            title:(items)=>{ 
+              const i=items[0]?.dataIndex; 
+              return i!==undefined?topItems[i]?.esp||"":""; 
+            }
+          }
+        } 
+      }, 
+      scales:{ 
+        x:{ 
+          ticks:{font:{size:10,weight:"700"}, maxRotation:45, minRotation:45}, 
+          grid:{display:false} 
+        }, 
+        y:{ 
+          beginAtZero:true,
+          ticks:{font:{size:11,weight:"700"}}, 
+          grid:{display:false} 
+        } 
+      } 
+    } 
+  });
+  if(el("subTop")) el("subTop").textContent = mes ? `Todas as especialidades — Mês: ${labelMes(mes)} (ordenado pelo maior Recepcionado).` : "Todas as especialidades no período selecionado (do maior para o menor Recepcionado).";
+}
+    
+    function buildReceita(){
+      destroy("cReceita");
+      const canvas = el("cReceita"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      if(!allData.length) { ctx.font = "14px Inter"; ctx.fillStyle = "#64748b"; ctx.textAlign = "center"; ctx.fillText("Carregando dados...", ctx.canvas.width/2, ctx.canvas.height/2); return; }
+      const mesFiltro = receitaFilterMonth; const source = mesFiltro ? getOciDataForMonth(mesFiltro) : dataF;
+      const mapFinanceiro = new Map(); source.forEach(item => { const esp = item.especialidade; if (!esp) return; const valor = item.financeiro || 0; if (valor <= 0) return; if (!mapFinanceiro.has(esp)) { mapFinanceiro.set(esp, 0); } mapFinanceiro.set(esp, mapFinanceiro.get(esp) + valor); });
+      if (mapFinanceiro.size === 0) { ctx.font = "14px Inter"; ctx.fillStyle = "#64748b"; ctx.textAlign = "center"; ctx.fillText("Sem dados financeiros para o período selecionado", ctx.canvas.width/2, ctx.canvas.height/2); return; }
+      const dadosArray = Array.from(mapFinanceiro, ([esp, valor]) => ({ esp, valor })).sort((a, b) => b.valor - a.valor);
+      const dadosLimitados = dadosArray.slice(0, 15);
+      const labels = dadosLimitados.map(d => abbreviateEspName(d.esp, 30));
+      const valores = dadosLimitados.map(d => d.valor);
+      charts["cReceita"] = new Chart(ctx, { type: "bar", data: { labels, datasets: [{ label: "Receita (R$)", data: valores, backgroundColor: "#059669", borderRadius: 6, barThickness: 22 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false }, datalabels: { display: true, anchor: "end", align: "right", color: "#0f172a", font: { size: 11, weight: "800" }, formatter: (v) => formatBRL(v) }, tooltip: { callbacks: { title: (items) => { const i = items[0]?.dataIndex; return i !== undefined ? dadosLimitados[i]?.esp || "" : ""; }, label: (ctx) => ` Receita: ${formatBRL(ctx.raw || 0)}` } } }, scales: { x: { beginAtZero: true, ticks: { font: { size: 12, weight: "700" }, callback: (v) => formatBRLCompact(v) }, grid: { display: false } }, y: { ticks: { font: { size: 12, weight: "700" }, padding: 4 }, grid: { display: false } } } } });
+      if(el("subReceita")) el("subReceita").textContent = mesFiltro && mesFiltro !== "" ? `Faturamento (R$) por especialidade • Mês: ${labelMes(mesFiltro)}` : "Faturamento total (R$) acumulado por especialidade";
+    }
+    
+    function buildDistribuicao(){
+      destroy("cDistribuicao");
+      const canvas = el("cDistribuicao"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      const mesFiltro = distribuicaoFilterMonth; const rows = mesFiltro ? getOciDataForMonth(mesFiltro) : dataF;
+      const ag = sum("agendado", rows); const rec = sum("recepcionado", rows); const apac = sum("apac", rows); const fat = sum("faturado", rows);
+      if(ag === 0 && rec === 0 && apac === 0 && fat === 0) { ctx.font = "14px Inter"; ctx.fillStyle = "#64748b"; ctx.textAlign = "center"; ctx.fillText("Sem dados para o período selecionado", ctx.canvas.width/2, ctx.canvas.height/2); return; }
+      charts["cDistribuicao"] = new Chart(ctx, { type: "doughnut", data: { labels: ["Agendados", "Recepcionados", "APAC Autorizadas", "Faturados"], datasets: [{ data: [ag, rec, apac, fat], backgroundColor: ["#3b82f6", "#059669", "#d97706", "#b91c1c"], borderColor: "#ffffff", borderWidth: 3, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "bottom", labels: { font: { size: 12, weight: "700" }, padding: 15, usePointStyle: true, pointStyle: "circle", color: "#0f172a", generateLabels: (chart) => { const data = chart.data; if (!data.labels || !data.datasets) return []; const { labels, datasets } = data; const dataset = datasets[0]; const total = dataset.data.reduce((a, b) => a + b, 0); return labels.map((label, i) => ({ text: `${label}: ${dataset.data[i].toLocaleString("pt-BR")} (${((dataset.data[i]/total)*100).toFixed(1)}%)`, fillStyle: dataset.backgroundColor[i], strokeStyle: dataset.backgroundColor[i], lineWidth: 2, hidden: false, index: i, fontColor: "#0f172a" })); } } }, datalabels: { color: "#fff", font: { size: 13, weight: "900" }, textShadowColor: "rgba(0,0,0,0.5)", textShadowBlur: 4, formatter: (value, context) => { const total = context.dataset.data.reduce((a, b) => a + b, 0); if (!total || !value) return ""; const pct = (value / total) * 100; return pct < 8 ? "" : pct.toFixed(1) + "%"; } }, tooltip: { callbacks: { label: (ctx) => { const label = ctx.label || ""; const value = ctx.raw || 0; const total = ctx.dataset.data.reduce((a, b) => a + b, 0); const pct = ((value / total) * 100).toFixed(1); return ` ${label}: ${value.toLocaleString("pt-BR")} (${pct}%)`; } } } } } });
+    }
+    
+    function sortTable(col,th){
+      if(tableSort.col===col){ tableSort.dir=tableSort.dir==="asc"?"desc":"asc"; }
+      else { tableSort.col=col; tableSort.dir="asc"; }
+      document.querySelectorAll("thead th").forEach(h=>h.classList.remove("sort-asc","sort-desc"));
+      th.classList.add(tableSort.dir==="asc"?"sort-asc":"sort-desc");
+      renderTable();
+    }
+    
+    function renderTable(){
+      const tBody = el("tBody"); if(!tBody) return;
+      const q=normStr(el("tSearch")?.value||"").toLowerCase();
+      let rows=dataF.filter(x=>{ if(!q) return true; return (x.especialidade||"").toLowerCase().includes(q) || (x.idade||"").toLowerCase().includes(q) || (x.mesLabel||x.mesRaw||"").toLowerCase().includes(q); });
+      if(columnFilterValues.length > 0 && activeColumnFilter) {
+        if(activeColumnFilter === 'especialidade') rows = rows.filter(x => columnFilterValues.includes(x.especialidade));
+        else if(activeColumnFilter === 'idade') rows = rows.filter(x => columnFilterValues.includes(x.idade || "Não informado"));
+        else if(activeColumnFilter === 'mesKey') rows = rows.filter(x => columnFilterValues.includes(x.mesLabel || x.mesRaw));
+      }
+      if(tableSort.col){ 
+        const col=tableSort.col, dir=tableSort.dir==="asc"?1:-1; 
+        rows=[...rows].sort((a,b)=>{ 
+          let va=a[col], vb=b[col];
+          if(col==="especialidade"||col==="idade"||col==="mesKey"){ 
+            va=String(va||"").toLowerCase(); 
+            vb=String(vb||"").toLowerCase(); 
+            return va.localeCompare(vb,"pt-BR")*dir; 
+          } else if(col==="financeiro") { 
+            const av = typeof a.financeiro === 'number' ? a.financeiro : 0;
+            const bv = typeof b.financeiro === 'number' ? b.financeiro : 0;
+            return (av - bv) * dir; 
+          } else { 
+            const av = typeof a[col] === 'number' ? a[col] : (a[col] || 0);
+            const bv = typeof b[col] === 'number' ? b[col] : (b[col] || 0);
+            return (av - bv) * dir; 
+          } 
+        }); 
+      }
+      if(el("tInfo")) el("tInfo").textContent=`${rows.length.toLocaleString("pt-BR")} registro(s)`;
+      if(!rows.length){ tBody.innerHTML=`<tr><td colspan="8" class="muted">Nenhum dado para os filtros selecionados.</td></tr>`; return; }
+      tBody.innerHTML=rows.slice(0,2000).map(x=>`<tr><td title="${x.especialidade}">${x.especialidade}</td><td>${x.idade||"Não informado"}</td><td>${x.mesLabel||x.mesRaw}</td><td>${x.agendado.toLocaleString("pt-BR")}</td><td>${x.recepcionado.toLocaleString("pt-BR")}</td><td>${x.apac.toLocaleString("pt-BR")}</td><td>${x.faturado.toLocaleString("pt-BR")}</td><td style="font-weight:800; color:${x.financeiro>0?'#059669':'#94a3b8'};">${x.financeiro>0?formatBRL(x.financeiro):'—'}</td></tr>`).join("");
+    }
+    
+    function exportExcel(){
+      if(!dataF.length){ toast("Sem dados para exportar com os filtros atuais.","error"); return; }
+      const wsData=[["ESPECIALIDADE","IDADE","MÊS/ANO","AGENDADO","RECEPCIONADO","APAC GERADAS","FATURADO","FINANCEIRO (R$)"], ...dataF.map(x=>[x.especialidade,x.idade,x.mesLabel||x.mesRaw,x.agendado,x.recepcionado,x.apac,x.faturado,x.financeiro?x.financeiro.toFixed(2).replace('.',','):0])];
+      const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(wsData);
+      ws["!cols"]=[{wch:44},{wch:18},{wch:12},{wch:12},{wch:14},{wch:12},{wch:12},{wch:18}];
+      XLSX.utils.book_append_sheet(wb,ws,"OCI");
+      const now=new Date(),stamp=now.toLocaleDateString("pt-BR").replaceAll("/","-");
+      XLSX.writeFile(wb,`OCI_${stamp}.xlsx`);
+      toast("Excel exportado com sucesso.","success");
+    }
+    
+    function switchTab(id,btn){
+      document.querySelectorAll(".tabContent").forEach(x=>x.classList.remove("active"));
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      const tabEl = el("tab-"+id);
+      if(tabEl) tabEl.classList.add("active");
+      btn.classList.add("active");
+      setTimeout(()=>{ Object.values(charts).forEach(c=>c?.resize?.()); },80);
+    }
+    
+    if (el('tSearchFisico')) { el('tSearchFisico').addEventListener('input', (e) => { const q = e.target.value.toLowerCase(); const sorted = [...rankingFisicoData].sort((a,b) => b.total - a.total); const filtered = sorted.filter(d => d.municipio.toLowerCase().includes(q)); renderTabelaFisico(filtered); }); }
+    if (el('tSearchFinanceiro')) { el('tSearchFinanceiro').addEventListener('input', (e) => { const q = e.target.value.toLowerCase(); const sorted = [...rankingFinanceiroData].sort((a,b) => b.total - a.total); const filtered = sorted.filter(d => d.municipio.toLowerCase().includes(q)); renderTabelaFinanceiro(filtered); }); }
+    
+    window.addEventListener("DOMContentLoaded",()=>{
+      initEventListeners();
+      loadData(false);
+      loadFinData(false);
+      loadRankingFisico();
+      loadRankingFinanceiro();
+    });
   </script>
 </body>
 </html>
