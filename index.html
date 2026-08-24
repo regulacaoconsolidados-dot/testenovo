@@ -610,7 +610,7 @@
 
   <main class="wrap">
 
-    <div class="card filters">
+        <div class="card filters">
       <div class="filtersTop">
         <div class="filtersTitle"><i class="fa-solid fa-filter" style="color:var(--accent)"></i> Filtros</div>
         <button class="btn-clear" id="btnClear"><i class="fa-solid fa-xmark"></i> Limpar</button>
@@ -718,7 +718,7 @@
       <button class="tab" onclick="switchTab('ranking-financeiro', this)"><i class="fa-solid fa-sack-dollar"></i> Ranking Financeiro</button>
     </div>
 
-    <section class="tabContent active" id="tab-visao" style="margin-top:14px;">
+        <section class="tabContent active" id="tab-visao" style="margin-top:14px;">
       <div class="card section">
         <div class="sectionTitle">
           <span style="display:flex;align-items:center;gap:10px;">
@@ -781,6 +781,7 @@
           </div>
         </div>
 
+        <!-- GRÁFICO EVOLUÇÃO MENSAL (PRIMEIRO) -->
         <div class="grid-1col">
           <div class="chartCard">
             <div class="chartHead">
@@ -793,6 +794,7 @@
           </div>
         </div>
 
+        <!-- GRÁFICO TOP ESPECIALIDADES (SEGUNDO, ABAIXO) -->
         <div class="grid-1col" style="margin-top:14px;">
           <div class="chartCard">
             <div class="chartHead">
@@ -802,6 +804,7 @@
           </div>
         </div>
 
+        <!-- GRÁFICOS RECEITA E DISTRIBUIÇÃO (AO LADO) -->
         <div class="grid-2cols" style="margin-top:14px;">
           <div class="chartCard">
             <div class="chartHead">
@@ -815,6 +818,7 @@
           </div>
         </div>
 
+        <!-- POSIÇÃO DE CONTAGEM -->
         <div class="grid-1col" style="margin-top:14px;">
           <div class="chartCard" style="background:linear-gradient(135deg, #f8fafc, #fff);">
             <div class="chartHead"><div><h3><i class="fa-solid fa-location-dot"></i> Posição de Contagem</h3><div class="chartSub">Comparativo físico vs financeiro (último mês disponível)</div></div></div>
@@ -851,7 +855,7 @@
       </div>
     </section>
 
-    <section class="tabContent" id="tab-financeiro" style="margin-top:14px;">
+        <section class="tabContent" id="tab-financeiro" style="margin-top:14px;">
       <div class="fin-header">
         <div class="fin-header-icon"><i class="fa-solid fa-coins"></i></div>
         <div class="fin-header-body"><div class="fin-header-title">Painel Financeiro — OCI Faturamento por Competência</div></div>
@@ -923,53 +927,109 @@
     </section>
   </main>
 
-  <script>
+    <script>
     Chart.register(ChartDataLabels);
     
     const SHEET_ID = "1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo";
     const GID = "2108990586";
     const GID_FIN = "1538908139";
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+    const CSV_FIN_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_FIN}`;
     
     const FIN_COLORS = ["#0f2f5f","#1a3a6b","#2a5298","#3b82f6","#059669","#d97706","#8b5cf6","#b91c1c","#0ea5e9","#7c3aed","#b45309","#be123c"];
     const FIN_MONTH_MAP = {"jan":{m:1,label:"Jan"},"fev":{m:2,label:"Fev"},"mar":{m:3,label:"Mar"},"abr":{m:4,label:"Abr"},"mai":{m:5,label:"Mai"},"jun":{m:6,label:"Jun"},"jul":{m:7,label:"Jul"},"ago":{m:8,label:"Ago"},"set":{m:9,label:"Set"},"out":{m:10,label:"Out"},"nov":{m:11,label:"Nov"},"dez":{m:12,label:"Dez"}};
 
+        
     const GRUPOS = {
-      "01": { nome: "01 - Atenção em Oncologia", subgrupos: [
-        { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama" },
-        { codigo: "09.01.01.002-2", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama" },
-        { codigo: "09.01.01.003-0", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Próstata" },
-        { codigo: "09.01.01.004-9", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Próstata" }
-      ] },
-      "02": { nome: "02 - Atenção em Cardiologia", subgrupos: [
-        { codigo: "09.02.01.001-8", nome: "OCI Avaliação de Risco Cirúrgico" },
-        { codigo: "09.02.01.002-6", nome: "OCI Avaliação Cardiológica" }
-      ] },
-      "03": { nome: "03 - Atenção em Ortopedia", subgrupos: [
-        { codigo: "09.03.01.001-1", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia" }
-      ] },
-      "04": { nome: "04 - Atenção em Otorrinolaringologia", subgrupos: [
-        { codigo: "09.04.01.001-5", nome: "OCI Avaliação Inicial Diagnóstica de Déficit Auditivo" }
-      ] },
-      "05": { nome: "05 - Atenção em Oftalmologia", subgrupos: [
-        { codigo: "09.05.01.001-9", nome: "OCI Avaliação Inicial em Oftalmologia - 0 a 8 Anos" }
-      ] },
-      "06": { nome: "06 - Atenção em Saúde da Mulher", subgrupos: [
-        { codigo: "09.06.01.001-2", nome: "GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher I" }
-      ] },
-      "07": { nome: "07 - Atenção em Saúde Bucal", subgrupos: [
-        { codigo: "09.07.01.001-6", nome: "OCI - ATENÇÃO EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA" },
-        { codigo: "09.07.01.002-4", nome: "OCI - REABILITAÇÃO PROTÉTICA EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA" }
-      ] },
-      "08": { nome: "08 - Atenção em Infectologia", subgrupos: [
-        { codigo: "09.08.01.001-0", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROMES RESPIRATÓRIAS" },
-        { codigo: "09.08.01.002-8", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROMES RESPIRATÓRIAS" },
-        { codigo: "09.08.01.003-6", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME NEUROLÓGICA" },
-        { codigo: "09.08.01.004-4", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME NEUROLÓGICA" },
-        { codigo: "09.08.01.005-2", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME MUCOCUTÂNEA" },
-        { codigo: "09.08.01.006-0", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME MUCOCUTÂNEA" },
-        { codigo: "09.08.01.007-9", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME CONSUMPTIVA" },
-        { codigo: "09.08.01.008-7", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME CONSUMPTIVA" }
-      ] }
+      "01": { 
+        nome: "01 - Atenção em Oncologia", 
+        subgrupos: [
+          { codigo: "09.01.01.001-4", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Mama" },
+          { codigo: "09.01.01.002-2", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama" },
+          { codigo: "09.01.01.003-0", nome: "OCI Avaliação Diagnóstica Inicial de Câncer de Próstata" },
+          { codigo: "09.01.01.004-9", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Próstata" },
+          { codigo: "09.01.01.005-7", nome: "OCI Investigação Diagnóstica de Câncer de Colo do Útero" },
+          { codigo: "09.01.01.006-5", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero" },
+          { codigo: "09.01.01.007-3", nome: "OCI Avaliação Diagnóstica de Câncer Gástrico" },
+          { codigo: "09.01.01.008-1", nome: "OCI Avaliação Diagnóstica de Câncer Colorretal" },
+          { codigo: "09.01.01.009-0", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - I" },
+          { codigo: "09.01.01.010-3", nome: "OCI Progressão da Avaliação Diagnóstica de Câncer de Mama - II" },
+          { codigo: "09.01.01.011-1", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - I" },
+          { codigo: "09.01.01.012-0", nome: "OCI Avaliação Diagnóstica e Terapêutica de Câncer de Colo do Útero - II" },
+          { codigo: "09.01.01.013-8", nome: "Oci de Imunohistoquímica de Neoplasia Maligna de Mama" }
+        ] 
+      },
+      "02": { 
+        nome: "02 - Atenção em Cardiologia", 
+        subgrupos: [
+          { codigo: "09.02.01.001-8", nome: "OCI Avaliação de Risco Cirúrgico" },
+          { codigo: "09.02.01.002-6", nome: "OCI Avaliação Cardiológica" },
+          { codigo: "09.02.01.003-4", nome: "OCI Avaliação Diagnóstica Inicial - Síndrome Coronariana Crônica" },
+          { codigo: "09.02.01.004-2", nome: "OCI Progressão da Avaliação Diagnóstica I - Síndrome Coronariana Crônica" },
+          { codigo: "09.02.01.005-0", nome: "OCI Progressão da Avaliação Diagnóstica II - Síndrome Coronariana Crônica" },
+          { codigo: "09.02.01.006-9", nome: "OCI Avaliação Diagnóstica - Insuficiência Cardíaca" },
+          { codigo: "09.02.01.007-7", nome: "Oci Gestão do Pré-Operatório" }
+        ] 
+      },
+      "03": { 
+        nome: "03 - Atenção em Ortopedia", 
+        subgrupos: [
+          { codigo: "09.03.01.001-1", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia" },
+          { codigo: "09.03.01.002-0", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia e Ultrassonografia" },
+          { codigo: "09.03.01.003-8", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia e Tomografia Computadorizada" },
+          { codigo: "09.03.01.004-6", nome: "OCI Avaliação Diagnóstica em Ortopedia com Recursos de Radiologia e Ressonância Magnética" }
+        ] 
+      },
+      "04": { 
+        nome: "04 - Atenção em Otorrinolaringologia", 
+        subgrupos: [
+          { codigo: "09.04.01.001-5", nome: "OCI Avaliação Inicial Diagnóstica de Déficit Auditivo" },
+          { codigo: "09.04.01.002-3", nome: "OCI Progressão da Avaliação Diagnóstica de Déficit Auditivo" },
+          { codigo: "09.04.01.003-1", nome: "OCI Avaliação Diagnóstica de Nasofaringe e de Orofaringe" }
+        ] 
+      },
+      "05": { 
+        nome: "05 - Atenção em Oftalmologia", 
+        subgrupos: [
+          { codigo: "09.05.01.001-9", nome: "OCI Avaliação Inicial em Oftalmologia - 0 a 8 Anos" },
+          { codigo: "09.05.01.002-7", nome: "OCI Avaliação de Estrabismo" },
+          { codigo: "09.05.01.003-5", nome: "OCI Avaliação Inicial em Oftalmologia - a Partir de 9 Anos" },
+          { codigo: "09.05.01.004-3", nome: "OCI Avaliação de Retinopatia Diabética" },
+          { codigo: "09.05.01.005-1", nome: "OCI Avaliação Inicial para Oncologia Oftalmológica" },
+          { codigo: "09.05.01.006-0", nome: "OCI Avaliação Diagnóstica em Neuro Oftalmologia" },
+          { codigo: "09.05.01.007-8", nome: "OCI Exames Oftalmológicos Sob Sedação" }
+        ] 
+      },
+      "06": { 
+        nome: "06 - Atenção em Saúde da Mulher", 
+        subgrupos: [
+          { codigo: "09.06.01.001-2", nome: "GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) I" },
+          { codigo: "09.06.01.002-0", nome: "OCI - GIN1 - Avaliação Diagnóstica Inicial de Saúde da Mulher (Ginecologia) II" },
+          { codigo: "09.06.01.003-9", nome: "OCI - GIN2 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Sangramento Uterino Anormal I" },
+          { codigo: "09.06.01.004-7", nome: "OCI - GIN2 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Sangramento Uterino Anormal II" },
+          { codigo: "09.06.01.005-5", nome: "OCI - GIN3 - Progressão da Avaliação Diagnóstica de Saúde da Mulher (Ginecologia) - Endometriose Profunda - Casos Complexos e Programação Cirúrgica" }
+        ] 
+      },
+      "07": { 
+        nome: "07 - Atenção em Saúde Bucal", 
+        subgrupos: [
+          { codigo: "09.07.01.001-6", nome: "OCI - ATENÇÃO EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA" },
+          { codigo: "09.07.01.002-4", nome: "OCI- REABILITAÇÃO PROTÉTICA EM SAÚDE BUCAL NA ATENÇÃO ESPECIALIZADA PARA MULHERES EM SITUAÇÃO DE VIOLÊNCIA" }
+        ] 
+      },
+      "08": { 
+        nome: "08 - Atenção em Infectologia", 
+        subgrupos: [
+          { codigo: "09.08.01.001-0", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROMES RESPIRATÓRIAS" },
+          { codigo: "09.08.01.002-8", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROMES RESPIRATÓRIAS" },
+          { codigo: "09.08.01.003-6", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME NEUROLÓGICA" },
+          { codigo: "09.08.01.004-4", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME NEUROLÓGICA" },
+          { codigo: "09.08.01.005-2", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME MUCOCUTÂNEA" },
+          { codigo: "09.08.01.006-0", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME MUCOCUTÂNEA" },
+          { codigo: "09.08.01.007-9", nome: "OCI AVALIAÇÃO DIAGNÓSTICA INICIAL DE SÍNDROME CONSUMPTIVA" },
+          { codigo: "09.08.01.008-7", nome: "OCI PROGRESSÃO DA AVALIAÇÃO DIAGNÓSTICA DE SÍNDROME CONSUMPTIVA" }
+        ] 
+      }
     };
     
     let allData = [], dataF = [], tableSort = { col: null, dir: "asc" };
@@ -985,44 +1045,9 @@
     const PT_LABEL = ["","Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
     const el = (id) => document.getElementById(id);
 
-    // DADOS MOCKADOS PARA TESTE
-    function gerarDadosMock() {
-      const codigos = [];
-      Object.values(GRUPOS).forEach(g => {
-        g.subgrupos.forEach(s => codigos.push(s.codigo));
-      });
-      
-      const meses = ["jan/25", "fev/25", "mar/25", "abr/25", "mai/25"];
-      const dados = [];
-      
-      codigos.forEach((cod, idx) => {
-        meses.forEach((mes, mi) => {
-          const base = Math.floor(Math.random() * 50) + 10 + (idx * 5) + (mi * 3);
-          const rec = Math.floor(base * (0.5 + Math.random() * 0.5));
-          const apac = Math.floor(rec * (0.4 + Math.random() * 0.6));
-          const fat = Math.floor(rec * (0.3 + Math.random() * 0.7));
-          dados.push({
-            especialidade: cod + " - " + (GRUPOS[Object.keys(GRUPOS)[idx % Object.keys(GRUPOS).length]]?.subgrupos.find(s => s.codigo === cod)?.nome || "Procedimento"),
-            idade: (Math.floor(Math.random() * 60) + 20) + " anos",
-            mesRaw: mes,
-            mesKey: `2025-${String(mi + 1).padStart(2, "0")}`,
-            mesLabel: PT_LABEL[mi + 1] + "/2025",
-            mesY: 2025,
-            mesM: mi + 1,
-            agendado: base,
-            recepcionado: rec,
-            apac: apac,
-            faturado: fat,
-            financeiro: fat * (Math.random() * 500 + 100)
-          });
-        });
-      });
-      
-      return dados;
-    }
-
+        
     function initEventListeners() {
-      el("btnRefresh").addEventListener("click", () => { loadMockData(true); });
+      el("btnRefresh").addEventListener("click", () => { loadData(true); loadFinData(true); loadRankingFisico(); loadRankingFinanceiro(); });
       el("btnExcel").addEventListener("click", exportExcel);
       el("btnClear").addEventListener("click", clearFilters);
       el("tSearch").addEventListener("input", renderTable);
@@ -1094,35 +1119,71 @@
     function parseFinanceiro(v){ const s=normStr(v).toUpperCase().trim(); if(!s||s==="NT"||s==="-"||s==="N/A"||s==="—"||s==="S/D"||s==="SEM DADOS") return 0; const clean=s.replace(/R\$\s*/g,"").replace(/\./g,"").replace(",",".").trim(); const n=parseFloat(clean); return isNaN(n)?0:n; }
     function parseMesAno(raw){ const s=normStr(raw).toLowerCase(); if(!s) return {key:"",label:"",y:0,m:0}; const mon=(s.match(/(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/)||[])[1]; const yy=(s.match(/(\d{2})\b/)||[])[1]; const m=mon?(PT_MONTH[mon]||0):0; const y=yy?(2000+parseInt(yy,10)):0; if(!m||!y) return {key:s,label:raw,y:0,m:0}; return {key:`${y}-${String(m).padStart(2,"0")}`,label:`${PT_LABEL[m]}/${y}`,y,m}; }
     function mesSortKey(d){ return (d.mesY*100)+d.mesM; }
+    function idadeKey(s){ const v=normStr(s).toUpperCase(); if(!v||v==="SEM DADOS") return 999999; let m=v.match(/(\d{1,3})\s*(A|Á|À)\s*(\d{1,3})/); if(m) return parseInt(m[1],10); m=v.match(/(\d{1,3})/); if(m) return parseInt(m[1],10); return 999998; }
     
-    function abbreviateEspName(esp, maxLength = 30) {
-      if (!esp) return "";
-      const abbreviations = {
-        "09.01.01.001-4": "CA Mama Inicial",
-        "09.01.01.002-2": "CA Mama Progressão",
-        "09.01.01.003-0": "CA Próstata Inicial",
-        "09.01.01.004-9": "CA Próstata Progressão",
-        "09.07.01.001-6": "Saúde Bucal - Violência",
-        "09.07.01.002-4": "Reab Protética - Violência",
-        "09.08.01.001-0": "Sínd Respiratória Ini",
-        "09.08.01.002-8": "Sínd Respiratória Prog",
-        "09.08.01.003-6": "Sínd Neurológica Ini",
-        "09.08.01.004-4": "Sínd Neurológica Prog",
-        "09.08.01.005-2": "Sínd Mucocutânea Ini",
-        "09.08.01.006-0": "Sínd Mucocutânea Prog",
-        "09.08.01.007-9": "Sínd Consuptiva Ini",
-        "09.08.01.008-7": "Sínd Consuptiva Prog"
-      };
-      for (const [codigo, abrev] of Object.entries(abbreviations)) {
-        if (esp.includes(codigo)) return abrev;
-      }
-      let abbr = esp.replace(/^OCI\s*/i, "").replace(/AVALIAÇÃO\s*/gi, "AVAL. ").replace(/DIAGNÓSTICA\s*/gi, "DIAG. ").replace(/INICIAL\s*/gi, "INIC. ").replace(/PROGRESSÃO\s*/gi, "PROG. ").replace(/\s+/g, " ").trim();
-      if (abbr.length <= maxLength) return abbr;
-      return abbr.substring(0, maxLength - 3) + "...";
-    }
+function abbreviateEspName(esp, maxLength = 30) {
+  if (!esp) return "";
+  const abbreviations = {
+    "09.01.01.001-4": "CA Mama Inicial",
+    "09.01.01.002-2": "CA Mama Progressão",
+    "09.01.01.003-0": "CA Próstata Inicial",
+    "09.01.01.004-9": "CA Próstata Progressão",
+    "09.01.01.005-7": "CA Colo Investigação",
+    "09.01.01.006-5": "CA Colo Terapêutica",
+    "09.01.01.007-3": "CA Gástrico",
+    "09.01.01.008-1": "CA Colorretal",
+    "09.01.01.009-0": "CA Mama Prog I",
+    "09.01.01.010-3": "CA Mama Prog II",
+    "09.01.01.011-1": "CA Colo Terap I",
+    "09.01.01.012-0": "CA Colo Terap II",
+    "09.01.01.013-8": "Imunohistoquímica Mama",
+    "09.02.01.001-8": "Risco Cirúrgico",
+    "09.02.01.002-6": "Avaliação Cardio",
+    "09.02.01.003-4": "SCC Inicial",
+    "09.02.01.004-2": "SCC Prog I",
+    "09.02.01.005-0": "SCC Prog II",
+    "09.02.01.006-9": "Insuf Cardíaca",
+    "09.02.01.007-7": "Gestão Pré-Operatório",
+    "09.03.01.001-1": "Ortop c/ Radio",
+    "09.03.01.002-0": "Ortop c/ Radio+USG",
+    "09.03.01.003-8": "Ortop c/ Radio+TC",
+    "09.03.01.004-6": "Ortop c/ Radio+RM",
+    "09.04.01.001-5": "Déficit Auditivo Ini",
+    "09.04.01.002-3": "Déficit Auditivo Prog",
+    "09.04.01.003-1": "Naso/Orofaringe",
+    "09.05.01.001-9": "Oftalmo 0-8a",
+    "09.05.01.002-7": "Estrabismo",
+    "09.05.01.003-5": "Oftalmo 9a+",
+    "09.05.01.004-3": "Retinopatia Diab",
+    "09.05.01.005-1": "Onco Oftalmo",
+    "09.05.01.006-0": "Neuro Oftalmo",
+    "09.05.01.007-8": "Exames c/ Sedação",
+    "09.06.01.001-2": "GIN1 - Saúde Mulher I",
+    "09.06.01.002-0": "GIN1 - Saúde Mulher II",
+    "09.06.01.003-9": "GIN2 - SUA I",
+    "09.06.01.004-7": "GIN2 - SUA II",
+    "09.06.01.005-5": "GIN3 - Endometriose",
+    "09.07.01.001-6": "Saúde Bucal - Violência",
+    "09.07.01.002-4": "Reab. Protética - Violência",
+    "09.08.01.001-0": "Sínd. Respiratória - Inicial",
+    "09.08.01.002-8": "Sínd. Respiratória - Prog",
+    "09.08.01.003-6": "Sínd. Neurológica - Inicial",
+    "09.08.01.004-4": "Sínd. Neurológica - Prog",
+    "09.08.01.005-2": "Sínd. Mucocutânea - Inicial",
+    "09.08.01.006-0": "Sínd. Mucocutânea - Prog",
+    "09.08.01.007-9": "Sínd. Consuptiva - Inicial",
+    "09.08.01.008-7": "Sínd. Consuptiva - Prog"
+  };
+  for (const [codigo, abrev] of Object.entries(abbreviations)) {
+    if (esp.includes(codigo)) return abrev;
+  }
+  let abbr = esp.replace(/^OCI\s*/i, "").replace(/AVALIAÇÃO\s*/gi, "AVAL. ").replace(/DIAGNÓSTICA\s*/gi, "DIAG. ").replace(/INICIAL\s*/gi, "INIC. ").replace(/PROGRESSÃO\s*/gi, "PROG. ").replace(/TERAPÊUTICA\s*/gi, "TERAP. ").replace(/CÂNCER DE\s*/gi, "CA ").replace(/\s+/g, " ").trim();
+  if (abbr.length <= maxLength) return abbr;
+  return abbr.substring(0, maxLength - 3) + "...";
+}
     
     function toggleChartFilter(id, event) { if(event) event.stopPropagation(); const popup = el(id); if(popup) { document.querySelectorAll('.chart-filter-popup').forEach(p => { if(p.id !== id) p.classList.remove('show'); }); popup.classList.toggle('show'); } }
-    function applyTopEspFilter() { topEspFilterMonth = el("topEspMesSelect")?.value || ""; if(el("topEspFilter")) el("topEspFilter").classList.remove('show'); }
+    function applyTopEspFilter() { topEspFilterMonth = el("topEspMesSelect")?.value || ""; if(el("topEspFilter")) el("topEspFilter").classList.remove('show'); (topEspFilterMonth || null); }
     function clearTopEspFilter() { topEspFilterMonth = ""; if(el("topEspMesSelect")) el("topEspMesSelect").value = ""; if(el("topEspFilter")) el("topEspFilter").classList.remove('show'); buildTop(null); }
     function applyIndicadoresFilter(){ indicadoresFilterMonth = el("indicadoresMesSelect")?.value || ""; if(el("indicadoresFilter")) el("indicadoresFilter").classList.remove('show'); updateCharts(); }
     function clearIndicadoresFilter(){ indicadoresFilterMonth = ""; if(el("indicadoresMesSelect")) el("indicadoresMesSelect").value = ""; if(el("indicadoresFilter")) el("indicadoresFilter").classList.remove('show'); updateCharts(); }
@@ -1148,84 +1209,134 @@
     function formatBRL(v){ return "R$\u00a0"+Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
     function formatBRLCompact(v){ v=Number(v||0); if(v>=1000000) return "R$\u00a0"+(v/1000000).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"M"; if(v>=1000) return "R$\u00a0"+(v/1000).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"K"; return formatBRL(v); }
 
-    function loadMockData(showMsg=false){
+        
+    async function loadData(showMsg=false){
       el("loading").classList.add("on");
-      if(showMsg) toast("Carregando dados de exemplo…","info");
-      
-      setTimeout(() => {
-        allData = gerarDadosMock();
+      if(showMsg) toast("Sincronizando com Google Sheets…","info");
+      try{
+        const res=await fetch(CSV_URL,{cache:"no-cache"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        const csv=await res.text();
+        const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true,dynamicTyping:false,transformHeader:normHeader});
+        allData=(parsed.data||[]).map(r=>{
+          const especialidade=normStr(r["ESPECIALIDADE"]);
+          const idade=normStr(r["IDADE"]);
+          const mesRaw=normStr(r["MÊS/2025"]||r["MES/2025"]||r["MÊS"]||r["MES"]);
+          const mes=parseMesAno(mesRaw);
+          let financeiroVal = 0;
+          if(r["FINANCEIRO"] !== undefined) financeiroVal = parseFinanceiro(r["FINANCEIRO"]);
+          else if(r["VALOR"] !== undefined) financeiroVal = parseFinanceiro(r["VALOR"]);
+          else if(r["RECEITA"] !== undefined) financeiroVal = parseFinanceiro(r["RECEITA"]);
+          else if(r["R$"] !== undefined) financeiroVal = parseFinanceiro(r["R$"]);
+          else { const keys = Object.keys(r); if(keys.length > 0) { const lastKey = keys[keys.length - 1]; financeiroVal = parseFinanceiro(r[lastKey]); } }
+          return {
+            especialidade:especialidade.replace(/\s+/g," ").trim(),
+            idade,mesRaw,
+            mesKey:mes.key,mesLabel:mes.label,mesY:mes.y,mesM:mes.m,
+            agendado:toInt(r["AGENDADO"]),recepcionado:toInt(r["RECEPCIONADO"]),
+            apac:toInt(r["APAC GERADAS"]||r["APAC"]||r["APACGERADAS"]),
+            faturado:toInt(r["FATURADO"]),
+            financeiro: financeiroVal
+          };
+        }).filter(x=>x.especialidade);
         allData.sort((a,b)=>mesSortKey(a)-mesSortKey(b)||a.especialidade.localeCompare(b.especialidade));
         fillFilters();
         populateOciMonthFilterSelects();
         dataF = [...allData];
         updateKPIs(); updateCharts(); renderTable();
         const now=new Date(); el("lastUpdate").textContent=`Última atualização: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR")}`;
-        toast(`Dados carregados: ${allData.length.toLocaleString("pt-BR")} registros.`,"success");
-        el("loading").classList.remove("on");
-      }, 500);
+        toast(`Dados OCI carregados: ${allData.length.toLocaleString("pt-BR")} registros.`,"success");
+      }catch(err){ console.error(err); toast("Falha ao carregar o CSV do Sheets. Verifique permissões/compartilhamento.","error"); allData=[]; dataF=[]; fillFilters(); populateOciMonthFilterSelects(); }finally{ el("loading").classList.remove("on"); }
     }
     
-    function loadFinData(showMsg=false){
-      // Dados financeiros mockados
-      const espMock = [
-        "09.01.01.001-4 - CA Mama Inicial",
-        "09.07.01.001-6 - Saúde Bucal Violência",
-        "09.08.01.001-0 - Sínd Respiratória Ini",
-        "09.08.01.003-6 - Sínd Neurológica Ini",
-        "09.08.01.005-2 - Sínd Mucocutânea Ini"
-      ];
-      const mesesFin = [
-        { key: "2025-01", shortLabel: "Jan/25", header: "jan/25" },
-        { key: "2025-02", shortLabel: "Fev/25", header: "fev/25" },
-        { key: "2025-03", shortLabel: "Mar/25", header: "mar/25" }
-      ];
-      finMonths = mesesFin;
-      finData = espMock.map(esp => {
-        const monthValues = {};
-        mesesFin.forEach(m => {
-          monthValues[m.key] = Math.floor(Math.random() * 50000) + 5000;
-        });
-        const total = Object.values(monthValues).reduce((a,b) => a + b, 0);
-        return { esp, monthValues, total };
-      });
-      
-      buildFinKPIs(); buildFinCharts();
-      const now=new Date(); el("finLastUpdate").textContent=`Atualizado: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR")}`;
-      if(showMsg) toast("Dados financeiros carregados.","success");
+    async function loadFinData(showMsg=false){
+      if(showMsg) toast("Sincronizando dados financeiros…","info");
+      try{
+        const res=await fetch(CSV_FIN_URL,{cache:"no-cache"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        const csv=await res.text();
+        const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true,dynamicTyping:false,transformHeader:(h)=>normStr(h)});
+        if(!parsed.data||!parsed.data.length){ console.warn("Financeiro: sem dados"); return; }
+        const headers=Object.keys(parsed.data[0]);
+        const monthHeaders=headers.filter(h=>{ const s=normStr(h).toLowerCase(); return /^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/.test(s); });
+        finMonths=monthHeaders.map(h=>parseFinMonthHeader(h)).filter(Boolean);
+        finData=parsed.data.filter(r=>{ const esp=normStr(r["ESPECIALIDADE"]||r[headers[0]]||"").toUpperCase(); return esp && esp!=="TOTAL" && !esp.startsWith("TOTAL"); }).map(r=>{ const esp=normStr(r["ESPECIALIDADE"]||r[headers[0]]||""); const monthValues={}; finMonths.forEach(m=>{ monthValues[m.key]=parseFinValue(r[m.header]); }); const total=finMonths.reduce((acc,m)=>acc+(monthValues[m.key]||0),0); return {esp,monthValues,total}; }).filter(r=>r.esp);
+        buildFinKPIs(); buildFinCharts();
+        const now=new Date(); el("finLastUpdate").textContent=`Atualizado: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR")}`;
+        if(showMsg) toast(`Financeiro carregado: ${finData.length} especialidades, ${finMonths.length} competências.`,"success");
+      }catch(err){ console.error("Financeiro erro:",err); el("finLastUpdate").textContent="Erro ao carregar dados financeiros."; toast("Falha ao carregar dados financeiros. Verifique as permissões.","error"); }
     }
     
-    function loadRankingFisico() {
-      const municipios = ["Contagem", "Belo Horizonte", "Betim", "Nova Lima", "Ibirité", "Santa Luzia", "Vespasiano", "Lagoa Santa", "Pedro Leopoldo", "Ribeirão das Neves"];
-      const meses = ["jan/25", "fev/25", "mar/25"];
-      rankingFisicoData = municipios.map(m => {
-        const obj = { municipio: m, total: 0 };
-        meses.forEach(mes => {
-          const val = Math.floor(Math.random() * 200) + 10;
-          obj[mes] = val;
-          obj.total += val;
-        });
-        return obj;
-      });
-      window.mesesRanking = meses.map((m,i) => ({ nome: m, rotulo: m, coluna: i+1, ano: "2025", mes: m.substring(0,3) }));
-      window.ultimoMes = { nome: "mar/25", rotulo: "mar/25" };
-      atualizarRankingFisico();
+    async function loadRankingFisico() {
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1342049672`;
+        const res = await fetch(url, {cache:"no-cache"});
+        const csv = await res.text();
+        const parsed = Papa.parse(csv, {header:false, skipEmptyLines:true});
+        const cabecalho = parsed.data[1];
+        const mesesDisponiveis = [];
+        for (let i = 1; i < cabecalho.length; i++) {
+          if (cabecalho[i] && cabecalho[i].trim() !== '') {
+            const nomeMes = cabecalho[i].trim();
+            const partes = nomeMes.split('/');
+            if (partes.length === 2) {
+              const ano = partes[0].substring(2);
+              const mes = partes[1].substring(0,3);
+              mesesDisponiveis.push({ coluna: i, nome: `${mes}${ano}`, rotulo: nomeMes, ano: partes[0], mes: mes });
+            }
+          }
+        }
+        mesesDisponiveis.sort((a, b) => { if (a.ano !== b.ano) return a.ano - b.ano; const meses = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12}; return meses[a.mes] - meses[b.mes]; });
+        window.mesesRanking = mesesDisponiveis;
+        window.ultimoMes = mesesDisponiveis[mesesDisponiveis.length - 1];
+        rankingFisicoData = parsed.data.slice(2).filter(row => {
+        const primeiroCampo = row[0]?.trim() || '';
+        return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
+        }).map(row => {
+          const municipio = row[0]?.trim() || '';
+          const meses = {};
+          mesesDisponiveis.forEach(m => { const valor = String(row[m.coluna] || '0').replace(/\./g, '').replace(',', '.'); meses[m.nome] = parseInt(valor) || 0; });
+          const total = Object.values(meses).reduce((acc, val) => acc + val, 0);
+          return { municipio, ...meses, total };
+        }).filter(d => d.municipio && d.municipio !== 'Município gestor');
+        atualizarRankingFisico();
+      } catch (error) { console.error('Erro ao carregar ranking físico:', error); toast('Erro ao carregar ranking físico. Verifique a aba.', 'error'); }
     }
     
-    function loadRankingFinanceiro() {
-      const municipios = ["Contagem", "Belo Horizonte", "Betim", "Nova Lima", "Ibirité", "Santa Luzia", "Vespasiano", "Lagoa Santa", "Pedro Leopoldo", "Ribeirão das Neves"];
-      const meses = ["jan/25", "fev/25", "mar/25"];
-      rankingFinanceiroData = municipios.map(m => {
-        const obj = { municipio: m, total: 0 };
-        meses.forEach(mes => {
-          const val = Math.floor(Math.random() * 50000) + 5000;
-          obj[mes] = val;
-          obj.total += val;
-        });
-        return obj;
-      });
-      window.mesesRankingFinanceiro = meses.map((m,i) => ({ nome: m, rotulo: m, coluna: i+1, ano: "2025", mes: m.substring(0,3) }));
-      window.ultimoMesFinanceiro = { nome: "mar/25", rotulo: "mar/25" };
-      atualizarRankingFinanceiro();
+    async function loadRankingFinanceiro() {
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=960044663`;
+        const res = await fetch(url, {cache:"no-cache"});
+        const csv = await res.text();
+        const parsed = Papa.parse(csv, {header:false, skipEmptyLines:true});
+        const cabecalho = parsed.data[1];
+        const mesesDisponiveis = [];
+        for (let i = 1; i < cabecalho.length; i++) {
+          if (cabecalho[i] && cabecalho[i].trim() !== '') {
+            const nomeMes = cabecalho[i].trim();
+            const partes = nomeMes.split('/');
+            if (partes.length === 2) {
+              const ano = partes[0].substring(2);
+              const mes = partes[1].substring(0,3);
+              mesesDisponiveis.push({ coluna: i, nome: `${mes}${ano}`, rotulo: nomeMes, ano: partes[0], mes: mes });
+            }
+          }
+        }
+        mesesDisponiveis.sort((a, b) => { if (a.ano !== b.ano) return a.ano - b.ano; const meses = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12}; return meses[a.mes] - meses[b.mes]; });
+        window.mesesRankingFinanceiro = mesesDisponiveis;
+        window.ultimoMesFinanceiro = mesesDisponiveis[mesesDisponiveis.length - 1];
+        rankingFinanceiroData = parsed.data.slice(2).filter(row => {
+        const primeiroCampo = row[0]?.trim() || '';
+        return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
+        }).map(row => {
+          const municipio = row[0]?.trim() || '';
+          const meses = {};
+          mesesDisponiveis.forEach(m => { const valor = String(row[m.coluna] || '0').replace('R$', '').replace(/\./g, '').replace(',', '.'); meses[m.nome] = parseFloat(valor) || 0; });
+          const total = Object.values(meses).reduce((acc, val) => acc + val, 0);
+          return { municipio, ...meses, total };
+        }).filter(d => d.municipio && d.municipio !== 'Município gestor');
+        atualizarRankingFinanceiro();
+      } catch (error) { console.error('Erro ao carregar ranking financeiro:', error); toast('Erro ao carregar ranking financeiro. Verifique a aba.', 'error'); }
     }
     
     function atualizarRankingFisico() {
@@ -1315,57 +1426,58 @@
     }
     
     function renderTabelaFisico(sorted) {
-      const tbody = el('tBodyFisico');
-      const cabecalho = el('cabecalhoFisico');
-      if (!tbody || !window.mesesRanking) return;
-      const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
-      if (cabecalho) { 
-        let html = '<th>Posição</th><th>Município</th>';
-        window.mesesRanking.forEach(m => { 
-          html += `<th>${m.rotulo}</th>`; 
-        }); 
-        html += '<th>Total</th><th>%</th>'; 
-        cabecalho.innerHTML = html; 
-      }
-      tbody.innerHTML = sorted.map((d, i) => { 
-        const pct = ((d.total / totalGeral) * 100).toFixed(1); 
-        const isContagem = d.municipio.toLowerCase().includes('contagem'); 
-        let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
-        linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
-        window.mesesRanking.forEach(m => { 
-          linha += `<td>${(d[m.nome] || 0).toLocaleString('pt-BR')}</td>`; 
-        }); 
-        linha += `<td><b>${d.total.toLocaleString('pt-BR')}</b></td><td>${pct}%</td></tr>`; 
-        return linha; 
-      }).join('');
-    }
+  const tbody = el('tBodyFisico');
+  const cabecalho = el('cabecalhoFisico');
+  if (!tbody || !window.mesesRanking) return;
+  const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+  if (cabecalho) { 
+    let html = '<th>Posição</th><th>Município</th>';
+    window.mesesRanking.forEach(m => { 
+      html += `<th>${m.rotulo}</th>`; 
+    }); 
+    html += '<th>Total</th><th>%</th>'; 
+    cabecalho.innerHTML = html; 
+  }
+  tbody.innerHTML = sorted.map((d, i) => { 
+    const pct = ((d.total / totalGeral) * 100).toFixed(1); 
+    const isContagem = d.municipio.toLowerCase().includes('contagem'); 
+    let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
+    linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
+    window.mesesRanking.forEach(m => { 
+      linha += `<td>${(d[m.nome] || 0).toLocaleString('pt-BR')}</td>`; 
+    }); 
+    linha += `<td><b>${d.total.toLocaleString('pt-BR')}</b></td><td>${pct}%</td></tr>`; 
+    return linha; 
+  }).join('');
+}
     
     function renderTabelaFinanceiro(sorted) {
-      const tbody = el('tBodyFinanceiro');
-      const cabecalho = el('cabecalhoFinanceiro');
-      if (!tbody || !window.mesesRankingFinanceiro) return;
-      const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
-      if (cabecalho) { 
-        let html = '<th>Posição</th><th>Município</th>';
-        window.mesesRankingFinanceiro.forEach(m => { 
-          html += `<th>${m.rotulo}</th>`; 
-        }); 
-        html += '<th>Total</th><th>%</th>'; 
-        cabecalho.innerHTML = html; 
-      }
-      tbody.innerHTML = sorted.map((d, i) => { 
-        const pct = ((d.total / totalGeral) * 100).toFixed(1); 
-        const isContagem = d.municipio.toLowerCase().includes('contagem'); 
-        let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
-        linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
-        window.mesesRankingFinanceiro.forEach(m => { 
-          linha += `<td>${formatBRL(d[m.nome] || 0)}</td>`; 
-        }); 
-        linha += `<td><b>${formatBRL(d.total)}</b></td><td>${pct}%</td></tr>`; 
-        return linha; 
-      }).join('');
-    }
+  const tbody = el('tBodyFinanceiro');
+  const cabecalho = el('cabecalhoFinanceiro');
+  if (!tbody || !window.mesesRankingFinanceiro) return;
+  const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+  if (cabecalho) { 
+    let html = '<th>Posição</th><th>Município</th>';
+    window.mesesRankingFinanceiro.forEach(m => { 
+      html += `<th>${m.rotulo}</th>`; 
+    }); 
+    html += '<th>Total</th><th>%</th>'; 
+    cabecalho.innerHTML = html; 
+  }
+  tbody.innerHTML = sorted.map((d, i) => { 
+    const pct = ((d.total / totalGeral) * 100).toFixed(1); 
+    const isContagem = d.municipio.toLowerCase().includes('contagem'); 
+    let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
+    linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
+    window.mesesRankingFinanceiro.forEach(m => { 
+      linha += `<td>${formatBRL(d[m.nome] || 0)}</td>`; 
+    }); 
+    linha += `<td><b>${formatBRL(d.total)}</b></td><td>${pct}%</td></tr>`; 
+    return linha; 
+  }).join('');
+}
 
+        
     function buildFinKPIs(){
       if(!finData.length||!finMonths.length) return;
       const totalGeral=finData.reduce((acc,r)=>acc+r.total,0);
@@ -1564,70 +1676,73 @@
     }
     
    function buildTop(mes){
-      destroy("cTop");
-      const canvas = el("cTop"); if(!canvas) return;
-      const ctx=canvas.getContext("2d");
-      const source = mes ? getOciDataForMonth(mes) : dataF;
-      const map=new Map(); 
-      source.forEach(x=>{ 
-        const k=x.especialidade; 
-        if(!map.has(k)) map.set(k,{rec:0,fat:0,esp:k}); 
-        const o=map.get(k); 
-        o.rec+=x.recepcionado; 
-        o.fat+=x.faturado; 
-      });
-      const arr=[...map.values()].sort((a,b)=>b.rec-a.rec);
-      const topItems = arr.slice(0, 15);
-      const dynamicH=Math.max(420, topItems.length * 28 + 80); 
-      if(el("cTopWrap")) el("cTopWrap").style.height=dynamicH+"px";
-      charts["cTop"]=new Chart(ctx,{ 
-        type:"bar", 
-        data:{ 
-          labels:topItems.map(x=>abbreviateEspName(x.esp, 25)), 
-          datasets:[ 
-            {label:"Recepcionado", data:topItems.map(x=>x.rec), backgroundColor:"#059669", borderRadius:6, barThickness:30},
-            {label:"Faturado", data:topItems.map(x=>x.fat), backgroundColor:"#b91c1c", borderRadius:6, barThickness:30}
-          ] 
+  destroy("cTop");
+  const canvas = el("cTop"); if(!canvas) return;
+  const ctx=canvas.getContext("2d");
+  const source = mes ? getOciDataForMonth(mes) : dataF;
+  const map=new Map(); 
+  source.forEach(x=>{ 
+    const k=x.especialidade; 
+    if(!map.has(k)) map.set(k,{rec:0,fat:0,esp:k}); 
+    const o=map.get(k); 
+    o.rec+=x.recepcionado; 
+    o.fat+=x.faturado; 
+  });
+  const arr=[...map.values()].sort((a,b)=>b.rec-a.rec);
+  
+  // Limita a 15 itens para não ficar muito poluído
+  const topItems = arr.slice(0, 15);
+  const dynamicH=Math.max(420, topItems.length * 28 + 80); 
+  if(el("cTopWrap")) el("cTopWrap").style.height=dynamicH+"px";
+  
+  charts["cTop"]=new Chart(ctx,{ 
+    type:"bar", 
+    data:{ 
+      labels:topItems.map(x=>abbreviateEspName(x.esp, 25)), 
+      datasets:[ 
+        {label:"Recepcionado", data:topItems.map(x=>x.rec), backgroundColor:"#059669", borderRadius:6, barThickness:30},
+        {label:"Faturado", data:topItems.map(x=>x.fat), backgroundColor:"#b91c1c", borderRadius:6, barThickness:30}
+      ] 
+    }, 
+    options:{ 
+      responsive:true, 
+      maintainAspectRatio:false,
+      plugins:{ 
+        legend:{position:"top",labels:{font:{size:13,weight:"800"},padding:18}}, 
+        datalabels:{ 
+          display:true, 
+          anchor:"end", 
+          align:"top",  // ALTERADO de "right" para "top" (barras verticais)
+          color:"#0f172a", 
+          font:{size:10,weight:"800"}, 
+          formatter:(v)=>v?v.toLocaleString("pt-BR"):"" 
         }, 
-        options:{ 
-          responsive:true, 
-          maintainAspectRatio:false,
-          plugins:{ 
-            legend:{position:"top",labels:{font:{size:13,weight:"800"},padding:18}}, 
-            datalabels:{ 
-              display:true, 
-              anchor:"end", 
-              align:"top",
-              color:"#0f172a", 
-              font:{size:10,weight:"800"}, 
-              formatter:(v)=>v?v.toLocaleString("pt-BR"):"" 
-            }, 
-            tooltip:{
-              titleFont:{size:12,weight:"800"},
-              bodyFont:{size:12},
-              callbacks:{
-                title:(items)=>{ 
-                  const i=items[0]?.dataIndex; 
-                  return i!==undefined?topItems[i]?.esp||"":""; 
-                }
-              }
-            } 
-          }, 
-          scales:{ 
-            x:{ 
-              ticks:{font:{size:10,weight:"700"}, maxRotation:45, minRotation:45}, 
-              grid:{display:false} 
-            }, 
-            y:{ 
-              beginAtZero:true,
-              ticks:{font:{size:11,weight:"700"}}, 
-              grid:{display:false} 
-            } 
-          } 
+        tooltip:{
+          titleFont:{size:12,weight:"800"},
+          bodyFont:{size:12},
+          callbacks:{
+            title:(items)=>{ 
+              const i=items[0]?.dataIndex; 
+              return i!==undefined?topItems[i]?.esp||"":""; 
+            }
+          }
         } 
-      });
-      if(el("subTop")) el("subTop").textContent = mes ? `Todas as especialidades — Mês: ${labelMes(mes)} (ordenado pelo maior Recepcionado).` : "Todas as especialidades no período selecionado (do maior para o menor Recepcionado).";
-    }
+      }, 
+      scales:{ 
+        x:{ 
+          ticks:{font:{size:10,weight:"700"}, maxRotation:45, minRotation:45}, 
+          grid:{display:false} 
+        }, 
+        y:{ 
+          beginAtZero:true,
+          ticks:{font:{size:11,weight:"700"}}, 
+          grid:{display:false} 
+        } 
+      } 
+    } 
+  });
+  if(el("subTop")) el("subTop").textContent = mes ? `Todas as especialidades — Mês: ${labelMes(mes)} (ordenado pelo maior Recepcionado).` : "Todas as especialidades no período selecionado (do maior para o menor Recepcionado).";
+}
     
     function buildReceita(){
       destroy("cReceita");
@@ -1641,9 +1756,7 @@
       const dadosLimitados = dadosArray.slice(0, 15);
       const labels = dadosLimitados.map(d => abbreviateEspName(d.esp, 30));
       const valores = dadosLimitados.map(d => d.valor);
-      charts["cReceita"] = new Chart(ctx, { type: "bar", data: { labels, datasets: [{ label: "Receita (R$)", data: valores, backgroundColor: "#059669", borderRadius: 6, barThickness: 22 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false }, datalabels: { display: true, anchor: "end", align: "right", color: "#0f172a", font: { size: 11, weight: "800" }, formatter: (v) => formatBRL(v) }, tooltip: { callbacks: { title: (items) => { const i = items[0]?.dataIndex; return i !== undefined ? dadosLimitados[i]?.esp || "" : ""; }, label: (ctx) => ` Receita: ${formatBRL(ctx.raw || 0)}` } } }, scales: { x: { beginAtZero: true, ticks: { font: { size: 12, weight: "700" }, callback: (v) => formatBRLCompact(v) }, grid: { display: false } }, y: { ticks: { font: { size: 12, weight: "700" }, padding: 4 }, grid: { display: false } } } } });
-      if(el("subReceita")) el("subReceita").textContent = mesFiltro && mesFiltro !== "" ? `Faturamento (R$) por especialidade • Mês: ${labelMes(mesFiltro)}` : "Faturamento total (R$) acumulado por especialidade";
-    }
+      charts["cReceita"] = new Chart(ctx, { type: "bar", data: { labels, datasets: [{ label: "Receita (R$)", data: valores, backgroundColor: "#059669", borderRadius: 6, barThickness: 22 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false }, datalabels: { display: true, anchor: "end", align: "right", color: "#0f172a", font: { size: 11, weight: "800" }, formatter: (v) => formatBRL(v) }, tooltip: { callbacks: { title: (items) => { const i = items[0]?.dataIndex; return i !== undefined ? dadosLimitados[i]?.esp || "" : ""; }, label: (ctx) => ` Receita: ${formatBRL(ctx.raw || 0)}` } } }, scales: { x: { beginAtZero: true, ticks: { font: { size: 12, weight: "700" }, callback: (v) => formatBRLCompact(v) }, grid: { display: false } }, y: { ticks: { font: { size: 12, weight: "700" }, padding: 4 }, grid: { display: false } } } } }); }
     
     function buildDistribuicao(){
       destroy("cDistribuicao");
@@ -1652,8 +1765,7 @@
       const mesFiltro = distribuicaoFilterMonth; const rows = mesFiltro ? getOciDataForMonth(mesFiltro) : dataF;
       const ag = sum("agendado", rows); const rec = sum("recepcionado", rows); const apac = sum("apac", rows); const fat = sum("faturado", rows);
       if(ag === 0 && rec === 0 && apac === 0 && fat === 0) { ctx.font = "14px Inter"; ctx.fillStyle = "#64748b"; ctx.textAlign = "center"; ctx.fillText("Sem dados para o período selecionado", ctx.canvas.width/2, ctx.canvas.height/2); return; }
-      charts["cDistribuicao"] = new Chart(ctx, { type: "doughnut", data: { labels: ["Agendados", "Recepcionados", "APAC Autorizadas", "Faturados"], datasets: [{ data: [ag, rec, apac, fat], backgroundColor: ["#3b82f6", "#059669", "#d97706", "#b91c1c"], borderColor: "#ffffff", borderWidth: 3, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "bottom", labels: { font: { size: 12, weight: "700" }, padding: 15, usePointStyle: true, pointStyle: "circle", color: "#0f172a", generateLabels: (chart) => { const data = chart.data; if (!data.labels || !data.datasets) return []; const { labels, datasets } = data; const dataset = datasets[0]; const total = dataset.data.reduce((a, b) => a + b, 0); return labels.map((label, i) => ({ text: `${label}: ${dataset.data[i].toLocaleString("pt-BR")} (${((dataset.data[i]/total)*100).toFixed(1)}%)`, fillStyle: dataset.backgroundColor[i], strokeStyle: dataset.backgroundColor[i], lineWidth: 2, hidden: false, index: i, fontColor: "#0f172a" })); } } }, datalabels: { color: "#fff", font: { size: 13, weight: "900" }, textShadowColor: "rgba(0,0,0,0.5)", textShadowBlur: 4, formatter: (value, context) => { const total = context.dataset.data.reduce((a, b) => a + b, 0); if (!total || !value) return ""; const pct = (value / total) * 100; return pct < 8 ? "" : pct.toFixed(1) + "%"; } }, tooltip: { callbacks: { label: (ctx) => { const label = ctx.label || ""; const value = ctx.raw || 0; const total = ctx.dataset.data.reduce((a, b) => a + b, 0); const pct = ((value / total) * 100).toFixed(1); return ` ${label}: ${value.toLocaleString("pt-BR")} (${pct}%)`; } } } } } });
-    }
+      charts["cDistribuicao"] = new Chart(ctx, { type: "doughnut", data: { labels: ["Agendados", "Recepcionados", "APAC Autorizadas", "Faturados"], datasets: [{ data: [ag, rec, apac, fat], backgroundColor: ["#3b82f6", "#059669", "#d97706", "#b91c1c"], borderColor: "#ffffff", borderWidth: 3, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "bottom", labels: { font: { size: 12, weight: "700" }, padding: 15, usePointStyle: true, pointStyle: "circle", color: "#0f172a", generateLabels: (chart) => { const data = chart.data; if (!data.labels || !data.datasets) return []; const { labels, datasets } = data; const dataset = datasets[0]; const total = dataset.data.reduce((a, b) => a + b, 0); return labels.map((label, i) => ({ text: `${label}: ${dataset.data[i].toLocaleString("pt-BR")} (${((dataset.data[i]/total)*100).toFixed(1)}%)`, fillStyle: dataset.backgroundColor[i], strokeStyle: dataset.backgroundColor[i], lineWidth: 2, hidden: false, index: i, fontColor: "#0f172a" })); } } }, datalabels: { color: "#fff", font: { size: 13, weight: "900" }, textShadowColor: "rgba(0,0,0,0.5)", textShadowBlur: 4, formatter: (value, context) => { const total = context.dataset.data.reduce((a, b) => a + b, 0); if (!total || !value) return ""; const pct = (value / total) * 100; return pct < 8 ? "" : pct.toFixed(1) + "%"; } }, tooltip: { callbacks: { label: (ctx) => { const label = ctx.label || ""; const value = ctx.raw || 0; const total = ctx.dataset.data.reduce((a, b) => a + b, 0); const pct = ((value / total) * 100).toFixed(1); return ` ${label}: ${value.toLocaleString("pt-BR")} (${pct}%)`; } } } } } }); }
     
     function sortTable(col,th){
       if(tableSort.col===col){ tableSort.dir=tableSort.dir==="asc"?"desc":"asc"; }
@@ -1721,7 +1833,7 @@
     
     window.addEventListener("DOMContentLoaded",()=>{
       initEventListeners();
-      loadMockData(false);
+      loadData(false);
       loadFinData(false);
       loadRankingFisico();
       loadRankingFinanceiro();
