@@ -1021,16 +1021,16 @@
       <!-- FILTRO DE MÊS PARA RANKING FÍSICO -->
       <div class="ranking-filter-bar">
         <div class="chart-filter-wrapper">
-          <div class="chart-filter-badge" onclick="toggleRankingFilter(event)">
+          <div class="chart-filter-badge" onclick="toggleRankingFilter('rankingFilterFisico', event)">
             <i class="fa-solid fa-filter"></i> Filtrar por mês
           </div>
-          <div id="rankingFilter" class="chart-filter-popup">
-            <select id="rankingMesSelect">
+          <div id="rankingFilterFisico" class="chart-filter-popup">
+            <select id="rankingMesSelectFisico">
               <option value="">Todos os meses</option>
             </select>
             <div class="filter-actions">
-              <button class="btn-filter-apply" onclick="applyRankingFilter()">Aplicar</button>
-              <button class="btn-filter-clear" onclick="clearRankingFilter()">Limpar</button>
+              <button class="btn-filter-apply" onclick="applyRankingFilter('rankingMesSelectFisico', 'rankingFilterFisico')">Aplicar</button>
+              <button class="btn-filter-clear" onclick="clearRankingFilter('rankingMesSelectFisico', 'rankingFilterFisico')">Limpar</button>
             </div>
           </div>
         </div>
@@ -1064,16 +1064,16 @@
       <!-- FILTRO DE MÊS PARA RANKING FINANCEIRO -->
       <div class="ranking-filter-bar">
         <div class="chart-filter-wrapper">
-          <div class="chart-filter-badge" onclick="toggleRankingFilter(event)">
+          <div class="chart-filter-badge" onclick="toggleRankingFilter('rankingFilterFinanceiro', event)">
             <i class="fa-solid fa-filter"></i> Filtrar por mês
           </div>
-          <div id="rankingFilter" class="chart-filter-popup">
-            <select id="rankingMesSelect">
+          <div id="rankingFilterFinanceiro" class="chart-filter-popup">
+            <select id="rankingMesSelectFinanceiro">
               <option value="">Todos os meses</option>
             </select>
             <div class="filter-actions">
-              <button class="btn-filter-apply" onclick="applyRankingFilter()">Aplicar</button>
-              <button class="btn-filter-clear" onclick="clearRankingFilter()">Limpar</button>
+              <button class="btn-filter-apply" onclick="applyRankingFilter('rankingMesSelectFinanceiro', 'rankingFilterFinanceiro')">Aplicar</button>
+              <button class="btn-filter-clear" onclick="clearRankingFilter('rankingMesSelectFinanceiro', 'rankingFilterFinanceiro')">Limpar</button>
             </div>
           </div>
         </div>
@@ -1205,7 +1205,7 @@
     let selectedSubgrupos = new Set(), selectedMeses = new Set(), allMeses = [];
     let topEspFilterMonth = "", indicadoresFilterMonth = "", receitaFilterMonth = "", distribuicaoFilterMonth = "";
     let receitaEspFilterMonth = "", finDonutFilterMonth = "";
-    let rankingFilterMonth = "";
+    let rankingFilterMonthFisico = "", rankingFilterMonthFinanceiro = "";
     let activeColumnFilter = null, columnFilterValues = [];
     let activeFinColumnFilter = null, finColumnFilterValues = [], finColumnFilterType = null;
     let finData = [], finMonths = [];
@@ -1238,28 +1238,52 @@
     });
     
     // ==================== FUNÇÕES DE FILTRO DOS RANKINGS ====================
-    function toggleRankingFilter(event) {
+    function toggleRankingFilter(popupId, event) {
       if(event) event.stopPropagation();
-      const popup = el("rankingFilter");
+      const popup = el(popupId);
       if(popup) {
         document.querySelectorAll('.chart-filter-popup').forEach(p => {
-          if(p.id !== 'rankingFilter') p.classList.remove('show');
+          if(p.id !== popupId) p.classList.remove('show');
         });
         popup.classList.toggle('show');
       }
     }
     
-    function applyRankingFilter() {
-      rankingFilterMonth = el("rankingMesSelect")?.value || "";
-      if(el("rankingFilter")) el("rankingFilter").classList.remove('show');
+    function applyRankingFilter(selectId, popupId) {
+      const select = el(selectId);
+      if (!select) return;
+      const value = select.value || "";
+      
+      if (selectId === 'rankingMesSelectFisico') {
+        rankingFilterMonthFisico = value;
+      } else if (selectId === 'rankingMesSelectFinanceiro') {
+        rankingFilterMonthFinanceiro = value;
+      }
+      
+      if (popupId) {
+        const popup = el(popupId);
+        if (popup) popup.classList.remove('show');
+      }
+      
       atualizarRankingFisico();
       atualizarRankingFinanceiro();
     }
     
-    function clearRankingFilter() {
-      rankingFilterMonth = "";
-      if(el("rankingMesSelect")) el("rankingMesSelect").value = "";
-      if(el("rankingFilter")) el("rankingFilter").classList.remove('show');
+    function clearRankingFilter(selectId, popupId) {
+      const select = el(selectId);
+      if (select) select.value = "";
+      
+      if (selectId === 'rankingMesSelectFisico') {
+        rankingFilterMonthFisico = "";
+      } else if (selectId === 'rankingMesSelectFinanceiro') {
+        rankingFilterMonthFinanceiro = "";
+      }
+      
+      if (popupId) {
+        const popup = el(popupId);
+        if (popup) popup.classList.remove('show');
+      }
+      
       atualizarRankingFisico();
       atualizarRankingFinanceiro();
     }
@@ -1278,10 +1302,14 @@
         finDonutFilterMonth = mesSelecionado;
       }
       
-      // Sincroniza com o filtro dos rankings
-      if (el("rankingMesSelect")) {
-        el("rankingMesSelect").value = mesSelecionado;
-        rankingFilterMonth = mesSelecionado;
+      // Sincroniza com os filtros dos rankings (cada um com seu ID)
+      if (el("rankingMesSelectFisico")) {
+        el("rankingMesSelectFisico").value = mesSelecionado;
+        rankingFilterMonthFisico = mesSelecionado;
+      }
+      if (el("rankingMesSelectFinanceiro")) {
+        el("rankingMesSelectFinanceiro").value = mesSelecionado;
+        rankingFilterMonthFinanceiro = mesSelecionado;
       }
       
       // Aplica os filtros se houver mês selecionado
@@ -1293,8 +1321,10 @@
       } else {
         clearReceitaEspFilter();
         clearFinDonutFilter();
-        rankingFilterMonth = "";
-        if(el("rankingMesSelect")) el("rankingMesSelect").value = "";
+        rankingFilterMonthFisico = "";
+        rankingFilterMonthFinanceiro = "";
+        if(el("rankingMesSelectFisico")) el("rankingMesSelectFisico").value = "";
+        if(el("rankingMesSelectFinanceiro")) el("rankingMesSelectFinanceiro").value = "";
         atualizarRankingFisico();
         atualizarRankingFinanceiro();
       }
@@ -1558,7 +1588,7 @@
         window.mesesRanking = mesesDisponiveis;
         window.ultimoMes = mesesDisponiveis[mesesDisponiveis.length - 1];
         
-        const select = el("rankingMesSelect");
+        const select = el("rankingMesSelectFisico");
         if (select && window.mesesRanking) {
           select.innerHTML = '<option value="">Todos os meses</option>' + 
             window.mesesRanking.map(m => `<option value="${m.nome}">${m.rotulo}</option>`).join('');
@@ -1583,8 +1613,8 @@
       
       let sorted = [...rankingFisicoData].sort((a,b) => b.total - a.total);
       
-      if (rankingFilterMonth && window.mesesRanking) {
-        const mesSelecionado = window.mesesRanking.find(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+      if (rankingFilterMonthFisico && window.mesesRanking) {
+        const mesSelecionado = window.mesesRanking.find(m => m.nome === rankingFilterMonthFisico || m.rotulo === rankingFilterMonthFisico);
         if (mesSelecionado) {
           sorted = sorted.map(d => ({
             ...d,
@@ -1601,8 +1631,8 @@
         const participacao = totalGeral > 0 ? ((contagem.total / totalGeral) * 100).toFixed(1) : 0;
         let ultimoMesValor = 0;
         let mesLabel = "";
-        if (rankingFilterMonth && window.mesesRanking) {
-          const mesSelecionado = window.mesesRanking.find(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+        if (rankingFilterMonthFisico && window.mesesRanking) {
+          const mesSelecionado = window.mesesRanking.find(m => m.nome === rankingFilterMonthFisico || m.rotulo === rankingFilterMonthFisico);
           if (mesSelecionado) {
             ultimoMesValor = contagem[mesSelecionado.nome] || 0;
             mesLabel = mesSelecionado.rotulo;
@@ -1635,8 +1665,8 @@
         const top5 = sorted.slice(0,5).filter(d => !d.municipio.toLowerCase().includes('contagem'));
         
         let mesesParaExibir = window.mesesRanking;
-        if (rankingFilterMonth) {
-          const index = window.mesesRanking.findIndex(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+        if (rankingFilterMonthFisico) {
+          const index = window.mesesRanking.findIndex(m => m.nome === rankingFilterMonthFisico || m.rotulo === rankingFilterMonthFisico);
           if (index !== -1) {
             mesesParaExibir = window.mesesRanking.slice(0, index + 1);
           }
@@ -1765,7 +1795,7 @@
         window.mesesRankingFinanceiro = mesesDisponiveis;
         window.ultimoMesFinanceiro = mesesDisponiveis[mesesDisponiveis.length - 1];
         
-        const select = el("rankingMesSelect");
+        const select = el("rankingMesSelectFinanceiro");
         if (select && window.mesesRankingFinanceiro) {
           select.innerHTML = '<option value="">Todos os meses</option>' + 
             window.mesesRankingFinanceiro.map(m => `<option value="${m.nome}">${m.rotulo}</option>`).join('');
@@ -1790,8 +1820,8 @@
       
       let sorted = [...rankingFinanceiroData].sort((a,b) => b.total - a.total);
       
-      if (rankingFilterMonth && window.mesesRankingFinanceiro) {
-        const mesSelecionado = window.mesesRankingFinanceiro.find(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+      if (rankingFilterMonthFinanceiro && window.mesesRankingFinanceiro) {
+        const mesSelecionado = window.mesesRankingFinanceiro.find(m => m.nome === rankingFilterMonthFinanceiro || m.rotulo === rankingFilterMonthFinanceiro);
         if (mesSelecionado) {
           sorted = sorted.map(d => ({
             ...d,
@@ -1808,8 +1838,8 @@
         const participacao = totalGeral > 0 ? ((contagem.total / totalGeral) * 100).toFixed(1) : 0;
         let ultimoMesValor = 0;
         let mesLabel = "";
-        if (rankingFilterMonth && window.mesesRankingFinanceiro) {
-          const mesSelecionado = window.mesesRankingFinanceiro.find(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+        if (rankingFilterMonthFinanceiro && window.mesesRankingFinanceiro) {
+          const mesSelecionado = window.mesesRankingFinanceiro.find(m => m.nome === rankingFilterMonthFinanceiro || m.rotulo === rankingFilterMonthFinanceiro);
           if (mesSelecionado) {
             ultimoMesValor = contagem[mesSelecionado.nome] || 0;
             mesLabel = mesSelecionado.rotulo;
@@ -1855,8 +1885,8 @@
         const top5 = sorted.slice(0,5).filter(d => !d.municipio.toLowerCase().includes('contagem'));
         
         let mesesParaExibir = window.mesesRankingFinanceiro;
-        if (rankingFilterMonth) {
-          const index = window.mesesRankingFinanceiro.findIndex(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+        if (rankingFilterMonthFinanceiro) {
+          const index = window.mesesRankingFinanceiro.findIndex(m => m.nome === rankingFilterMonthFinanceiro || m.rotulo === rankingFilterMonthFinanceiro);
           if (index !== -1) {
             mesesParaExibir = window.mesesRankingFinanceiro.slice(0, index + 1);
           }
