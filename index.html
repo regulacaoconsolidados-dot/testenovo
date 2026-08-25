@@ -554,6 +554,13 @@
       color:#ff0;
     }
 
+    .ranking-filter-bar {
+      display:flex;
+      justify-content:flex-end;
+      margin-top:14px;
+      gap:10px;
+    }
+
     @media(max-width:900px){
       .kpis{grid-template-columns:1fr 1fr}
       .fg{grid-column:span 12;}
@@ -568,6 +575,7 @@
         flex: 1 1 100% !important;
         min-width: 100% !important;
       }
+      .ranking-filter-bar { justify-content:flex-start; }
     }
     @media(max-width:560px){
       .kpis{grid-template-columns:1fr}
@@ -610,7 +618,8 @@
 
   <main class="wrap">
 
-        <div class="card filters">
+    <!-- FILTROS PRINCIPAIS -->
+    <div class="card filters">
       <div class="filtersTop">
         <div class="filtersTitle"><i class="fa-solid fa-filter" style="color:var(--accent)"></i> Filtros</div>
         <button class="btn-clear" id="btnClear"><i class="fa-solid fa-xmark"></i> Limpar</button>
@@ -675,6 +684,7 @@
       </div>
     </div>
 
+    <!-- KPIS PRINCIPAIS -->
     <div class="kpis" style="margin-top:14px;">
       <div class="kpi ag">
         <div class="kpiIcon"><i class="fa-solid fa-calendar-check"></i></div>
@@ -710,6 +720,7 @@
       </div>
     </div>
 
+    <!-- TABS -->
     <div class="tabs" style="margin-top:14px;">
       <button class="tab active" onclick="switchTab('visao', this)"><i class="fa-solid fa-chart-line"></i> Visão Geral</button>
       <button class="tab" onclick="switchTab('financeiro', this)"><i class="fa-solid fa-coins"></i> Financeiro</button>
@@ -718,7 +729,8 @@
       <button class="tab" onclick="switchTab('ranking-financeiro', this)"><i class="fa-solid fa-sack-dollar"></i> Ranking Financeiro</button>
     </div>
 
-        <section class="tabContent active" id="tab-visao" style="margin-top:14px;">
+    <!-- TAB VISÃO GERAL -->
+    <section class="tabContent active" id="tab-visao" style="margin-top:14px;">
       <div class="card section">
         <div class="sectionTitle">
           <span style="display:flex;align-items:center;gap:10px;">
@@ -781,7 +793,7 @@
           </div>
         </div>
 
-        <!-- GRÁFICO EVOLUÇÃO MENSAL (PRIMEIRO) -->
+        <!-- GRÁFICO EVOLUÇÃO MENSAL -->
         <div class="grid-1col">
           <div class="chartCard">
             <div class="chartHead">
@@ -794,7 +806,7 @@
           </div>
         </div>
 
-        <!-- GRÁFICO TOP ESPECIALIDADES (SEGUNDO, ABAIXO) -->
+        <!-- GRÁFICO TOP ESPECIALIDADES -->
         <div class="grid-1col" style="margin-top:14px;">
           <div class="chartCard">
             <div class="chartHead">
@@ -804,7 +816,7 @@
           </div>
         </div>
 
-        <!-- GRÁFICOS RECEITA E DISTRIBUIÇÃO (AO LADO) -->
+        <!-- GRÁFICOS RECEITA E DISTRIBUIÇÃO -->
         <div class="grid-2cols" style="margin-top:14px;">
           <div class="chartCard">
             <div class="chartHead">
@@ -855,123 +867,125 @@
       </div>
     </section>
 
-  <section class="tabContent" id="tab-financeiro" style="margin-top:14px;">
-  <div class="fin-header">
-    <div class="fin-header-icon"><i class="fa-solid fa-coins"></i></div>
-    <div class="fin-header-body"><div class="fin-header-title">Painel Financeiro — OCI Faturamento por Competência</div></div>
-    <div class="fin-header-right"><div class="fin-header-update" id="finLastUpdate">Carregando dados financeiros…</div><div class="fin-header-badge"><i class="fa-solid fa-circle-check"></i> Sincronizado com Google Sheets</div></div>
-  </div>
-  
-  <div class="kpis" style="margin-top:14px;">
-    <div class="kpi fin1"><div class="kpiIcon"><i class="fa-solid fa-sack-dollar"></i></div><div><div class="label">Receita Total Acumulada</div><div class="val fin-val" id="fKTotal">—</div><div class="sub" id="fKTotalSub">—</div></div></div>
-    <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-arrow-trend-up"></i></div><div><div class="label">Melhor Competência</div><div class="val fin-val" id="fKBest">—</div><div class="sub" id="fKBestSub">—</div></div></div>
-    <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-chart-simple"></i></div><div><div class="label">Média Mensal</div><div class="val fin-val" id="fKAvg">—</div><div class="sub" id="fKAvgSub">—</div></div></div>
-    <div class="kpi fin4"><div class="kpiIcon"><i class="fa-solid fa-trophy"></i></div><div><div class="label">Especialidade Destaque</div><div class="val fin-val" id="fKTopEsp">—</div><div class="sub" id="fKTopEspSub">—</div></div></div>
-  </div>
-  
-  <div class="card section" style="margin-top:14px;">
-    <div class="sectionTitle"><i class="fa-solid fa-chart-area" style="color:#0ea5e9"></i> Análise Financeira Detalhada</div>
-    
-    <!-- Evolução do Faturamento -->
-    <div class="grid-1col">
-      <div class="chartCard">
-        <div class="chartHead">
-          <div>
-            <h3>Evolução do Faturamento Mensal (Total Geral)</h3>
-            <div class="chartSub">• Ponto dourado = melhor mês • Ponto vermelho = menor mês</div>
-          </div>
-        </div>
-        <div class="chartWrap" style="height:320px;"><canvas id="cFinEvolucao"></canvas></div>
-        <div class="fin-mom-bar" id="finMomBar"></div>
-      </div>
-    </div>
-    
-    <!-- Receita por Especialidade + Participação -->
-    <div class="grid-2cols" style="margin-top:14px;">
-      <div class="chartCard">
-        <div class="chartHead">
-          <div><h3>Receita por Especialidade — Total do Período</h3></div>
-          <div class="chart-filter-wrapper">
-            <div class="chart-filter-badge" onclick="toggleChartFilter('receitaEspFilter', event)">
-              <i class="fa-solid fa-filter"></i> Filtrar por mês
-            </div>
-            <div id="receitaEspFilter" class="chart-filter-popup">
-              <select id="receitaEspMesSelect"><option value="">Todos os meses</option></select>
-              <div class="filter-actions">
-                <button class="btn-filter-apply" onclick="applyReceitaEspFilter()">Aplicar</button>
-                <button class="btn-filter-clear" onclick="clearReceitaEspFilter()">Limpar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="chartWrap" style="height:360px;"><canvas id="cFinBarEsp"></canvas></div>
+    <!-- TAB FINANCEIRO -->
+    <section class="tabContent" id="tab-financeiro" style="margin-top:14px;">
+      <div class="fin-header">
+        <div class="fin-header-icon"><i class="fa-solid fa-coins"></i></div>
+        <div class="fin-header-body"><div class="fin-header-title">Painel Financeiro — OCI Faturamento por Competência</div></div>
+        <div class="fin-header-right"><div class="fin-header-update" id="finLastUpdate">Carregando dados financeiros…</div><div class="fin-header-badge"><i class="fa-solid fa-circle-check"></i> Sincronizado com Google Sheets</div></div>
       </div>
       
-      <div class="chartCard">
-        <div class="chartHead">
-          <div>
-            <h3>Participação das Especialidades no Total</h3>
-            <div class="chartSub">Fatia % de cada especialidade sobre a receita total acumulada</div>
-          </div>
-          <div class="chart-filter-wrapper">
-            <div class="chart-filter-badge" onclick="toggleChartFilter('finDonutFilter', event)">
-              <i class="fa-solid fa-filter"></i> Filtrar por mês
-            </div>
-            <div id="finDonutFilter" class="chart-filter-popup">
-              <select id="finDonutMesSelect"><option value="">Todos os meses</option></select>
-              <div class="filter-actions">
-                <button class="btn-filter-apply" onclick="applyFinDonutFilter()">Aplicar</button>
-                <button class="btn-filter-clear" onclick="clearFinDonutFilter()">Limpar</button>
+      <div class="kpis" style="margin-top:14px;">
+        <div class="kpi fin1"><div class="kpiIcon"><i class="fa-solid fa-sack-dollar"></i></div><div><div class="label">Receita Total Acumulada</div><div class="val fin-val" id="fKTotal">—</div><div class="sub" id="fKTotalSub">—</div></div></div>
+        <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-arrow-trend-up"></i></div><div><div class="label">Melhor Competência</div><div class="val fin-val" id="fKBest">—</div><div class="sub" id="fKBestSub">—</div></div></div>
+        <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-chart-simple"></i></div><div><div class="label">Média Mensal</div><div class="val fin-val" id="fKAvg">—</div><div class="sub" id="fKAvgSub">—</div></div></div>
+        <div class="kpi fin4"><div class="kpiIcon"><i class="fa-solid fa-trophy"></i></div><div><div class="label">Especialidade Destaque</div><div class="val fin-val" id="fKTopEsp">—</div><div class="sub" id="fKTopEspSub">—</div></div></div>
+      </div>
+      
+      <div class="card section" style="margin-top:14px;">
+        <div class="sectionTitle"><i class="fa-solid fa-chart-area" style="color:#0ea5e9"></i> Análise Financeira Detalhada</div>
+        
+        <!-- Evolução do Faturamento -->
+        <div class="grid-1col">
+          <div class="chartCard">
+            <div class="chartHead">
+              <div>
+                <h3>Evolução do Faturamento Mensal (Total Geral)</h3>
+                <div class="chartSub">• Ponto dourado = melhor mês • Ponto vermelho = menor mês</div>
               </div>
             </div>
+            <div class="chartWrap" style="height:320px;"><canvas id="cFinEvolucao"></canvas></div>
+            <div class="fin-mom-bar" id="finMomBar"></div>
           </div>
         </div>
-        <div class="chartWrap" style="height:360px;"><canvas id="cFinDonut"></canvas></div>
-      </div>
-    </div>
-    
-    <!-- Composição Mensal -->
-    <div class="grid-1col" style="margin-top:14px;">
-      <div class="chartCard">
-        <div class="chartHead">
-          <div>
-            <h3>Composição Mensal por Especialidade (Barras Agrupadas)</h3>
-            <div class="chartSub">Contribuição de cada especialidade na receita de cada competência</div>
+        
+        <!-- Receita por Especialidade + Participação -->
+        <div class="grid-2cols" style="margin-top:14px;">
+          <div class="chartCard">
+            <div class="chartHead">
+              <div><h3>Receita por Especialidade — Total do Período</h3></div>
+              <div class="chart-filter-wrapper">
+                <div class="chart-filter-badge" onclick="toggleChartFilter('receitaEspFilter', event)">
+                  <i class="fa-solid fa-filter"></i> Filtrar por mês
+                </div>
+                <div id="receitaEspFilter" class="chart-filter-popup">
+                  <select id="receitaEspMesSelect"><option value="">Todos os meses</option></select>
+                  <div class="filter-actions">
+                    <button class="btn-filter-apply" onclick="applyReceitaEspFilter()">Aplicar</button>
+                    <button class="btn-filter-clear" onclick="clearReceitaEspFilter()">Limpar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chartWrap" style="height:360px;"><canvas id="cFinBarEsp"></canvas></div>
+          </div>
+          
+          <div class="chartCard">
+            <div class="chartHead">
+              <div>
+                <h3>Participação das Especialidades no Total</h3>
+                <div class="chartSub">Fatia % de cada especialidade sobre a receita total acumulada</div>
+              </div>
+              <div class="chart-filter-wrapper">
+                <div class="chart-filter-badge" onclick="toggleChartFilter('finDonutFilter', event)">
+                  <i class="fa-solid fa-filter"></i> Filtrar por mês
+                </div>
+                <div id="finDonutFilter" class="chart-filter-popup">
+                  <select id="finDonutMesSelect"><option value="">Todos os meses</option></select>
+                  <div class="filter-actions">
+                    <button class="btn-filter-apply" onclick="applyFinDonutFilter()">Aplicar</button>
+                    <button class="btn-filter-clear" onclick="clearFinDonutFilter()">Limpar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chartWrap" style="height:360px;"><canvas id="cFinDonut"></canvas></div>
           </div>
         </div>
-        <div class="chartWrap" style="height:400px;"><canvas id="cFinStack"></canvas></div>
-      </div>
-    </div>
-    
-    <!-- Tabela Financeira -->
-    <div class="grid-1col" style="margin-top:14px;">
-      <div class="chartCard">
-        <div class="chartHead">
-          <div>
-            <h3>Tabela Financeira — Faturamento por Especialidade × Competência</h3>
-            <div class="chartSub">
-              <span>Valores em Reais (R$)</span>
-              <span class="fin-nt-legend"><b>NT</b> = Não Transferido</span>
+        
+        <!-- Composição Mensal -->
+        <div class="grid-1col" style="margin-top:14px;">
+          <div class="chartCard">
+            <div class="chartHead">
+              <div>
+                <h3>Composição Mensal por Especialidade (Barras Agrupadas)</h3>
+                <div class="chartSub">Contribuição de cada especialidade na receita de cada competência</div>
+              </div>
+            </div>
+            <div class="chartWrap" style="height:400px;"><canvas id="cFinStack"></canvas></div>
+          </div>
+        </div>
+        
+        <!-- Tabela Financeira -->
+        <div class="grid-1col" style="margin-top:14px;">
+          <div class="chartCard">
+            <div class="chartHead">
+              <div>
+                <h3>Tabela Financeira — Faturamento por Especialidade × Competência</h3>
+                <div class="chartSub">
+                  <span>Valores em Reais (R$)</span>
+                  <span class="fin-nt-legend"><b>NT</b> = Não Transferido</span>
+                </div>
+              </div>
+            </div>
+            <div id="finTableWrap" style="overflow:auto;border-radius:12px;border:1px solid var(--border);margin-top:4px;max-height:460px;">
+              <div style="padding:20px;text-align:center;">Carregando tabela financeira…</div>
             </div>
           </div>
         </div>
-        <div id="finTableWrap" style="overflow:auto;border-radius:12px;border:1px solid var(--border);margin-top:4px;max-height:460px;">
-          <div style="padding:20px;text-align:center;">Carregando tabela financeira…</div>
+        
+        <!-- Popup de filtro -->
+        <div id="finColumnFilterPopup" class="chart-filter-popup" style="position:fixed;z-index:2000;">
+          <select id="finColFilterSelect" multiple size="5"></select>
+          <div class="filter-actions">
+            <button class="btn-filter-apply" onclick="applyFinColumnFilter()">Aplicar</button>
+            <button class="btn-filter-clear" onclick="clearFinColumnFilter()">Limpar</button>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Popup de filtro -->
-    <div id="finColumnFilterPopup" class="chart-filter-popup" style="position:fixed;z-index:2000;">
-      <select id="finColFilterSelect" multiple size="5"></select>
-      <div class="filter-actions">
-        <button class="btn-filter-apply" onclick="applyFinColumnFilter()">Aplicar</button>
-        <button class="btn-filter-clear" onclick="clearFinColumnFilter()">Limpar</button>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
+    <!-- TAB TABELA OCI -->
     <section class="tabContent" id="tab-tabela" style="margin-top:14px;">
       <div class="card section">
         <div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Tabela filtrada (dados reais)</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearch" placeholder="Buscar..." /></div><div class="muted" id="tInfo">—</div></div>
@@ -996,30 +1010,94 @@
       </div>
     </section>
 
+    <!-- TAB RANKING FÍSICO -->
     <section class="tabContent" id="tab-ranking-fisico" style="margin-top:14px;">
-      <div class="fin-header" style="background:linear-gradient(135deg, #0a3a2a, #0f4a35);"><div class="fin-header-icon"><i class="fa-solid fa-dumbbell"></i></div><div class="fin-header-body"><div class="fin-header-title">Ranking Físico por Município</div><div class="fin-header-sub">Procedimentos para Ofertas de Cuidados Integrados</div></div><div class="fin-header-right"><div class="fin-header-update" id="rankingFisicoUpdate">Carregando...</div></div></div>
+      <div class="fin-header" style="background:linear-gradient(135deg, #0a3a2a, #0f4a35);">
+        <div class="fin-header-icon"><i class="fa-solid fa-dumbbell"></i></div>
+        <div class="fin-header-body"><div class="fin-header-title">Ranking Físico por Município</div><div class="fin-header-sub">Procedimentos para Ofertas de Cuidados Integrados</div></div>
+        <div class="fin-header-right"><div class="fin-header-update" id="rankingFisicoUpdate">Carregando...</div></div>
+      </div>
+      
+      <!-- FILTRO DE MÊS PARA RANKING FÍSICO -->
+      <div class="ranking-filter-bar">
+        <div class="chart-filter-wrapper">
+          <div class="chart-filter-badge" onclick="toggleRankingFilter(event)">
+            <i class="fa-solid fa-filter"></i> Filtrar por mês
+          </div>
+          <div id="rankingFilter" class="chart-filter-popup">
+            <select id="rankingMesSelect">
+              <option value="">Todos os meses</option>
+            </select>
+            <div class="filter-actions">
+              <button class="btn-filter-apply" onclick="applyRankingFilter()">Aplicar</button>
+              <button class="btn-filter-clear" onclick="clearRankingFilter()">Limpar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:14px;">
         <div class="kpi fin1"><div class="kpiIcon"><i class="fa-solid fa-crown"></i></div><div><div class="label">Posição de Contagem</div><div class="val" id="fisicoPosicao">#0</div><div class="sub" id="fisicoPosicaoSub">—</div></div></div>
         <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-chart-line"></i></div><div><div class="label">Total de Procedimentos</div><div class="val" id="fisicoTotal">0</div><div class="sub" id="fisicoTotalSub">Contagem</div></div></div>
         <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-percent"></i></div><div><div class="label">Participação</div><div class="val" id="fisicoParticipacao">0%</div><div class="sub" id="fisicoParticipacaoSub">do total geral</div></div></div>
       </div>
-      <div class="grid-2cols" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoEvolucao"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Total Acumulado)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoBarras"></canvas></div></div></div>
-      <div class="card section" style="margin-top:14px;"><div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Ranking Completo - Físico</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearchFisico" placeholder="Buscar município..." /></div></div><div style="overflow:auto; max-height:400px;"><table id="tabelaFisico"><thead><tr id="cabecalhoFisico"></tr></thead><tbody id="tBodyFisico"></tbody></table></div></div>
+      
+      <div class="grid-2cols" style="margin-top:14px;">
+        <div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoEvolucao"></canvas></div></div>
+        <div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Total Acumulado)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFisicoBarras"></canvas></div></div>
+      </div>
+      
+      <div class="card section" style="margin-top:14px;">
+        <div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Ranking Completo - Físico</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearchFisico" placeholder="Buscar município..." /></div></div>
+        <div style="overflow:auto; max-height:400px;"><table id="tabelaFisico"><thead><tr id="cabecalhoFisico"></tr></thead><tbody id="tBodyFisico"></tbody></table></div>
+      </div>
     </section>
 
+    <!-- TAB RANKING FINANCEIRO -->
     <section class="tabContent" id="tab-ranking-financeiro" style="margin-top:14px;">
-      <div class="fin-header fin-header-ranking" style="background:linear-gradient(135deg, #0a3a2a, #0f4a35);"><div class="fin-header-icon"><i class="fa-solid fa-sack-dollar"></i></div><div class="fin-header-body"><div class="fin-header-title">Ranking Financeiro por Município</div><div class="fin-header-sub">Valores em R$ - Procedimentos OCI</div></div><div class="fin-header-right"><div class="fin-header-update" id="rankingFinanceiroUpdate">Carregando...</div></div></div>
+      <div class="fin-header fin-header-ranking" style="background:linear-gradient(135deg, #0a3a2a, #0f4a35);">
+        <div class="fin-header-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+        <div class="fin-header-body"><div class="fin-header-title">Ranking Financeiro por Município</div><div class="fin-header-sub">Valores em R$ - Procedimentos OCI</div></div>
+        <div class="fin-header-right"><div class="fin-header-update" id="rankingFinanceiroUpdate">Carregando...</div></div>
+      </div>
+      
+      <!-- FILTRO DE MÊS PARA RANKING FINANCEIRO -->
+      <div class="ranking-filter-bar">
+        <div class="chart-filter-wrapper">
+          <div class="chart-filter-badge" onclick="toggleRankingFilter(event)">
+            <i class="fa-solid fa-filter"></i> Filtrar por mês
+          </div>
+          <div id="rankingFilter" class="chart-filter-popup">
+            <select id="rankingMesSelect">
+              <option value="">Todos os meses</option>
+            </select>
+            <div class="filter-actions">
+              <button class="btn-filter-apply" onclick="applyRankingFilter()">Aplicar</button>
+              <button class="btn-filter-clear" onclick="clearRankingFilter()">Limpar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:14px;">
         <div class="kpi fin1"><div class="kpiIcon"><i class="fa-solid fa-crown"></i></div><div><div class="label">Posição de Contagem</div><div class="val" id="financeiroPosicao">#0</div><div class="sub" id="financeiroPosicaoSub">—</div></div></div>
         <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-coins"></i></div><div><div class="label">Total Financeiro</div><div class="val" id="financeiroTotal">R$ 0</div><div class="sub" id="financeiroTotalSub">Contagem</div></div></div>
         <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-percent"></i></div><div><div class="label">Participação</div><div class="val" id="financeiroParticipacao">0%</div><div class="sub" id="financeiroParticipacaoSub">do total geral</div></div></div>
       </div>
-      <div class="grid-2cols" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5 (R$)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroEvolucao"></canvas></div></div><div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Receita Total)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroBarras"></canvas></div></div></div>
-      <div class="card section" style="margin-top:14px;"><div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Ranking Completo - Financeiro (R$)</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearchFinanceiro" placeholder="Buscar município..." /></div></div><div style="overflow:auto; max-height:400px;"><table id="tabelaFinanceiro"><thead><tr id="cabecalhoFinanceiro"></tr></thead><tbody id="tBodyFinanceiro"></tbody></table></div></div>
+      
+      <div class="grid-2cols" style="margin-top:14px;">
+        <div class="chartCard"><div class="chartHead"><h3>Evolução Mensal - Contagem vs Top 5 (R$)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroEvolucao"></canvas></div></div>
+        <div class="chartCard"><div class="chartHead"><h3>Top 10 Municípios (Receita Total)</h3></div><div class="chartWrap" style="height:300px;"><canvas id="cRankFinanceiroBarras"></canvas></div></div>
+      </div>
+      
+      <div class="card section" style="margin-top:14px;">
+        <div class="tableTop"><div class="sectionTitle"><i class="fa-solid fa-table"></i> Ranking Completo - Financeiro (R$)</div><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="tSearchFinanceiro" placeholder="Buscar município..." /></div></div>
+        <div style="overflow:auto; max-height:400px;"><table id="tabelaFinanceiro"><thead><tr id="cabecalhoFinanceiro"></tr></thead><tbody id="tBodyFinanceiro"></tbody></table></div>
+      </div>
     </section>
   </main>
 
-    <script>
+  <script>
     Chart.register(ChartDataLabels);
     
     const SHEET_ID = "1BONeij455aKawVr1iyskMLAJMKeBHzWmUZp_E-TDUWo";
@@ -1031,7 +1109,6 @@
     const FIN_COLORS = ["#0f2f5f","#1a3a6b","#2a5298","#3b82f6","#059669","#d97706","#8b5cf6","#b91c1c","#0ea5e9","#7c3aed","#b45309","#be123c"];
     const FIN_MONTH_MAP = {"jan":{m:1,label:"Jan"},"fev":{m:2,label:"Fev"},"mar":{m:3,label:"Mar"},"abr":{m:4,label:"Abr"},"mai":{m:5,label:"Mai"},"jun":{m:6,label:"Jun"},"jul":{m:7,label:"Jul"},"ago":{m:8,label:"Ago"},"set":{m:9,label:"Set"},"out":{m:10,label:"Out"},"nov":{m:11,label:"Nov"},"dez":{m:12,label:"Dez"}};
 
-        
     const GRUPOS = {
       "01": { 
         nome: "01 - Atenção em Oncologia", 
@@ -1128,6 +1205,7 @@
     let selectedSubgrupos = new Set(), selectedMeses = new Set(), allMeses = [];
     let topEspFilterMonth = "", indicadoresFilterMonth = "", receitaFilterMonth = "", distribuicaoFilterMonth = "";
     let receitaEspFilterMonth = "", finDonutFilterMonth = "";
+    let rankingFilterMonth = "";
     let activeColumnFilter = null, columnFilterValues = [];
     let activeFinColumnFilter = null, finColumnFilterValues = [], finColumnFilterType = null;
     let finData = [], finMonths = [];
@@ -1137,7 +1215,7 @@
     const PT_LABEL = ["","Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
     const el = (id) => document.getElementById(id);
 
-        
+    // ==================== INICIALIZAÇÃO ====================
     function initEventListeners() {
       el("btnRefresh").addEventListener("click", () => { loadData(true); loadFinData(true); loadRankingFisico(); loadRankingFinanceiro(); });
       el("btnExcel").addEventListener("click", exportExcel);
@@ -1154,9 +1232,75 @@
       if(colFilter && !colFilter.contains(e.target) && !e.target.closest('.th-filter-icon')) colFilter.classList.remove('show');
       const finColFilter = el("finColumnFilterPopup");
       if(finColFilter && !finColFilter.contains(e.target) && !e.target.closest('.fin-filter-icon')) finColFilter.classList.remove('show');
-      document.querySelectorAll('.chart-filter-popup').forEach(popup => { if(!popup.contains(e.target) && !e.target.closest('.chart-filter-badge')) popup.classList.remove('show'); });
+      document.querySelectorAll('.chart-filter-popup').forEach(popup => { 
+        if(!popup.contains(e.target) && !e.target.closest('.chart-filter-badge')) popup.classList.remove('show'); 
+      });
     });
     
+    // ==================== FUNÇÕES DE FILTRO DOS RANKINGS ====================
+    function toggleRankingFilter(event) {
+      if(event) event.stopPropagation();
+      const popup = el("rankingFilter");
+      if(popup) {
+        document.querySelectorAll('.chart-filter-popup').forEach(p => {
+          if(p.id !== 'rankingFilter') p.classList.remove('show');
+        });
+        popup.classList.toggle('show');
+      }
+    }
+    
+    function applyRankingFilter() {
+      rankingFilterMonth = el("rankingMesSelect")?.value || "";
+      if(el("rankingFilter")) el("rankingFilter").classList.remove('show');
+      atualizarRankingFisico();
+      atualizarRankingFinanceiro();
+    }
+    
+    function clearRankingFilter() {
+      rankingFilterMonth = "";
+      if(el("rankingMesSelect")) el("rankingMesSelect").value = "";
+      if(el("rankingFilter")) el("rankingFilter").classList.remove('show');
+      atualizarRankingFisico();
+      atualizarRankingFinanceiro();
+    }
+    
+    // ==================== SINCRONIZAÇÃO DE FILTROS ====================
+    function syncMonthFilters() {
+      const mesSelecionado = selectedMeses.size === 1 ? [...selectedMeses][0] : "";
+      
+      // Sincroniza com os filtros financeiros
+      if (el("receitaEspMesSelect")) {
+        el("receitaEspMesSelect").value = mesSelecionado;
+        receitaEspFilterMonth = mesSelecionado;
+      }
+      if (el("finDonutMesSelect")) {
+        el("finDonutMesSelect").value = mesSelecionado;
+        finDonutFilterMonth = mesSelecionado;
+      }
+      
+      // Sincroniza com o filtro dos rankings
+      if (el("rankingMesSelect")) {
+        el("rankingMesSelect").value = mesSelecionado;
+        rankingFilterMonth = mesSelecionado;
+      }
+      
+      // Aplica os filtros se houver mês selecionado
+      if (mesSelecionado) {
+        applyReceitaEspFilter();
+        applyFinDonutFilter();
+        atualizarRankingFisico();
+        atualizarRankingFinanceiro();
+      } else {
+        clearReceitaEspFilter();
+        clearFinDonutFilter();
+        rankingFilterMonth = "";
+        if(el("rankingMesSelect")) el("rankingMesSelect").value = "";
+        atualizarRankingFisico();
+        atualizarRankingFinanceiro();
+      }
+    }
+    
+    // ==================== FUNÇÕES AUXILIARES ====================
     function handleGrupoChange() {
       const grupoSelect = el("grupoSelect");
       const grupo = grupoSelect ? grupoSelect.value : "";
@@ -1207,7 +1351,6 @@
         const codigo = selectedSubgrupos.values().next().value; 
         let nomeEncontrado = null; 
         Object.values(GRUPOS).forEach(g => { g.subgrupos.forEach(s => { if (s.codigo === codigo) nomeEncontrado = s.nome; }); }); 
-        // CORREÇÃO: só adiciona reticências se o texto ultrapassar 60 caracteres
         lbl.textContent = nomeEncontrado 
           ? (nomeEncontrado.length > 60 ? nomeEncontrado.substring(0, 60) + "..." : nomeEncontrado) 
           : "1 selecionado"; 
@@ -1230,9 +1373,23 @@
     function parseFinanceiro(v){ const s=normStr(v).toUpperCase().trim(); if(!s||s==="NT"||s==="-"||s==="N/A"||s==="—"||s==="S/D"||s==="SEM DADOS") return 0; const clean=s.replace(/R\$\s*/g,"").replace(/\./g,"").replace(",",".").trim(); const n=parseFloat(clean); return isNaN(n)?0:n; }
     function parseMesAno(raw){ const s=normStr(raw).toLowerCase(); if(!s) return {key:"",label:"",y:0,m:0}; const mon=(s.match(/(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/)||[])[1]; const yy=(s.match(/(\d{2})\b/)||[])[1]; const m=mon?(PT_MONTH[mon]||0):0; const y=yy?(2000+parseInt(yy,10)):0; if(!m||!y) return {key:s,label:raw,y:0,m:0}; return {key:`${y}-${String(m).padStart(2,"0")}`,label:`${PT_LABEL[m]}/${y}`,y,m}; }
     function mesSortKey(d){ return (d.mesY*100)+d.mesM; }
-    function idadeKey(s){ const v=normStr(s).toUpperCase(); if(!v||v==="SEM DADOS") return 999999; let m=v.match(/(\d{1,3})\s*(A|Á|À)\s*(\d{1,3})/); if(m) return parseInt(m[1],10); m=v.match(/(\d{1,3})/); if(m) return parseInt(m[1],10); return 999998; }
     
-function abbreviateEspName(esp, maxLength = 30) {
+    // ==================== CORREÇÃO: PARSER FINANCEIRO ====================
+    function parseFinMonthHeader(h){ 
+      const s=normStr(h).toLowerCase().trim(); 
+      const mon3=s.substring(0,3); 
+      const nums=s.match(/\d+/g); 
+      if(!nums || !nums.length) return null; 
+      const rawYear=nums[nums.length-1]; 
+      const y = rawYear.length>=4 ? parseInt(rawYear.slice(-4),10) : 2000+parseInt(rawYear.slice(-2),10);
+      if (y < 2000 || y > 2100) return null;
+      const yy = String(y).slice(-2);
+      const info=FIN_MONTH_MAP[mon3]; 
+      if(!info) return null; 
+      return { key:`${y}-${String(info.m).padStart(2,"0")}`, label:`${info.label}/${y}`, shortLabel:`${info.label}/${yy}`, y, m:info.m, header:h }; 
+    }
+    
+    function abbreviateEspName(esp, maxLength = 30) {
       if (!esp) return "";
       const abbreviations = {
         "09.01.01.001-4": "CA Mama Inicial",
@@ -1285,59 +1442,26 @@ function abbreviateEspName(esp, maxLength = 30) {
         "09.08.01.007-9": "Sínd. Consuptiva - Inicial",
         "09.08.01.008-7": "Sínd. Consuptiva - Prog"
       };
-  for (const [codigo, abrev] of Object.entries(abbreviations)) {
-    if (esp.includes(codigo)) return abrev;
-  }
-  let abbr = esp.replace(/^OCI\s*/i, "").replace(/AVALIAÇÃO\s*/gi, "AVAL. ").replace(/DIAGNÓSTICA\s*/gi, "DIAG. ").replace(/INICIAL\s*/gi, "INIC. ").replace(/PROGRESSÃO\s*/gi, "PROG. ").replace(/TERAPÊUTICA\s*/gi, "TERAP. ").replace(/CÂNCER DE\s*/gi, "CA ").replace(/\s+/g, " ").trim();
-  if (abbr.length <= maxLength) return abbr;
-  return abbr.substring(0, maxLength - 3) + "...";
-}
+      for (const [codigo, abrev] of Object.entries(abbreviations)) {
+        if (esp.includes(codigo)) return abrev;
+      }
+      let abbr = esp.replace(/^OCI\s*/i, "").replace(/AVALIAÇÃO\s*/gi, "AVAL. ").replace(/DIAGNÓSTICA\s*/gi, "DIAG. ").replace(/INICIAL\s*/gi, "INIC. ").replace(/PROGRESSÃO\s*/gi, "PROG. ").replace(/TERAPÊUTICA\s*/gi, "TERAP. ").replace(/CÂNCER DE\s*/gi, "CA ").replace(/\s+/g, " ").trim();
+      if (abbr.length <= maxLength) return abbr;
+      return abbr.substring(0, maxLength - 3) + "...";
+    }
     
+    function formatBRL(v){ return "R$\u00a0"+Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    function formatBRLCompact(v){ v=Number(v||0); if(v>=1000000) return "R$\u00a0"+(v/1000000).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"M"; if(v>=1000) return "R$\u00a0"+(v/1000).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"K"; return formatBRL(v); }
+    function parseFinValue(v){ const s=normStr(v).toUpperCase().trim(); if(!s||s==="NT"||s==="-"||s==="N/A"||s==="—"||s==="S/D") return 0; const clean=s.replace(/R\$\s*/g,"").replace(/\./g,"").replace(",",".").trim(); const n=parseFloat(clean); return isNaN(n)?0:n; }
+
+    // ==================== FUNÇÕES DE FILTRO DOS GRÁFICOS ====================
     function toggleChartFilter(id, event) { if(event) event.stopPropagation(); const popup = el(id); if(popup) { document.querySelectorAll('.chart-filter-popup').forEach(p => { if(p.id !== id) p.classList.remove('show'); }); popup.classList.toggle('show'); } }
-    function applyTopEspFilter() { topEspFilterMonth = el("topEspMesSelect")?.value || ""; if(el("topEspFilter")) el("topEspFilter").classList.remove('show'); (topEspFilterMonth || null); }
-    function clearTopEspFilter() { topEspFilterMonth = ""; if(el("topEspMesSelect")) el("topEspMesSelect").value = ""; if(el("topEspFilter")) el("topEspFilter").classList.remove('show'); buildTop(null); }
-    function applyIndicadoresFilter(){ indicadoresFilterMonth = el("indicadoresMesSelect")?.value || ""; if(el("indicadoresFilter")) el("indicadoresFilter").classList.remove('show'); updateCharts(); }
-    function clearIndicadoresFilter(){ indicadoresFilterMonth = ""; if(el("indicadoresMesSelect")) el("indicadoresMesSelect").value = ""; if(el("indicadoresFilter")) el("indicadoresFilter").classList.remove('show'); updateCharts(); }
-    function applyReceitaFilter() { receitaFilterMonth = el("receitaMesSelect")?.value || ""; if(el("receitaFilter")) el("receitaFilter").classList.remove('show'); buildReceita(); }
-    function clearReceitaFilter() { receitaFilterMonth = ""; if(el("receitaMesSelect")) el("receitaMesSelect").value = ""; if(el("receitaFilter")) el("receitaFilter").classList.remove('show'); buildReceita(); }
-    function applyDistribuicaoFilter() { distribuicaoFilterMonth = el("distribuicaoMesSelect")?.value || ""; if(el("distribuicaoFilter")) el("distribuicaoFilter").classList.remove('show'); buildDistribuicao(); }
-    function clearDistribuicaoFilter() { distribuicaoFilterMonth = ""; if(el("distribuicaoMesSelect")) el("distribuicaoMesSelect").value = ""; if(el("distribuicaoFilter")) el("distribuicaoFilter").classList.remove('show'); buildDistribuicao(); }
     function applyReceitaEspFilter() { receitaEspFilterMonth = el("receitaEspMesSelect")?.value || ""; if(el("receitaEspFilter")) el("receitaEspFilter").classList.remove('show'); buildFinBarEsp(); }
     function clearReceitaEspFilter() { receitaEspFilterMonth = ""; if(el("receitaEspMesSelect")) el("receitaEspMesSelect").value = ""; if(el("receitaEspFilter")) el("receitaEspFilter").classList.remove('show'); buildFinBarEsp(); }
     function applyFinDonutFilter() { finDonutFilterMonth = el("finDonutMesSelect")?.value || ""; if(el("finDonutFilter")) el("finDonutFilter").classList.remove('show'); buildFinDonut(); }
     function clearFinDonutFilter() { finDonutFilterMonth = ""; if(el("finDonutMesSelect")) el("finDonutMesSelect").value = ""; if(el("finDonutFilter")) el("finDonutFilter").classList.remove('show'); buildFinDonut(); }
     
-    function toggleColumnFilter(col, event) { event.stopPropagation(); const popup = el("columnFilterPopup"); const select = el("colFilterSelect"); if(!dataF || !dataF.length) { toast("Sem dados para filtrar","info"); return; } let values = []; if(col === 'especialidade') { values = [...new Set(dataF.map(x => x.especialidade))].sort(); } else if(col === 'idade') { values = [...new Set(dataF.map(x => x.idade || "Não informado"))].sort(); } else if(col === 'mesKey') { values = [...new Set(dataF.map(x => x.mesLabel || x.mesRaw))].sort(); } else { toast("Filtro para colunas numéricas em desenvolvimento","info"); return; } select.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join(''); activeColumnFilter = col; const rect = event.target.getBoundingClientRect(); popup.style.top = (rect.bottom + window.scrollY + 5) + 'px'; popup.style.left = (rect.left + window.scrollX - 180) + 'px'; popup.classList.add('show'); }
-    function applyColumnFilter() { const select = el("colFilterSelect"); columnFilterValues = Array.from(select.selectedOptions).map(opt => opt.value); if(el("columnFilterPopup")) el("columnFilterPopup").classList.remove('show'); renderTable(); }
-    function clearColumnFilter() { columnFilterValues = []; if(el("colFilterSelect")) el("colFilterSelect").value = ""; if(el("columnFilterPopup")) el("columnFilterPopup").classList.remove('show'); renderTable(); }
-    
-    function toggleFinColumnFilter(type, event) { event.stopPropagation(); const popup = el("finColumnFilterPopup"); const select = el("finColFilterSelect"); if(!finData || !finData.length) { toast("Sem dados financeiros para filtrar","info"); return; } let options = []; if(type === 'esp') { options = finData.map(r => ({value:r.esp, label:r.esp})).sort((a,b)=>a.label.localeCompare(b.label,'pt-BR')); finColumnFilterType = 'esp'; activeFinColumnFilter = null; } else if(type.startsWith('month-')) { const monthKey = type.replace('month-', ''); options = [{value:"__POS__", label:"Somente com valor (≠ NT)"},{value:"__ZERO__", label:"Somente NT/zero"}]; finColumnFilterType = 'month'; activeFinColumnFilter = monthKey; } else if(type === 'total') { options = [{value:"__POS__", label:"Somente com valor (> 0)"},{value:"__ZERO__", label:"Somente NT/zero (= 0)"}]; finColumnFilterType = 'total'; activeFinColumnFilter = null; } select.innerHTML = options.map(o => `<option value="${o.value}">${o.label}</option>`).join(''); const rect = event.target.getBoundingClientRect(); popup.style.top = (rect.bottom + window.scrollY + 5) + 'px'; popup.style.left = (rect.left + window.scrollX - 180) + 'px'; popup.classList.add('show'); }
-    function applyFinColumnFilter() { const select = el("finColFilterSelect"); finColumnFilterValues = Array.from(select.selectedOptions).map(opt => opt.value); if(el("finColumnFilterPopup")) el("finColumnFilterPopup").classList.remove('show'); renderFinTable(); }
-    function clearFinColumnFilter() { finColumnFilterValues = []; finColumnFilterType = null; activeFinColumnFilter = null; if(el("finColFilterSelect")) el("finColFilterSelect").value = ""; if(el("finColumnFilterPopup")) el("finColumnFilterPopup").classList.remove('show'); renderFinTable(); }
-    
-    // CORREÇÃO: parseFinMonthHeader agora funciona com "jan/25" e "jan/2025"
-    function parseFinMonthHeader(h){ 
-      const s=normStr(h).toLowerCase().trim(); 
-      const mon3=s.substring(0,3); 
-      // Pega todos os números do cabeçalho
-      const nums=s.match(/\d+/g); 
-      if(!nums || !nums.length) return null; 
-      // Pega o último número (mais seguro)
-      const rawYear=nums[nums.length-1]; 
-      // Se tem 4 dígitos ou mais, usa diretamente; senão, calcula 2000 + último 2 dígitos
-      const y = rawYear.length>=4 ? parseInt(rawYear.slice(-4),10) : 2000+parseInt(rawYear.slice(-2),10);
-      // Validação extra para evitar anos absurdos
-      if (y < 2000 || y > 2100) return null;
-      const yy = String(y).slice(-2);
-      const info=FIN_MONTH_MAP[mon3]; 
-      if(!info) return null; 
-      return { key:`${y}-${String(info.m).padStart(2,"0")}`, label:`${info.label}/${y}`, shortLabel:`${info.label}/${yy}`, y, m:info.m, header:h }; 
-    }
-    function parseFinValue(v){ const s=normStr(v).toUpperCase().trim(); if(!s||s==="NT"||s==="-"||s==="N/A"||s==="—"||s==="S/D") return 0; const clean=s.replace(/R\$\s*/g,"").replace(/\./g,"").replace(",",".").trim(); const n=parseFloat(clean); return isNaN(n)?0:n; }
-    function formatBRL(v){ return "R$\u00a0"+Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
-    function formatBRLCompact(v){ v=Number(v||0); if(v>=1000000) return "R$\u00a0"+(v/1000000).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"M"; if(v>=1000) return "R$\u00a0"+(v/1000).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"K"; return formatBRL(v); }
-
-        
+    // ==================== CARREGAMENTO DE DADOS ====================
     async function loadData(showMsg=false){
       el("loading").classList.add("on");
       if(showMsg) toast("Sincronizando com Google Sheets…","info");
@@ -1351,7 +1475,6 @@ function abbreviateEspName(esp, maxLength = 30) {
           const idade=normStr(r["IDADE"]);
           const mesRaw=normStr(r["MÊS/2025"]||r["MES/2025"]||r["MÊS"]||r["MES"]);
           const mes=parseMesAno(mesRaw);
-          // CORREÇÃO: busca por coluna de valor financeiro de forma mais robusta
           let financeiroVal = 0;
           const colunasFinanceiro = ["FINANCEIRO", "VALOR", "RECEITA", "R$", "R$ FINANCEIRO", "FINANCEIRO (R$)"];
           let encontrado = false;
@@ -1362,13 +1485,11 @@ function abbreviateEspName(esp, maxLength = 30) {
               break;
             }
           }
-          // Fallback apenas se nenhuma coluna conhecida foi encontrada
           if (!encontrado) {
             const keys = Object.keys(r);
             if (keys.length > 0) {
               const lastKey = keys[keys.length - 1];
               const testVal = parseFinanceiro(r[lastKey]);
-              // Verifica se o valor parece ser financeiro (contém R$ ou é um número grande)
               const stringVal = String(r[lastKey] || "").toUpperCase();
               if (stringVal.includes("R$") || stringVal.includes("NT") || testVal > 100) {
                 financeiroVal = testVal;
@@ -1413,6 +1534,7 @@ function abbreviateEspName(esp, maxLength = 30) {
       }catch(err){ console.error("Financeiro erro:",err); el("finLastUpdate").textContent="Erro ao carregar dados financeiros."; toast("Falha ao carregar dados financeiros. Verifique as permissões.","error"); }
     }
     
+    // ==================== RANKING FÍSICO ====================
     async function loadRankingFisico() {
       try {
         const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1342049672`;
@@ -1435,9 +1557,16 @@ function abbreviateEspName(esp, maxLength = 30) {
         mesesDisponiveis.sort((a, b) => { if (a.ano !== b.ano) return a.ano - b.ano; const meses = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12}; return meses[a.mes] - meses[b.mes]; });
         window.mesesRanking = mesesDisponiveis;
         window.ultimoMes = mesesDisponiveis[mesesDisponiveis.length - 1];
+        
+        const select = el("rankingMesSelect");
+        if (select && window.mesesRanking) {
+          select.innerHTML = '<option value="">Todos os meses</option>' + 
+            window.mesesRanking.map(m => `<option value="${m.nome}">${m.rotulo}</option>`).join('');
+        }
+        
         rankingFisicoData = parsed.data.slice(2).filter(row => {
-        const primeiroCampo = row[0]?.trim() || '';
-        return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
+          const primeiroCampo = row[0]?.trim() || '';
+          return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
         }).map(row => {
           const municipio = row[0]?.trim() || '';
           const meses = {};
@@ -1449,6 +1578,170 @@ function abbreviateEspName(esp, maxLength = 30) {
       } catch (error) { console.error('Erro ao carregar ranking físico:', error); toast('Erro ao carregar ranking físico. Verifique a aba.', 'error'); }
     }
     
+    function atualizarRankingFisico() {
+      if (!rankingFisicoData.length || !window.mesesRanking) return;
+      
+      let sorted = [...rankingFisicoData].sort((a,b) => b.total - a.total);
+      
+      if (rankingFilterMonth && window.mesesRanking) {
+        const mesSelecionado = window.mesesRanking.find(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+        if (mesSelecionado) {
+          sorted = sorted.map(d => ({
+            ...d,
+            total: d[mesSelecionado.nome] || 0
+          })).sort((a,b) => b.total - a.total);
+        }
+      }
+      
+      const contagemIndex = sorted.findIndex(d => d.municipio.toLowerCase().includes('contagem'));
+      const contagem = sorted[contagemIndex];
+      
+      if (contagem) {
+        const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+        const participacao = totalGeral > 0 ? ((contagem.total / totalGeral) * 100).toFixed(1) : 0;
+        let ultimoMesValor = 0;
+        let mesLabel = "";
+        if (rankingFilterMonth && window.mesesRanking) {
+          const mesSelecionado = window.mesesRanking.find(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+          if (mesSelecionado) {
+            ultimoMesValor = contagem[mesSelecionado.nome] || 0;
+            mesLabel = mesSelecionado.rotulo;
+          }
+        } else if (window.ultimoMes) {
+          ultimoMesValor = contagem[window.ultimoMes.nome] || 0;
+          mesLabel = window.ultimoMes.rotulo;
+        }
+        
+        if (el('fisicoPosicao')) el('fisicoPosicao').textContent = `#${contagemIndex + 1}`;
+        if (el('fisicoPosicaoSub')) el('fisicoPosicaoSub').textContent = `${sorted.length} municípios`;
+        if (el('fisicoTotal')) el('fisicoTotal').textContent = contagem.total.toLocaleString('pt-BR');
+        if (el('fisicoParticipacao')) el('fisicoParticipacao').textContent = `${participacao}%`;
+        if (el('rankFisicoPos')) el('rankFisicoPos').textContent = `#${contagemIndex + 1}`;
+        if (el('rankFisicoDetalhe')) el('rankFisicoDetalhe').textContent = `${contagemIndex + 1}º de ${sorted.length}`;
+        if (el('rankFisicoTotal')) el('rankFisicoTotal').textContent = ultimoMesValor.toLocaleString('pt-BR');
+        if (el('rankFisicoLabel')) el('rankFisicoLabel').textContent = `Total (${mesLabel || 'último mês'})`;
+      }
+      
+      buildRankingFisicoGraficos(sorted);
+      renderTabelaFisico(sorted);
+      if (el('rankingFisicoUpdate')) el('rankingFisicoUpdate').textContent = `Atualizado: ${new Date().toLocaleDateString('pt-BR')}`;
+    }
+    
+    function buildRankingFisicoGraficos(sorted) {
+      destroy('cRankFisicoEvolucao');
+      const ctxEvol = el('cRankFisicoEvolucao')?.getContext('2d');
+      if (ctxEvol && window.mesesRanking) {
+        const contagem = sorted.find(d => d.municipio.toLowerCase().includes('contagem'));
+        const top5 = sorted.slice(0,5).filter(d => !d.municipio.toLowerCase().includes('contagem'));
+        
+        let mesesParaExibir = window.mesesRanking;
+        if (rankingFilterMonth) {
+          const index = window.mesesRanking.findIndex(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+          if (index !== -1) {
+            mesesParaExibir = window.mesesRanking.slice(0, index + 1);
+          }
+        }
+        
+        const rotulos = mesesParaExibir.map(m => m.rotulo);
+        const valoresContagem = mesesParaExibir.map(m => contagem ? (contagem[m.nome] || 0) : 0);
+        const mediaTop5 = mesesParaExibir.map(m => { 
+          const soma = top5.reduce((acc, d) => acc + (d[m.nome] || 0), 0); 
+          return top5.length ? Math.round(soma / top5.length) : 0; 
+        });
+        
+        charts['cRankFisicoEvolucao'] = new Chart(ctxEvol, { 
+          type: 'line', 
+          data: { 
+            labels: rotulos, 
+            datasets: [
+              { 
+                label: '📍 CONTAGEM', 
+                data: valoresContagem, 
+                borderColor: '#0f2f5f', 
+                backgroundColor: 'rgba(15,47,95,.1)', 
+                borderWidth: 4, 
+                tension: 0.3 
+              }, 
+              { 
+                label: 'Média Top 5', 
+                data: mediaTop5, 
+                borderColor: '#94a3b8', 
+                borderDash: [5,5], 
+                borderWidth: 2, 
+                tension: 0.3 
+              }
+            ] 
+          }, 
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { datalabels: { display: false } }, 
+            scales: { 
+              x: { grid: { display: false } }, 
+              y: { grid: { display: false } } 
+            } 
+          } 
+        });
+      }
+      
+      destroy('cRankFisicoBarras');
+      const ctxBar = el('cRankFisicoBarras')?.getContext('2d');
+      if (ctxBar) { 
+        const top10 = sorted.slice(0,10); 
+        charts['cRankFisicoBarras'] = new Chart(ctxBar, { 
+          type: 'bar', 
+          data: { 
+            labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), 
+            datasets: [{ 
+              data: top10.map(d => d.total), 
+              backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), 
+              borderRadius: 8 
+            }] 
+          }, 
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            indexAxis: 'y', 
+            plugins: { 
+              legend: { display: false }, 
+              datalabels: { anchor: 'end', align: 'right', formatter: (v) => v.toLocaleString('pt-BR') } 
+            }, 
+            scales: { 
+              x: { grid: { display: false } }, 
+              y: { grid: { display: false } } 
+            } 
+          } 
+        }); 
+      }
+    }
+    
+    function renderTabelaFisico(sorted) {
+      const tbody = el('tBodyFisico');
+      const cabecalho = el('cabecalhoFisico');
+      if (!tbody || !window.mesesRanking) return;
+      const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+      if (cabecalho) { 
+        let html = '<th>Posição</th><th>Município</th>';
+        window.mesesRanking.forEach(m => { 
+          html += `<th>${m.rotulo}</th>`; 
+        }); 
+        html += '<th>Total</th><th>%</th>'; 
+        cabecalho.innerHTML = html; 
+      }
+      tbody.innerHTML = sorted.map((d, i) => { 
+        const pct = totalGeral > 0 ? ((d.total / totalGeral) * 100).toFixed(1) : 0; 
+        const isContagem = d.municipio.toLowerCase().includes('contagem'); 
+        let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
+        linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
+        window.mesesRanking.forEach(m => { 
+          linha += `<td>${(d[m.nome] || 0).toLocaleString('pt-BR')}</td>`; 
+        }); 
+        linha += `<td><b>${d.total.toLocaleString('pt-BR')}</b></td><td>${pct}%</td></tr>`; 
+        return linha; 
+      }).join('');
+    }
+    
+    // ==================== RANKING FINANCEIRO ====================
     async function loadRankingFinanceiro() {
       try {
         const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=960044663`;
@@ -1471,9 +1764,16 @@ function abbreviateEspName(esp, maxLength = 30) {
         mesesDisponiveis.sort((a, b) => { if (a.ano !== b.ano) return a.ano - b.ano; const meses = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12}; return meses[a.mes] - meses[b.mes]; });
         window.mesesRankingFinanceiro = mesesDisponiveis;
         window.ultimoMesFinanceiro = mesesDisponiveis[mesesDisponiveis.length - 1];
+        
+        const select = el("rankingMesSelect");
+        if (select && window.mesesRankingFinanceiro) {
+          select.innerHTML = '<option value="">Todos os meses</option>' + 
+            window.mesesRankingFinanceiro.map(m => `<option value="${m.nome}">${m.rotulo}</option>`).join('');
+        }
+        
         rankingFinanceiroData = parsed.data.slice(2).filter(row => {
-        const primeiroCampo = row[0]?.trim() || '';
-        return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
+          const primeiroCampo = row[0]?.trim() || '';
+          return primeiroCampo && primeiroCampo.toUpperCase() !== 'TOTAL';
         }).map(row => {
           const municipio = row[0]?.trim() || '';
           const meses = {};
@@ -1485,38 +1785,40 @@ function abbreviateEspName(esp, maxLength = 30) {
       } catch (error) { console.error('Erro ao carregar ranking financeiro:', error); toast('Erro ao carregar ranking financeiro. Verifique a aba.', 'error'); }
     }
     
-    function atualizarRankingFisico() {
-      if (!rankingFisicoData.length || !window.ultimoMes) return;
-      const sorted = [...rankingFisicoData].sort((a,b) => b.total - a.total);
-      const contagemIndex = sorted.findIndex(d => d.municipio.toLowerCase().includes('contagem'));
-      const contagem = sorted[contagemIndex];
-      if (contagem) {
-        const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
-        const participacao = ((contagem.total / totalGeral) * 100).toFixed(1);
-        const ultimoMesValor = contagem[window.ultimoMes.nome] || 0;
-        if (el('fisicoPosicao')) el('fisicoPosicao').textContent = `#${contagemIndex + 1}`;
-        if (el('fisicoPosicaoSub')) el('fisicoPosicaoSub').textContent = `${sorted.length} municípios`;
-        if (el('fisicoTotal')) el('fisicoTotal').textContent = contagem.total.toLocaleString('pt-BR');
-        if (el('fisicoParticipacao')) el('fisicoParticipacao').textContent = `${participacao}%`;
-        if (el('rankFisicoPos')) el('rankFisicoPos').textContent = `#${contagemIndex + 1}`;
-        if (el('rankFisicoDetalhe')) el('rankFisicoDetalhe').textContent = `${contagemIndex + 1}º de ${sorted.length}`;
-        if (el('rankFisicoTotal')) el('rankFisicoTotal').textContent = ultimoMesValor.toLocaleString('pt-BR');
-        if (el('rankFisicoLabel')) el('rankFisicoLabel').textContent = `Total (${window.ultimoMes.rotulo})`;
-      }
-      buildRankingFisicoGraficos(sorted);
-      renderTabelaFisico(sorted);
-      if (el('rankingFisicoUpdate')) el('rankingFisicoUpdate').textContent = `Atualizado: ${new Date().toLocaleDateString('pt-BR')}`;
-    }
-    
     function atualizarRankingFinanceiro() {
       if (!rankingFinanceiroData.length || !window.ultimoMesFinanceiro) return;
-      const sorted = [...rankingFinanceiroData].sort((a,b) => b.total - a.total);
+      
+      let sorted = [...rankingFinanceiroData].sort((a,b) => b.total - a.total);
+      
+      if (rankingFilterMonth && window.mesesRankingFinanceiro) {
+        const mesSelecionado = window.mesesRankingFinanceiro.find(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+        if (mesSelecionado) {
+          sorted = sorted.map(d => ({
+            ...d,
+            total: d[mesSelecionado.nome] || 0
+          })).sort((a,b) => b.total - a.total);
+        }
+      }
+      
       const contagemIndex = sorted.findIndex(d => d.municipio.toLowerCase().includes('contagem'));
       const contagem = sorted[contagemIndex];
+      
       if (contagem) {
         const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
-        const participacao = ((contagem.total / totalGeral) * 100).toFixed(1);
-        const ultimoMesValor = contagem[window.ultimoMesFinanceiro.nome] || 0;
+        const participacao = totalGeral > 0 ? ((contagem.total / totalGeral) * 100).toFixed(1) : 0;
+        let ultimoMesValor = 0;
+        let mesLabel = "";
+        if (rankingFilterMonth && window.mesesRankingFinanceiro) {
+          const mesSelecionado = window.mesesRankingFinanceiro.find(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+          if (mesSelecionado) {
+            ultimoMesValor = contagem[mesSelecionado.nome] || 0;
+            mesLabel = mesSelecionado.rotulo;
+          }
+        } else if (window.ultimoMesFinanceiro) {
+          ultimoMesValor = contagem[window.ultimoMesFinanceiro.nome] || 0;
+          mesLabel = window.ultimoMesFinanceiro.rotulo;
+        }
+        
         if (el('financeiroPosicao')) el('financeiroPosicao').textContent = `#${contagemIndex + 1}`;
         if (el('financeiroPosicaoSub')) el('financeiroPosicaoSub').textContent = `${sorted.length} municípios`;
         if (el('financeiroTotal')) el('financeiroTotal').textContent = formatBRL(contagem.total);
@@ -1524,35 +1826,25 @@ function abbreviateEspName(esp, maxLength = 30) {
         if (el('rankFinanceiroPos')) el('rankFinanceiroPos').textContent = `#${contagemIndex + 1}`;
         if (el('rankFinanceiroDetalhe')) el('rankFinanceiroDetalhe').textContent = `${contagemIndex + 1}º de ${sorted.length}`;
         if (el('rankFinanceiroTotal')) el('rankFinanceiroTotal').textContent = formatBRL(ultimoMesValor);
-        if (el('rankFinanceiroLabel')) el('rankFinanceiroLabel').textContent = `Total (${window.ultimoMesFinanceiro.rotulo})`;
+        if (el('rankFinanceiroLabel')) el('rankFinanceiroLabel').textContent = `Total (${mesLabel || 'último mês'})`;
         if (el('rankParticipacao')) el('rankParticipacao').textContent = `${participacao}%`;
         if (el('rankBarra')) el('rankBarra').style.width = `${participacao}%`;
+        
         const top5SemContagem = sorted.filter((d, i) => !d.municipio.toLowerCase().includes('contagem')).slice(0, 5);
         let miniHTML = '<div style="display:grid; grid-template-columns:30px 1fr 80px; gap:5px; font-weight:700;"><div>#</div><div>Município</div><div style="text-align:right">Total</div>';
-        top5SemContagem.forEach((m, i) => { miniHTML += `<div style="color:#64748b; font-weight:700">${i+1}</div><div style="color:inherit; font-weight:700">${m.municipio.substring(0,20)}</div><div style="text-align:right; font-weight:900;">${formatBRL(m.total)}</div>`; });
-        if (contagem) { miniHTML += `<div style="color:#0f2f5f; font-weight:900; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px;">📍</div><div style="color:#0f2f5f; font-weight:900; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px;">CONTAGEM</div><div style="color:#0f2f5f; font-weight:900; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px; text-align:right;">${formatBRL(contagem.total)}</div>`; }
+        top5SemContagem.forEach((m, i) => { 
+          miniHTML += `<div style="color:#64748b; font-weight:700">${i+1}</div><div style="color:inherit; font-weight:700">${m.municipio.substring(0,20)}</div><div style="text-align:right; font-weight:900;">${formatBRL(m.total)}</div>`; 
+        });
+        if (contagem) { 
+          miniHTML += `<div style="color:#0f2f5f; font-weight:900; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px;">📍</div><div style="color:#0f2f5f; font-weight:900; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px;">CONTAGEM</div><div style="color:#0f2f5f; font-weight:900; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px; text-align:right;">${formatBRL(contagem.total)}</div>`; 
+        }
         miniHTML += '</div>';
         if (el('miniRanking')) el('miniRanking').innerHTML = miniHTML;
       }
+      
       buildRankingFinanceiroGraficos(sorted);
       renderTabelaFinanceiro(sorted);
       if (el('rankingFinanceiroUpdate')) el('rankingFinanceiroUpdate').textContent = `Atualizado: ${new Date().toLocaleDateString('pt-BR')}`;
-    }
-    
-    function buildRankingFisicoGraficos(sorted) {
-      destroy('cRankFisicoEvolucao');
-      const ctxEvol = el('cRankFisicoEvolucao')?.getContext('2d');
-      if (ctxEvol && window.mesesRanking) {
-        const contagem = sorted.find(d => d.municipio.toLowerCase().includes('contagem'));
-        const top5 = sorted.slice(0,5).filter(d => !d.municipio.toLowerCase().includes('contagem'));
-        const rotulos = window.mesesRanking.map(m => m.rotulo);
-        const valoresContagem = window.mesesRanking.map(m => contagem ? (contagem[m.nome] || 0) : 0);
-        const mediaTop5 = window.mesesRanking.map(m => { const soma = top5.reduce((acc, d) => acc + (d[m.nome] || 0), 0); return top5.length ? Math.round(soma / top5.length) : 0; });
-        charts['cRankFisicoEvolucao'] = new Chart(ctxEvol, { type: 'line', data: { labels: rotulos, datasets: [{ label: '📍 CONTAGEM', data: valoresContagem, borderColor: '#0f2f5f', backgroundColor: 'rgba(15,47,95,.1)', borderWidth: 4, tension: 0.3 }, { label: 'Média Top 5', data: mediaTop5, borderColor: '#94a3b8', borderDash: [5,5], borderWidth: 2, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } } });
-      }
-      destroy('cRankFisicoBarras');
-      const ctxBar = el('cRankFisicoBarras')?.getContext('2d');
-      if (ctxBar) { const top10 = sorted.slice(0,10); charts['cRankFisicoBarras'] = new Chart(ctxBar, { type: 'bar', data: { labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), datasets: [{ data: top10.map(d => d.total), backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', formatter: (v) => v.toLocaleString('pt-BR') } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } } }); }
     }
     
     function buildRankingFinanceiroGraficos(sorted) {
@@ -1561,69 +1853,121 @@ function abbreviateEspName(esp, maxLength = 30) {
       if (ctxEvol && window.mesesRankingFinanceiro) {
         const contagem = sorted.find(d => d.municipio.toLowerCase().includes('contagem'));
         const top5 = sorted.slice(0,5).filter(d => !d.municipio.toLowerCase().includes('contagem'));
-        const rotulos = window.mesesRankingFinanceiro.map(m => m.rotulo);
-        const valoresContagem = window.mesesRankingFinanceiro.map(m => contagem ? (contagem[m.nome] || 0) : 0);
-        const mediaTop5 = window.mesesRankingFinanceiro.map(m => { const soma = top5.reduce((acc, d) => acc + (d[m.nome] || 0), 0); return top5.length ? soma / top5.length : 0; });
-        charts['cRankFinanceiroEvolucao'] = new Chart(ctxEvol, { type: 'line', data: { labels: rotulos, datasets: [{ label: '📍 CONTAGEM', data: valoresContagem, borderColor: '#0f2f5f', backgroundColor: 'rgba(15,47,95,.1)', borderWidth: 4, tension: 0.3 }, { label: 'Média Top 5', data: mediaTop5, borderColor: '#94a3b8', borderDash: [5,5], borderWidth: 2, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false } }, scales: { x: { grid: { display: false } }, y: { ticks: { callback: (v) => formatBRL(v) }, grid: { display: false } } } } });
+        
+        let mesesParaExibir = window.mesesRankingFinanceiro;
+        if (rankingFilterMonth) {
+          const index = window.mesesRankingFinanceiro.findIndex(m => m.nome === rankingFilterMonth || m.rotulo === rankingFilterMonth);
+          if (index !== -1) {
+            mesesParaExibir = window.mesesRankingFinanceiro.slice(0, index + 1);
+          }
+        }
+        
+        const rotulos = mesesParaExibir.map(m => m.rotulo);
+        const valoresContagem = mesesParaExibir.map(m => contagem ? (contagem[m.nome] || 0) : 0);
+        const mediaTop5 = mesesParaExibir.map(m => { 
+          const soma = top5.reduce((acc, d) => acc + (d[m.nome] || 0), 0); 
+          return top5.length ? soma / top5.length : 0; 
+        });
+        
+        charts['cRankFinanceiroEvolucao'] = new Chart(ctxEvol, { 
+          type: 'line', 
+          data: { 
+            labels: rotulos, 
+            datasets: [
+              { 
+                label: '📍 CONTAGEM', 
+                data: valoresContagem, 
+                borderColor: '#0f2f5f', 
+                backgroundColor: 'rgba(15,47,95,.1)', 
+                borderWidth: 4, 
+                tension: 0.3 
+              }, 
+              { 
+                label: 'Média Top 5', 
+                data: mediaTop5, 
+                borderColor: '#94a3b8', 
+                borderDash: [5,5], 
+                borderWidth: 2, 
+                tension: 0.3 
+              }
+            ] 
+          }, 
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { datalabels: { display: false } }, 
+            scales: { 
+              x: { grid: { display: false } }, 
+              y: { 
+                ticks: { callback: (v) => formatBRL(v) }, 
+                grid: { display: false } 
+              } 
+            } 
+          } 
+        });
       }
+      
       destroy('cRankFinanceiroBarras');
       const ctxBar = el('cRankFinanceiroBarras')?.getContext('2d');
-      if (ctxBar) { const top10 = sorted.slice(0,10); charts['cRankFinanceiroBarras'] = new Chart(ctxBar, { type: 'bar', data: { labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), datasets: [{ data: top10.map(d => d.total), backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', formatter: (v) => formatBRL(v) } }, scales: { x: { ticks: { callback: (v) => formatBRLCompact(v) }, grid: { display: false } }, y: { grid: { display: false } } } } }); }
+      if (ctxBar) { 
+        const top10 = sorted.slice(0,10); 
+        charts['cRankFinanceiroBarras'] = new Chart(ctxBar, { 
+          type: 'bar', 
+          data: { 
+            labels: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '📍 CONTAGEM' : d.municipio.substring(0,20)), 
+            datasets: [{ 
+              data: top10.map(d => d.total), 
+              backgroundColor: top10.map(d => d.municipio.toLowerCase().includes('contagem') ? '#0f2f5f' : '#94a3b8'), 
+              borderRadius: 8 
+            }] 
+          }, 
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            indexAxis: 'y', 
+            plugins: { 
+              legend: { display: false }, 
+              datalabels: { anchor: 'end', align: 'right', formatter: (v) => formatBRL(v) } 
+            }, 
+            scales: { 
+              x: { 
+                ticks: { callback: (v) => formatBRLCompact(v) }, 
+                grid: { display: false } 
+              }, 
+              y: { grid: { display: false } } 
+            } 
+          } 
+        }); 
+      }
     }
     
-    function renderTabelaFisico(sorted) {
-  const tbody = el('tBodyFisico');
-  const cabecalho = el('cabecalhoFisico');
-  if (!tbody || !window.mesesRanking) return;
-  const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
-  if (cabecalho) { 
-    let html = '<th>Posição</th><th>Município</th>';
-    window.mesesRanking.forEach(m => { 
-      html += `<th>${m.rotulo}</th>`; 
-    }); 
-    html += '<th>Total</th><th>%</th>'; 
-    cabecalho.innerHTML = html; 
-  }
-  tbody.innerHTML = sorted.map((d, i) => { 
-    const pct = ((d.total / totalGeral) * 100).toFixed(1); 
-    const isContagem = d.municipio.toLowerCase().includes('contagem'); 
-    let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
-    linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
-    window.mesesRanking.forEach(m => { 
-      linha += `<td>${(d[m.nome] || 0).toLocaleString('pt-BR')}</td>`; 
-    }); 
-    linha += `<td><b>${d.total.toLocaleString('pt-BR')}</b></td><td>${pct}%</td></tr>`; 
-    return linha; 
-  }).join('');
-}
-    
     function renderTabelaFinanceiro(sorted) {
-  const tbody = el('tBodyFinanceiro');
-  const cabecalho = el('cabecalhoFinanceiro');
-  if (!tbody || !window.mesesRankingFinanceiro) return;
-  const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
-  if (cabecalho) { 
-    let html = '<th>Posição</th><th>Município</th>';
-    window.mesesRankingFinanceiro.forEach(m => { 
-      html += `<th>${m.rotulo}</th>`; 
-    }); 
-    html += '<th>Total</th><th>%</th>'; 
-    cabecalho.innerHTML = html; 
-  }
-  tbody.innerHTML = sorted.map((d, i) => { 
-    const pct = ((d.total / totalGeral) * 100).toFixed(1); 
-    const isContagem = d.municipio.toLowerCase().includes('contagem'); 
-    let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
-    linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
-    window.mesesRankingFinanceiro.forEach(m => { 
-      linha += `<td>${formatBRL(d[m.nome] || 0)}</td>`; 
-    }); 
-    linha += `<td><b>${formatBRL(d.total)}</b></td><td>${pct}%</td></tr>`; 
-    return linha; 
-  }).join('');
-}
-
-        
+      const tbody = el('tBodyFinanceiro');
+      const cabecalho = el('cabecalhoFinanceiro');
+      if (!tbody || !window.mesesRankingFinanceiro) return;
+      const totalGeral = sorted.reduce((acc, d) => acc + d.total, 0);
+      if (cabecalho) { 
+        let html = '<th>Posição</th><th>Município</th>';
+        window.mesesRankingFinanceiro.forEach(m => { 
+          html += `<th>${m.rotulo}</th>`; 
+        }); 
+        html += '<th>Total</th><th>%</th>'; 
+        cabecalho.innerHTML = html; 
+      }
+      tbody.innerHTML = sorted.map((d, i) => { 
+        const pct = totalGeral > 0 ? ((d.total / totalGeral) * 100).toFixed(1) : 0; 
+        const isContagem = d.municipio.toLowerCase().includes('contagem'); 
+        let linha = `<tr style="${isContagem ? 'background:rgba(15,47,95,.05); font-weight:900;' : ''}">`; 
+        linha += `<td><b>${i+1}º</b></td><td>${isContagem ? '📍 ' : ''}${d.municipio}</td>`; 
+        window.mesesRankingFinanceiro.forEach(m => { 
+          linha += `<td>${formatBRL(d[m.nome] || 0)}</td>`; 
+        }); 
+        linha += `<td><b>${formatBRL(d.total)}</b></td><td>${pct}%</td></tr>`; 
+        return linha; 
+      }).join('');
+    }
+    
+    // ==================== FUNÇÕES FINANCEIRAS ====================
     function buildFinKPIs(){
       if(!finData.length||!finMonths.length) return;
       const totalGeral=finData.reduce((acc,r)=>acc+r.total,0);
@@ -1707,6 +2051,15 @@ function abbreviateEspName(esp, maxLength = 30) {
       wrap.innerHTML=html;
     }
     
+    function toggleFinColumnFilter(type, event) { event.stopPropagation(); const popup = el("finColumnFilterPopup"); const select = el("finColFilterSelect"); if(!finData || !finData.length) { toast("Sem dados financeiros para filtrar","info"); return; } let options = []; if(type === 'esp') { options = finData.map(r => ({value:r.esp, label:r.esp})).sort((a,b)=>a.label.localeCompare(b.label,'pt-BR')); finColumnFilterType = 'esp'; activeFinColumnFilter = null; } else if(type.startsWith('month-')) { const monthKey = type.replace('month-', ''); options = [{value:"__POS__", label:"Somente com valor (≠ NT)"},{value:"__ZERO__", label:"Somente NT/zero"}]; finColumnFilterType = 'month'; activeFinColumnFilter = monthKey; } else if(type === 'total') { options = [{value:"__POS__", label:"Somente com valor (> 0)"},{value:"__ZERO__", label:"Somente NT/zero (= 0)"}]; finColumnFilterType = 'total'; activeFinColumnFilter = null; } select.innerHTML = options.map(o => `<option value="${o.value}">${o.label}</option>`).join(''); const rect = event.target.getBoundingClientRect(); popup.style.top = (rect.bottom + window.scrollY + 5) + 'px'; popup.style.left = (rect.left + window.scrollX - 180) + 'px'; popup.classList.add('show'); }
+    function applyFinColumnFilter() { const select = el("finColFilterSelect"); finColumnFilterValues = Array.from(select.selectedOptions).map(opt => opt.value); if(el("finColumnFilterPopup")) el("finColumnFilterPopup").classList.remove('show'); renderFinTable(); }
+    function clearFinColumnFilter() { finColumnFilterValues = []; finColumnFilterType = null; activeFinColumnFilter = null; if(el("finColFilterSelect")) el("finColFilterSelect").value = ""; if(el("finColumnFilterPopup")) el("finColumnFilterPopup").classList.remove('show'); renderFinTable(); }
+    
+    // ==================== FUNÇÕES DE FILTRO E ATUALIZAÇÃO ====================
+    function toggleColumnFilter(col, event) { event.stopPropagation(); const popup = el("columnFilterPopup"); const select = el("colFilterSelect"); if(!dataF || !dataF.length) { toast("Sem dados para filtrar","info"); return; } let values = []; if(col === 'especialidade') { values = [...new Set(dataF.map(x => x.especialidade))].sort(); } else if(col === 'idade') { values = [...new Set(dataF.map(x => x.idade || "Não informado"))].sort(); } else if(col === 'mesKey') { values = [...new Set(dataF.map(x => x.mesLabel || x.mesRaw))].sort(); } else { toast("Filtro para colunas numéricas em desenvolvimento","info"); return; } select.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join(''); activeColumnFilter = col; const rect = event.target.getBoundingClientRect(); popup.style.top = (rect.bottom + window.scrollY + 5) + 'px'; popup.style.left = (rect.left + window.scrollX - 180) + 'px'; popup.classList.add('show'); }
+    function applyColumnFilter() { const select = el("colFilterSelect"); columnFilterValues = Array.from(select.selectedOptions).map(opt => opt.value); if(el("columnFilterPopup")) el("columnFilterPopup").classList.remove('show'); renderTable(); }
+    function clearColumnFilter() { columnFilterValues = []; if(el("colFilterSelect")) el("colFilterSelect").value = ""; if(el("columnFilterPopup")) el("columnFilterPopup").classList.remove('show'); renderTable(); }
+    
     function fillFilters(){
       const mesesMap=new Map(allData.filter(x=>x.mesKey).sort((a,b)=>mesSortKey(a)-mesSortKey(b)).map(x=>[x.mesKey, {key:x.mesKey, label:x.mesLabel}]));
       allMeses = Array.from(mesesMap.values());
@@ -1742,17 +2095,18 @@ function abbreviateEspName(esp, maxLength = 30) {
         return true;
       });
       updateKPIs(); updateCharts(); renderTable();
+      syncMonthFilters();
     }
     
     function sum(col, rows=dataF){ return rows.reduce((acc,x)=>acc+(x[col]||0),0); }
     function pct(a,b){ if(!b) return 0; return (a/b)*100; }
     function setNum(id,n){ const elem = el(id); if(elem) elem.textContent=(n||0).toLocaleString("pt-BR"); }
+    
     function updateKPIs(){
       const ag=sum("agendado"),rec=sum("recepcionado"),apac=sum("apac"),fat=sum("faturado");
       setNum("kAg",ag); setNum("kRec",rec); setNum("kApac",apac); setNum("kFat",fat);
       if(el("kAgSub")) el("kAgSub").textContent=`Recepção: ${pct(rec,ag).toFixed(1)}%`;
       if(el("kRecSub")) el("kRecSub").textContent=`APAC/Recep.: ${pct(apac,rec).toFixed(1)}%`;
-      // CORREÇÃO: APAC deve mostrar Fat./APAC, não Fat./Recep.
       if(el("kApacSub")) el("kApacSub").textContent=`Fat./APAC: ${pct(fat,apac).toFixed(1)}%`;
       if(el("kFatSub")) el("kFatSub").textContent=`Fat./Ag.: ${pct(fat,ag).toFixed(1)}%`;
     }
@@ -1772,6 +2126,7 @@ function abbreviateEspName(esp, maxLength = 30) {
       if(el("subEvolucao")) el("subEvolucao").textContent = `${subLabel} • ${mesLabels}`;
     }
     
+    // ==================== GRÁFICOS DA VISÃO GERAL ====================
     function buildGaugeFatRec(monthKey){
       destroy("cGaugeFatRec");
       const canvas = el("cGaugeFatRec"); if(!canvas) return;
@@ -1822,74 +2177,72 @@ function abbreviateEspName(esp, maxLength = 30) {
       charts["cEvolucao"]=new Chart(ctx,{ type:"line", data:{ labels:arr.map(x=>x.label), datasets:[ {label:"Agendado",data:arr.map(x=>x.ag),borderColor:"#3b82f6",backgroundColor:"rgba(59,130,246,.10)",tension:.35,fill:true,borderWidth:2.5,pointRadius:5,pointHoverRadius:7}, {label:"Recepcionado",data:arr.map(x=>x.rec),borderColor:"#059669",backgroundColor:"rgba(5,150,105,.08)",tension:.35,fill:false,borderWidth:2.5,pointRadius:5,pointHoverRadius:7}, {label:"APAC",data:arr.map(x=>x.apac),borderColor:"#d97706",backgroundColor:"rgba(217,119,6,.10)",tension:.35,fill:false,borderWidth:2.5,pointRadius:5,pointHoverRadius:7}, {label:"Faturado",data:arr.map(x=>x.fat),borderColor:"#b91c1c",backgroundColor:"rgba(185,28,28,.08)",tension:.35,fill:false,borderWidth:2.5,pointRadius:5,pointHoverRadius:7} ] }, options:{ ...baseOptions(), plugins:{ ...baseOptions().plugins, legend:{ position:"top", labels:{ font:{size:13,weight:"800"}, padding:10, usePointStyle: true, pointStyle: "circle" } }, datalabels:{ display:true, anchor:"end", align:"top", offset:6, color:(ctx)=>datasetColors[ctx.datasetIndex]||"#0f172a", font:{size:11,weight:"800"}, formatter:(v)=>v?v.toLocaleString("pt-BR"):"" } }, layout: { padding: { top: 10, bottom: 20 } } } });
     }
     
-   function buildTop(mes){
-  destroy("cTop");
-  const canvas = el("cTop"); if(!canvas) return;
-  const ctx=canvas.getContext("2d");
-  const source = mes ? getOciDataForMonth(mes) : dataF;
-  const map=new Map(); 
-  source.forEach(x=>{ 
-    const k=x.especialidade; 
-    if(!map.has(k)) map.set(k,{rec:0,fat:0,esp:k}); 
-    const o=map.get(k); 
-    o.rec+=x.recepcionado; 
-    o.fat+=x.faturado; 
-  });
-  const arr=[...map.values()].sort((a,b)=>b.rec-a.rec);
-  
-  // Limita a 15 itens para não ficar muito poluído
-  const topItems = arr.slice(0, 15);
-  const dynamicH=Math.max(420, topItems.length * 28 + 80); 
-  if(el("cTopWrap")) el("cTopWrap").style.height=dynamicH+"px";
-  
-  charts["cTop"]=new Chart(ctx,{ 
-    type:"bar", 
-    data:{ 
-      labels:topItems.map(x=>abbreviateEspName(x.esp, 25)), 
-      datasets:[ 
-        {label:"Recepcionado", data:topItems.map(x=>x.rec), backgroundColor:"#059669", borderRadius:6, barThickness:30},
-        {label:"Faturado", data:topItems.map(x=>x.fat), backgroundColor:"#b91c1c", borderRadius:6, barThickness:30}
-      ] 
-    }, 
-    options:{ 
-      responsive:true, 
-      maintainAspectRatio:false,
-      plugins:{ 
-        legend:{position:"top",labels:{font:{size:13,weight:"800"},padding:18}}, 
-        datalabels:{ 
-          display:true, 
-          anchor:"end", 
-          align:"top",
-          color:"#0f172a", 
-          font:{size:10,weight:"800"}, 
-          formatter:(v)=>v?v.toLocaleString("pt-BR"):"" 
+    function buildTop(mes){
+      destroy("cTop");
+      const canvas = el("cTop"); if(!canvas) return;
+      const ctx=canvas.getContext("2d");
+      const source = mes ? getOciDataForMonth(mes) : dataF;
+      const map=new Map(); 
+      source.forEach(x=>{ 
+        const k=x.especialidade; 
+        if(!map.has(k)) map.set(k,{rec:0,fat:0,esp:k}); 
+        const o=map.get(k); 
+        o.rec+=x.recepcionado; 
+        o.fat+=x.faturado; 
+      });
+      const arr=[...map.values()].sort((a,b)=>b.rec-a.rec);
+      const topItems = arr.slice(0, 15);
+      const dynamicH=Math.max(420, topItems.length * 28 + 80); 
+      if(el("cTopWrap")) el("cTopWrap").style.height=dynamicH+"px";
+      
+      charts["cTop"]=new Chart(ctx,{ 
+        type:"bar", 
+        data:{ 
+          labels:topItems.map(x=>abbreviateEspName(x.esp, 25)), 
+          datasets:[ 
+            {label:"Recepcionado", data:topItems.map(x=>x.rec), backgroundColor:"#059669", borderRadius:6, barThickness:30},
+            {label:"Faturado", data:topItems.map(x=>x.fat), backgroundColor:"#b91c1c", borderRadius:6, barThickness:30}
+          ] 
         }, 
-        tooltip:{
-          titleFont:{size:12,weight:"800"},
-          bodyFont:{size:12},
-          callbacks:{
-            title:(items)=>{ 
-              const i=items[0]?.dataIndex; 
-              return i!==undefined?topItems[i]?.esp||"":""; 
-            }
-          }
+        options:{ 
+          responsive:true, 
+          maintainAspectRatio:false,
+          plugins:{ 
+            legend:{position:"top",labels:{font:{size:13,weight:"800"},padding:18}}, 
+            datalabels:{ 
+              display:true, 
+              anchor:"end", 
+              align:"top",
+              color:"#0f172a", 
+              font:{size:10,weight:"800"}, 
+              formatter:(v)=>v?v.toLocaleString("pt-BR"):"" 
+            }, 
+            tooltip:{
+              titleFont:{size:12,weight:"800"},
+              bodyFont:{size:12},
+              callbacks:{
+                title:(items)=>{ 
+                  const i=items[0]?.dataIndex; 
+                  return i!==undefined?topItems[i]?.esp||"":""; 
+                }
+              }
+            } 
+          }, 
+          scales:{ 
+            x:{ 
+              ticks:{font:{size:10,weight:"700"}, maxRotation:45, minRotation:45}, 
+              grid:{display:false} 
+            }, 
+            y:{ 
+              beginAtZero:true,
+              ticks:{font:{size:11,weight:"700"}}, 
+              grid:{display:false} 
+            } 
+          } 
         } 
-      }, 
-      scales:{ 
-        x:{ 
-          ticks:{font:{size:10,weight:"700"}, maxRotation:45, minRotation:45}, 
-          grid:{display:false} 
-        }, 
-        y:{ 
-          beginAtZero:true,
-          ticks:{font:{size:11,weight:"700"}}, 
-          grid:{display:false} 
-        } 
-      } 
-    } 
-  });
-  if(el("subTop")) el("subTop").textContent = mes ? `Todas as especialidades — Mês: ${labelMes(mes)} (ordenado pelo maior Recepcionado).` : "Todas as especialidades no período selecionado (do maior para o menor Recepcionado).";
-}
+      });
+      if(el("subTop")) el("subTop").textContent = mes ? `Todas as especialidades — Mês: ${labelMes(mes)} (ordenado pelo maior Recepcionado).` : "Todas as especialidades no período selecionado (do maior para o menor Recepcionado).";
+    }
     
     function buildReceita(){
       destroy("cReceita");
@@ -1917,6 +2270,7 @@ function abbreviateEspName(esp, maxLength = 30) {
       charts["cDistribuicao"] = new Chart(ctx, { type: "doughnut", data: { labels: ["Agendados", "Recepcionados", "APAC Autorizadas", "Faturados"], datasets: [{ data: [ag, rec, apac, fat], backgroundColor: ["#3b82f6", "#059669", "#d97706", "#b91c1c"], borderColor: "#ffffff", borderWidth: 3, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "bottom", labels: { font: { size: 12, weight: "700" }, padding: 15, usePointStyle: true, pointStyle: "circle", color: "#0f172a", generateLabels: (chart) => { const data = chart.data; if (!data.labels || !data.datasets) return []; const { labels, datasets } = data; const dataset = datasets[0]; const total = dataset.data.reduce((a, b) => a + b, 0); return labels.map((label, i) => ({ text: `${label}: ${dataset.data[i].toLocaleString("pt-BR")} (${((dataset.data[i]/total)*100).toFixed(1)}%)`, fillStyle: dataset.backgroundColor[i], strokeStyle: dataset.backgroundColor[i], lineWidth: 2, hidden: false, index: i, fontColor: "#0f172a" })); } } }, datalabels: { color: "#fff", font: { size: 13, weight: "900" }, textShadowColor: "rgba(0,0,0,0.5)", textShadowBlur: 4, formatter: (value, context) => { const total = context.dataset.data.reduce((a, b) => a + b, 0); if (!total || !value) return ""; const pct = (value / total) * 100; return pct < 8 ? "" : pct.toFixed(1) + "%"; } }, tooltip: { callbacks: { label: (ctx) => { const label = ctx.label || ""; const value = ctx.raw || 0; const total = ctx.dataset.data.reduce((a, b) => a + b, 0); const pct = ((value / total) * 100).toFixed(1); return ` ${label}: ${value.toLocaleString("pt-BR")} (${pct}%)`; } } } } } });
     }
     
+    // ==================== TABELA OCI ====================
     function sortTable(col,th){
       if(tableSort.col===col){ tableSort.dir=tableSort.dir==="asc"?"desc":"asc"; }
       else { tableSort.col=col; tableSort.dir="asc"; }
@@ -1978,9 +2332,11 @@ function abbreviateEspName(esp, maxLength = 30) {
       setTimeout(()=>{ Object.values(charts).forEach(c=>c?.resize?.()); },80);
     }
     
+    // ==================== EVENT LISTENERS ADICIONAIS ====================
     if (el('tSearchFisico')) { el('tSearchFisico').addEventListener('input', (e) => { const q = e.target.value.toLowerCase(); const sorted = [...rankingFisicoData].sort((a,b) => b.total - a.total); const filtered = sorted.filter(d => d.municipio.toLowerCase().includes(q)); renderTabelaFisico(filtered); }); }
     if (el('tSearchFinanceiro')) { el('tSearchFinanceiro').addEventListener('input', (e) => { const q = e.target.value.toLowerCase(); const sorted = [...rankingFinanceiroData].sort((a,b) => b.total - a.total); const filtered = sorted.filter(d => d.municipio.toLowerCase().includes(q)); renderTabelaFinanceiro(filtered); }); }
     
+    // ==================== INICIALIZAÇÃO ====================
     window.addEventListener("DOMContentLoaded",()=>{
       initEventListeners();
       loadData(false);
