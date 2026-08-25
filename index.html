@@ -861,15 +861,32 @@
     <div class="fin-header-body"><div class="fin-header-title">Painel Financeiro — OCI Faturamento por Competência</div></div>
     <div class="fin-header-right"><div class="fin-header-update" id="finLastUpdate">Carregando dados financeiros…</div><div class="fin-header-badge"><i class="fa-solid fa-circle-check"></i> Sincronizado com Google Sheets</div></div>
   </div>
+  
   <div class="kpis" style="margin-top:14px;">
     <div class="kpi fin1"><div class="kpiIcon"><i class="fa-solid fa-sack-dollar"></i></div><div><div class="label">Receita Total Acumulada</div><div class="val fin-val" id="fKTotal">—</div><div class="sub" id="fKTotalSub">—</div></div></div>
     <div class="kpi fin2"><div class="kpiIcon"><i class="fa-solid fa-arrow-trend-up"></i></div><div><div class="label">Melhor Competência</div><div class="val fin-val" id="fKBest">—</div><div class="sub" id="fKBestSub">—</div></div></div>
     <div class="kpi fin3"><div class="kpiIcon"><i class="fa-solid fa-chart-simple"></i></div><div><div class="label">Média Mensal</div><div class="val fin-val" id="fKAvg">—</div><div class="sub" id="fKAvgSub">—</div></div></div>
     <div class="kpi fin4"><div class="kpiIcon"><i class="fa-solid fa-trophy"></i></div><div><div class="label">Especialidade Destaque</div><div class="val fin-val" id="fKTopEsp">—</div><div class="sub" id="fKTopEspSub">—</div></div></div>
   </div>
+  
   <div class="card section" style="margin-top:14px;">
     <div class="sectionTitle"><i class="fa-solid fa-chart-area" style="color:#0ea5e9"></i> Análise Financeira Detalhada</div>
-    <div class="grid-1col"><div class="chartCard"><div class="chartHead"><div><h3>Evolução do Faturamento Mensal (Total Geral)</h3><div class="chartSub">• Ponto dourado = melhor mês • Ponto vermelho = menor mês</div></div></div><div class="chartWrap" style="height:320px;"><canvas id="cFinEvolucao"></canvas></div><div class="fin-mom-bar" id="finMomBar"></div></div></div>
+    
+    <!-- Evolução do Faturamento -->
+    <div class="grid-1col">
+      <div class="chartCard">
+        <div class="chartHead">
+          <div>
+            <h3>Evolução do Faturamento Mensal (Total Geral)</h3>
+            <div class="chartSub">• Ponto dourado = melhor mês • Ponto vermelho = menor mês</div>
+          </div>
+        </div>
+        <div class="chartWrap" style="height:320px;"><canvas id="cFinEvolucao"></canvas></div>
+        <div class="fin-mom-bar" id="finMomBar"></div>
+      </div>
+    </div>
+    
+    <!-- Receita por Especialidade + Participação -->
     <div class="grid-2cols" style="margin-top:14px;">
       <div class="chartCard">
         <div class="chartHead">
@@ -889,10 +906,13 @@
         </div>
         <div class="chartWrap" style="height:360px;"><canvas id="cFinBarEsp"></canvas></div>
       </div>
+      
       <div class="chartCard">
         <div class="chartHead">
-          <div><h3>Participação das Especialidades no Total</h3>
-          <div class="chartSub">Fatia % de cada especialidade sobre a receita total acumulada</div></div>
+          <div>
+            <h3>Participação das Especialidades no Total</h3>
+            <div class="chartSub">Fatia % de cada especialidade sobre a receita total acumulada</div>
+          </div>
           <div class="chart-filter-wrapper">
             <div class="chart-filter-badge" onclick="toggleChartFilter('finDonutFilter', event)">
               <i class="fa-solid fa-filter"></i> Filtrar por mês
@@ -909,9 +929,46 @@
         <div class="chartWrap" style="height:360px;"><canvas id="cFinDonut"></canvas></div>
       </div>
     </div>
-    <div class="grid-1col" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><div><h3>Composição Mensal por Especialidade (Barras Agrupadas)</h3><div class="chartSub">Contribuição de cada especialidade na receita de cada competência</div></div></div><div class="chartWrap" style="height:400px;"><canvas id="cFinStack"></canvas></div></div></div>
-    <div class="grid-1col" style="margin-top:14px;"><div class="chartCard"><div class="chartHead"><div><h3>Tabela Financeira — Faturamento por Especialidade × Competência</h3><div class="chartSub"><span>Valores em Reais (R$)</span><span class="fin-nt-legend"><b>NT</b> = Não Transferido</span></div></div></div><div id="finTableWrap" style="overflow:auto;border-radius:12px;border:1px solid var(--border);margin-top:4px;max-height:460px;"><div style="padding:20px;text-align:center;">Carregando tabela financeira…</div></div></div></div>
-    <div id="finColumnFilterPopup" class="chart-filter-popup" style="position:fixed;z-index:2000;"><select id="finColFilterSelect" multiple size="5"></select><div class="filter-actions"><button class="btn-filter-apply" onclick="applyFinColumnFilter()">Aplicar</button><button class="btn-filter-clear" onclick="clearFinColumnFilter()">Limpar</button></div></div>
+    
+    <!-- Composição Mensal -->
+    <div class="grid-1col" style="margin-top:14px;">
+      <div class="chartCard">
+        <div class="chartHead">
+          <div>
+            <h3>Composição Mensal por Especialidade (Barras Agrupadas)</h3>
+            <div class="chartSub">Contribuição de cada especialidade na receita de cada competência</div>
+          </div>
+        </div>
+        <div class="chartWrap" style="height:400px;"><canvas id="cFinStack"></canvas></div>
+      </div>
+    </div>
+    
+    <!-- Tabela Financeira -->
+    <div class="grid-1col" style="margin-top:14px;">
+      <div class="chartCard">
+        <div class="chartHead">
+          <div>
+            <h3>Tabela Financeira — Faturamento por Especialidade × Competência</h3>
+            <div class="chartSub">
+              <span>Valores em Reais (R$)</span>
+              <span class="fin-nt-legend"><b>NT</b> = Não Transferido</span>
+            </div>
+          </div>
+        </div>
+        <div id="finTableWrap" style="overflow:auto;border-radius:12px;border:1px solid var(--border);margin-top:4px;max-height:460px;">
+          <div style="padding:20px;text-align:center;">Carregando tabela financeira…</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Popup de filtro -->
+    <div id="finColumnFilterPopup" class="chart-filter-popup" style="position:fixed;z-index:2000;">
+      <select id="finColFilterSelect" multiple size="5"></select>
+      <div class="filter-actions">
+        <button class="btn-filter-apply" onclick="applyFinColumnFilter()">Aplicar</button>
+        <button class="btn-filter-clear" onclick="clearFinColumnFilter()">Limpar</button>
+      </div>
+    </div>
   </div>
 </section>
 
