@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏥 FERRAMENTA OCI v7.0 - Painel de Monitoramento</title>
+    <title>🏥 FERRAMENTA OCI v7.1 - Painel de Monitoramento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -305,7 +305,7 @@ function showScreen(screenId) {
 <!-- ==================== LOADING ==================== -->
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
-    <p class="text-white mt-4 font-bold">Carregando Ferramenta OCI v7.0...</p>
+    <p class="text-white mt-4 font-bold">Carregando Ferramenta OCI v7.1...</p>
     <p class="text-blue-300 text-sm mt-2">👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
 </div>
 
@@ -314,7 +314,7 @@ function showScreen(screenId) {
     <div class="bg-white rounded-3xl p-8 md:p-10 w-full max-w-md shadow-2xl text-center border border-slate-100 mx-4">
         <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">🏥</div>
         <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Ferramenta OCI</h1>
-        <p class="text-slate-500 text-sm mb-2">Painel Linha do Cuidado do Paciente v7.0</p>
+        <p class="text-slate-500 text-sm mb-2">Painel Linha do Cuidado do Paciente v7.1</p>
         <div class="text-left space-y-4">
             <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome Completo</label><input type="text" id="loginNome" placeholder="Digite seu nome completo" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all"></div>
             <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">CPF</label><input type="text" id="loginCPF" placeholder="000.000.000-00" maxlength="14" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl outline-none transition-all" oninput="mascaraCPF(this)"></div>
@@ -425,7 +425,7 @@ function showScreen(screenId) {
         <div class="p-6 flex items-center gap-3 border-b border-white/10">
             <div class="bg-blue-600 p-2 rounded-xl">🏥</div>
             <div>
-                <span class="text-lg font-extrabold">OCI <span class="text-blue-400">v7.0</span></span>
+                <span class="text-lg font-extrabold">OCI <span class="text-blue-400">v7.1</span></span>
                 <p class="text-[9px] text-blue-300 font-bold">Linha do Cuidado</p>
             </div>
         </div>
@@ -539,7 +539,7 @@ function showScreen(screenId) {
             <div class="h-16 flex items-center justify-between px-4 md:px-8">
                 <div>
                     <h2 class="text-lg md:text-xl font-extrabold" id="headerTitle">🧠 Lógica e Indicadores</h2>
-                    <p class="text-blue-400 text-[10px] font-bold uppercase">Ferramenta OCI v7.0 | 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
+                    <p class="text-blue-400 text-[10px] font-bold uppercase">Ferramenta OCI v7.1 | 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
                 </div>
                 <div class="flex items-center gap-3 md:gap-5">
                     <div class="relative hidden lg:block">
@@ -580,7 +580,7 @@ function showScreen(screenId) {
             <!-- ============ 🧠 LÓGICA E INDICADORES ============ -->
             <div id="content-logica-indicadores" class="tab-content active space-y-6">
                 <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg">
-                    <h2 class="text-xl font-extrabold mb-2"><i class="fas fa-brain mr-2"></i> Lógica e Indicadores do Ferramenta OCI v7.0</h2>
+                    <h2 class="text-xl font-extrabold mb-2"><i class="fas fa-brain mr-2"></i> Lógica e Indicadores do Ferramenta OCI v7.1</h2>
                     <p class="text-blue-100 text-sm">Entenda como funciona a Linha do Cuidado OCI e todos os seus indicadores</p>
                 </div>
 
@@ -743,7 +743,7 @@ function showScreen(screenId) {
                     <select id="filtroVisaoPeriodo" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="atualizarTudo()"><option value="30">Últimos 30 dias</option><option value="60">Últimos 60 dias</option><option value="90">Últimos 90 dias</option><option value="180">Últimos 180 dias</option><option value="365" selected>Último ano</option></select>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="statsGrid"></div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border"><h3 class="font-bold text-sm mb-4"><i class="fas fa-industry text-slate-600"></i> Linha do Cuidado OCI v7.0</h3><div class="flex flex-wrap gap-2 items-center" id="linhaProducao"></div></div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border"><h3 class="font-bold text-sm mb-4"><i class="fas fa-industry text-slate-600"></i> Linha do Cuidado OCI v7.1</h3><div class="flex flex-wrap gap-2 items-center" id="linhaProducao"></div></div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="alertasGrid"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3><div class="chart-container"><canvas id="chartPerformance"></canvas></div></div>
@@ -963,7 +963,7 @@ function showScreen(screenId) {
                 </div>
             </div>
 
-            <!-- ============ 📋 RETORNOS RECEPCIONADOS - CORRIGIDO ============ -->
+            <!-- ============ 📋 RETORNOS RECEPCIONADOS ============ -->
             <div id="content-retornos-recepcionados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -1140,7 +1140,7 @@ function showScreen(screenId) {
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','local')">Local <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','data_agendada')">Data da 1ª Consulta <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','data_fechamento')">Data Fechamento <i class="fas fa-sort"></i></th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable bg-indigo-50" onclick="ordenarTabela('apacs-geradas','numero_apac')">Nº APAC <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase bg-indigo-50" onclick="ordenarTabela('apacs-geradas','numero_apac')">Nº APAC <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','exames')">Exames <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','data_realizacao_exame')">Data Realização <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','usuario_cadastrou')">Cadastrado por: <i class="fas fa-sort"></i></th>
@@ -1158,7 +1158,7 @@ function showScreen(screenId) {
 
 <script>
 // ============================================
-// 🏥 FERRAMENTA OCI v7.0 - JAVASCRIPT PRINCIPAL
+// 🏥 FERRAMENTA OCI v7.1 - JAVASCRIPT PRINCIPAL
 // 👑 Ana Paula Araújo da Silva | Mat: 201704
 // 📅 06/06/2026 - VERSÃO REFORMADA COMPLETA
 // ============================================
@@ -1432,9 +1432,13 @@ function switchTab(tabId) {
 }
 
 // ============================================
-// FUNÇÕES ADMIN (resumidas)
+// FUNÇÕES ADMIN (CORRIGIDAS)
 // ============================================
 function abrirModalAdmin() {
+    if (!usuarioLogado || usuarioLogado.tipo !== 'admin') {
+        alert('❌ Apenas Administradores podem acessar esta área.');
+        return;
+    }
     document.getElementById('modalAdmin').classList.add('show');
     switchAdminTab('usuarios');
     renderizarListaUsuarios();
@@ -1500,13 +1504,24 @@ async function renderizarListaUsuarios() {
     if (!supabaseClient) return;
     showLoading();
     try {
-        const { data: usuarios, error } = await supabaseClient.rpc('listar_usuarios_seguro');
+        const { data: usuarios, error } = await supabaseClient
+            .from('usuarios')
+            .select('id, nome, cpf, email, telefone, unidade_saude, tipo, created_at')
+            .order('created_at', { ascending: false });
+        
         hideLoading();
         if (error) { alert('❌ Erro: ' + error.message); return; }
+        
         const busca = (document.getElementById('adminBuscaUsuario')?.value || '').toLowerCase();
-        let lista = (usuarios || []).filter(u => !busca || u.nome.toLowerCase().includes(busca) || (u.cpf || '').includes(busca));
+        let lista = (usuarios || []).filter(u => 
+            !busca || 
+            u.nome.toLowerCase().includes(busca) || 
+            (u.cpf || '').includes(busca)
+        );
+        
         const tbody = document.getElementById('adminTabelaUsuarios');
         if (!tbody) return;
+        
         tbody.innerHTML = lista.map(u => `
             <tr class="hover:bg-slate-50 border-t">
                 <td class="px-3 py-2 font-bold text-sm">${u.nome || ''}</td>
@@ -1523,8 +1538,13 @@ async function renderizarListaUsuarios() {
                 </td>
             </tr>
         `).join('');
+        
         if (!lista.length) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
-    } catch(err) { hideLoading(); alert('❌ Erro ao carregar lista.'); }
+    } catch(err) { 
+        hideLoading(); 
+        console.error(err);
+        alert('❌ Erro ao carregar lista.'); 
+    }
 }
 
 async function cadastrarUsuarioAdmin() {
@@ -1543,21 +1563,66 @@ async function cadastrarUsuarioAdmin() {
     if (tipo === 'usuario' && !unidadeSaude) return alert('❌ Selecione a UBS!');
     
     showLoading();
-    const { data, error } = await supabaseClient.rpc('cadastrar_usuario_painel', {
-        p_nome: nome, p_cpf: cpf, p_email: email, p_telefone: telefone,
-        p_unidade_saude: unidadeSaude, p_senha: senha, p_tipo: tipo
-    });
-    hideLoading();
-    if (error || !data?.success) return alert('❌ Erro: ' + (data?.message || error?.message));
-    alert('✅ Usuário cadastrado!');
-    document.getElementById('adminNovoNome').value = '';
-    document.getElementById('adminNovoCPF').value = '';
-    document.getElementById('adminNovoEmail').value = '';
-    document.getElementById('adminNovoTelefone').value = '';
-    document.getElementById('adminNovoSenha').value = '';
-    document.getElementById('adminNovoUbs').value = '';
-    switchAdminTab('usuarios');
-    renderizarListaUsuarios();
+    try {
+        // Verifica se o CPF já está cadastrado
+        const { data: existingUser, error: checkError } = await supabaseClient
+            .from('usuarios')
+            .select('id')
+            .eq('cpf', cpf)
+            .maybeSingle();
+        
+        if (checkError) throw new Error(checkError.message);
+        if (existingUser) {
+            hideLoading();
+            return alert(`❌ CPF ${formatarCPF(cpf)} já está cadastrado no sistema!`);
+        }
+        
+        const { data, error } = await supabaseClient
+            .from('usuarios')
+            .insert({
+                nome: nome,
+                cpf: cpf,
+                email: email,
+                telefone: telefone,
+                unidade_saude: unidadeSaude,
+                senha_hash: senha,
+                tipo: tipo
+            })
+            .select();
+            
+        hideLoading();
+        if (error) {
+            if (error.code === '23505') {
+                return alert('❌ CPF ou e-mail já cadastrado!');
+            }
+            return alert('❌ Erro: ' + error.message);
+        }
+        
+        alert('✅ Usuário cadastrado com sucesso!');
+        document.getElementById('adminNovoNome').value = '';
+        document.getElementById('adminNovoCPF').value = '';
+        document.getElementById('adminNovoEmail').value = '';
+        document.getElementById('adminNovoTelefone').value = '';
+        document.getElementById('adminNovoSenha').value = '';
+        document.getElementById('adminNovoUbs').value = '';
+        switchAdminTab('usuarios');
+        renderizarListaUsuarios();
+        
+        // Registrar log
+        try {
+            await supabaseClient.from('logs_auditoria').insert({
+                usuario_id: usuarioLogado.id,
+                usuario_nome: usuarioLogado.nome,
+                acao: 'CADASTRO_USUARIO',
+                descricao: `Cadastrou usuário: ${nome} (${formatarCPF(cpf)}) - Tipo: ${tipo}`
+            });
+        } catch(logError) { /* silent */ }
+        
+    } catch(err) {
+        hideLoading();
+        console.error(err);
+        alert('❌ Erro ao cadastrar: ' + err.message);
+    }
 }
 
 function editarUsuario(u) {
@@ -1585,7 +1650,15 @@ async function salvarEdicaoUsuario() {
     const unidadeSaude = tipo === 'usuario' ? document.getElementById('editUsuarioUbs')?.value : null;
     const novaSenha = document.getElementById('editUsuarioSenha').value.trim();
     
-    const updateData = { nome, email, telefone, tipo, unidade_saude: unidadeSaude };
+    if (!nome) return alert('⚠️ Nome é obrigatório!');
+    
+    const updateData = { 
+        nome, 
+        email, 
+        telefone, 
+        tipo, 
+        unidade_saude: unidadeSaude 
+    };
     if (novaSenha && novaSenha.length === 6) updateData.senha_hash = novaSenha;
     
     showLoading();
@@ -1625,11 +1698,19 @@ async function renderizarLogs() {
     if (!supabaseClient || !podeVerDadosCompletos()) return;
     showLoading();
     try {
-        const { data: logs, error } = await supabaseClient.from('logs_auditoria').select('*').order('data_hora', { ascending: false }).limit(100);
+        const { data: logs, error } = await supabaseClient
+            .from('logs_auditoria')
+            .select('*')
+            .order('data_hora', { ascending: false })
+            .limit(100);
         hideLoading();
         if (error) return;
         const busca = (document.getElementById('adminBuscaLogs')?.value || '').toLowerCase();
-        let lista = (logs || []).filter(l => !busca || l.acao.toLowerCase().includes(busca) || (l.usuario_nome || '').toLowerCase().includes(busca));
+        let lista = (logs || []).filter(l => 
+            !busca || 
+            l.acao.toLowerCase().includes(busca) || 
+            (l.usuario_nome || '').toLowerCase().includes(busca)
+        );
         const tbody = document.getElementById('adminTabelaLogs');
         if (!tbody) return;
         tbody.innerHTML = lista.map(l => `
@@ -1698,19 +1779,17 @@ async function carregarDadosSupabase() {
 }
 
 // ============================================
-// FUNÇÃO DE BUSCA GLOBAL - CORRIGIDA
+// FUNÇÃO DE BUSCA GLOBAL
 // ============================================
 function buscarGlobal() {
     const input = document.getElementById('globalSearch');
     if (!input) return;
     const termo = input.value.trim().toLowerCase();
     if (!termo) {
-        // Se o campo estiver vazio, recarrega os dados normais
         atualizarTudo();
         return;
     }
     
-    // Filtra os pacientes e consultas
     const pacientesEncontrados = pacientes.filter(p => 
         (p.prontuario && p.prontuario.toString().includes(termo)) ||
         (p.nome && p.nome.toLowerCase().includes(termo)) ||
@@ -1728,15 +1807,12 @@ function buscarGlobal() {
         return;
     }
     
-    // Salva os dados filtrados temporariamente
     const consultasAntigas = consultas;
     consultas = consultasEncontradas;
     
-    // Atualiza a visualização na aba atual
     const tabAtual = document.querySelector('.tab-content.active');
     if (tabAtual) {
         const id = tabAtual.id.replace('content-', '');
-        // Verifica se é uma aba de tabela
         const tiposTabela = ['monitoramento','monitoramento-exames','primeira-consulta-agendadas','primeira-consulta','aptos-retorno','retornos-agendados','retornos-recepcionados','absenteismo-1consulta','absenteismo-retorno','apac','apacs-geradas'];
         if (tiposTabela.includes(id)) {
             renderizarTabelas();
@@ -1745,7 +1821,6 @@ function buscarGlobal() {
         }
     }
     
-    // Restaura os dados originais para não perder o estado
     setTimeout(() => {
         consultas = consultasAntigas;
     }, 5000);
@@ -1758,14 +1833,29 @@ function buscarGlobal() {
 // ============================================
 function toast(msg, type = 'info') {
     const box = document.getElementById('toastBox');
-    if (!box) return;
+    if (!box) {
+        const newBox = document.createElement('div');
+        newBox.id = 'toastBox';
+        newBox.className = 'fixed top-4 right-4 z-50 space-y-2';
+        document.body.appendChild(newBox);
+    }
+    const container = document.getElementById('toastBox');
     const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
+    const colors = {
+        info: 'bg-blue-600',
+        success: 'bg-emerald-600',
+        warning: 'bg-amber-600',
+        error: 'bg-red-600'
+    };
+    toast.className = `${colors[type] || colors.info} text-white px-4 py-3 rounded-xl shadow-lg text-sm font-bold flex items-center gap-3 transition-all duration-300 transform translate-x-full`;
     toast.innerHTML = `<span>${msg}</span>`;
-    box.appendChild(toast);
+    container.appendChild(toast);
     setTimeout(() => {
+        toast.style.transform = 'translateX(0)';
+    }, 10);
+    setTimeout(() => {
+        toast.style.transform = 'translateX(100%)';
         toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s';
         setTimeout(() => toast.remove(), 300);
     }, 4000);
 }
@@ -2216,7 +2306,7 @@ function renderizarTabelas() {
 }
 
 // ============================================
-// EXPORTAÇÃO EXCEL - COM MASCARAMENTO DE CPF
+// EXPORTAÇÃO EXCEL
 // ============================================
 function exportarExcel(tipo) {
     const dados = getDadosFiltrados(tipo);
@@ -2236,7 +2326,6 @@ function exportarExcel(tipo) {
             'Status': item.status || '',
             'Data': item.data_agendada || ''
         };
-        // Adicionar campos específicos conforme tipo
         if (tipo === 'monitoramento-exames') {
             row['Exame'] = item.nome_exame || '';
             row['Data Solicitação'] = item.data_solicitacao_exame || '';
@@ -2388,14 +2477,14 @@ function logout() {
 // INICIALIZAÇÃO
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🏥 FERRAMENTA OCI v7.0 REFORMADA - INICIANDO...');
+    console.log('🏥 FERRAMENTA OCI v7.1 REFORMADA - INICIANDO...');
     console.log('👑 Ana Paula Araújo da Silva | Mat: 201704');
 
     carregarUBSnoSelect('adminNovoUbs');
     carregarUBSnoSelect('editUsuarioUbs');
     toggleUbsField();
     
-    // ============ CORREÇÃO: BUSCA GLOBAL ============
+    // BUSCA GLOBAL
     document.getElementById('globalSearch').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') buscarGlobal();
     });
@@ -2403,7 +2492,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!e.target.value.trim()) atualizarTudo();
     });
 
-    // LOGIN
+    // LOGIN - Usando a RPC login_painel_admin
     document.getElementById('btnLogin').addEventListener('click', async () => {
         const nome = document.getElementById('loginNome').value.trim();
         const cpf = limparCPF(document.getElementById('loginCPF').value);
@@ -2413,44 +2502,59 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
         
         showLoading();
-        const { data, error } = await supabaseClient.rpc('login_painel_admin', {
-            p_cpf: cpf,
-            p_senha: senha
-        });
-        hideLoading();
-
-        if (error || !data || !data.success) {
-            return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
+        try {
+            // Usando a RPC login_painel_admin
+            const { data, error } = await supabaseClient.rpc('login_painel_admin', {
+                p_cpf: cpf,
+                p_senha: senha
+            });
+            
+            hideLoading();
+            
+            if (error || !data || !data.success) {
+                return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
+            }
+            
+            usuarioLogado = data;
+            
+            // Buscar dados adicionais do usuário
+            const { data: userData } = await supabaseClient
+                .from('usuarios')
+                .select('*')
+                .eq('id', usuarioLogado.id)
+                .maybeSingle();
+            
+            if (userData) {
+                usuarioLogado.unidade_saude = userData.unidade_saude || '';
+                usuarioLogado.email = userData.email || '';
+                usuarioLogado.telefone = userData.telefone || '';
+            }
+            
+            document.getElementById('screenLogin').style.display = 'none';
+            document.getElementById('screenLogin').classList.remove('active');
+            document.getElementById('screenSistema').classList.add('active');
+            document.getElementById('screenSistema').style.display = 'flex';
+            
+            const tipoLabel = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : 
+                             usuarioLogado.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário Comum';
+            document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Admin';
+            document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'A')[0].toUpperCase();
+            document.getElementById('sidebarTipo').textContent = tipoLabel;
+            document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
+            
+            const adminSection = document.getElementById('sidebarAdminSection');
+            if (adminSection) adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
+            
+            const apacSection = document.getElementById('sidebarAPACSection');
+            if (apacSection) apacSection.classList.toggle('hidden', !podeGerarRelatorioAPAC());
+            
+            await atualizarTudo();
+            
+        } catch(err) {
+            hideLoading();
+            console.error(err);
+            alert('❌ Erro ao fazer login: ' + err.message);
         }
-
-        usuarioLogado = data;
-        
-        const { data: userData } = await supabaseClient.from('usuarios').select('*').eq('id', usuarioLogado.id).maybeSingle();
-        if (userData) {
-            usuarioLogado.unidade_saude = userData.unidade_saude || '';
-            usuarioLogado.email = userData.email || '';
-            usuarioLogado.telefone = userData.telefone || '';
-        }
-        
-        document.getElementById('screenLogin').style.display = 'none';
-        document.getElementById('screenLogin').classList.remove('active');
-        document.getElementById('screenSistema').classList.add('active');
-        document.getElementById('screenSistema').style.display = 'flex';
-        
-        const tipoLabel = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : 
-                         usuarioLogado.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário Comum';
-        document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Admin';
-        document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'A')[0].toUpperCase();
-        document.getElementById('sidebarTipo').textContent = tipoLabel;
-        document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
-        
-        const adminSection = document.getElementById('sidebarAdminSection');
-        if (adminSection) adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
-        
-        const apacSection = document.getElementById('sidebarAPACSection');
-        if (apacSection) apacSection.classList.toggle('hidden', !podeGerarRelatorioAPAC());
-        
-        atualizarTudo();
     });
 
     // REDEFINIR SENHA
@@ -2469,24 +2573,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (novaSenha !== confirma) return alert('❌ As senhas não conferem!');
         
         showLoading();
-        const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
-            p_cpf: cpf,
-            p_nome_mae: nomeMae || '',
-            p_cidade_natal: cidadeNatal,
-            p_codigo: codigo,
-            p_nova_senha: novaSenha
-        });
-        hideLoading();
-        
-        if (error || !data || !data.success) {
-            return alert('❌ ' + (data?.message || 'Erro ao redefinir senha!'));
+        try {
+            const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
+                p_cpf: cpf,
+                p_nome_mae: nomeMae || '',
+                p_cidade_natal: cidadeNatal,
+                p_codigo: codigo,
+                p_nova_senha: novaSenha
+            });
+            
+            hideLoading();
+            
+            if (error || !data || !data.success) {
+                return alert('❌ ' + (data?.message || 'Erro ao redefinir senha!'));
+            }
+            alert('✅ Senha redefinida com sucesso!');
+            ['resetCPF','resetNomeMae','resetCidadeNatal','resetCodigo','resetNovaSenha','resetConfirmaSenha'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            showScreen('screenLogin');
+        } catch(err) {
+            hideLoading();
+            alert('❌ Erro: ' + err.message);
         }
-        alert('✅ Senha redefinida com sucesso!');
-        ['resetCPF','resetNomeMae','resetCidadeNatal','resetCodigo','resetNovaSenha','resetConfirmaSenha'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-        showScreen('screenLogin');
     });
 
     // ENTER NO LOGIN
@@ -2510,7 +2620,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (usuarioLogado) atualizarTudo(); 
     }, 30000);
 
-    console.log('✅ FERRAMENTA OCI v7.0 REFORMADA INICIALIZADA COM SUCESSO!');
+    console.log('✅ FERRAMENTA OCI v7.1 REFORMADA INICIALIZADA COM SUCESSO!');
 });
 
 </script>
