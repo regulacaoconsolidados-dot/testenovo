@@ -487,15 +487,15 @@ function showScreen(screenId) {
             </a>
             
             <!-- ===== SEÇÃO DE ADMINISTRAÇÃO ===== -->
-               <div id="sidebarAdminSection" class="hidden">
-             <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
-                   <i class="fas fa-user-shield"></i> ⚙️ Administração
+            <div id="sidebarAdminSection" class="hidden">
+                <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
+                    <i class="fas fa-user-shield"></i> ⚙️ Administração
                 </a>
-                 <!-- BOTÃO PARA MIGRAR PARA ADMIN APAC - AGORA DENTRO DA SEÇÃO -->
-                  <button onclick="migrarPerfilAdminAPAC()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-indigo-400 font-bold hover:bg-white/10 transition-all" style="background:transparent; border:none; cursor:pointer; width:100%; text-align:left; padding-left: 44px;">
-                      <i class="fas fa-arrow-up"></i> 📑 Migrar para Admin APAC
-                  </button>
-                 </div>
+                <!-- BOTÃO PARA MIGRAR PARA ADMIN APAC - DENTRO DA SEÇÃO -->
+                <button onclick="migrarPerfilAdminAPAC()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-indigo-400 font-bold hover:bg-white/10 transition-all" style="background:transparent; border:none; cursor:pointer; width:100%; text-align:left; padding-left: 44px;">
+                    <i class="fas fa-arrow-up"></i> 📑 Migrar para Admin APAC
+                </button>
+            </div>
             
             <div class="relative">
                 <button onclick="toggleExportMenu()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-white font-bold hover:bg-white/10 transition-all">
@@ -1770,7 +1770,7 @@ async function salvarEdicaoUsuario() {
     }
 }
 
-// ===== FUNÇÃO PARA MIGRAR PERFIL (NOVA) =====
+// ===== FUNÇÃO PARA MIGRAR PERFIL - CORRIGIDA =====
 async function migrarPerfilAdminAPAC() {
     if (!usuarioLogado) return alert('❌ Faça login primeiro!');
     if (usuarioLogado.tipo === 'admin_apac') return alert('✅ Você já é Admin APAC!');
@@ -1780,32 +1780,22 @@ async function migrarPerfilAdminAPAC() {
     
     showLoading();
     try {
-        // Usa a função RPC segura
+        // Tenta usar a função RPC primeiro (mais segura)
         const { data, error } = await supabaseClient.rpc('migrar_para_admin_apac', {
             p_usuario_id: usuarioLogado.id
         });
         
-        hideLoading();
-        
         if (error) {
-            console.error('Erro RPC:', error);
-            // Tenta fallback para update direto (se tiver permissão)
-            try {
-                const { error: updateError } = await supabaseClient
-                    .from('usuarios')
-                    .update({ tipo: 'admin_apac' })
-                    .eq('id', usuarioLogado.id);
-                
-                if (updateError) throw updateError;
-            } catch (fallbackErr) {
-                alert(`❌ Erro ao migrar perfil: ${error.message || fallbackErr.message}\n\nEntre em contato com o administrador do sistema.`);
-                return;
-            }
-        }
-        
-        if (data && data.success === false) {
-            alert(`❌ ${data.message}`);
-            return;
+            console.warn('RPC falhou, tentando fallback:', error);
+            // Fallback: tenta update direto
+            const { error: updateError } = await supabaseClient
+                .from('usuarios')
+                .update({ tipo: 'admin_apac' })
+                .eq('id', usuarioLogado.id);
+            
+            if (updateError) throw updateError;
+        } else if (data && data.success === false) {
+            throw new Error(data.message || 'Erro desconhecido');
         }
         
         // Atualiza a sessão do usuário
@@ -1822,14 +1812,14 @@ async function migrarPerfilAdminAPAC() {
         // Esconde o botão de migração (já migrou)
         const adminSection = document.getElementById('sidebarAdminSection');
         if (adminSection) {
-            // Mantém a seção de administração visível, mas pode esconder o botão de migração
             const migrarBtn = adminSection.querySelector('button[onclick*="migrarPerfilAdminAPAC"]');
             if (migrarBtn) migrarBtn.style.display = 'none';
         }
         
+        hideLoading();
         alert('✅ Perfil migrado para Admin APAC com sucesso!\nAgora você pode gerar relatórios APAC completos.');
         
-        // Log de auditoria (fallback)
+        // Log de auditoria
         try {
             await supabaseClient.from('logs_auditoria').insert({
                 usuario_id: usuarioLogado.id,
@@ -1839,16 +1829,15 @@ async function migrarPerfilAdminAPAC() {
             });
         } catch(logErr) { /* ignora erro de log */ }
         
-        // Recarrega a lista de usuários se estiver visível
         await renderizarListaUsuarios();
         
     } catch(err) {
         hideLoading();
         console.error('Erro na migração:', err);
-        alert(`❌ Erro ao migrar perfil: ${err.message}\n\nEntre em contato com o administrador do sistema.`);
+        alert(`❌ Erro ao migrar perfil: ${err.message}\n\nVerifique se você tem permissões de Administrador.`);
     }
 }
-    
+
 // ============================================
 // MODAL RELATÓRIO APAC
 // ============================================
@@ -1910,12 +1899,10 @@ function buscarGlobal() {
     if (!input) return;
     const termo = input.value.trim().toLowerCase();
     if (!termo) {
-        // Se o campo estiver vazio, recarrega os dados normais
         atualizarTudo();
         return;
     }
     
-    // Filtra os pacientes e consultas
     const pacientesEncontrados = pacientes.filter(p => 
         (p.prontuario && p.prontuario.toString().includes(termo)) ||
         (p.nome && p.nome.toLowerCase().includes(termo)) ||
@@ -1933,15 +1920,12 @@ function buscarGlobal() {
         return;
     }
     
-    // Salva os dados filtrados temporariamente
     const consultasAntigas = consultas;
     consultas = consultasEncontradas;
     
-    // Atualiza a visualização na aba atual
     const tabAtual = document.querySelector('.tab-content.active');
     if (tabAtual) {
         const id = tabAtual.id.replace('content-', '');
-        // Verifica se é uma aba de tabela
         const tiposTabela = ['monitoramento','monitoramento-exames','primeira-consulta-agendadas','primeira-consulta','aptos-retorno','retornos-agendados','retornos-recepcionados','absenteismo-1consulta','absenteismo-retorno','apac','apacs-geradas'];
         if (tiposTabela.includes(id)) {
             renderizarTabelas();
@@ -1950,12 +1934,11 @@ function buscarGlobal() {
         }
     }
     
-    // Restaura os dados originais para não perder o estado
     setTimeout(() => {
         consultas = consultasAntigas;
     }, 5000);
     
-    toast(`🔍 ${consultasEncontradas.length} registro(s) encontrados para: ${termo}`, 'success');
+    toast(`🔍 ${consultasEncontradas.length} registro(s) encontrado(s)`, 'success');
 }
 
 // ============================================
@@ -2441,7 +2424,6 @@ function exportarExcel(tipo) {
             'Status': item.status || '',
             'Data': item.data_agendada || ''
         };
-        // Adicionar campos específicos conforme tipo
         if (tipo === 'monitoramento-exames') {
             row['Exame'] = item.nome_exame || '';
             row['Data Solicitação'] = item.data_solicitacao_exame || '';
