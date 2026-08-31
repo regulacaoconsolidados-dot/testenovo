@@ -129,6 +129,8 @@
         
         .sidebar-btn-migrar { background: transparent !important; border: none !important; cursor: pointer; width: 100%; text-align: left; padding-left: 44px; }
         .sidebar-btn-migrar:hover { background: rgba(255,255,255,0.06) !important; }
+        .export-menu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .export-menu.open { max-height: 500px; }
     </style>
 </head>
 <body>
@@ -396,7 +398,7 @@
 <!-- ============ SISTEMA PRINCIPAL ============ -->
 <div id="screenSistema" class="hidden h-full w-full flex overflow-hidden">
     
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR - LAYOUT ORIGINAL RESTAURADO -->
     <aside class="w-64 gradient-header text-white hidden md:flex flex-col h-full shadow-2xl z-50 flex-shrink-0">
         <div class="p-6 flex items-center gap-3 border-b border-white/10">
             <div class="bg-blue-600 p-2 rounded-xl">🏥</div>
@@ -407,6 +409,7 @@
         </div>
         
         <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
+            <!-- Itens principais -->
             <a href="#" onclick="switchTab('logica-indicadores')" class="sidebar-item active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold">
                 <i class="fas fa-brain w-4 text-yellow-400"></i> 🧠 Lógica e Indicadores
             </a>
@@ -414,6 +417,7 @@
                 <i class="fas fa-th-large w-4"></i> 📊 Visão Geral
             </a>
             
+            <!-- Caixa de Ferramentas -->
             <div class="mt-2">
                 <div onclick="toggleFerramentas()" class="flex items-center justify-between p-3 rounded-xl text-sm text-slate-300 font-bold cursor-pointer hover:bg-white/5">
                     <span><i class="fas fa-tools w-4 mr-2"></i> 🧰 Caixa de Ferramentas</span>
@@ -458,11 +462,13 @@
             
             <div class="border-t border-white/10 my-4"></div>
             
-            <!-- ============================================ -->
-            <!-- SIDEBAR ADMIN - CORRIGIDO -->
-            <!-- ============================================ -->
+            <!-- Link Portal de Retorno -->
+            <a href="https://paineldousuario.regulacaoconsolidados.workers.dev/#" target="_blank" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-emerald-400 font-bold hover:bg-white/10 transition-all">
+                <i class="fas fa-external-link-alt w-4"></i> 📋 Portal de Retorno
+            </a>
+            
+            <!-- Seção Administração (visível apenas para Admin) -->
             <div id="sidebarAdminSection" class="hidden">
-                <!-- Botão Administração (apenas Admin) -->
                 <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
                     <i class="fas fa-user-shield"></i> ⚙️ Administração
                 </a>
@@ -473,9 +479,27 @@
                 </button>
             </div>
             
-            <!-- ============================================ -->
-            <!-- SIDEBAR APAC SECTION -->
-            <!-- ============================================ -->
+            <!-- ===== BAIXAR RELATÓRIOS - RESTAURADO ===== -->
+            <div class="relative">
+                <button onclick="toggleExportMenu()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-white font-bold hover:bg-white/10 transition-all">
+                    <i class="fas fa-download"></i> 📥 Baixar Relatórios
+                    <i class="fas fa-chevron-down ml-auto text-xs transition-transform" id="exportArrow"></i>
+                </button>
+                <div id="exportMenu" class="hidden pl-4 space-y-1 mt-1">
+                    <button onclick="exportarExcel('primeira-consulta-agendadas')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-sky-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> 1ª Cons. Agendadas</button>
+                    <button onclick="exportarExcel('primeira-consulta')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-cyan-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> 1ª Consulta Recep.</button>
+                    <button onclick="exportarExcel('aptos-retorno')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-emerald-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> Aptos Retorno</button>
+                    <button onclick="exportarExcel('retornos-agendados')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-blue-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> Ret. Agendados</button>
+                    <button onclick="exportarExcel('retornos-recepcionados')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-teal-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> Ret. Recepcionados</button>
+                    <button onclick="exportarExcel('absenteismo-1consulta')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-orange-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> Abs. 1ª Cons.</button>
+                    <button onclick="exportarExcel('absenteismo-retorno')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-red-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> Abs. Retorno</button>
+                    <button onclick="exportarExcel('apac')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-purple-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> OCI´s Fechadas</button>
+                    <button onclick="exportarExcel('apacs-geradas')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-indigo-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> APAC´s Geradas</button>
+                    <button onclick="exportarExcel('monitoramento-exames')" class="w-full flex items-center gap-3 p-2 rounded-xl text-xs text-pink-400 font-bold hover:bg-white/5"><i class="fas fa-file-excel w-3"></i> Monitor. Exames</button>
+                </div>
+            </div>
+            
+            <!-- Seção APAC (visível para Admin e Admin APAC) -->
             <div id="sidebarAPACSection" class="hidden mt-2">
                 <button onclick="abrirModalRelatorioAPAC()" class="w-full btn-apac-gradient text-sm flex items-center justify-center gap-2">
                     <i class="fas fa-file-medical"></i> 📑 Gerar Relatório APAC
@@ -499,7 +523,7 @@
     <!-- ÁREA PRINCIPAL -->
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f0f4f8]">
         
-        <!-- HEADER -->
+        <!-- HEADER - COM BOTÕES RESTAURADOS -->
         <header class="gradient-header text-white flex-shrink-0 border-b border-white/10">
             <div class="h-16 flex items-center justify-between px-4 md:px-8">
                 <div>
@@ -522,20 +546,21 @@
                 </div>
             </div>
             
+            <!-- BOTÕES DO CABEÇALHO - LAYOUT ORIGINAL RESTAURADO -->
             <div class="header-buttons">
-                <button class="btn-logica" onclick="switchTab('logica-indicadores')"><i class="fas fa-brain"></i> Lógica</button>
-                <button class="btn-visao" onclick="switchTab('visao-geral')"><i class="fas fa-th-large"></i> Visão</button>
-                <button class="btn-monitor" onclick="switchTab('monitoramento')"><i class="fas fa-users"></i> Monitor</button>
-                <button class="btn-exames" onclick="switchTab('monitoramento-exames')"><i class="fas fa-flask"></i> Exames</button>
-                <button class="btn-primeira" onclick="switchTab('primeira-consulta-agendadas')"><i class="fas fa-clock"></i> 1ª Agd.</button>
-                <button class="btn-primeira" onclick="switchTab('primeira-consulta')"><i class="fas fa-clipboard-check"></i> 1ª Rec.</button>
-                <button class="btn-retorno" onclick="switchTab('aptos-retorno')"><i class="fas fa-check-circle"></i> Aptos</button>
-                <button class="btn-retorno" onclick="switchTab('retornos-agendados')"><i class="fas fa-calendar-plus"></i> Ret. Agd.</button>
-                <button class="btn-retorno" onclick="switchTab('retornos-recepcionados')"><i class="fas fa-calendar-check"></i> Ret. Rec.</button>
-                <button class="btn-abs" onclick="switchTab('absenteismo-1consulta')"><i class="fas fa-user-times"></i> Abs. 1ª</button>
-                <button class="btn-abs" onclick="switchTab('absenteismo-retorno')"><i class="fas fa-user-slash"></i> Abs. Ret.</button>
-                <button class="btn-oci" onclick="switchTab('apac')"><i class="fas fa-file-invoice"></i> OCI Fec.</button>
-                <button class="btn-apac" onclick="switchTab('apacs-geradas')"><i class="fas fa-file-medical"></i> APAC</button>
+                <button class="btn-logica" onclick="switchTab('logica-indicadores')"><i class="fas fa-brain"></i> Lógica Indicadores</button>
+                <button class="btn-visao" onclick="switchTab('visao-geral')"><i class="fas fa-th-large"></i> Visão Geral</button>
+                <button class="btn-monitor" onclick="switchTab('monitoramento')"><i class="fas fa-users"></i> Monitoramento</button>
+                <button class="btn-exames" onclick="switchTab('monitoramento-exames')"><i class="fas fa-flask"></i> Monitor. Exames</button>
+                <button class="btn-primeira" onclick="switchTab('primeira-consulta-agendadas')"><i class="fas fa-clock"></i> 1ª Cons. Agendados</button>
+                <button class="btn-primeira" onclick="switchTab('primeira-consulta')"><i class="fas fa-clipboard-check"></i> 1ª Cons. Recep.</button>
+                <button class="btn-retorno" onclick="switchTab('aptos-retorno')"><i class="fas fa-check-circle"></i> Aptos Retornos</button>
+                <button class="btn-retorno" onclick="switchTab('retornos-agendados')"><i class="fas fa-calendar-plus"></i> Ret. Agendados</button>
+                <button class="btn-retorno" onclick="switchTab('retornos-recepcionados')"><i class="fas fa-calendar-check"></i> Ret. Recepcionados</button>
+                <button class="btn-abs" onclick="switchTab('absenteismo-1consulta')"><i class="fas fa-user-times"></i> Abs. 1ª Cons.</button>
+                <button class="btn-abs" onclick="switchTab('absenteismo-retorno')"><i class="fas fa-user-slash"></i> Abs. Retornos</button>
+                <button class="btn-oci" onclick="switchTab('apac')"><i class="fas fa-file-invoice"></i> OCI´s Fechadas</button>
+                <button class="btn-apac" onclick="switchTab('apacs-geradas')"><i class="fas fa-file-medical"></i> APAC´s Geradas</button>
             </div>
         </header>
 
@@ -1076,10 +1101,17 @@
 // 📅 31/08/2026 - VERSÃO FINAL CORRIGIDA
 // ============================================
 
+// ⚠️ ATUALIZE COM SUAS CREDENCIAIS DO SUPABASE
 const SUPABASE_URL = 'https://qgrpqsvsxidxezsonasb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_v7xrru1Cda8Ok4O0JmgJlA_g-DHJEbT';
+
 let supabaseClient = null;
-try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.warn('Supabase offline'); }
+try { 
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('✅ Supabase client inicializado com sucesso!');
+} catch(e) { 
+    console.warn('⚠️ Supabase offline:', e.message); 
+}
 
 // ============================================
 // LISTAS GLOBAIS
@@ -1167,14 +1199,6 @@ const LISTA_UBS = [
     'CONTAGEM PENITENCIARIA NELSON HUNGRIA',
     'UNIDADE BASICA DE SAUDE TUPA',
     'UNIDADE BASICA DE SAUDE LIBERDADE II'
-];
-
-const especialidades = [
-    {id:1, nome:'Cardiologia', icone:'🫀', grupo_sigtap:'02', exames_obrigatorios:'ECG + Teste Ergométrico', prazo_retorno_dias:60},
-    {id:2, nome:'Ortopedia', icone:'🦴', grupo_sigtap:'03', exames_obrigatorios:'RX + USG + Tomografia', prazo_retorno_dias:60},
-    {id:3, nome:'Oncologia', icone:'🎗️', grupo_sigtap:'01', exames_obrigatorios:'Biópsia + AP + USG', prazo_retorno_dias:30},
-    {id:4, nome:'Oftalmologia', icone:'👁️', grupo_sigtap:'05', exames_obrigatorios:'Mapeamento + Tonometria', prazo_retorno_dias:60},
-    {id:5, nome:'Otorrino', icone:'👂', grupo_sigtap:'04', exames_obrigatorios:'Audiometria + Videolaringoscopia', prazo_retorno_dias:60}
 ];
 
 // ============================================
@@ -1355,6 +1379,16 @@ function toggleFerramentas() {
     if (sub) {
         sub.classList.toggle('open');
         icon.classList.toggle('open');
+    }
+}
+
+function toggleExportMenu() {
+    const menu = document.getElementById('exportMenu');
+    const arrow = document.getElementById('exportArrow');
+    if (menu && arrow) {
+        menu.classList.toggle('hidden');
+        arrow.classList.toggle('fa-chevron-up');
+        arrow.classList.toggle('fa-chevron-down');
     }
 }
 
@@ -1647,7 +1681,6 @@ async function renderizarLogs() {
 async function carregarSelectsMigracao() {
     if (!supabaseClient) return;
     try {
-        // Carregar usuários comuns para migrar
         const { data: usuariosComuns } = await supabaseClient
             .from('usuarios')
             .select('id, nome, cpf, tipo')
@@ -1661,7 +1694,6 @@ async function carregarSelectsMigracao() {
                 ).join('');
         }
         
-        // Carregar Admin APACs para reverter
         const { data: adminApacs } = await supabaseClient
             .from('usuarios')
             .select('id, nome, cpf')
@@ -1752,12 +1784,11 @@ async function renderizarTabelaAPAC() {
 }
 
 // ============================================
-// FUNÇÃO: ATUALIZAR SIDEBAR (CORRIGIDA)
+// FUNÇÃO: ATUALIZAR SIDEBAR
 // ============================================
 function atualizarSidebar() {
     if (!usuarioLogado) return;
     
-    // Atualizar informações do usuário
     document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Usuário';
     document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
     
@@ -1766,7 +1797,6 @@ function atualizarSidebar() {
     document.getElementById('sidebarTipo').textContent = tipoLabel;
     document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
     
-    // Atualizar visibilidade dos botões
     const adminSection = document.getElementById('sidebarAdminSection');
     if (adminSection) {
         adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
@@ -1818,13 +1848,8 @@ async function migrarMeuPerfilAdminAPAC() {
             return;
         }
         
-        // Atualizar dados do usuário logado
         usuarioLogado.tipo = 'admin_apac';
-        
-        // Atualizar sidebar
         atualizarSidebar();
-        
-        // Atualizar listas
         renderizarListaUsuarios();
         carregarSelectsMigracao();
         renderizarTabelaAPAC();
@@ -2541,7 +2566,6 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarUBSnoSelect('editUsuarioUbs');
     toggleUbsField();
     
-    // Busca global
     document.getElementById('globalSearch').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') buscarGlobal();
     });
@@ -2549,7 +2573,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!e.target.value.trim()) atualizarTudo();
     });
 
-    // LOGIN
     document.getElementById('btnLogin').addEventListener('click', async () => {
         const nome = document.getElementById('loginNome').value.trim();
         const cpf = limparCPF(document.getElementById('loginCPF').value);
@@ -2584,14 +2607,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('screenSistema').classList.add('active');
         document.getElementById('screenSistema').style.display = 'flex';
         
-        // Atualizar sidebar com as novas funções
         atualizarSidebar();
         
         toast('✅ Bem-vindo, ' + usuarioLogado.nome + '!', 'success');
         atualizarTudo();
     });
 
-    // REDEFINIR SENHA
     document.getElementById('btnResetConfirmar').addEventListener('click', async () => {
         const cpf = limparCPF(document.getElementById('resetCPF').value);
         const nomeMae = document.getElementById('resetNomeMae').value.trim();
@@ -2628,12 +2649,10 @@ document.addEventListener('DOMContentLoaded', () => {
         showScreen('screenLogin');
     });
 
-    // ENTER NO LOGIN
     document.getElementById('loginSenha').addEventListener('keydown', (e) => { 
         if (e.key === 'Enter') document.getElementById('btnLogin').click(); 
     });
 
-    // FECHAR MODAIS
     document.getElementById('modalAdmin').addEventListener('click', function(e) { 
         if (e.target === this) fecharModalAdmin(); 
     });
@@ -2644,13 +2663,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === this) fecharModal('modalRelatorioAPAC'); 
     });
 
-    // ATUALIZAÇÃO AUTOMÁTICA
     setInterval(() => { 
         if (usuarioLogado) atualizarTudo(); 
     }, 30000);
 
     console.log('✅ FERRAMENTA OCI v7.0 INICIALIZADA COM SUCESSO!');
 });
+
+// ============================================
+// ESPECIALIDADES (necessário para os gráficos)
+// ============================================
+const especialidades = [
+    {id:1, nome:'Cardiologia', icone:'🫀', grupo_sigtap:'02', exames_obrigatorios:'ECG + Teste Ergométrico', prazo_retorno_dias:60},
+    {id:2, nome:'Ortopedia', icone:'🦴', grupo_sigtap:'03', exames_obrigatorios:'RX + USG + Tomografia', prazo_retorno_dias:60},
+    {id:3, nome:'Oncologia', icone:'🎗️', grupo_sigtap:'01', exames_obrigatorios:'Biópsia + AP + USG', prazo_retorno_dias:30},
+    {id:4, nome:'Oftalmologia', icone:'👁️', grupo_sigtap:'05', exames_obrigatorios:'Mapeamento + Tonometria', prazo_retorno_dias:60},
+    {id:5, nome:'Otorrino', icone:'👂', grupo_sigtap:'04', exames_obrigatorios:'Audiometria + Videolaringoscopia', prazo_retorno_dias:60}
+];
 </script>
 </body>
 </html>
