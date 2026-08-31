@@ -487,15 +487,15 @@ function showScreen(screenId) {
             </a>
             
             <!-- ===== SEÇÃO DE ADMINISTRAÇÃO ===== -->
-            <div id="sidebarAdminSection" class="hidden">
-                <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
-                    <i class="fas fa-user-shield"></i> ⚙️ Administração
+               <div id="sidebarAdminSection" class="hidden">
+             <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
+                   <i class="fas fa-user-shield"></i> ⚙️ Administração
                 </a>
-                <!-- BOTÃO PARA MIGRAR PARA ADMIN APAC -->
-                <button onclick="migrarPerfilAdminAPAC()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-indigo-400 font-bold hover:bg-white/10 transition-all" style="background:transparent; border:none; cursor:pointer; width:100%; text-align:left;">
-                    <i class="fas fa-arrow-up"></i> 📑 Migrar para Admin APAC
-                </button>
-            </div>
+                 <!-- BOTÃO PARA MIGRAR PARA ADMIN APAC - AGORA DENTRO DA SEÇÃO -->
+                  <button onclick="migrarPerfilAdminAPAC()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-indigo-400 font-bold hover:bg-white/10 transition-all" style="background:transparent; border:none; cursor:pointer; width:100%; text-align:left; padding-left: 44px;">
+                      <i class="fas fa-arrow-up"></i> 📑 Migrar para Admin APAC
+                  </button>
+                 </div>
             
             <div class="relative">
                 <button onclick="toggleExportMenu()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-white font-bold hover:bg-white/10 transition-all">
@@ -1780,24 +1780,56 @@ async function migrarPerfilAdminAPAC() {
     
     showLoading();
     try {
-        const { error } = await supabaseClient
-            .from('usuarios')
-            .update({ tipo: 'admin_apac' })
-            .eq('id', usuarioLogado.id);
+        // Usa a função RPC segura
+        const { data, error } = await supabaseClient.rpc('migrar_para_admin_apac', {
+            p_usuario_id: usuarioLogado.id
+        });
         
         hideLoading();
-        if (error) throw error;
         
+        if (error) {
+            console.error('Erro RPC:', error);
+            // Tenta fallback para update direto (se tiver permissão)
+            try {
+                const { error: updateError } = await supabaseClient
+                    .from('usuarios')
+                    .update({ tipo: 'admin_apac' })
+                    .eq('id', usuarioLogado.id);
+                
+                if (updateError) throw updateError;
+            } catch (fallbackErr) {
+                alert(`❌ Erro ao migrar perfil: ${error.message || fallbackErr.message}\n\nEntre em contato com o administrador do sistema.`);
+                return;
+            }
+        }
+        
+        if (data && data.success === false) {
+            alert(`❌ ${data.message}`);
+            return;
+        }
+        
+        // Atualiza a sessão do usuário
         usuarioLogado.tipo = 'admin_apac';
         
+        // Atualiza a sidebar
         const tipoLabel = '📑 Admin APAC';
         document.getElementById('sidebarTipo').textContent = tipoLabel;
+        
+        // Mostra o botão de relatório APAC
         const apacSection = document.getElementById('sidebarAPACSection');
         if (apacSection) apacSection.classList.remove('hidden');
         
+        // Esconde o botão de migração (já migrou)
+        const adminSection = document.getElementById('sidebarAdminSection');
+        if (adminSection) {
+            // Mantém a seção de administração visível, mas pode esconder o botão de migração
+            const migrarBtn = adminSection.querySelector('button[onclick*="migrarPerfilAdminAPAC"]');
+            if (migrarBtn) migrarBtn.style.display = 'none';
+        }
+        
         alert('✅ Perfil migrado para Admin APAC com sucesso!\nAgora você pode gerar relatórios APAC completos.');
         
-        // Log de auditoria
+        // Log de auditoria (fallback)
         try {
             await supabaseClient.from('logs_auditoria').insert({
                 usuario_id: usuarioLogado.id,
@@ -1807,14 +1839,16 @@ async function migrarPerfilAdminAPAC() {
             });
         } catch(logErr) { /* ignora erro de log */ }
         
+        // Recarrega a lista de usuários se estiver visível
         await renderizarListaUsuarios();
         
     } catch(err) {
         hideLoading();
         console.error('Erro na migração:', err);
-        alert(`❌ Erro ao migrar perfil: ${err.message}`);
+        alert(`❌ Erro ao migrar perfil: ${err.message}\n\nEntre em contato com o administrador do sistema.`);
     }
 }
+    
 // ============================================
 // MODAL RELATÓRIO APAC
 // ============================================
