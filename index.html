@@ -487,10 +487,14 @@ function showScreen(screenId) {
             </a>
             
             <div id="sidebarAdminSection" class="hidden">
-                <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
-                    <i class="fas fa-user-shield"></i> ⚙️ Administração
-                </a>
-            </div>
+                   <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
+                     <i class="fas fa-user-shield"></i> ⚙️ Administração
+                    </a>
+    
+                <button onclick="migrarPerfilAdminAPAC()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-indigo-400 font-bold hover:bg-white/10 transition-all" style="background:transparent; border:none; cursor:pointer; width:100%; text-align:left;">
+                    <i class="fas fa-arrow-up"></i> 📑 Migrar para Admin APAC
+                      </button>
+                  </div>
             
             <div class="relative">
                 <button onclick="toggleExportMenu()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-white font-bold hover:bg-white/10 transition-all">
@@ -1431,68 +1435,30 @@ function switchTab(tabId) {
     if (tabId === 'visao-geral') setTimeout(renderizarGraficos, 300);
 }
 
+/// ============================================
+// FUNÇÕES ADMIN - CORRIGIDAS
 // ============================================
-// FUNÇÕES ADMIN (resumidas)
-// ============================================
-function abrirModalAdmin() {
-    document.getElementById('modalAdmin').classList.add('show');
-    switchAdminTab('usuarios');
-    renderizarListaUsuarios();
-}
 
-function switchAdminTab(tabId) {
-    document.querySelectorAll('.admin-tab-btn').forEach(b => {
-        b.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
-        b.classList.add('text-slate-400');
-    });
-    const tabEl = document.getElementById('adminTab-' + tabId);
-    if (tabEl) tabEl.classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
-    document.querySelectorAll('.admin-content').forEach(c => c.classList.add('hidden'));
-    const contentEl = document.getElementById('adminContent-' + tabId);
-    if (contentEl) contentEl.classList.remove('hidden');
-    if (tabId === 'logs') renderizarLogs();
-}
+// ===== LISTA DE USUÁRIOS COM CACHE =====
+let usuariosCache = [];
+let usuariosCacheTimestamp = 0;
+const CACHE_TTL = 30000; // 30 segundos
 
-function toggleUbsField() {
-    const tipo = document.getElementById('adminNovoTipo')?.value;
-    const ubsDiv = document.getElementById('adminNovoUbsDiv');
-    if (ubsDiv) ubsDiv.style.display = tipo === 'usuario' ? 'block' : 'none';
-}
-
-function toggleEditUbsField() {
-    const tipo = document.getElementById('editUsuarioTipo')?.value;
-    const ubsDiv = document.getElementById('editUsuarioUbsDiv');
-    if (ubsDiv) ubsDiv.style.display = tipo === 'usuario' ? 'block' : 'none';
-}
-
-function carregarUBSnoSelect(selectId) {
-    const select = document.getElementById(selectId);
-    if (!select) return;
-    select.innerHTML = '<option value="">Selecione a UBS</option>' + 
-        LISTA_UBS.map(u => `<option value="${u.replace(/'/g, "\\'")}">${u}</option>`).join('');
-}
-
-function preencherCPF(cpf) {
-    const el = document.getElementById('adminNovoCPF');
-    if (el) el.value = cpf;
-}
-
-function gerarCPFAdmin() {
-    const el = document.getElementById('adminNovoCPF');
-    if (el) {
-        let cpf = '';
-        for (let i=0; i<9; i++) cpf += Math.floor(Math.random() * 9);
-        let d1 = 0;
-        for (let i=0; i<9; i++) d1 += parseInt(cpf[i]) * (10 - i);
-        d1 = (d1 * 10) % 11;
-        if (d1 === 10) d1 = 0;
-        cpf += d1;
-        let d2 = 0;
-        for (let i=0; i<10; i++) d2 += parseInt(cpf[i]) * (11 - i);
-        d2 = (d2 * 10) % 11;
-        if (d2 === 10) d2 = 0;
-        cpf += d2;
-        el.value = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+async function getUsuarios(forceRefresh = false) {
+    if (!supabaseClient) return [];
+    const now = Date.now();
+    if (!forceRefresh && usuariosCache.length > 0 && (now - usuariosCacheTimestamp) < CACHE_TTL) {
+        return usuariosCache;
+    }
+    try {
+        const { data, error } = await supabaseClient.rpc('listar_usuarios_seguro');
+        if (error) throw error;
+        usuariosCache = data || [];
+        usuariosCacheTimestamp = now;
+        return usuariosCache;
+    } catch (err) {
+        console.error('Erro ao listar usuários:', err);
+        return usuariosCache.length > 0 ? usuariosCache : [];
     }
 }
 
@@ -1500,11 +1466,10 @@ async function renderizarListaUsuarios() {
     if (!supabaseClient) return;
     showLoading();
     try {
-        const { data: usuarios, error } = await supabaseClient.rpc('listar_usuarios_seguro');
+        const usuarios = await getUsuarios(true);
         hideLoading();
-        if (error) { alert('❌ Erro: ' + error.message); return; }
         const busca = (document.getElementById('adminBuscaUsuario')?.value || '').toLowerCase();
-        let lista = (usuarios || []).filter(u => !busca || u.nome.toLowerCase().includes(busca) || (u.cpf || '').includes(busca));
+        let lista = usuarios.filter(u => !busca || u.nome.toLowerCase().includes(busca) || (u.cpf || '').includes(busca));
         const tbody = document.getElementById('adminTabelaUsuarios');
         if (!tbody) return;
         tbody.innerHTML = lista.map(u => `
@@ -1517,7 +1482,7 @@ async function renderizarListaUsuarios() {
                 <td class="px-3 py-2">
                     <div class="flex gap-2">
                         <button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button>
-                        <button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button>
+                        <button onclick='excluirUsuario(${u.id}, "${u.cpf}")' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button>
                         <button onclick='gerarTokenRedefinicao("${u.cpf}")' class="text-amber-600 hover:text-amber-800 text-xs font-bold">🔑</button>
                     </div>
                 </td>
@@ -1527,6 +1492,57 @@ async function renderizarListaUsuarios() {
     } catch(err) { hideLoading(); alert('❌ Erro ao carregar lista.'); }
 }
 
+// ===== EXCLUSÃO DE USUÁRIO - CORRIGIDA =====
+async function excluirUsuario(id, cpf) {
+    if (id === usuarioLogado?.id) return alert('❌ Não pode excluir a si mesmo!');
+    if (!confirm(`⚠️ Tem certeza que deseja excluir permanentemente o usuário com CPF ${formatarCPF(cpf)}?\n\nEsta ação NÃO pode ser desfeita!`)) return;
+    
+    showLoading();
+    try {
+        // 1. Primeiro, tenta excluir usando a função RPC segura
+        const { data, error } = await supabaseClient.rpc('excluir_usuario_seguro', {
+            p_usuario_id: id
+        });
+        
+        if (error) {
+            // Se falhar, tenta exclusão direta
+            console.warn('RPC falhou, tentando exclusão direta:', error);
+            const { error: deleteError } = await supabaseClient
+                .from('usuarios')
+                .delete()
+                .eq('id', id);
+            
+            if (deleteError) throw deleteError;
+        }
+        
+        // 2. Limpa o cache
+        usuariosCache = [];
+        usuariosCacheTimestamp = 0;
+        
+        // 3. Recarrega a lista
+        await renderizarListaUsuarios();
+        
+        hideLoading();
+        alert(`✅ Usuário ${formatarCPF(cpf)} excluído com sucesso!\n\nO CPF agora está liberado para novo cadastro.`);
+        
+        // 4. Log de auditoria
+        try {
+            await supabaseClient.from('logs_auditoria').insert({
+                usuario_id: usuarioLogado.id,
+                usuario_nome: usuarioLogado.nome,
+                acao: 'EXCLUSAO_USUARIO',
+                descricao: `Usuário ${formatarCPF(cpf)} excluído por ${usuarioLogado.nome}`
+            });
+        } catch(logErr) { /* ignora erro de log */ }
+        
+    } catch(err) {
+        hideLoading();
+        console.error('Erro ao excluir:', err);
+        alert(`❌ Erro ao excluir usuário: ${err.message}\n\nTente novamente ou contate o suporte.`);
+    }
+}
+
+// ===== CADASTRO DE USUÁRIO - CORRIGIDO =====
 async function cadastrarUsuarioAdmin() {
     const nome = document.getElementById('adminNovoNome')?.value?.trim();
     const cpf = limparCPF(document.getElementById('adminNovoCPF')?.value || '');
@@ -1536,41 +1552,95 @@ async function cadastrarUsuarioAdmin() {
     const tipo = document.getElementById('adminNovoTipo')?.value || 'usuario';
     const unidadeSaude = tipo === 'usuario' ? document.getElementById('adminNovoUbs')?.value : null;
     
-    if (!nome || !cpf || !email || !senha) return alert('⚠️ Preencha todos os campos!');
-    if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
-    if (senha.length !== 6) return alert('⚠️ Senha deve ter 6 dígitos!');
+    // Validações
+    if (!nome || !cpf || !email || !senha) return alert('⚠️ Preencha todos os campos obrigatórios!');
+    if (!validarCPF(cpf)) return alert('❌ CPF inválido! Verifique os dígitos.');
+    if (senha.length !== 6) return alert('⚠️ Senha deve ter exatamente 6 dígitos!');
     if (!email.includes('@') || !email.includes('.')) return alert('❌ E-mail inválido!');
-    if (tipo === 'usuario' && !unidadeSaude) return alert('❌ Selecione a UBS!');
+    if (tipo === 'usuario' && !unidadeSaude) return alert('❌ Para usuário comum, selecione a UBS!');
     
     showLoading();
-    const { data, error } = await supabaseClient.rpc('cadastrar_usuario_painel', {
-        p_nome: nome, p_cpf: cpf, p_email: email, p_telefone: telefone,
-        p_unidade_saude: unidadeSaude, p_senha: senha, p_tipo: tipo
-    });
-    hideLoading();
-    if (error || !data?.success) return alert('❌ Erro: ' + (data?.message || error?.message));
-    alert('✅ Usuário cadastrado!');
-    document.getElementById('adminNovoNome').value = '';
-    document.getElementById('adminNovoCPF').value = '';
-    document.getElementById('adminNovoEmail').value = '';
-    document.getElementById('adminNovoTelefone').value = '';
-    document.getElementById('adminNovoSenha').value = '';
-    document.getElementById('adminNovoUbs').value = '';
-    switchAdminTab('usuarios');
-    renderizarListaUsuarios();
+    
+    try {
+        // 1. Verifica se o CPF já existe (inclusive em cache)
+        const usuarios = await getUsuarios(true);
+        const existe = usuarios.some(u => limparCPF(u.cpf) === cpf);
+        if (existe) {
+            hideLoading();
+            return alert(`❌ CPF ${formatarCPF(cpf)} já está cadastrado!\n\nSe o usuário foi excluído recentemente, aguarde alguns segundos e tente novamente.`);
+        }
+        
+        // 2. Tenta cadastrar
+        const { data, error } = await supabaseClient.rpc('cadastrar_usuario_painel', {
+            p_nome: nome,
+            p_cpf: cpf,
+            p_email: email,
+            p_telefone: telefone,
+            p_unidade_saude: unidadeSaude,
+            p_senha: senha,
+            p_tipo: tipo
+        });
+        
+        hideLoading();
+        
+        if (error || !data?.success) {
+            // Mensagem de erro mais amigável
+            let msg = data?.message || error?.message || 'Erro desconhecido';
+            if (msg.includes('duplicate') || msg.includes('UNIQUE')) {
+                msg = `CPF ${formatarCPF(cpf)} já está cadastrado. Tente outro CPF.`;
+            }
+            return alert(`❌ Erro ao cadastrar: ${msg}`);
+        }
+        
+        // 3. Limpa o cache
+        usuariosCache = [];
+        usuariosCacheTimestamp = 0;
+        
+        alert(`✅ Usuário ${nome} cadastrado com sucesso!\nCPF: ${formatarCPF(cpf)}\nTipo: ${tipo === 'admin' ? 'Administrador' : tipo === 'admin_apac' ? 'Admin APAC' : 'Usuário Comum'}`);
+        
+        // 4. Limpa o formulário
+        document.getElementById('adminNovoNome').value = '';
+        document.getElementById('adminNovoCPF').value = '';
+        document.getElementById('adminNovoEmail').value = '';
+        document.getElementById('adminNovoTelefone').value = '';
+        document.getElementById('adminNovoSenha').value = '';
+        document.getElementById('adminNovoUbs').value = '';
+        
+        // 5. Recarrega a lista
+        switchAdminTab('usuarios');
+        await renderizarListaUsuarios();
+        
+        // 6. Log de auditoria
+        try {
+            await supabaseClient.from('logs_auditoria').insert({
+                usuario_id: usuarioLogado.id,
+                usuario_nome: usuarioLogado.nome,
+                acao: 'CADASTRO_USUARIO',
+                descricao: `Novo usuário ${nome} (${formatarCPF(cpf)}) cadastrado por ${usuarioLogado.nome}`
+            });
+        } catch(logErr) { /* ignora erro de log */ }
+        
+    } catch(err) {
+        hideLoading();
+        console.error('Erro no cadastro:', err);
+        alert(`❌ Erro inesperado: ${err.message}\n\nTente novamente.`);
+    }
 }
 
+// ===== EDIÇÃO DE USUÁRIO - CORRIGIDA =====
 function editarUsuario(u) {
     document.getElementById('editUsuarioId').value = u.id;
-    document.getElementById('editUsuarioNome').value = u.nome;
+    document.getElementById('editUsuarioNome').value = u.nome || '';
     document.getElementById('editUsuarioCPF').value = formatarCPF(u.cpf);
     document.getElementById('editUsuarioEmail').value = u.email || '';
     document.getElementById('editUsuarioTelefone').value = u.telefone || '';
     document.getElementById('editUsuarioSenha').value = '';
-    document.getElementById('editUsuarioTipo').value = u.tipo;
+    document.getElementById('editUsuarioTipo').value = u.tipo || 'usuario';
+    
     const ubsSelect = document.getElementById('editUsuarioUbs');
     if (ubsSelect) {
-        ubsSelect.innerHTML = '<option value="">Selecione a UBS</option>' + LISTA_UBS.map(ubs => `<option value="${ubs}" ${u.unidade_saude === ubs ? 'selected' : ''}>${ubs}</option>`).join('');
+        ubsSelect.innerHTML = '<option value="">Selecione a UBS</option>' + 
+            LISTA_UBS.map(ubs => `<option value="${ubs}" ${u.unidade_saude === ubs ? 'selected' : ''}>${ubs}</option>`).join('');
     }
     toggleEditUbsField();
     document.getElementById('modalEditarUsuario').classList.add('show');
@@ -1585,65 +1655,124 @@ async function salvarEdicaoUsuario() {
     const unidadeSaude = tipo === 'usuario' ? document.getElementById('editUsuarioUbs')?.value : null;
     const novaSenha = document.getElementById('editUsuarioSenha').value.trim();
     
-    const updateData = { nome, email, telefone, tipo, unidade_saude: unidadeSaude };
-    if (novaSenha && novaSenha.length === 6) updateData.senha_hash = novaSenha;
+    if (!nome) return alert('⚠️ Nome é obrigatório!');
+    if (!email.includes('@') || !email.includes('.')) return alert('❌ E-mail inválido!');
+    if (tipo === 'usuario' && !unidadeSaude) return alert('❌ Selecione a UBS!');
+    if (novaSenha && novaSenha.length !== 6) return alert('⚠️ Senha deve ter 6 dígitos!');
     
     showLoading();
-    const { error } = await supabaseClient.from('usuarios').update(updateData).eq('id', id);
-    hideLoading();
-    if (error) return alert('❌ Erro: ' + error.message);
-    alert('✅ Usuário atualizado!');
-    document.getElementById('modalEditarUsuario').classList.remove('show');
-    renderizarListaUsuarios();
-}
-
-async function excluirUsuario(id) {
-    if (id === usuarioLogado?.id) return alert('❌ Não pode excluir a si mesmo!');
-    if (!confirm('Excluir este usuário permanentemente?')) return;
-    showLoading();
-    await supabaseClient.from('usuarios').delete().eq('id', id);
-    hideLoading();
-    alert('✅ Excluído!');
-    renderizarListaUsuarios();
-}
-
-async function gerarTokenRedefinicao(cpf) {
-    if (!cpf) { alert('❌ CPF não informado!'); return; }
-    showLoading();
     try {
-        const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin_oci', { p_cpf: cpf });
-        hideLoading();
-        if (error || !data?.success) {
-            alert('❌ ' + (data?.message || error?.message || 'Erro ao gerar código'));
-            return;
+        const updateData = { 
+            nome, 
+            email, 
+            telefone, 
+            tipo, 
+            unidade_saude: unidadeSaude 
+        };
+        if (novaSenha && novaSenha.length === 6) {
+            updateData.senha_hash = novaSenha;
         }
-        alert(`🔑 CÓDIGO GERADO!\n\nCPF: ${formatarCPF(cpf)}\nCÓDIGO: ${data.codigo}\n\n⏰ Válido por 1 hora`);
-    } catch (err) { hideLoading(); alert('❌ Erro inesperado.'); }
+        
+        const { error } = await supabaseClient
+            .from('usuarios')
+            .update(updateData)
+            .eq('id', id);
+        
+        hideLoading();
+        if (error) throw error;
+        
+        // Limpa o cache
+        usuariosCache = [];
+        usuariosCacheTimestamp = 0;
+        
+        alert('✅ Usuário atualizado com sucesso!');
+        document.getElementById('modalEditarUsuario').classList.remove('show');
+        await renderizarListaUsuarios();
+        
+        // Se o usuário editou a si mesmo, atualiza a sessão
+        if (id === usuarioLogado?.id) {
+            usuarioLogado.nome = nome;
+            usuarioLogado.tipo = tipo;
+            usuarioLogado.unidade_saude = unidadeSaude;
+            usuarioLogado.email = email;
+            usuarioLogado.telefone = telefone;
+            
+            // Atualiza a sidebar
+            document.getElementById('sidebarNome').textContent = nome;
+            document.getElementById('sidebarAvatar').textContent = nome[0].toUpperCase();
+            const tipoLabel = tipo === 'admin' ? '👑 Administrador' : 
+                             tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário';
+            document.getElementById('sidebarTipo').textContent = tipoLabel;
+            document.getElementById('sidebarUBS').textContent = unidadeSaude || '';
+            
+            const adminSection = document.getElementById('sidebarAdminSection');
+            if (adminSection) adminSection.classList.toggle('hidden', tipo !== 'admin');
+            const apacSection = document.getElementById('sidebarAPACSection');
+            if (apacSection) apacSection.classList.toggle('hidden', !podeGerarRelatorioAPAC());
+        }
+        
+        // Log de auditoria
+        try {
+            await supabaseClient.from('logs_auditoria').insert({
+                usuario_id: usuarioLogado.id,
+                usuario_nome: usuarioLogado.nome,
+                acao: 'EDICAO_USUARIO',
+                descricao: `Usuário ${nome} (ID: ${id}) editado por ${usuarioLogado.nome}`
+            });
+        } catch(logErr) { /* ignora erro de log */ }
+        
+    } catch(err) {
+        hideLoading();
+        console.error('Erro na edição:', err);
+        alert(`❌ Erro ao atualizar: ${err.message}`);
+    }
 }
 
-async function renderizarLogs() {
-    if (!supabaseClient || !podeVerDadosCompletos()) return;
+// ===== FUNÇÃO PARA MIGRAR PERFIL (NOVA) =====
+async function migrarPerfilAdminAPAC() {
+    if (!usuarioLogado) return alert('❌ Faça login primeiro!');
+    if (usuarioLogado.tipo === 'admin_apac') return alert('✅ Você já é Admin APAC!');
+    if (usuarioLogado.tipo !== 'admin') return alert('❌ Apenas Administradores podem migrar para Admin APAC.');
+    
+    if (!confirm(`⚠️ Deseja migrar o usuário ${usuarioLogado.nome} para Admin APAC?\n\nEsta ação dará acesso à geração de relatórios APAC completos.`)) return;
+    
     showLoading();
     try {
-        const { data: logs, error } = await supabaseClient.from('logs_auditoria').select('*').order('data_hora', { ascending: false }).limit(100);
+        const { error } = await supabaseClient
+            .from('usuarios')
+            .update({ tipo: 'admin_apac' })
+            .eq('id', usuarioLogado.id);
+        
         hideLoading();
-        if (error) return;
-        const busca = (document.getElementById('adminBuscaLogs')?.value || '').toLowerCase();
-        let lista = (logs || []).filter(l => !busca || l.acao.toLowerCase().includes(busca) || (l.usuario_nome || '').toLowerCase().includes(busca));
-        const tbody = document.getElementById('adminTabelaLogs');
-        if (!tbody) return;
-        tbody.innerHTML = lista.map(l => `
-            <tr class="hover:bg-slate-50 border-t">
-                <td class="px-3 py-2 text-xs">${formatarDataHora(l.data_hora)}</td>
-                <td class="px-3 py-2 text-xs font-bold">${l.usuario_nome || '—'}</td>
-                <td class="px-3 py-2 text-xs"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700">${l.acao || '—'}</span></td>
-                <td class="px-3 py-2 text-xs">${l.descricao || '—'}</td>
-            </tr>
-        `).join('');
-        if (!lista.length) tbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-slate-400 font-bold">Nenhum log encontrado</td></tr>';
-    } catch(err) { hideLoading(); }
+        if (error) throw error;
+        
+        usuarioLogado.tipo = 'admin_apac';
+        
+        const tipoLabel = '📑 Admin APAC';
+        document.getElementById('sidebarTipo').textContent = tipoLabel;
+        const apacSection = document.getElementById('sidebarAPACSection');
+        if (apacSection) apacSection.classList.remove('hidden');
+        
+        alert('✅ Perfil migrado para Admin APAC com sucesso!\nAgora você pode gerar relatórios APAC completos.');
+        
+        // Log de auditoria
+        try {
+            await supabaseClient.from('logs_auditoria').insert({
+                usuario_id: usuarioLogado.id,
+                usuario_nome: usuarioLogado.nome,
+                acao: 'MIGRACAO_ADMIN_APAC',
+                descricao: `Usuário ${usuarioLogado.nome} migrou para Admin APAC`
+            });
+        } catch(logErr) { /* ignora erro de log */ }
+        
+        await renderizarListaUsuarios();
+        
+    } catch(err) {
+        hideLoading();
+        console.error('Erro na migração:', err);
+        alert(`❌ Erro ao migrar perfil: ${err.message}`);
+    }
 }
-
 // ============================================
 // MODAL RELATÓRIO APAC
 // ============================================
