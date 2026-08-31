@@ -73,6 +73,65 @@
         .collapse-icon.open { transform: rotate(180deg); }
         .ferramentas-sub { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
         .ferramentas-sub.open { max-height: 600px; }
+        
+        /* NOVOS BOTÕES DA TELA INICIAL */
+        .header-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #ffffff;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .header-buttons button {
+            background: #f1f5f9;
+            color: #1e293b;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .header-buttons button:hover {
+            background: #2563eb;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -4px rgba(37,99,235,0.25);
+        }
+        .header-buttons button i {
+            margin-right: 6px;
+        }
+        
+        /* Cores dos botões por categoria */
+        .header-buttons .btn-logica { background: #e0e7ff; color: #1e40af; }
+        .header-buttons .btn-visao { background: #dbeafe; color: #1e40af; }
+        .header-buttons .btn-monitor { background: #e0f2fe; color: #0369a1; }
+        .header-buttons .btn-exames { background: #fce7f3; color: #9d174d; }
+        .header-buttons .btn-primeira { background: #d1fae5; color: #065f46; }
+        .header-buttons .btn-retorno { background: #fef3c7; color: #92400e; }
+        .header-buttons .btn-abs { background: #fee2e2; color: #991b1b; }
+        .header-buttons .btn-oci { background: #ede9fe; color: #5b21b6; }
+        .header-buttons .btn-apac { background: #fae8ff; color: #6b21a5; }
+        
+        /* Colunas com largura fixa para tabelas */
+        .tabela-colunas th {
+            white-space: nowrap;
+            font-size: 10px;
+            padding: 8px 6px;
+        }
+        .tabela-colunas td {
+            font-size: 12px;
+            padding: 6px 6px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden">
@@ -362,24 +421,43 @@ function showScreen(screenId) {
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f0f4f8]">
         
         <!-- HEADER -->
-        <header class="h-20 gradient-header text-white flex items-center justify-between px-4 md:px-8 z-40 flex-shrink-0 border-b border-white/10">
-            <div>
-                <h2 class="text-lg md:text-xl font-extrabold" id="headerTitle">🧠 Lógica e Indicadores</h2>
-                <p class="text-blue-400 text-[10px] font-bold uppercase">Ferramenta OCI v7.0 | 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
+        <header class="gradient-header text-white flex-shrink-0 border-b border-white/10">
+            <div class="h-16 flex items-center justify-between px-4 md:px-8">
+                <div>
+                    <h2 class="text-lg md:text-xl font-extrabold" id="headerTitle">🧠 Lógica e Indicadores</h2>
+                    <p class="text-blue-400 text-[10px] font-bold uppercase">Ferramenta OCI v7.0 | 👑 Desenvolvido por: Ana Paula Araújo da Silva | Mat: 201704</p>
+                </div>
+                <div class="flex items-center gap-3 md:gap-5">
+                    <div class="relative hidden lg:block">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="globalSearch" placeholder="Buscar por Prontuário ou Nº Solicitação..." class="pl-10 pr-4 py-2 bg-white/10 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 w-64 text-sm text-white placeholder-slate-400 outline-none">
+                    </div>
+                    <div class="relative cursor-pointer bg-white/10 p-2.5 rounded-xl hover:bg-white/20">
+                        <i class="far fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold" id="alertCount">0</span>
+                    </div>
+                    <div class="text-right hidden sm:block">
+                        <p class="text-[10px] text-blue-300 font-bold uppercase">Status</p>
+                        <p class="text-xs text-emerald-400 font-bold flex items-center gap-1.5"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> Online</p>
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center gap-3 md:gap-5">
-                <div class="relative hidden lg:block">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="globalSearch" placeholder="Buscar por Prontuário ou Nº Solicitação..." class="pl-10 pr-4 py-2 bg-white/10 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 w-64 text-sm text-white placeholder-slate-400 outline-none">
-                </div>
-                <div class="relative cursor-pointer bg-white/10 p-2.5 rounded-xl hover:bg-white/20">
-                    <i class="far fa-bell text-lg"></i>
-                    <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold" id="alertCount">0</span>
-                </div>
-                <div class="text-right hidden sm:block">
-                    <p class="text-[10px] text-blue-300 font-bold uppercase">Status</p>
-                    <p class="text-xs text-emerald-400 font-bold flex items-center gap-1.5"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> Online</p>
-                </div>
+            
+            <!-- ===== NOVOS BOTÕES DA TELA INICIAL ===== -->
+            <div class="header-buttons">
+                <button class="btn-logica" onclick="switchTab('logica-indicadores')"><i class="fas fa-brain"></i> Lógica Indicadores</button>
+                <button class="btn-visao" onclick="switchTab('visao-geral')"><i class="fas fa-th-large"></i> Visão Geral</button>
+                <button class="btn-monitor" onclick="switchTab('monitoramento')"><i class="fas fa-users"></i> Monitoramento</button>
+                <button class="btn-exames" onclick="switchTab('monitoramento-exames')"><i class="fas fa-flask"></i> Monitor. Exames</button>
+                <button class="btn-primeira" onclick="switchTab('primeira-consulta-agendadas')"><i class="fas fa-clock"></i> 1ª Cons. Agendados</button>
+                <button class="btn-primeira" onclick="switchTab('primeira-consulta')"><i class="fas fa-clipboard-check"></i> 1ª Cons. Recep.</button>
+                <button class="btn-retorno" onclick="switchTab('aptos-retorno')"><i class="fas fa-check-circle"></i> Aptos Retornos</button>
+                <button class="btn-retorno" onclick="switchTab('retornos-agendados')"><i class="fas fa-calendar-plus"></i> Ret. Agendados</button>
+                <button class="btn-retorno" onclick="switchTab('retornos-recepcionados')"><i class="fas fa-calendar-check"></i> Ret. Recepcionados</button>
+                <button class="btn-abs" onclick="switchTab('absenteismo-1consulta')"><i class="fas fa-user-times"></i> Abs. 1ª Cons.</button>
+                <button class="btn-abs" onclick="switchTab('absenteismo-retorno')"><i class="fas fa-user-slash"></i> Abs. Retornos</button>
+                <button class="btn-oci" onclick="switchTab('apac')"><i class="fas fa-file-invoice"></i> OCI´s Fechadas</button>
+                <button class="btn-apac" onclick="switchTab('apacs-geradas')"><i class="fas fa-file-medical"></i> APAC´s Geradas</button>
             </div>
         </header>
 
@@ -503,8 +581,6 @@ function showScreen(screenId) {
                 </div>
             </div>
 
-            <!-- ============ DEMONSTRAÇÃO DOS FILTROS (CONTINUA NA PRÓXIMA PARTE) ============ -->
-            
             <!-- ============ 👥 MONITORAMENTO ============ -->
             <div id="content-monitoramento" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
@@ -564,7 +640,7 @@ function showScreen(screenId) {
                 </div>
             </div>
 
-            <!-- ============ 🕐 1ª CONSULTA AGENDADAS ============ -->
+            <!-- ============ 🕐 1ª CONSULTA AGENDADAS - COLUNAS ATUALIZADAS ============ -->
             <div id="content-primeira-consulta-agendadas" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -576,13 +652,26 @@ function showScreen(screenId) {
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full"><thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','prontuario')">Prontuário <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','nome')">Paciente <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','cpf')">CPF <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','especialidade')">Especialidade <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','data')">Data Agendada <i class="fas fa-sort"></i></th></tr></thead><tbody id="tabelaPrimeiraConsultaAgendadas"></tbody></table>
+                        <table class="w-full tabela-colunas">
+                            <thead><tr class="bg-slate-50">
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','medico')">Médico <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','local')">Local <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','data_agendada')">Data da Agenda <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta-agendadas','operador')">Operador <i class="fas fa-sort"></i></th>
+                            </tr></thead>
+                            <tbody id="tabelaPrimeiraConsultaAgendadas"></tbody>
+                        </table>
                     </div>
                     <div class="p-4 border-t" id="paginacaoPrimeiraConsultaAgendadas"></div>
                 </div>
             </div>
 
-            <!-- ============ 🆕 1ª CONSULTA RECEPCIONADOS ============ -->
+            <!-- ============ 🆕 1ª CONSULTA RECEPCIONADOS - COLUNAS ATUALIZADAS ============ -->
             <div id="content-primeira-consulta" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -594,13 +683,28 @@ function showScreen(screenId) {
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full"><thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','prontuario')">Prontuário <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','nome')">Paciente <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','cpf')">CPF <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','especialidade')">Especialidade <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','data')">Data <i class="fas fa-sort"></i></th></tr></thead><tbody id="tabelaPrimeiraConsulta"></tbody></table>
+                        <table class="w-full tabela-colunas">
+                            <thead><tr class="bg-slate-50">
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','unidade_saude')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','subgrupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','medico')">Médico <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','local')">Local <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','data_recepcionada')">Data da 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('primeira-consulta','operador')">Operador <i class="fas fa-sort"></i></th>
+                            </tr></thead>
+                            <tbody id="tabelaPrimeiraConsulta"></tbody>
+                        </table>
                     </div>
                     <div class="p-4 border-t" id="paginacaoPrimeiraConsulta"></div>
                 </div>
             </div>
 
-            <!-- ============ ✅ APTOS PARA O RETORNO ============ -->
+            <!-- ============ ✅ APTOS PARA O RETORNO - COLUNAS ATUALIZADAS ============ -->
             <div id="content-aptos-retorno" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -612,13 +716,30 @@ function showScreen(screenId) {
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full"><thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','prontuario')">Prontuário <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','nome')">Paciente <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','cpf')">CPF <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','especialidade')">Especialidade <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase">Exames <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase">Data Realização <i class="fas fa-sort"></i></th></tr></thead><tbody id="tabelaAptosRetorno"></tbody></table>
+                        <table class="w-full tabela-colunas">
+                            <thead><tr class="bg-slate-50">
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','unidade_saude')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','subgrupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','medico')">Médico <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','local')">Local <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','data_agendada')">Data da 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','exames')">Exames <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','data_realizacao_exame')">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('aptos-retorno','usuario_cadastrou')">Cadastrado por: <i class="fas fa-sort"></i></th>
+                            </tr></thead>
+                            <tbody id="tabelaAptosRetorno"></tbody>
+                        </table>
                     </div>
                     <div class="p-4 border-t" id="paginacaoAptosRetorno"></div>
                 </div>
             </div>
 
-            <!-- ============ 📅 RETORNOS AGENDADOS ============ -->
+            <!-- ============ 📅 RETORNOS AGENDADOS - COLUNAS ATUALIZADAS ============ -->
             <div id="content-retornos-agendados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -630,13 +751,32 @@ function showScreen(screenId) {
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full"><thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. 1ª Cons.</th><th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. Retorno</th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','nome')">Paciente <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','cpf')">CPF <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','especialidade')">Especialidade <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase">Data Retorno <i class="fas fa-sort"></i></th></tr></thead><tbody id="tabelaRetornosAgendados"></tbody></table>
+                        <table class="w-full tabela-colunas">
+                            <thead><tr class="bg-slate-50">
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','numero_solicitacao')">Nº Solicitação 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','numero_solicitacao_retorno')">Nº Solicitação Retorno <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','unidade_saude')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','subgrupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','medico')">Médico <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','local')">Local <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','data_agendada')">Data da 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','data_retorno_agendada')">Data Retorno <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','exames')">Exames <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','data_realizacao_exame')">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-agendados','usuario_cadastrou')">Cadastrado por: <i class="fas fa-sort"></i></th>
+                            </tr></thead>
+                            <tbody id="tabelaRetornosAgendados"></tbody>
+                        </table>
                     </div>
                     <div class="p-4 border-t" id="paginacaoRetornosAgendados"></div>
                 </div>
             </div>
 
-            <!-- ============ 📋 RETORNOS RECEPCIONADOS ============ -->
+            <!-- ============ 📋 RETORNOS RECEPCIONADOS - COLUNAS ATUALIZADAS ============ -->
             <div id="content-retornos-recepcionados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -648,17 +788,36 @@ function showScreen(screenId) {
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full"><thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. 1ª Cons.</th><th class="px-4 py-3 text-xs font-bold uppercase">Nº Solic. Retorno</th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','nome')">Paciente <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','cpf')">CPF <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','especialidade')">Especialidade <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase">Data Recepção <i class="fas fa-sort"></i></th></tr></thead><tbody id="tabelaRetornosRecepcionados"></tbody></table>
+                        <table class="w-full tabela-colunas">
+                            <thead><tr class="bg-slate-50">
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','numero_solicitacao')">Nº Solicitação 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','numero_solicitacao_retorno')">Nº Solicitação Retorno <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','unidade_saude')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','subgrupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','medico')">Médico <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','local')">Local <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','data_agendada')">Data da 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','data_retorno_recepcionada')">Data Recepção <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','exames')">Exames <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','data_realizacao_exame')">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','usuario_cadastrou')">Cadastrado por: <i class="fas fa-sort"></i></th>
+                            </tr></thead>
+                            <tbody id="tabelaRetornosRecepcionados"></tbody>
+                        </table>
                     </div>
                     <div class="p-4 border-t" id="paginacaoRetornosRecepcionados"></div>
                 </div>
             </div>
 
-            <!-- ============ 🚫 ABSENTEÍSMO 1ª CONSULTA ============ -->
+            <!-- ============ 🚫 ABSENTEÍSMO 1ª CONSULTA - COLUNAS ATUALIZADAS ============ -->
             <div id="content-absenteismo-1consulta" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
-                        <h3 class="text-lg font-bold">🚫 1ª Consulta - Absenteísmo</h3>
+                        <h3 class="text-lg font-bold">🚫 Absenteísmo - 1ª Consulta</h3>
                         <div class="flex gap-2">
                             <input type="text" id="buscaAbsenteismo1Consulta" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('absenteismo-1consulta')">
                             <select id="paginaAbsenteismo1Consulta" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="mudarPagina('absenteismo-1consulta')"><option value="15">15</option><option value="30">30</option><option value="50">50</option><option value="100" selected>100</option></select>
@@ -666,17 +825,29 @@ function showScreen(screenId) {
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full"><thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','prontuario')">Prontuário <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','nome')">Paciente <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','cpf')">CPF <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','especialidade')">Especialidade <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','data')">Data <i class="fas fa-sort"></i></th></tr></thead><tbody id="tabelaAbsenteismo1Consulta"></tbody></table>
+                        <table class="w-full tabela-colunas">
+                            <thead><tr class="bg-slate-50">
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','unidade_saude')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','medico')">Médico <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','local')">Local <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-1consulta','data_agendada')">Data do Agendamento <i class="fas fa-sort"></i></th>
+                            </tr></thead>
+                            <tbody id="tabelaAbsenteismo1Consulta"></tbody>
+                        </table>
                     </div>
                     <div class="p-4 border-t" id="paginacaoAbsenteismo1Consulta"></div>
                 </div>
             </div>
 
-            <!-- ============ 🚫 ABSENTEÍSMO RETORNO ============ -->
+            <!-- ============ 🚫 ABSENTEÍSMO RETORNO - COLUNAS ATUALIZADAS ============ -->
             <div id="content-absenteismo-retorno" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
-                        <h3 class="text-lg font-bold">🚫 Retorno - Absenteísmo</h3>
+                        <h3 class="text-lg font-bold">🚫 Absenteísmo - Retorno</h3>
                         <div class="flex gap-2">
                             <input type="text" id="buscaAbsenteismoRetorno" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('absenteismo-retorno')">
                             <select id="paginaAbsenteismoRetorno" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="mudarPagina('absenteismo-retorno')"><option value="15">15</option><option value="30">30</option><option value="50">50</option><option value="100" selected>100</option></select>
@@ -684,13 +855,26 @@ function showScreen(screenId) {
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full"><thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','prontuario')">Prontuário <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','nome')">Paciente <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','cpf')">CPF <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','especialidade')">Especialidade <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','data')">Data Retorno <i class="fas fa-sort"></i></th></tr></thead><tbody id="tabelaAbsenteismoRetorno"></tbody></table>
+                        <table class="w-full tabela-colunas">
+                            <thead><tr class="bg-slate-50">
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','numero_solicitacao_retorno')">Nº Solicitação Retorno <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','unidade_saude')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','medico')">Médico <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','local')">Local <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','data_retorno_agendada')">Data do Agendamento do Retorno <i class="fas fa-sort"></i></th>
+                            </tr></thead>
+                            <tbody id="tabelaAbsenteismoRetorno"></tbody>
+                        </table>
                     </div>
                     <div class="p-4 border-t" id="paginacaoAbsenteismoRetorno"></div>
                 </div>
             </div>
 
-            <!-- ============ 📄 OCI´S FECHADAS ============ -->
+            <!-- ============ 📄 OCI´S FECHADAS - COLUNAS ATUALIZADAS ============ -->
             <div id="content-apac" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -711,13 +895,31 @@ function showScreen(screenId) {
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full"><thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','prontuario')">Prontuário <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','nome')">Paciente <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','cpf')">CPF <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','especialidade')">Especialidade <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','data_fechamento')">Data Fechamento <i class="fas fa-sort"></i></th></tr></thead><tbody id="tabelaAPAC"></tbody></table>
+                        <table class="w-full tabela-colunas">
+                            <thead><tr class="bg-slate-50">
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','numero_solicitacao')">Nº Solicitação 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','unidade_saude')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','subgrupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','medico')">Médico <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','local')">Local <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','data_agendada')">Data da 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','data_retorno_recepcionada')">Data Recepção <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','exames')">Exames <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','data_realizacao_exame')">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apac','usuario_cadastrou')">Cadastrado por: <i class="fas fa-sort"></i></th>
+                            </tr></thead>
+                            <tbody id="tabelaAPAC"></tbody>
+                        </table>
                     </div>
                     <div class="p-4 border-t" id="paginacaoAPAC"></div>
                 </div>
             </div>
 
-            <!-- ============ 📑 APAC´S GERADAS ============ -->
+            <!-- ============ 📑 APAC´S GERADAS - COLUNAS ATUALIZADAS ============ -->
             <div id="content-apacs-geradas" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -738,7 +940,26 @@ function showScreen(screenId) {
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full"><thead><tr class="bg-slate-50"><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','numero_solicitacao')">Nº Solicitação <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','prontuario')">Prontuário <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','nome')">Paciente <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','cpf')">CPF <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','especialidade')">Especialidade <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable bg-indigo-50" onclick="ordenarTabela('apacs-geradas','numero_apac')">Nº APAC <i class="fas fa-sort"></i></th><th class="px-4 py-3 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','data_fechamento')">Data Fechamento <i class="fas fa-sort"></i></th></tr></thead><tbody id="tabelaAPACSGeradas"></tbody></table>
+                        <table class="w-full tabela-colunas">
+                            <thead><tr class="bg-slate-50">
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','numero_solicitacao')">Nº Solicitação 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','prontuario')">Prontuário <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','nome')">Paciente <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','cpf')">CPF <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','unidade_saude')">Unidade de Saúde <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','subgrupo')">Grupo/Subgrupo <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','medico')">Médico <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','local')">Local <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','data_agendada')">Data da 1ª Consulta <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','data_fechamento')">Data Fechamento <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable bg-indigo-50" onclick="ordenarTabela('apacs-geradas','numero_apac')">Nº APAC <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','exames')">Exames <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','data_realizacao_exame')">Data Realização <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('apacs-geradas','usuario_cadastrou')">Cadastrado por: <i class="fas fa-sort"></i></th>
+                            </tr></thead>
+                            <tbody id="tabelaAPACSGeradas"></tbody>
+                        </table>
                     </div>
                     <div class="p-4 border-t" id="paginacaoAPACSGeradas"></div>
                 </div>
@@ -1730,7 +1951,7 @@ function limparFiltroAPACS() {
 }
 
 // ============================================
-// RENDERIZAR TABELAS
+// RENDERIZAR TABELAS - COM AS NOVAS COLUNAS
 // ============================================
 function renderizarTabelas() {
     const tiposTabela = ['monitoramento','monitoramento-exames','primeira-consulta-agendadas','primeira-consulta','aptos-retorno','retornos-agendados','retornos-recepcionados','absenteismo-1consulta','absenteismo-retorno','apac','apacs-geradas'];
@@ -1775,16 +1996,204 @@ function renderizarTabelas() {
                 const nomeExibido = podeCompleto ? (p.nome || '—') : mascararNome(p.nome);
                 const cpfExibido = podeCompleto ? formatarCPF(p.cpf) : mascararCPF(p.cpf);
                 const telefoneExibido = podeCompleto ? (p.telefone || '—') : mascararTelefone(p.telefone);
-
-                return `<tr class="hover:bg-slate-50 border-b">
-                    <td class="px-4 py-3"><span class="text-sm font-bold text-blue-600">${item.numero_solicitacao || item.id}</span></td>
-                    <td class="px-4 py-3"><span class="text-sm font-bold text-purple-600">${p.prontuario || '—'}</span></td>
-                    <td class="px-4 py-3 font-bold text-sm mascara-nome">${nomeExibido}</td>
-                    <td class="px-4 py-3 text-sm font-mono mascara-cpf">${cpfExibido}</td>
-                    <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
-                    <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${st.c}">${st.t}</span></td>
-                    <td class="px-4 py-3">${item.status === 'faltou' ? '🚫 Faltou' : item.status === 'retorno_faltou' ? '🚫 Faltou Retorno' : '✅ OK'}</td>
-                </tr>`;
+                
+                // Montar linha baseada no tipo (com as novas colunas)
+                let linha = '';
+                
+                switch(tipo) {
+                    case 'primeira-consulta-agendadas':
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm">${item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
+                            <td class="px-2 py-2 text-sm">${item.operador_agendamento || '—'}</td>
+                        </tr>`;
+                        break;
+                        
+                    case 'primeira-consulta':
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm">${e.grupo_sigtap || '—'}/${e.id || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_recepcionada || item.data_agendada)}</td>
+                            <td class="px-2 py-2 text-sm">${item.operador_agendamento || '—'}</td>
+                        </tr>`;
+                        break;
+                        
+                    case 'aptos-retorno':
+                        const examesAptos = item.exames_realizados ? 
+                            (typeof item.exames_realizados === 'string' ? 
+                                JSON.parse(item.exames_realizados || '[]') : 
+                                item.exames_realizados) : [];
+                        const listaExames = Array.isArray(examesAptos) ? examesAptos.map(ex => ex.nome || '—').join(', ') : '—';
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm">${e.grupo_sigtap || '—'}/${e.id || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
+                            <td class="px-2 py-2 text-sm">${listaExames}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_realizacao_exame)}</td>
+                            <td class="px-2 py-2 text-sm">${item.usuario_cadastrou || '—'}</td>
+                        </tr>`;
+                        break;
+                        
+                    case 'retornos-agendados':
+                        const examesRetAg = item.exames_realizados ? 
+                            (typeof item.exames_realizados === 'string' ? 
+                                JSON.parse(item.exames_realizados || '[]') : 
+                                item.exames_realizados) : [];
+                        const listaExamesRetAg = Array.isArray(examesRetAg) ? examesRetAg.map(ex => ex.nome || '—').join(', ') : '—';
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-indigo-600">${item.numero_solicitacao_retorno || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm">${e.grupo_sigtap || '—'}/${e.id || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.medico_retorno || item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_retorno || item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_retorno_agendada)}</td>
+                            <td class="px-2 py-2 text-sm">${listaExamesRetAg}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_realizacao_exame)}</td>
+                            <td class="px-2 py-2 text-sm">${item.usuario_cadastrou || '—'}</td>
+                        </tr>`;
+                        break;
+                        
+                    case 'retornos-recepcionados':
+                        const examesRetRec = item.exames_realizados ? 
+                            (typeof item.exames_realizados === 'string' ? 
+                                JSON.parse(item.exames_realizados || '[]') : 
+                                item.exames_realizados) : [];
+                        const listaExamesRetRec = Array.isArray(examesRetRec) ? examesRetRec.map(ex => ex.nome || '—').join(', ') : '—';
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-indigo-600">${item.numero_solicitacao_retorno || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm">${e.grupo_sigtap || '—'}/${e.id || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.medico_retorno || item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_retorno || item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_retorno_recepcionada)}</td>
+                            <td class="px-2 py-2 text-sm">${listaExamesRetRec}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_realizacao_exame)}</td>
+                            <td class="px-2 py-2 text-sm">${item.usuario_cadastrou || '—'}</td>
+                        </tr>`;
+                        break;
+                        
+                    case 'absenteismo-1consulta':
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
+                        </tr>`;
+                        break;
+                        
+                    case 'absenteismo-retorno':
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-indigo-600">${item.numero_solicitacao_retorno || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm">${item.medico_retorno || item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_retorno || item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_retorno_agendada)}</td>
+                        </tr>`;
+                        break;
+                        
+                    case 'apac':
+                        const examesOCI = item.exames_realizados ? 
+                            (typeof item.exames_realizados === 'string' ? 
+                                JSON.parse(item.exames_realizados || '[]') : 
+                                item.exames_realizados) : [];
+                        const listaExamesOCI = Array.isArray(examesOCI) ? examesOCI.map(ex => ex.nome || '—').join(', ') : '—';
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm">${e.grupo_sigtap || '—'}/${e.id || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.medico_retorno || item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_retorno || item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_retorno_recepcionada)}</td>
+                            <td class="px-2 py-2 text-sm">${listaExamesOCI}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_realizacao_exame)}</td>
+                            <td class="px-2 py-2 text-sm">${item.usuario_cadastrou || '—'}</td>
+                        </tr>`;
+                        break;
+                        
+                    case 'apacs-geradas':
+                        const examesAPAC = item.exames_realizados ? 
+                            (typeof item.exames_realizados === 'string' ? 
+                                JSON.parse(item.exames_realizados || '[]') : 
+                                item.exames_realizados) : [];
+                        const listaExamesAPAC = Array.isArray(examesAPAC) ? examesAPAC.map(ex => ex.nome || '—').join(', ') : '—';
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm">${e.grupo_sigtap || '—'}/${e.id || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.medico_retorno || item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_retorno || item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_fechamento)}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-indigo-600">${item.numero_apac || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${listaExamesAPAC}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_realizacao_exame)}</td>
+                            <td class="px-2 py-2 text-sm">${item.usuario_cadastrou || '—'}</td>
+                        </tr>`;
+                        break;
+                        
+                    default:
+                        // Monitoramento padrão
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-4 py-3"><span class="text-sm font-bold text-blue-600">${item.numero_solicitacao || item.id}</span></td>
+                            <td class="px-4 py-3"><span class="text-sm font-bold text-purple-600">${p.prontuario || '—'}</span></td>
+                            <td class="px-4 py-3 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-4 py-3 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${st.c}">${st.t}</span></td>
+                            <td class="px-4 py-3">${item.status === 'faltou' ? '🚫 Faltou' : item.status === 'retorno_faltou' ? '🚫 Faltou Retorno' : '✅ OK'}</td>
+                        </tr>`;
+                }
+                
+                return linha;
             }).join('');
         }
 
@@ -1810,31 +2219,202 @@ function exportarExcel(tipo) {
     const exportData = dados.map(item => {
         const p = pacientes.find(x => x.id === item.paciente_id) || {};
         const e = especialidades.find(x => x.id === item.especialidade_id) || {};
-
-        const row = {
-            'Nº Solicitação': item.numero_solicitacao || '',
-            'Prontuário': p.prontuario || '',
-            'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
-            'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
-            'Especialidade': e.nome || '',
-            'Status': item.status || '',
-            'Data': item.data_agendada || ''
-        };
-
-        if (tipo === 'apac' || tipo === 'apacs-geradas') {
-            row['Data Fechamento'] = item.data_fechamento || '';
-            if (tipo === 'apacs-geradas') {
-                row['Nº APAC'] = item.numero_apac || '';
-            }
+        
+        // Montar linha baseada no tipo
+        let row = {};
+        
+        switch(tipo) {
+            case 'primeira-consulta-agendadas':
+                row = {
+                    'Nº Solicitação': item.numero_solicitacao || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Especialidade': e.nome || '',
+                    'Médico': item.medico_solicitante || '',
+                    'Local': item.local_consulta || '',
+                    'Data da Agenda': item.data_agendada || '',
+                    'Operador': item.operador_agendamento || ''
+                };
+                break;
+                
+            case 'primeira-consulta':
+                row = {
+                    'Nº Solicitação': item.numero_solicitacao || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Unidade de Saúde': item.unidade_basica_saude || '',
+                    'Especialidade': e.nome || '',
+                    'Grupo/Subgrupo': `${e.grupo_sigtap || ''}/${e.id || ''}`,
+                    'Médico': item.medico_solicitante || '',
+                    'Local': item.local_consulta || '',
+                    'Data da 1ª Consulta': item.data_recepcionada || item.data_agendada || '',
+                    'Operador': item.operador_agendamento || ''
+                };
+                break;
+                
+            case 'aptos-retorno':
+                const examesAptos = item.exames_realizados ? 
+                    (typeof item.exames_realizados === 'string' ? 
+                        JSON.parse(item.exames_realizados || '[]') : 
+                        item.exames_realizados) : [];
+                const listaExamesAptos = Array.isArray(examesAptos) ? examesAptos.map(ex => ex.nome || '').join('; ') : '';
+                row = {
+                    'Nº Solicitação': item.numero_solicitacao || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Unidade de Saúde': item.unidade_basica_saude || '',
+                    'Especialidade': e.nome || '',
+                    'Grupo/Subgrupo': `${e.grupo_sigtap || ''}/${e.id || ''}`,
+                    'Médico': item.medico_solicitante || '',
+                    'Local': item.local_consulta || '',
+                    'Data da 1ª Consulta': item.data_agendada || '',
+                    'Exames': listaExamesAptos,
+                    'Data Realização': item.data_realizacao_exame || '',
+                    'Cadastrado por:': item.usuario_cadastrou || ''
+                };
+                break;
+                
+            case 'retornos-agendados':
+                const examesRetAg = item.exames_realizados ? 
+                    (typeof item.exames_realizados === 'string' ? 
+                        JSON.parse(item.exames_realizados || '[]') : 
+                        item.exames_realizados) : [];
+                const listaExamesRetAg = Array.isArray(examesRetAg) ? examesRetAg.map(ex => ex.nome || '').join('; ') : '';
+                row = {
+                    'Nº Solicitação 1ª Consulta': item.numero_solicitacao || '',
+                    'Nº Solicitação Retorno': item.numero_solicitacao_retorno || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Unidade de Saúde': item.unidade_basica_saude || '',
+                    'Especialidade': e.nome || '',
+                    'Grupo/Subgrupo': `${e.grupo_sigtap || ''}/${e.id || ''}`,
+                    'Médico': item.medico_retorno || item.medico_solicitante || '',
+                    'Local': item.local_retorno || item.local_consulta || '',
+                    'Data da 1ª Consulta': item.data_agendada || '',
+                    'Data Retorno': item.data_retorno_agendada || '',
+                    'Exames': listaExamesRetAg,
+                    'Data Realização': item.data_realizacao_exame || '',
+                    'Cadastrado por:': item.usuario_cadastrou || ''
+                };
+                break;
+                
+            case 'retornos-recepcionados':
+                const examesRetRec = item.exames_realizados ? 
+                    (typeof item.exames_realizados === 'string' ? 
+                        JSON.parse(item.exames_realizados || '[]') : 
+                        item.exames_realizados) : [];
+                const listaExamesRetRec = Array.isArray(examesRetRec) ? examesRetRec.map(ex => ex.nome || '').join('; ') : '';
+                row = {
+                    'Nº Solicitação 1ª Consulta': item.numero_solicitacao || '',
+                    'Nº Solicitação Retorno': item.numero_solicitacao_retorno || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Unidade de Saúde': item.unidade_basica_saude || '',
+                    'Especialidade': e.nome || '',
+                    'Grupo/Subgrupo': `${e.grupo_sigtap || ''}/${e.id || ''}`,
+                    'Médico': item.medico_retorno || item.medico_solicitante || '',
+                    'Local': item.local_retorno || item.local_consulta || '',
+                    'Data da 1ª Consulta': item.data_agendada || '',
+                    'Data Recepção': item.data_retorno_recepcionada || '',
+                    'Exames': listaExamesRetRec,
+                    'Data Realização': item.data_realizacao_exame || '',
+                    'Cadastrado por:': item.usuario_cadastrou || ''
+                };
+                break;
+                
+            case 'absenteismo-1consulta':
+                row = {
+                    'Nº Solicitação': item.numero_solicitacao || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Unidade de Saúde': item.unidade_basica_saude || '',
+                    'Médico': item.medico_solicitante || '',
+                    'Local': item.local_consulta || '',
+                    'Data do Agendamento': item.data_agendada || ''
+                };
+                break;
+                
+            case 'absenteismo-retorno':
+                row = {
+                    'Nº Solicitação Retorno': item.numero_solicitacao_retorno || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Unidade de Saúde': item.unidade_basica_saude || '',
+                    'Especialidade': e.nome || '',
+                    'Médico': item.medico_retorno || item.medico_solicitante || '',
+                    'Local': item.local_retorno || item.local_consulta || '',
+                    'Data do Agendamento do Retorno': item.data_retorno_agendada || ''
+                };
+                break;
+                
+            case 'apac':
+                const examesOCI = item.exames_realizados ? 
+                    (typeof item.exames_realizados === 'string' ? 
+                        JSON.parse(item.exames_realizados || '[]') : 
+                        item.exames_realizados) : [];
+                const listaExamesOCI = Array.isArray(examesOCI) ? examesOCI.map(ex => ex.nome || '').join('; ') : '';
+                row = {
+                    'Nº Solicitação 1ª Consulta': item.numero_solicitacao || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Unidade de Saúde': item.unidade_basica_saude || '',
+                    'Especialidade': e.nome || '',
+                    'Grupo/Subgrupo': `${e.grupo_sigtap || ''}/${e.id || ''}`,
+                    'Médico': item.medico_retorno || item.medico_solicitante || '',
+                    'Local': item.local_retorno || item.local_consulta || '',
+                    'Data da 1ª Consulta': item.data_agendada || '',
+                    'Data Recepção': item.data_retorno_recepcionada || '',
+                    'Exames': listaExamesOCI,
+                    'Data Realização': item.data_realizacao_exame || '',
+                    'Cadastrado por:': item.usuario_cadastrou || ''
+                };
+                break;
+                
+            case 'apacs-geradas':
+                const examesAPAC = item.exames_realizados ? 
+                    (typeof item.exames_realizados === 'string' ? 
+                        JSON.parse(item.exames_realizados || '[]') : 
+                        item.exames_realizados) : [];
+                const listaExamesAPAC = Array.isArray(examesAPAC) ? examesAPAC.map(ex => ex.nome || '').join('; ') : '';
+                row = {
+                    'Nº Solicitação 1ª Consulta': item.numero_solicitacao || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Unidade de Saúde': item.unidade_basica_saude || '',
+                    'Especialidade': e.nome || '',
+                    'Grupo/Subgrupo': `${e.grupo_sigtap || ''}/${e.id || ''}`,
+                    'Médico': item.medico_retorno || item.medico_solicitante || '',
+                    'Local': item.local_retorno || item.local_consulta || '',
+                    'Data da 1ª Consulta': item.data_agendada || '',
+                    'Data Fechamento': item.data_fechamento || '',
+                    'Nº APAC': item.numero_apac || '',
+                    'Exames': listaExamesAPAC,
+                    'Data Realização': item.data_realizacao_exame || '',
+                    'Cadastrado por:': item.usuario_cadastrou || ''
+                };
+                break;
+                
+            default:
+                row = {
+                    'Nº Solicitação': item.numero_solicitacao || '',
+                    'Prontuário': p.prontuario || '',
+                    'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
+                    'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+                    'Especialidade': e.nome || '',
+                    'Status': item.status || '',
+                    'Data': item.data_agendada || ''
+                };
         }
-
-        if (tipo === 'monitoramento-exames') {
-            row['Exame'] = item.nome_exame || '';
-            row['Data Solicitação'] = item.data_solicitacao_exame || '';
-            row['Data Realização'] = item.data_realizacao_exame || '';
-            row['Status Exame'] = item.status_exame || '';
-        }
-
+        
         return row;
     });
 
