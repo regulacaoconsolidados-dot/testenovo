@@ -486,15 +486,16 @@ function showScreen(screenId) {
                 <i class="fas fa-external-link-alt w-4"></i> 📋 Portal de Retorno
             </a>
             
+            <!-- ===== SEÇÃO DE ADMINISTRAÇÃO ===== -->
             <div id="sidebarAdminSection" class="hidden">
-                   <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
-                     <i class="fas fa-user-shield"></i> ⚙️ Administração
-                    </a>
-    
+                <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
+                    <i class="fas fa-user-shield"></i> ⚙️ Administração
+                </a>
+                <!-- BOTÃO PARA MIGRAR PARA ADMIN APAC -->
                 <button onclick="migrarPerfilAdminAPAC()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-indigo-400 font-bold hover:bg-white/10 transition-all" style="background:transparent; border:none; cursor:pointer; width:100%; text-align:left;">
                     <i class="fas fa-arrow-up"></i> 📑 Migrar para Admin APAC
-                      </button>
-                  </div>
+                </button>
+            </div>
             
             <div class="relative">
                 <button onclick="toggleExportMenu()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-white font-bold hover:bg-white/10 transition-all">
@@ -1267,6 +1268,47 @@ const especialidades = [
     {id:4, nome:'Oftalmologia', icone:'👁️', grupo_sigtap:'05', exames_obrigatorios:'Mapeamento + Tonometria', prazo_retorno_dias:60},
     {id:5, nome:'Otorrino', icone:'👂', grupo_sigtap:'04', exames_obrigatorios:'Audiometria + Videolaringoscopia', prazo_retorno_dias:60}
 ];
+
+// ============================================
+// FUNÇÃO CARREGAR UBS - CORRIGIDA
+// ============================================
+function carregarUBSnoSelect(selectId) {
+    const select = document.getElementById(selectId);
+    if (!select) {
+        console.warn(`⚠️ Select com ID "${selectId}" não encontrado.`);
+        return;
+    }
+    // Limpa o select antes de adicionar novas opções
+    select.innerHTML = '<option value="">Selecione a UBS</option>';
+    
+    // Adiciona todas as UBS da lista
+    LISTA_UBS.forEach(ubs => {
+        const option = document.createElement('option');
+        option.value = ubs;
+        option.textContent = ubs;
+        select.appendChild(option);
+    });
+}
+
+// ============================================
+// FUNÇÃO TOGGLE UBS - CORRIGIDA
+// ============================================
+function toggleUbsField() {
+    const tipoSelect = document.getElementById('adminNovoTipo');
+    const ubsDiv = document.getElementById('adminNovoUbsDiv');
+    if (!tipoSelect || !ubsDiv) return;
+    
+    // Mostra o campo UBS apenas se o tipo for "usuario"
+    ubsDiv.style.display = tipoSelect.value === 'usuario' ? 'block' : 'none';
+}
+
+function toggleEditUbsField() {
+    const tipoSelect = document.getElementById('editUsuarioTipo');
+    const ubsDiv = document.getElementById('editUsuarioUbsDiv');
+    if (!tipoSelect || !ubsDiv) return;
+    
+    ubsDiv.style.display = tipoSelect.value === 'usuario' ? 'block' : 'none';
+}
 
 // ============================================
 // VARIÁVEIS GLOBAIS
@@ -2668,3 +2710,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('✅ FERRAMENTA OCI v7.0 REFORMADA INICIALIZADA COM SUCESSO!');
 });
+</script>
+</body>
+</html>
