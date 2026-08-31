@@ -2520,128 +2520,151 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🏥 FERRAMENTA OCI v7.0 REFORMADA - INICIANDO...');
     console.log('👑 Ana Paula Araújo da Silva | Mat: 201704');
 
+    // Carrega as UBS nos selects (AGORA AS FUNÇÕES ESTÃO DEFINIDAS)
     carregarUBSnoSelect('adminNovoUbs');
     carregarUBSnoSelect('editUsuarioUbs');
     toggleUbsField();
     
     // ============ CORREÇÃO: BUSCA GLOBAL ============
-    document.getElementById('globalSearch').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') buscarGlobal();
-    });
-    document.getElementById('globalSearch').addEventListener('input', (e) => {
-        if (!e.target.value.trim()) atualizarTudo();
-    });
+    const globalSearch = document.getElementById('globalSearch');
+    if (globalSearch) {
+        globalSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') buscarGlobal();
+        });
+        globalSearch.addEventListener('input', (e) => {
+            if (!e.target.value.trim()) atualizarTudo();
+        });
+    }
 
     // LOGIN
-    document.getElementById('btnLogin').addEventListener('click', async () => {
-        const nome = document.getElementById('loginNome').value.trim();
-        const cpf = limparCPF(document.getElementById('loginCPF').value);
-        const senha = document.getElementById('loginSenha').value.trim();
-        
-        if (!nome || !cpf || !senha) return alert('⚠️ Preencha todos os campos!');
-        if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
-        
-        showLoading();
-        const { data, error } = await supabaseClient.rpc('login_painel_admin', {
-            p_cpf: cpf,
-            p_senha: senha
+    const btnLogin = document.getElementById('btnLogin');
+    if (btnLogin) {
+        btnLogin.addEventListener('click', async () => {
+            const nome = document.getElementById('loginNome').value.trim();
+            const cpf = limparCPF(document.getElementById('loginCPF').value);
+            const senha = document.getElementById('loginSenha').value.trim();
+            
+            if (!nome || !cpf || !senha) return alert('⚠️ Preencha todos os campos!');
+            if (!validarCPF(cpf)) return alert('❌ CPF inválido!');
+            
+            showLoading();
+            const { data, error } = await supabaseClient.rpc('login_painel_admin', {
+                p_cpf: cpf,
+                p_senha: senha
+            });
+            hideLoading();
+
+            if (error || !data || !data.success) {
+                return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
+            }
+
+            usuarioLogado = data;
+            
+            const { data: userData } = await supabaseClient.from('usuarios').select('*').eq('id', usuarioLogado.id).maybeSingle();
+            if (userData) {
+                usuarioLogado.unidade_saude = userData.unidade_saude || '';
+                usuarioLogado.email = userData.email || '';
+                usuarioLogado.telefone = userData.telefone || '';
+            }
+            
+            document.getElementById('screenLogin').style.display = 'none';
+            document.getElementById('screenLogin').classList.remove('active');
+            document.getElementById('screenSistema').classList.add('active');
+            document.getElementById('screenSistema').style.display = 'flex';
+            
+            const tipoLabel = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : 
+                             usuarioLogado.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário Comum';
+            document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Admin';
+            document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'A')[0].toUpperCase();
+            document.getElementById('sidebarTipo').textContent = tipoLabel;
+            document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
+            
+            const adminSection = document.getElementById('sidebarAdminSection');
+            if (adminSection) adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
+            
+            const apacSection = document.getElementById('sidebarAPACSection');
+            if (apacSection) apacSection.classList.toggle('hidden', !podeGerarRelatorioAPAC());
+            
+            atualizarTudo();
         });
-        hideLoading();
-
-        if (error || !data || !data.success) {
-            return alert('❌ ' + (data?.message || 'Usuário não encontrado!'));
-        }
-
-        usuarioLogado = data;
-        
-        const { data: userData } = await supabaseClient.from('usuarios').select('*').eq('id', usuarioLogado.id).maybeSingle();
-        if (userData) {
-            usuarioLogado.unidade_saude = userData.unidade_saude || '';
-            usuarioLogado.email = userData.email || '';
-            usuarioLogado.telefone = userData.telefone || '';
-        }
-        
-        document.getElementById('screenLogin').style.display = 'none';
-        document.getElementById('screenLogin').classList.remove('active');
-        document.getElementById('screenSistema').classList.add('active');
-        document.getElementById('screenSistema').style.display = 'flex';
-        
-        const tipoLabel = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : 
-                         usuarioLogado.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário Comum';
-        document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Admin';
-        document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'A')[0].toUpperCase();
-        document.getElementById('sidebarTipo').textContent = tipoLabel;
-        document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
-        
-        const adminSection = document.getElementById('sidebarAdminSection');
-        if (adminSection) adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
-        
-        const apacSection = document.getElementById('sidebarAPACSection');
-        if (apacSection) apacSection.classList.toggle('hidden', !podeGerarRelatorioAPAC());
-        
-        atualizarTudo();
-    });
+    }
 
     // REDEFINIR SENHA
-    document.getElementById('btnResetConfirmar').addEventListener('click', async () => {
-        const cpf = limparCPF(document.getElementById('resetCPF').value);
-        const nomeMae = document.getElementById('resetNomeMae').value.trim();
-        const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
-        const codigo = document.getElementById('resetCodigo').value.trim();
-        const novaSenha = document.getElementById('resetNovaSenha').value.trim();
-        const confirma = document.getElementById('resetConfirmaSenha').value.trim();
-        
-        if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
-        if (!cidadeNatal) return alert('❌ Informe sua cidade natal!');
-        if (!codigo || codigo.length !== 6) return alert('❌ Informe o código de 6 dígitos!');
-        if (!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
-        if (novaSenha !== confirma) return alert('❌ As senhas não conferem!');
-        
-        showLoading();
-        const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
-            p_cpf: cpf,
-            p_nome_mae: nomeMae || '',
-            p_cidade_natal: cidadeNatal,
-            p_codigo: codigo,
-            p_nova_senha: novaSenha
+    const btnReset = document.getElementById('btnResetConfirmar');
+    if (btnReset) {
+        btnReset.addEventListener('click', async () => {
+            const cpf = limparCPF(document.getElementById('resetCPF').value);
+            const nomeMae = document.getElementById('resetNomeMae').value.trim();
+            const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
+            const codigo = document.getElementById('resetCodigo').value.trim();
+            const novaSenha = document.getElementById('resetNovaSenha').value.trim();
+            const confirma = document.getElementById('resetConfirmaSenha').value.trim();
+            
+            if (!cpf || !validarCPF(cpf)) return alert('❌ CPF inválido!');
+            if (!cidadeNatal) return alert('❌ Informe sua cidade natal!');
+            if (!codigo || codigo.length !== 6) return alert('❌ Informe o código de 6 dígitos!');
+            if (!novaSenha || novaSenha.length !== 6) return alert('❌ Nova senha deve ter 6 dígitos!');
+            if (novaSenha !== confirma) return alert('❌ As senhas não conferem!');
+            
+            showLoading();
+            const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
+                p_cpf: cpf,
+                p_nome_mae: nomeMae || '',
+                p_cidade_natal: cidadeNatal,
+                p_codigo: codigo,
+                p_nova_senha: novaSenha
+            });
+            hideLoading();
+            
+            if (error || !data || !data.success) {
+                return alert('❌ ' + (data?.message || 'Erro ao redefinir senha!'));
+            }
+            alert('✅ Senha redefinida com sucesso!');
+            ['resetCPF','resetNomeMae','resetCidadeNatal','resetCodigo','resetNovaSenha','resetConfirmaSenha'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            showScreen('screenLogin');
         });
-        hideLoading();
-        
-        if (error || !data || !data.success) {
-            return alert('❌ ' + (data?.message || 'Erro ao redefinir senha!'));
-        }
-        alert('✅ Senha redefinida com sucesso!');
-        ['resetCPF','resetNomeMae','resetCidadeNatal','resetCodigo','resetNovaSenha','resetConfirmaSenha'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-        showScreen('screenLogin');
-    });
+    }
 
     // ENTER NO LOGIN
-    document.getElementById('loginSenha').addEventListener('keydown', (e) => { 
-        if (e.key === 'Enter') document.getElementById('btnLogin').click(); 
-    });
+    const loginSenha = document.getElementById('loginSenha');
+    if (loginSenha) {
+        loginSenha.addEventListener('keydown', (e) => { 
+            if (e.key === 'Enter') {
+                const btn = document.getElementById('btnLogin');
+                if (btn) btn.click();
+            }
+        });
+    }
 
     // FECHAR MODAIS
-    document.getElementById('modalAdmin').addEventListener('click', function(e) { 
-        if (e.target === this) fecharModalAdmin(); 
-    });
-    document.getElementById('modalEditarUsuario').addEventListener('click', function(e) { 
-        if (e.target === this) fecharModal('modalEditarUsuario'); 
-    });
-    document.getElementById('modalRelatorioAPAC').addEventListener('click', function(e) { 
-        if (e.target === this) fecharModal('modalRelatorioAPAC'); 
-    });
+    const modalAdmin = document.getElementById('modalAdmin');
+    if (modalAdmin) {
+        modalAdmin.addEventListener('click', function(e) { 
+            if (e.target === this) fecharModalAdmin(); 
+        });
+    }
+    
+    const modalEditar = document.getElementById('modalEditarUsuario');
+    if (modalEditar) {
+        modalEditar.addEventListener('click', function(e) { 
+            if (e.target === this) fecharModal('modalEditarUsuario'); 
+        });
+    }
+    
+    const modalRelatorio = document.getElementById('modalRelatorioAPAC');
+    if (modalRelatorio) {
+        modalRelatorio.addEventListener('click', function(e) { 
+            if (e.target === this) fecharModal('modalRelatorioAPAC'); 
+        });
+    }
 
-    // ATUALIZAÇÃO AUTOMÁTICA
+    // ATUALIZAÇÃO AUTOMÁTICA (a cada 30 segundos)
     setInterval(() => { 
         if (usuarioLogado) atualizarTudo(); 
     }, 30000);
 
     console.log('✅ FERRAMENTA OCI v7.0 REFORMADA INICIALIZADA COM SUCESSO!');
 });
-
-</script>
-</body>
-</html>
