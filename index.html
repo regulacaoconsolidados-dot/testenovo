@@ -74,7 +74,6 @@
         .ferramentas-sub { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
         .ferramentas-sub.open { max-height: 600px; }
         
-        /* NOVOS BOTÕES DA TELA INICIAL */
         .header-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -114,7 +113,6 @@
         .header-buttons .btn-oci { background: #ede9fe; color: #5b21b6; }
         .header-buttons .btn-apac { background: #fae8ff; color: #6b21a5; }
         
-        /* TIMELINE - Barra de progresso */
         .timeline-container {
             display: flex;
             align-items: center;
@@ -207,7 +205,6 @@
         .alerta-badge.amarelo { background: #fef3c7; color: #92400e; }
         .alerta-badge.cinza { background: #f1f5f9; color: #64748b; }
 
-        /* Colunas com largura fixa para tabelas */
         .tabela-colunas th {
             white-space: nowrap;
             font-size: 10px;
@@ -230,6 +227,31 @@
             font-size: 12px;
             padding: 8px 6px;
             vertical-align: middle;
+        }
+        
+        .legenda-timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        .legenda-timeline-item .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .legenda-timeline-item .desc {
+            font-size: 11px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .legenda-timeline-item .detalhe {
+            font-size: 10px;
+            color: #64748b;
         }
     </style>
 </head>
@@ -409,17 +431,13 @@ function showScreen(screenId) {
         </div>
         
         <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
-            <!-- 🧠 Lógica e Indicadores - Sempre visível -->
             <a href="#" onclick="switchTab('logica-indicadores')" class="sidebar-item active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold">
                 <i class="fas fa-brain w-4 text-yellow-400"></i> 🧠 Lógica e Indicadores
             </a>
-            
-            <!-- 📊 Visão Geral - Sempre visível -->
             <a href="#" onclick="switchTab('visao-geral')" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300">
                 <i class="fas fa-th-large w-4"></i> 📊 Visão Geral
             </a>
             
-            <!-- 🧰 Caixa de Ferramentas - Expansível -->
             <div class="mt-2">
                 <div onclick="toggleFerramentas()" class="flex items-center justify-between p-3 rounded-xl text-sm text-slate-300 font-bold cursor-pointer hover:bg-white/5">
                     <span><i class="fas fa-tools w-4 mr-2"></i> 🧰 Caixa de Ferramentas</span>
@@ -464,19 +482,16 @@ function showScreen(screenId) {
             
             <div class="border-t border-white/10 my-4"></div>
             
-            <!-- 📋 Portal do Retorno - Link externo -->
             <a href="https://paineldousuario.regulacaoconsolidados.workers.dev/#" target="_blank" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-emerald-400 font-bold hover:bg-white/10 transition-all">
                 <i class="fas fa-external-link-alt w-4"></i> 📋 Portal de Retorno
             </a>
             
-            <!-- ⚙️ Administração - Apenas admin -->
             <div id="sidebarAdminSection" class="hidden">
                 <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
                     <i class="fas fa-user-shield"></i> ⚙️ Administração
                 </a>
             </div>
             
-            <!-- 📥 Baixar Relatórios - Dropdown -->
             <div class="relative">
                 <button onclick="toggleExportMenu()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-white font-bold hover:bg-white/10 transition-all">
                     <i class="fas fa-download"></i> 📥 Baixar Relatórios
@@ -496,7 +511,6 @@ function showScreen(screenId) {
                 </div>
             </div>
             
-            <!-- 📑 Gerar Relatório APAC - Apenas admin/admin_apac -->
             <div id="sidebarAPACSection" class="hidden mt-2">
                 <button onclick="abrirModalRelatorioAPAC()" class="w-full btn-apac text-sm flex items-center justify-center gap-2">
                     <i class="fas fa-file-medical"></i> 📑 Gerar Relatório APAC
@@ -543,7 +557,6 @@ function showScreen(screenId) {
                 </div>
             </div>
             
-            <!-- ===== NOVOS BOTÕES DA TELA INICIAL ===== -->
             <div class="header-buttons">
                 <button class="btn-logica" onclick="switchTab('logica-indicadores')"><i class="fas fa-brain"></i> Lógica Indicadores</button>
                 <button class="btn-visao" onclick="switchTab('visao-geral')"><i class="fas fa-th-large"></i> Visão Geral</button>
@@ -597,6 +610,62 @@ function showScreen(screenId) {
                         <span class="fluxo-step bg-orange-100 text-orange-700"><i class="fas fa-user-times mr-1"></i> Absenteísmo 1ª Consulta</span>
                         <span class="fluxo-step bg-red-100 text-red-700"><i class="fas fa-user-slash mr-1"></i> Absenteísmo Retorno</span>
                     </div>
+                    
+                    <!-- NOVA LEGENDA DETALHADA DO TIMELINE -->
+                    <div class="mt-6 border-t pt-4">
+                        <h4 class="font-bold text-sm text-slate-700 mb-3"><i class="fas fa-info-circle text-blue-500 mr-2"></i>📌 Legenda da Timeline (Passos da Linha do Cuidado)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                            <div class="legenda-timeline-item">
+                                <span class="dot" style="background:#3b82f6;"></span>
+                                <div><span class="desc">1ª Agendada</span><br><span class="detalhe">Paciente agendou a 1ª consulta</span></div>
+                            </div>
+                            <div class="legenda-timeline-item">
+                                <span class="dot" style="background:#06b6d4;"></span>
+                                <div><span class="desc">Recep.</span><br><span class="detalhe">Paciente compareceu à 1ª consulta</span></div>
+                            </div>
+                            <div class="legenda-timeline-item">
+                                <span class="dot" style="background:#f59e0b;"></span>
+                                <div><span class="desc">Exames</span><br><span class="detalhe">Aguardando realização de exames</span></div>
+                            </div>
+                            <div class="legenda-timeline-item">
+                                <span class="dot" style="background:#22c55e;"></span>
+                                <div><span class="desc">Apto</span><br><span class="detalhe">Exames ok, apto para retorno</span></div>
+                            </div>
+                            <div class="legenda-timeline-item">
+                                <span class="dot" style="background:#6366f1;"></span>
+                                <div><span class="desc">Ret. Agd.</span><br><span class="detalhe">Retorno já agendado na agenda</span></div>
+                            </div>
+                            <div class="legenda-timeline-item">
+                                <span class="dot" style="background:#14b8a6;"></span>
+                                <div><span class="desc">Ret. Rec.</span><br><span class="detalhe">Paciente compareceu ao retorno</span></div>
+                            </div>
+                            <div class="legenda-timeline-item">
+                                <span class="dot" style="background:#8b5cf6;"></span>
+                                <div><span class="desc">OCI Fec.</span><br><span class="detalhe">OCI finalizada, aguardando APAC</span></div>
+                            </div>
+                            <div class="legenda-timeline-item">
+                                <span class="dot" style="background:#ec4899;"></span>
+                                <div><span class="desc">APAC</span><br><span class="detalhe">✅ APAC gerada com sucesso</span></div>
+                            </div>
+                        </div>
+                        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div class="legenda-timeline-item border-orange-200 bg-orange-50">
+                                <span class="dot" style="background:#f97316;"></span>
+                                <div><span class="desc text-orange-700">🚫 Faltou 1ª Consulta</span><br><span class="detalhe">Paciente não compareceu à 1ª consulta</span></div>
+                            </div>
+                            <div class="legenda-timeline-item border-red-200 bg-red-50">
+                                <span class="dot" style="background:#ef4444;"></span>
+                                <div><span class="desc text-red-700">🚫 Faltou Retorno</span><br><span class="detalhe">Paciente não compareceu ao retorno</span></div>
+                            </div>
+                        </div>
+                        <div class="mt-3 bg-slate-50 rounded-xl p-3 border border-slate-200">
+                            <p class="text-xs text-slate-600 font-medium"><i class="fas fa-lightbulb text-amber-500 mr-1"></i> <strong>Como funciona:</strong> Cada etapa é representada por um círculo colorido. 
+                            <span class="text-emerald-600 font-bold">● Verde</span> = etapa concluída, 
+                            <span class="text-blue-600 font-bold">● Azul pulsante</span> = etapa atual, 
+                            <span class="text-slate-300 font-bold">● Cinza</span> = etapa pendente. 
+                            A porcentagem mostra o progresso total do paciente na linha do cuidado.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- CARDS DE INDICADORES CRÍTICOS -->
@@ -607,6 +676,11 @@ function showScreen(screenId) {
                             <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">🫀 Cardiologia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">ECG; ERG</span></div>
                             <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">🦴 Ortopedia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">RX; USG; TOMO</span></div>
                             <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">🎗️ Oncologia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">BIO; AP; USG</span></div>
+                            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">👁️ Oftalmologia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">Mapeamento; Tonometria</span></div>
+                            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">👂 Otorrino</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">Audiometria; Videolaringoscopia</span></div>
+                        </div>
+                        <div class="mt-3 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg">
+                            <i class="fas fa-info-circle text-blue-400 mr-1"></i> Cada especialidade tem exames obrigatórios e prazos específicos para retorno.
                         </div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border p-6 card-emerald">
@@ -616,6 +690,10 @@ function showScreen(screenId) {
                             <div class="flex gap-3">
                                 <div class="flex-1 text-center p-3 bg-blue-50 rounded-xl"><p class="text-[10px] text-blue-600 font-bold uppercase">Tempo Médio OCI</p><p class="text-xl font-black text-blue-700" id="indTempoMedio">—</p></div>
                                 <div class="flex-1 text-center p-3 bg-purple-50 rounded-xl"><p class="text-[10px] text-purple-600 font-bold uppercase">Retornos Realizados</p><p class="text-xl font-black text-purple-700" id="indRetornosRealizados">—</p></div>
+                            </div>
+                            <div class="text-center p-3 bg-amber-50 rounded-xl">
+                                <p class="text-[10px] text-amber-600 font-bold uppercase">OCIs Pendentes (prazo vencido)</p>
+                                <p class="text-xl font-black text-amber-700" id="indOCIsPendentes">—</p>
                             </div>
                         </div>
                     </div>
@@ -629,6 +707,10 @@ function showScreen(screenId) {
                             <div class="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-3">
                                 <div class="w-8 h-8 bg-amber-500 text-white rounded-lg flex items-center justify-center shrink-0"><i class="fas fa-flask"></i></div>
                                 <div><p class="text-xs font-bold text-amber-700">Exames em atraso</p><p class="text-[10px] text-amber-600">Aguardando realização</p></div>
+                            </div>
+                            <div class="p-3 bg-sky-50 border border-sky-100 rounded-xl flex items-start gap-3">
+                                <div class="w-8 h-8 bg-sky-500 text-white rounded-lg flex items-center justify-center shrink-0"><i class="fas fa-calendar-check"></i></div>
+                                <div><p class="text-xs font-bold text-sky-700">Retornos Agendados</p><p class="text-[10px] text-sky-600">Pacientes com retorno marcado</p></div>
                             </div>
                         </div>
                     </div>
@@ -681,7 +763,7 @@ function showScreen(screenId) {
                 </div>
             </div>
 
-            <!-- ============ 👥 MONITORAMENTO - COM TIMELINE ============ -->
+            <!-- ============ 👥 MONITORAMENTO ============ -->
             <div id="content-monitoramento" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 items-center justify-between">
@@ -881,7 +963,7 @@ function showScreen(screenId) {
                 </div>
             </div>
 
-            <!-- ============ 📋 RETORNOS RECEPCIONADOS ============ -->
+            <!-- ============ 📋 RETORNOS RECEPCIONADOS - CORRIGIDO ============ -->
             <div id="content-retornos-recepcionados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -906,7 +988,7 @@ function showScreen(screenId) {
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','medico')">Médico <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','local')">Local <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','data_agendada')">Data da 1ª Consulta <i class="fas fa-sort"></i></th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','data_retorno_recepcionada')">Data Recepção <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','data_retorno_recepcionada')">Data Recepção Retorno <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','exames')">Exames <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','data_realizacao_exame')">Data Realização <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('retornos-recepcionados','usuario_cadastrou')">Cadastrado por: <i class="fas fa-sort"></i></th>
@@ -970,7 +1052,7 @@ function showScreen(screenId) {
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','especialidade')">Especialidade <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','medico')">Médico <i class="fas fa-sort"></i></th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','local')">Local <i class="fas fa-sort"></i></th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','data_retorno_agendada')">Data do Agendamento do Retorno <i class="fas fa-sort"></i></th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('absenteismo-retorno','data_retorno_agendada')">Data Agendamento Retorno <i class="fas fa-sort"></i></th>
                             </tr></thead>
                             <tbody id="tabelaAbsenteismoRetorno"></tbody>
                         </table>
@@ -1183,101 +1265,6 @@ const especialidades = [
 ];
 
 // ============================================
-// FUNÇÕES DE MASCARAMENTO - NOVAS REGRAS
-// ============================================
-function mascararNome(nome) {
-    if (!nome) return 'Paciente';
-    const primeiroNome = nome.trim().split(' ')[0];
-    return primeiroNome || 'Paciente';
-}
-
-function mascararCPF(cpf) {
-    if (!cpf) return '***.***.***-**';
-    const limpo = cpf.replace(/\D/g, '');
-    if (limpo.length < 3) return '***.***.***-**';
-    const primeiros = limpo.slice(0, 3);
-    return `${primeiros}.***.***-**`;
-}
-
-function mascararTelefone(telefone) {
-    if (!telefone) return '(**) ****-****';
-    return '(**) ****-****';
-}
-
-// ============================================
-// FUNÇÃO DE TIMELINE
-// ============================================
-function gerarTimeline(status, dataCriacao) {
-    // Definição dos passos da linha do cuidado
-    const passos = [
-        { id: 'agendada', label: '1ª Agendada', cor: '#3b82f6' },
-        { id: 'recepcionada', label: 'Recep.', cor: '#06b6d4' },
-        { id: 'aguardando_exame', label: 'Exames', cor: '#f59e0b' },
-        { id: 'apto_retorno', label: 'Apto', cor: '#22c55e' },
-        { id: 'retorno_agendado', label: 'Ret. Agd.', cor: '#6366f1' },
-        { id: 'retorno_recepcionado', label: 'Ret. Rec.', cor: '#14b8a6' },
-        { id: 'oci_fechada', label: 'OCI Fec.', cor: '#8b5cf6' },
-        { id: 'apac_gerada', label: 'APAC', cor: '#ec4899' }
-    ];
-    
-    // Mapeamento de status para índice
-    const statusMap = {
-        'agendada': 0,
-        'recepcionada': 1,
-        'aguardando_exame': 2,
-        'apto_retorno': 3,
-        'retorno_agendado': 4,
-        'retorno_recepcionado': 5,
-        'oci_fechada': 6,
-        'apac_gerada': 7,
-        'faltou': -1,
-        'retorno_faltou': -1,
-        'cancelada': -1,
-        'transferida': -1
-    };
-    
-    const statusIndex = statusMap[status] !== undefined ? statusMap[status] : -1;
-    const totalPassos = passos.length;
-    
-    // Se for status de falha, mostra timeline diferente
-    if (statusIndex === -1) {
-        const statusLabels = {
-            'faltou': '🚫 Faltou 1ª Consulta',
-            'retorno_faltou': '🚫 Faltou Retorno',
-            'cancelada': '❌ Cancelada',
-            'transferida': '↪️ Transferida'
-        };
-        return `
-            <div class="timeline-container">
-                <span class="text-xs font-bold text-rose-600">${statusLabels[status] || status}</span>
-            </div>
-        `;
-    }
-    
-    // Calcular porcentagem
-    const progresso = Math.round(((statusIndex + 1) / totalPassos) * 100);
-    
-    // Gerar dots
-    let dotsHtml = '';
-    for (let i = 0; i < totalPassos; i++) {
-        let classe = 'step-dot pending';
-        if (i < statusIndex) classe = 'step-dot done';
-        else if (i === statusIndex) classe = 'step-dot active';
-        dotsHtml += `<div class="${classe}" title="${passos[i].label}"></div>`;
-        if (i < totalPassos - 1) {
-            dotsHtml += `<div class="step-line ${i < statusIndex ? 'done' : ''}"></div>`;
-        }
-    }
-    
-    return `
-        <div class="timeline-container">
-            <div class="timeline-steps">${dotsHtml}</div>
-            <div class="timeline-label">${progresso}%</div>
-        </div>
-    `;
-}
-
-// ============================================
 // VARIÁVEIS GLOBAIS
 // ============================================
 let usuarioLogado = null;
@@ -1362,6 +1349,28 @@ function getStatusBadge(status) {
 }
 
 // ============================================
+// FUNÇÕES DE MASCARAMENTO
+// ============================================
+function mascararNome(nome) {
+    if (!nome) return 'Paciente';
+    const primeiroNome = nome.trim().split(' ')[0];
+    return primeiroNome || 'Paciente';
+}
+
+function mascararCPF(cpf) {
+    if (!cpf) return '***.***.***-**';
+    const limpo = cpf.replace(/\D/g, '');
+    if (limpo.length < 3) return '***.***.***-**';
+    const primeiros = limpo.slice(0, 3);
+    return `${primeiros}.***.***-**`;
+}
+
+function mascararTelefone(telefone) {
+    if (!telefone) return '(**) ****-****';
+    return '(**) ****-****';
+}
+
+// ============================================
 // PERMISSÕES
 // ============================================
 function podeVerDadosCompletos() {
@@ -1423,7 +1432,7 @@ function switchTab(tabId) {
 }
 
 // ============================================
-// FUNÇÕES ADMIN (resumidas para não estourar limite)
+// FUNÇÕES ADMIN (resumidas)
 // ============================================
 function abrirModalAdmin() {
     document.getElementById('modalAdmin').classList.add('show');
@@ -1661,7 +1670,6 @@ function abrirModalRelatorioAPAC() {
 
 async function gerarRelatorioAPAC(formato) {
     if (!podeGerarRelatorioAPAC()) return alert('❌ Sem permissão.');
-    // ... (mantido igual ao original, mas resumido para não estourar limite)
     alert('📑 Função de relatório APAC disponível na versão completa.');
 }
 
@@ -1687,6 +1695,139 @@ async function carregarDadosSupabase() {
             linhaDB.forEach(l => consultas.push(l));
         }
     } catch(e) { console.warn('⚠️ Erro ao carregar Supabase:', e.message); }
+}
+
+// ============================================
+// FUNÇÃO DE BUSCA GLOBAL - CORRIGIDA
+// ============================================
+function buscarGlobal() {
+    const input = document.getElementById('globalSearch');
+    if (!input) return;
+    const termo = input.value.trim().toLowerCase();
+    if (!termo) {
+        // Se o campo estiver vazio, recarrega os dados normais
+        atualizarTudo();
+        return;
+    }
+    
+    // Filtra os pacientes e consultas
+    const pacientesEncontrados = pacientes.filter(p => 
+        (p.prontuario && p.prontuario.toString().includes(termo)) ||
+        (p.nome && p.nome.toLowerCase().includes(termo)) ||
+        (p.cpf && p.cpf.replace(/\D/g, '').includes(termo))
+    );
+    
+    const idsPacientes = new Set(pacientesEncontrados.map(p => p.id));
+    const consultasEncontradas = consultas.filter(c => 
+        idsPacientes.has(c.paciente_id) ||
+        (c.numero_solicitacao && c.numero_solicitacao.toString().includes(termo))
+    );
+    
+    if (consultasEncontradas.length === 0) {
+        toast('🔍 Nenhum resultado encontrado para: ' + termo, 'info');
+        return;
+    }
+    
+    // Salva os dados filtrados temporariamente
+    const consultasAntigas = consultas;
+    consultas = consultasEncontradas;
+    
+    // Atualiza a visualização na aba atual
+    const tabAtual = document.querySelector('.tab-content.active');
+    if (tabAtual) {
+        const id = tabAtual.id.replace('content-', '');
+        // Verifica se é uma aba de tabela
+        const tiposTabela = ['monitoramento','monitoramento-exames','primeira-consulta-agendadas','primeira-consulta','aptos-retorno','retornos-agendados','retornos-recepcionados','absenteismo-1consulta','absenteismo-retorno','apac','apacs-geradas'];
+        if (tiposTabela.includes(id)) {
+            renderizarTabelas();
+        } else if (id === 'visao-geral') {
+            atualizarTudo();
+        }
+    }
+    
+    // Restaura os dados originais para não perder o estado
+    setTimeout(() => {
+        consultas = consultasAntigas;
+    }, 5000);
+    
+    toast(`🔍 ${consultasEncontradas.length} registro(s) encontrados para: ${termo}`, 'success');
+}
+
+// ============================================
+// TOAST
+// ============================================
+function toast(msg, type = 'info') {
+    const box = document.getElementById('toastBox');
+    if (!box) return;
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<span>${msg}</span>`;
+    box.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+// ============================================
+// TIMELINE
+// ============================================
+function gerarTimeline(status, dataCriacao) {
+    const passos = [
+        { id: 'agendada', label: '1ª Agendada', cor: '#3b82f6' },
+        { id: 'recepcionada', label: 'Recep.', cor: '#06b6d4' },
+        { id: 'aguardando_exame', label: 'Exames', cor: '#f59e0b' },
+        { id: 'apto_retorno', label: 'Apto', cor: '#22c55e' },
+        { id: 'retorno_agendado', label: 'Ret. Agd.', cor: '#6366f1' },
+        { id: 'retorno_recepcionado', label: 'Ret. Rec.', cor: '#14b8a6' },
+        { id: 'oci_fechada', label: 'OCI Fec.', cor: '#8b5cf6' },
+        { id: 'apac_gerada', label: 'APAC', cor: '#ec4899' }
+    ];
+    
+    const statusMap = {
+        'agendada': 0, 'recepcionada': 1, 'aguardando_exame': 2,
+        'apto_retorno': 3, 'retorno_agendado': 4, 'retorno_recepcionado': 5,
+        'oci_fechada': 6, 'apac_gerada': 7,
+        'faltou': -1, 'retorno_faltou': -1, 'cancelada': -1, 'transferida': -1
+    };
+    
+    const statusIndex = statusMap[status] !== undefined ? statusMap[status] : -1;
+    const totalPassos = passos.length;
+    
+    if (statusIndex === -1) {
+        const statusLabels = {
+            'faltou': '🚫 Faltou 1ª Consulta',
+            'retorno_faltou': '🚫 Faltou Retorno',
+            'cancelada': '❌ Cancelada',
+            'transferida': '↪️ Transferida'
+        };
+        return `
+            <div class="timeline-container">
+                <span class="text-xs font-bold text-rose-600">${statusLabels[status] || status}</span>
+            </div>
+        `;
+    }
+    
+    const progresso = Math.round(((statusIndex + 1) / totalPassos) * 100);
+    
+    let dotsHtml = '';
+    for (let i = 0; i < totalPassos; i++) {
+        let classe = 'step-dot pending';
+        if (i < statusIndex) classe = 'step-dot done';
+        else if (i === statusIndex) classe = 'step-dot active';
+        dotsHtml += `<div class="${classe}" title="${passos[i].label}"></div>`;
+        if (i < totalPassos - 1) {
+            dotsHtml += `<div class="step-line ${i < statusIndex ? 'done' : ''}"></div>`;
+        }
+    }
+    
+    return `
+        <div class="timeline-container">
+            <div class="timeline-steps">${dotsHtml}</div>
+            <div class="timeline-label">${progresso}%</div>
+        </div>
+    `;
 }
 
 // ============================================
@@ -1766,7 +1907,7 @@ async function atualizarTudo() {
     document.getElementById('indTaxaComparecimento').textContent = pct + '%';
     document.getElementById('indTempoMedio').textContent = '14 dias';
     document.getElementById('indRetornosRealizados').textContent = retornoRecepcionado;
-
+    
     const ocisPendentes = cf.filter(c => {
         if (['oci_fechada','apac_gerada','faltou','retorno_faltou','cancelada','transferida'].includes(c.status)) return false;
         if (!c.data_agendada) return false;
@@ -1775,6 +1916,7 @@ async function atualizarTudo() {
         return dias > prazo;
     });
     document.getElementById('alertCount').textContent = ocisPendentes.length;
+    document.getElementById('indOCIsPendentes').textContent = ocisPendentes.length;
 
     renderizarTabelas();
     renderizarGraficos();
@@ -1961,11 +2103,9 @@ function renderizarTabelas() {
                 const e = especialidades.find(x => x.id === item.especialidade_id) || {};
                 const st = getStatusBadge(item.status);
                 
-                // MASCARAMENTO - apenas primeiro nome e 3 primeiros dígitos do CPF
                 const nomeExibido = mascararNome(p.nome);
                 const cpfExibido = mascararCPF(p.cpf);
                 
-                // Calcular dias restantes e alerta
                 let diasRestantes = '—';
                 let alertaClasse = 'cinza';
                 let alertaTexto = '—';
@@ -1992,7 +2132,6 @@ function renderizarTabelas() {
                     }
                 }
                 
-                // Montar linha baseada no tipo
                 let linha = '';
                 
                 switch(tipo) {
@@ -2025,8 +2164,27 @@ function renderizarTabelas() {
                         </tr>`;
                         break;
                         
+                    case 'retornos-recepcionados':
+                        linha = `<tr class="hover:bg-slate-50 border-b">
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-indigo-600">${item.numero_solicitacao_retorno || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm">${item.subgrupo_sigtap ? `${item.codigo_sigtap || ''}/${item.subgrupo_sigtap}` : '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.medico_retorno || item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_retorno || item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_retorno_recepcionada || item.data_recepcionada)}</td>
+                            <td class="px-2 py-2 text-sm">${item.exames_realizados ? (typeof item.exames_realizados === 'string' ? JSON.parse(item.exames_realizados).map(e => e.nome).join(', ') : '—') : '—'}</td>
+                            <td class="px-2 py-2 text-sm">${formatarData(item.data_realizacao_exame)}</td>
+                            <td class="px-2 py-2 text-sm">${item.usuario_cadastrou || '—'}</td>
+                        </tr>`;
+                        break;
+                        
                     default:
-                        // Para outras telas, usar a lógica padrão com as novas colunas
                         linha = `<tr class="hover:bg-slate-50 border-b">
                             <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
                             <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
@@ -2058,7 +2216,7 @@ function renderizarTabelas() {
 }
 
 // ============================================
-// EXPORTAÇÃO EXCEL (resumida)
+// EXPORTAÇÃO EXCEL - COM MASCARAMENTO DE CPF
 // ============================================
 function exportarExcel(tipo) {
     const dados = getDadosFiltrados(tipo);
@@ -2085,6 +2243,10 @@ function exportarExcel(tipo) {
             row['Data Realização'] = item.data_realizacao_exame || '';
             row['Status Exame'] = item.status_exame || '';
         }
+        if (tipo === 'retornos-recepcionados') {
+            row['Nº Solicitação Retorno'] = item.numero_solicitacao_retorno || '';
+            row['Data Recepção Retorno'] = item.data_retorno_recepcionada || '';
+        }
         return row;
     });
 
@@ -2096,7 +2258,7 @@ function exportarExcel(tipo) {
 }
 
 // ============================================
-// GRÁFICOS (simplificados)
+// GRÁFICOS
 // ============================================
 function getUltimos6Meses() {
     const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -2232,6 +2394,14 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarUBSnoSelect('adminNovoUbs');
     carregarUBSnoSelect('editUsuarioUbs');
     toggleUbsField();
+    
+    // ============ CORREÇÃO: BUSCA GLOBAL ============
+    document.getElementById('globalSearch').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') buscarGlobal();
+    });
+    document.getElementById('globalSearch').addEventListener('input', (e) => {
+        if (!e.target.value.trim()) atualizarTudo();
+    });
 
     // LOGIN
     document.getElementById('btnLogin').addEventListener('click', async () => {
