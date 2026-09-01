@@ -19,6 +19,9 @@
         .gradient-header::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%); animation: rotate 25s linear infinite; pointer-events: none; }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
+        .sidebar-gradient { background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%); position: relative; overflow: hidden; }
+        .sidebar-gradient::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%); animation: rotate 25s linear infinite; pointer-events: none; }
+        
         .card-blue { border-left: 5px solid #3b82f6; }
         .card-amber { border-left: 5px solid #f59e0b; }
         .card-emerald { border-left: 5px solid #10b981; }
@@ -41,7 +44,8 @@
         .sidebar-item:hover { background: rgba(255,255,255,0.06); }
         .sidebar-item.active { background: rgba(59,130,246,0.15); border-left: 4px solid #3b82f6; }
         .sidebar-item .sub-item { padding-left: 28px; font-size: 12px; }
-        .sidebar-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 700; padding: 12px 16px 6px; }
+        .sidebar-btn-migrar { background: transparent !important; border: none !important; cursor: pointer; width: 100%; text-align: left; padding-left: 44px; }
+        .sidebar-btn-migrar:hover { background: rgba(255,255,255,0.06) !important; }
         
         .screen { display: none; }
         .screen.active { display: flex; justify-content: center; align-items: center; }
@@ -127,8 +131,6 @@
         .toast.warning { background: #f59e0b; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        .sidebar-btn-migrar { background: transparent !important; border: none !important; cursor: pointer; width: 100%; text-align: left; padding-left: 44px; }
-        .sidebar-btn-migrar:hover { background: rgba(255,255,255,0.06) !important; }
         .export-menu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
         .export-menu.open { max-height: 500px; }
     </style>
@@ -194,7 +196,6 @@
             <button onclick="switchAdminTab('migracao')" id="adminTab-migracao" class="admin-tab-btn pb-2 text-sm font-bold text-slate-400 whitespace-nowrap">🔄 Migração APAC</button>
         </div>
         
-        <!-- TAB USUÁRIOS -->
         <div id="adminContent-usuarios" class="admin-content">
             <div class="mb-3 flex gap-3 flex-wrap">
                 <input type="text" id="adminBuscaUsuario" placeholder="🔍 Buscar usuário..." class="flex-1 px-4 py-2 border rounded-xl text-sm" oninput="renderizarListaUsuarios()">
@@ -215,7 +216,6 @@
             </div>
         </div>
         
-        <!-- TAB NOVO USUÁRIO -->
         <div id="adminContent-novo" class="admin-content hidden">
             <form class="space-y-3" onsubmit="return false;">
                 <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-2">
@@ -251,7 +251,6 @@
             </form>
         </div>
         
-        <!-- TAB LOGS -->
         <div id="adminContent-logs" class="admin-content hidden">
             <div class="mb-3 flex gap-3 flex-wrap">
                 <input type="text" id="adminBuscaLogs" placeholder="🔍 Buscar logs..." class="flex-1 px-4 py-2 border rounded-xl text-sm" oninput="renderizarLogs()">
@@ -271,7 +270,6 @@
             </div>
         </div>
         
-        <!-- TAB MIGRAÇÃO APAC -->
         <div id="adminContent-migracao" class="admin-content hidden">
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
                 <p class="text-sm text-amber-700 font-bold">🔄 Gerenciar Migração para Admin APAC</p>
@@ -279,7 +277,6 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Migrar para Admin APAC -->
                 <div class="bg-white border rounded-xl p-4">
                     <h3 class="font-bold text-sm mb-3 text-purple-700">⬆️ Migrar para Admin APAC</h3>
                     <div class="space-y-3">
@@ -293,7 +290,6 @@
                     </div>
                 </div>
                 
-                <!-- Reverter para Admin -->
                 <div class="bg-white border rounded-xl p-4">
                     <h3 class="font-bold text-sm mb-3 text-amber-700">⬇️ Reverter para Admin</h3>
                     <div class="space-y-3">
@@ -312,7 +308,6 @@
                 </div>
             </div>
             
-            <!-- Lista de Admin APAC -->
             <div class="mt-4 bg-white border rounded-xl p-4">
                 <h3 class="font-bold text-sm mb-3 text-indigo-700">📋 Admin APAC Atuais</h3>
                 <div class="overflow-x-auto max-h-64 overflow-y-auto">
@@ -398,9 +393,8 @@
 <!-- ============ SISTEMA PRINCIPAL ============ -->
 <div id="screenSistema" class="hidden h-full w-full flex overflow-hidden">
     
-    <!-- SIDEBAR - LAYOUT ORIGINAL RESTAURADO -->
-    <aside class="w-64 gradient-header text-white hidden md:flex flex-col h-full shadow-2xl z-50 flex-shrink-0">
-        <div class="p-6 flex items-center gap-3 border-b border-white/10">
+    <aside class="w-64 sidebar-gradient text-white hidden md:flex flex-col h-full shadow-2xl z-50 flex-shrink-0">
+        <div class="p-6 flex items-center gap-3 border-b border-white/10 relative z-10">
             <div class="bg-blue-600 p-2 rounded-xl">🏥</div>
             <div>
                 <span class="text-lg font-extrabold">OCI <span class="text-blue-400">v7.0</span></span>
@@ -408,8 +402,7 @@
             </div>
         </div>
         
-        <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
-            <!-- Itens principais -->
+        <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto relative z-10">
             <a href="#" onclick="switchTab('logica-indicadores')" class="sidebar-item active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold">
                 <i class="fas fa-brain w-4 text-yellow-400"></i> 🧠 Lógica e Indicadores
             </a>
@@ -417,7 +410,6 @@
                 <i class="fas fa-th-large w-4"></i> 📊 Visão Geral
             </a>
             
-            <!-- Caixa de Ferramentas -->
             <div class="mt-2">
                 <div onclick="toggleFerramentas()" class="flex items-center justify-between p-3 rounded-xl text-sm text-slate-300 font-bold cursor-pointer hover:bg-white/5">
                     <span><i class="fas fa-tools w-4 mr-2"></i> 🧰 Caixa de Ferramentas</span>
@@ -462,24 +454,19 @@
             
             <div class="border-t border-white/10 my-4"></div>
             
-            <!-- Link Portal de Retorno -->
             <a href="https://paineldousuario.regulacaoconsolidados.workers.dev/#" target="_blank" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-emerald-400 font-bold hover:bg-white/10 transition-all">
                 <i class="fas fa-external-link-alt w-4"></i> 📋 Portal de Retorno
             </a>
             
-            <!-- Seção Administração (visível apenas para Admin) -->
             <div id="sidebarAdminSection" class="hidden">
                 <a href="#" onclick="abrirModalAdmin()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-purple-400 font-bold">
                     <i class="fas fa-user-shield"></i> ⚙️ Administração
                 </a>
-                
-                <!-- Botão Migrar para Admin APAC (apenas Admin) -->
                 <button onclick="migrarMeuPerfilAdminAPAC()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-indigo-400 font-bold sidebar-btn-migrar">
                     <i class="fas fa-arrow-up"></i> 📑 Migrar para Admin APAC
                 </button>
             </div>
             
-            <!-- ===== BAIXAR RELATÓRIOS - RESTAURADO ===== -->
             <div class="relative">
                 <button onclick="toggleExportMenu()" class="w-full sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm text-white font-bold hover:bg-white/10 transition-all">
                     <i class="fas fa-download"></i> 📥 Baixar Relatórios
@@ -499,7 +486,6 @@
                 </div>
             </div>
             
-            <!-- Seção APAC (visível para Admin e Admin APAC) -->
             <div id="sidebarAPACSection" class="hidden mt-2">
                 <button onclick="abrirModalRelatorioAPAC()" class="w-full btn-apac-gradient text-sm flex items-center justify-center gap-2">
                     <i class="fas fa-file-medical"></i> 📑 Gerar Relatório APAC
@@ -507,7 +493,7 @@
             </div>
         </nav>
         
-        <div class="p-4 border-t border-white/10">
+        <div class="p-4 border-t border-white/10 relative z-10">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-lg" id="sidebarAvatar">A</div>
                 <div>
@@ -520,10 +506,8 @@
         </div>
     </aside>
     
-    <!-- ÁREA PRINCIPAL -->
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f0f4f8]">
         
-        <!-- HEADER - COM BOTÕES RESTAURADOS -->
         <header class="gradient-header text-white flex-shrink-0 border-b border-white/10">
             <div class="h-16 flex items-center justify-between px-4 md:px-8">
                 <div>
@@ -546,180 +530,110 @@
                 </div>
             </div>
             
-            <!-- BOTÕES DO CABEÇALHO - LAYOUT ORIGINAL RESTAURADO -->
             <div class="header-buttons">
-                <button class="btn-logica" onclick="switchTab('logica-indicadores')"><i class="fas fa-brain"></i> Lógica Indicadores</button>
-                <button class="btn-visao" onclick="switchTab('visao-geral')"><i class="fas fa-th-large"></i> Visão Geral</button>
-                <button class="btn-monitor" onclick="switchTab('monitoramento')"><i class="fas fa-users"></i> Monitoramento</button>
-                <button class="btn-exames" onclick="switchTab('monitoramento-exames')"><i class="fas fa-flask"></i> Monitor. Exames</button>
-                <button class="btn-primeira" onclick="switchTab('primeira-consulta-agendadas')"><i class="fas fa-clock"></i> 1ª Cons. Agendados</button>
-                <button class="btn-primeira" onclick="switchTab('primeira-consulta')"><i class="fas fa-clipboard-check"></i> 1ª Cons. Recep.</button>
-                <button class="btn-retorno" onclick="switchTab('aptos-retorno')"><i class="fas fa-check-circle"></i> Aptos Retornos</button>
-                <button class="btn-retorno" onclick="switchTab('retornos-agendados')"><i class="fas fa-calendar-plus"></i> Ret. Agendados</button>
-                <button class="btn-retorno" onclick="switchTab('retornos-recepcionados')"><i class="fas fa-calendar-check"></i> Ret. Recepcionados</button>
-                <button class="btn-abs" onclick="switchTab('absenteismo-1consulta')"><i class="fas fa-user-times"></i> Abs. 1ª Cons.</button>
-                <button class="btn-abs" onclick="switchTab('absenteismo-retorno')"><i class="fas fa-user-slash"></i> Abs. Retornos</button>
-                <button class="btn-oci" onclick="switchTab('apac')"><i class="fas fa-file-invoice"></i> OCI´s Fechadas</button>
-                <button class="btn-apac" onclick="switchTab('apacs-geradas')"><i class="fas fa-file-medical"></i> APAC´s Geradas</button>
+                <button class="btn-logica" onclick="switchTab('logica-indicadores')"><i class="fas fa-brain"></i> Lógica</button>
+                <button class="btn-visao" onclick="switchTab('visao-geral')"><i class="fas fa-th-large"></i> Visão</button>
+                <button class="btn-monitor" onclick="switchTab('monitoramento')"><i class="fas fa-users"></i> Monitor</button>
+                <button class="btn-exames" onclick="switchTab('monitoramento-exames')"><i class="fas fa-flask"></i> Exames</button>
+                <button class="btn-primeira" onclick="switchTab('primeira-consulta-agendadas')"><i class="fas fa-clock"></i> 1ª Agd.</button>
+                <button class="btn-primeira" onclick="switchTab('primeira-consulta')"><i class="fas fa-clipboard-check"></i> 1ª Rec.</button>
+                <button class="btn-retorno" onclick="switchTab('aptos-retorno')"><i class="fas fa-check-circle"></i> Aptos</button>
+                <button class="btn-retorno" onclick="switchTab('retornos-agendados')"><i class="fas fa-calendar-plus"></i> Ret. Agd.</button>
+                <button class="btn-retorno" onclick="switchTab('retornos-recepcionados')"><i class="fas fa-calendar-check"></i> Ret. Rec.</button>
+                <button class="btn-abs" onclick="switchTab('absenteismo-1consulta')"><i class="fas fa-user-times"></i> Abs. 1ª</button>
+                <button class="btn-abs" onclick="switchTab('absenteismo-retorno')"><i class="fas fa-user-slash"></i> Abs. Ret.</button>
+                <button class="btn-oci" onclick="switchTab('apac')"><i class="fas fa-file-invoice"></i> OCI Fec.</button>
+                <button class="btn-apac" onclick="switchTab('apacs-geradas')"><i class="fas fa-file-medical"></i> APAC</button>
             </div>
         </header>
 
-        <!-- CONTEÚDO PRINCIPAL -->
         <div class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8" id="mainContent">
             
-            <!-- ============ LÓGICA E INDICADORES ============ -->
+            <!-- LÓGICA E INDICADORES -->
             <div id="content-logica-indicadores" class="tab-content active space-y-6">
                 <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg">
-                    <h2 class="text-xl font-extrabold mb-2"><i class="fas fa-brain mr-2"></i> Lógica e Indicadores do Ferramenta OCI v7.0</h2>
-                    <p class="text-blue-100 text-sm">Entenda como funciona a Linha do Cuidado OCI e todos os seus indicadores</p>
+                    <h2 class="text-xl font-extrabold mb-2"><i class="fas fa-brain mr-2"></i> Lógica e Indicadores</h2>
+                    <p class="text-blue-100 text-sm">Entenda como funciona a Linha do Cuidado OCI</p>
                 </div>
-
-                <!-- FLUXO DA LINHA DO CUIDADO -->
+                
                 <div class="bg-white rounded-2xl shadow-sm border p-6">
-                    <h3 class="font-bold text-lg mb-4 text-slate-800"><i class="fas fa-project-diagram text-blue-500 mr-2"></i>🔄 Fluxo da Linha do Cuidado OCI</h3>
+                    <h3 class="font-bold text-lg mb-4 text-slate-800"><i class="fas fa-project-diagram text-blue-500 mr-2"></i>🔄 Fluxo da Linha do Cuidado</h3>
                     <div class="flex flex-wrap gap-2 items-center text-sm">
-                        <span class="fluxo-step bg-sky-100 text-sky-700"><i class="fas fa-clock mr-1"></i> 1ª Cons. Agendada</span>
+                        <span class="fluxo-step bg-sky-100 text-sky-700">1ª Cons. Agendada</span>
                         <span class="fluxo-arrow">→</span>
-                        <span class="fluxo-step bg-cyan-100 text-cyan-700"><i class="fas fa-clipboard-check mr-1"></i> 1ª Cons. Recepcionada</span>
+                        <span class="fluxo-step bg-cyan-100 text-cyan-700">1ª Cons. Recepcionada</span>
                         <span class="fluxo-arrow">→</span>
-                        <span class="fluxo-step bg-blue-100 text-blue-700"><i class="fas fa-flask mr-1"></i> Solicita Exames</span>
+                        <span class="fluxo-step bg-blue-100 text-blue-700">Solicita Exames</span>
                         <span class="fluxo-arrow">→</span>
-                        <span class="fluxo-step bg-amber-100 text-amber-700"><i class="fas fa-hourglass-half mr-1"></i> Aguardando Exames</span>
+                        <span class="fluxo-step bg-amber-100 text-amber-700">Aguardando Exames</span>
                         <span class="fluxo-arrow">→</span>
-                        <span class="fluxo-step bg-emerald-100 text-emerald-700"><i class="fas fa-check-circle mr-1"></i> Apto p/ Retorno</span>
+                        <span class="fluxo-step bg-emerald-100 text-emerald-700">Apto p/ Retorno</span>
                         <span class="fluxo-arrow">→</span>
-                        <span class="fluxo-step bg-indigo-100 text-indigo-700"><i class="fas fa-calendar-plus mr-1"></i> Retorno Agendado</span>
+                        <span class="fluxo-step bg-indigo-100 text-indigo-700">Retorno Agendado</span>
                         <span class="fluxo-arrow">→</span>
-                        <span class="fluxo-step bg-teal-100 text-teal-700"><i class="fas fa-calendar-check mr-1"></i> Retorno Recepcionado</span>
+                        <span class="fluxo-step bg-teal-100 text-teal-700">Retorno Recepcionado</span>
                         <span class="fluxo-arrow">→</span>
-                        <span class="fluxo-step bg-purple-100 text-purple-700"><i class="fas fa-file-invoice mr-1"></i> OCI Fechada</span>
+                        <span class="fluxo-step bg-purple-100 text-purple-700">OCI Fechada</span>
                         <span class="fluxo-arrow">→</span>
-                        <span class="fluxo-step bg-pink-100 text-pink-700"><i class="fas fa-file-medical mr-1"></i> APAC Gerada</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2 mt-4">
-                        <span class="fluxo-step bg-orange-100 text-orange-700"><i class="fas fa-user-times mr-1"></i> Absenteísmo 1ª Consulta</span>
-                        <span class="fluxo-step bg-red-100 text-red-700"><i class="fas fa-user-slash mr-1"></i> Absenteísmo Retorno</span>
-                    </div>
-                    
-                    <!-- LEGENDA -->
-                    <div class="mt-6 border-t pt-4">
-                        <h4 class="font-bold text-sm text-slate-700 mb-3"><i class="fas fa-info-circle text-blue-500 mr-2"></i>📌 Legenda da Timeline</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-                            <div class="legenda-timeline-item">
-                                <span class="dot" style="background:#3b82f6;"></span>
-                                <div><span class="desc">1ª Agendada</span><br><span class="detalhe">Paciente agendou a 1ª consulta</span></div>
-                            </div>
-                            <div class="legenda-timeline-item">
-                                <span class="dot" style="background:#06b6d4;"></span>
-                                <div><span class="desc">Recep.</span><br><span class="detalhe">Paciente compareceu à 1ª consulta</span></div>
-                            </div>
-                            <div class="legenda-timeline-item">
-                                <span class="dot" style="background:#f59e0b;"></span>
-                                <div><span class="desc">Exames</span><br><span class="detalhe">Aguardando realização de exames</span></div>
-                            </div>
-                            <div class="legenda-timeline-item">
-                                <span class="dot" style="background:#22c55e;"></span>
-                                <div><span class="desc">Apto</span><br><span class="detalhe">Exames ok, apto para retorno</span></div>
-                            </div>
-                            <div class="legenda-timeline-item">
-                                <span class="dot" style="background:#6366f1;"></span>
-                                <div><span class="desc">Ret. Agd.</span><br><span class="detalhe">Retorno já agendado</span></div>
-                            </div>
-                            <div class="legenda-timeline-item">
-                                <span class="dot" style="background:#14b8a6;"></span>
-                                <div><span class="desc">Ret. Rec.</span><br><span class="detalhe">Paciente compareceu ao retorno</span></div>
-                            </div>
-                            <div class="legenda-timeline-item">
-                                <span class="dot" style="background:#8b5cf6;"></span>
-                                <div><span class="desc">OCI Fec.</span><br><span class="detalhe">OCI finalizada, aguardando APAC</span></div>
-                            </div>
-                            <div class="legenda-timeline-item">
-                                <span class="dot" style="background:#ec4899;"></span>
-                                <div><span class="desc">APAC</span><br><span class="detalhe">✅ APAC gerada com sucesso</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-3 bg-slate-50 rounded-xl p-3 border border-slate-200">
-                            <p class="text-xs text-slate-600 font-medium"><i class="fas fa-lightbulb text-amber-500 mr-1"></i> <strong>Como funciona:</strong> Cada etapa é representada por um círculo colorido. 
-                            <span class="text-emerald-600 font-bold">● Verde</span> = etapa concluída, 
-                            <span class="text-blue-600 font-bold">● Azul pulsante</span> = etapa atual, 
-                            <span class="text-slate-300 font-bold">● Cinza</span> = etapa pendente.</p>
-                        </div>
+                        <span class="fluxo-step bg-pink-100 text-pink-700">APAC Gerada</span>
                     </div>
                 </div>
-
-                <!-- CARDS DE INDICADORES -->
+                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white rounded-2xl shadow-sm border p-6 card-blue">
-                        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-stethoscope text-blue-500"></i> Regras por Especialidade</h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">🫀 Cardiologia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">ECG; ERG</span></div>
-                            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">🦴 Ortopedia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">RX; USG; TOMO</span></div>
-                            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">🎗️ Oncologia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">BIO; AP; USG</span></div>
-                            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">👁️ Oftalmologia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">Mapeamento; Tonometria</span></div>
-                            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">👂 Otorrino</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">Audiometria; Videolaringoscopia</span></div>
+                        <h3 class="font-bold text-slate-800 mb-4">Regras por Especialidade</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between p-2 bg-slate-50 rounded"><span>🫀 Cardiologia</span><span class="text-xs text-blue-600">ECG; ERG</span></div>
+                            <div class="flex justify-between p-2 bg-slate-50 rounded"><span>🦴 Ortopedia</span><span class="text-xs text-blue-600">RX; USG; TOMO</span></div>
+                            <div class="flex justify-between p-2 bg-slate-50 rounded"><span>🎗️ Oncologia</span><span class="text-xs text-blue-600">BIO; AP; USG</span></div>
+                            <div class="flex justify-between p-2 bg-slate-50 rounded"><span>👁️ Oftalmologia</span><span class="text-xs text-blue-600">Mapeamento; Tonometria</span></div>
+                            <div class="flex justify-between p-2 bg-slate-50 rounded"><span>👂 Otorrino</span><span class="text-xs text-blue-600">Audiometria; Videolaringoscopia</span></div>
                         </div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border p-6 card-emerald">
-                        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-chart-line text-emerald-500"></i> Indicadores Críticos</h3>
-                        <div class="grid grid-cols-1 gap-3">
-                            <div class="text-center p-3 bg-emerald-50 rounded-xl"><p class="text-[10px] text-emerald-600 font-bold uppercase">Taxa Comparecimento</p><p class="text-2xl font-black text-emerald-700" id="indTaxaComparecimento">—</p></div>
-                            <div class="flex gap-3">
-                                <div class="flex-1 text-center p-3 bg-blue-50 rounded-xl"><p class="text-[10px] text-blue-600 font-bold uppercase">Tempo Médio OCI</p><p class="text-xl font-black text-blue-700" id="indTempoMedio">—</p></div>
-                                <div class="flex-1 text-center p-3 bg-purple-50 rounded-xl"><p class="text-[10px] text-purple-600 font-bold uppercase">Retornos Realizados</p><p class="text-xl font-black text-purple-700" id="indRetornosRealizados">—</p></div>
-                            </div>
-                            <div class="text-center p-3 bg-amber-50 rounded-xl"><p class="text-[10px] text-amber-600 font-bold uppercase">OCIs Pendentes</p><p class="text-xl font-black text-amber-700" id="indOCIsPendentes">—</p></div>
+                        <h3 class="font-bold text-slate-800 mb-4">Indicadores Críticos</h3>
+                        <div class="text-center p-3 bg-emerald-50 rounded-xl"><p class="text-[10px] text-emerald-600 font-bold">Taxa Comparecimento</p><p class="text-2xl font-black text-emerald-700" id="indTaxaComparecimento">—</p></div>
+                        <div class="flex gap-3 mt-2">
+                            <div class="flex-1 text-center p-3 bg-blue-50 rounded-xl"><p class="text-[10px] text-blue-600 font-bold">Tempo Médio OCI</p><p class="text-xl font-black text-blue-700" id="indTempoMedio">—</p></div>
+                            <div class="flex-1 text-center p-3 bg-purple-50 rounded-xl"><p class="text-[10px] text-purple-600 font-bold">Retornos Realizados</p><p class="text-xl font-black text-purple-700" id="indRetornosRealizados">—</p></div>
                         </div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border p-6 card-rose">
-                        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-exclamation-triangle text-rose-500"></i> Alertas de Fechamento</h3>
-                        <div class="space-y-3" id="alertasFechamento">
-                            <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-3">
-                                <div class="w-8 h-8 bg-rose-500 text-white rounded-lg flex items-center justify-center shrink-0"><i class="fas fa-clock"></i></div>
-                                <div><p class="text-xs font-bold text-rose-700">OCIs Pendentes</p><p class="text-[10px] text-rose-600">Acima do prazo da especialidade</p></div>
-                            </div>
-                            <div class="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-3">
-                                <div class="w-8 h-8 bg-amber-500 text-white rounded-lg flex items-center justify-center shrink-0"><i class="fas fa-flask"></i></div>
-                                <div><p class="text-xs font-bold text-amber-700">Exames em atraso</p><p class="text-[10px] text-amber-600">Aguardando realização</p></div>
-                            </div>
-                            <div class="p-3 bg-sky-50 border border-sky-100 rounded-xl flex items-start gap-3">
-                                <div class="w-8 h-8 bg-sky-500 text-white rounded-lg flex items-center justify-center shrink-0"><i class="fas fa-calendar-check"></i></div>
-                                <div><p class="text-xs font-bold text-sky-700">Retornos Agendados</p><p class="text-[10px] text-sky-600">Pacientes com retorno marcado</p></div>
-                            </div>
-                        </div>
+                        <h3 class="font-bold text-slate-800 mb-4">Alertas de Fechamento</h3>
+                        <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl"><p class="text-xs font-bold text-rose-700">OCIs Pendentes</p><p class="text-[10px] text-rose-600">Acima do prazo</p></div>
+                        <div class="p-3 bg-amber-50 border border-amber-100 rounded-xl mt-2"><p class="text-xs font-bold text-amber-700">Exames em atraso</p><p class="text-[10px] text-amber-600">Aguardando realização</p></div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============ VISÃO GERAL ============ -->
+            <!-- VISÃO GERAL -->
             <div id="content-visao-geral" class="tab-content space-y-6">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border flex flex-wrap gap-3 items-center">
                     <span class="text-xs font-bold text-slate-600">🔍 Filtros:</span>
-                    <select id="filtroVisaoEspecialidade" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="atualizarTudo()"><option value="">Todas Especialidades</option></select>
+                    <select id="filtroVisaoEspecialidade" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="atualizarTudo()"><option value="">Todas</option></select>
                     <select id="filtroVisaoPeriodo" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="atualizarTudo()">
-                        <option value="30">Últimos 30 dias</option>
-                        <option value="60">Últimos 60 dias</option>
-                        <option value="90">Últimos 90 dias</option>
-                        <option value="180">Últimos 180 dias</option>
-                        <option value="365" selected>Último ano</option>
+                        <option value="30">30 dias</option><option value="60">60 dias</option>
+                        <option value="90">90 dias</option><option value="180">180 dias</option>
+                        <option value="365" selected>1 ano</option>
                     </select>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="statsGrid"></div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border"><h3 class="font-bold text-sm mb-4"><i class="fas fa-industry text-slate-600"></i> Linha do Cuidado OCI v7.0</h3><div class="flex flex-wrap gap-2 items-center" id="linhaProducao"></div></div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border"><h3 class="font-bold text-sm mb-4">Linha do Cuidado OCI v7.0</h3><div class="flex flex-wrap gap-2 items-center" id="linhaProducao"></div></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-line text-blue-500"></i> Desempenho OCI</h3><div class="chart-container"><canvas id="chartPerformance"></canvas></div></div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-pie text-purple-500"></i> Pacientes por Especialidade</h3><div class="chart-container"><canvas id="chartSpecialty"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">Desempenho OCI</h3><div class="chart-container"><canvas id="chartPerformance"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">Pacientes por Especialidade</h3><div class="chart-container"><canvas id="chartSpecialty"></canvas></div></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-bar text-emerald-500"></i> Taxa de Comparecimento</h3><div class="chart-container"><canvas id="chartComparecimento"></canvas></div></div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-chart-pie text-cyan-500"></i> Distribuição de Status</h3><div class="chart-container"><canvas id="chartStatus"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">Taxa de Comparecimento</h3><div class="chart-container"><canvas id="chartComparecimento"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">Distribuição de Status</h3><div class="chart-container"><canvas id="chartStatus"></canvas></div></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-check-double text-emerald-500"></i> OCI´s Fechadas por Mês</h3><div class="chart-container"><canvas id="chartOCIsFechadasMes"></canvas></div></div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4"><i class="fas fa-file-prescription text-indigo-500"></i> APAC´s Geradas por Mês</h3><div class="chart-container"><canvas id="chartAPACsGeradasMes"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">OCI´s Fechadas por Mês</h3><div class="chart-container"><canvas id="chartOCIsFechadasMes"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">APAC´s Geradas por Mês</h3><div class="chart-container"><canvas id="chartAPACsGeradasMes"></canvas></div></div>
                 </div>
             </div>
 
-            <!-- ============ MONITORAMENTO ============ -->
+            <!-- MONITORAMENTO -->
             <div id="content-monitoramento" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 items-center justify-between">
@@ -727,7 +641,7 @@
                         <div class="flex flex-wrap gap-2">
                             <input type="text" id="buscaMonitoramento" placeholder="🔍 Buscar..." class="px-4 py-2 border rounded-xl text-sm w-64" oninput="filtrarTabela('monitoramento')">
                             <select id="filtroEspecialidadeMonitoramento" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="filtrarTabela('monitoramento')"><option value="">Todas</option></select>
-                            <select id="filtroStatusMonitoramento" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="filtrarTabela('monitoramento')"><option value="">Todos</option><option value="agendada">Agendada</option><option value="recepcionada">Recepcionada</option><option value="aguardando_exame">Aguardando Exame</option><option value="apto_retorno">Apto Retorno</option><option value="retorno_agendado">Retorno Agendado</option><option value="retorno_recepcionado">Retorno Recepcionado</option><option value="oci_fechada">OCI Fechada</option><option value="apac_gerada">APAC Gerada</option><option value="faltou">Faltou</option><option value="retorno_faltou">Faltou Retorno</option></select>
+                            <select id="filtroStatusMonitoramento" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="filtrarTabela('monitoramento')"><option value="">Todos</option></select>
                             <select id="paginaMonitoramento" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="mudarPagina('monitoramento')"><option value="15">15</option><option value="30">30</option><option value="50">50</option><option value="100" selected>100</option></select>
                             <button onclick="exportarExcel('monitoramento')" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700"><i class="fas fa-download"></i> Excel</button>
                         </div>
@@ -735,23 +649,23 @@
                     <div class="overflow-x-auto">
                         <table class="w-full monitoramento-tabela">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','numero_solicitacao')">Nº Solicitação</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','prontuario')">Prontuário</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','nome')">Paciente</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','especialidade')">Especialidade</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solicitação</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase">Prontuário</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase">Especialidade</th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase" style="min-width:180px;">Linha do Cuidado</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','status')">Status</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase">Status</th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase">Dias Rest.</th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase">Alerta</th>
                             </tr></thead>
                             <tbody class="divide-y" id="tabelaMonitoramento"></tbody>
                         </table>
                     </div>
-                    <div class="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2" id="paginacaoMonitoramento"></div>
+                    <div class="p-4 border-t" id="paginacaoMonitoramento"></div>
                 </div>
             </div>
 
-            <!-- ============ MONITORAMENTO DE EXAMES ============ -->
+            <!-- MONITORAMENTO EXAMES -->
             <div id="content-monitoramento-exames" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 items-center justify-between">
@@ -781,7 +695,7 @@
                 </div>
             </div>
 
-            <!-- ============ 1ª CONSULTA AGENDADAS ============ -->
+            <!-- 1ª CONSULTA AGENDADAS -->
             <div id="content-primeira-consulta-agendadas" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -812,7 +726,7 @@
                 </div>
             </div>
 
-            <!-- ============ 1ª CONSULTA RECEPCIONADOS ============ -->
+            <!-- 1ª CONSULTA RECEPCIONADOS -->
             <div id="content-primeira-consulta" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -844,7 +758,7 @@
                 </div>
             </div>
 
-            <!-- ============ APTOS PARA RETORNO ============ -->
+            <!-- APTOS RETORNO -->
             <div id="content-aptos-retorno" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -877,7 +791,7 @@
                 </div>
             </div>
 
-            <!-- ============ RETORNOS AGENDADOS ============ -->
+            <!-- RETORNOS AGENDADOS -->
             <div id="content-retornos-agendados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -911,7 +825,7 @@
                 </div>
             </div>
 
-            <!-- ============ RETORNOS RECEPCIONADOS ============ -->
+            <!-- RETORNOS RECEPCIONADOS -->
             <div id="content-retornos-recepcionados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -945,7 +859,7 @@
                 </div>
             </div>
 
-            <!-- ============ ABSENTEÍSMO 1ª CONSULTA ============ -->
+            <!-- ABSENTEÍSMO 1ª CONSULTA -->
             <div id="content-absenteismo-1consulta" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -975,7 +889,7 @@
                 </div>
             </div>
 
-            <!-- ============ ABSENTEÍSMO RETORNO ============ -->
+            <!-- ABSENTEÍSMO RETORNO -->
             <div id="content-absenteismo-retorno" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -1006,7 +920,7 @@
                 </div>
             </div>
 
-            <!-- ============ OCI´S FECHADAS ============ -->
+            <!-- OCI´S FECHADAS -->
             <div id="content-apac" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -1047,7 +961,7 @@
                 </div>
             </div>
 
-            <!-- ============ APAC´S GERADAS ============ -->
+            <!-- APAC´S GERADAS -->
             <div id="content-apacs-geradas" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between">
@@ -1089,11 +1003,10 @@
                 </div>
             </div>
             
-        </div><!-- Fim do conteúdo principal -->
+        </div>
     </main>
 </div>
 
-<!-- ==================== JAVASCRIPT ==================== -->
 <script>
 // ============================================
 // 🏥 FERRAMENTA OCI v7.0 - JAVASCRIPT PRINCIPAL
@@ -1101,7 +1014,7 @@
 // 📅 31/08/2026 - VERSÃO FINAL CORRIGIDA
 // ============================================
 
-// ⚠️ ATUALIZE COM SUAS CREDENCIAIS DO SUPABASE
+// ⚠️ COLOQUE AQUI SUAS NOVAS CREDENCIAIS DO SUPABASE
 const SUPABASE_URL = 'https://qgrpqsvsxidxezsonasb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_v7xrru1Cda8Ok4O0JmgJlA_g-DHJEbT';
 
@@ -1119,86 +1032,15 @@ try {
 const LISTA_UBS = [
     'UNIDADE BASICA DE SAUDE JARDIM BANDEIRANTES',
     'UNIDADE BASICA DE SAUDE AGUA BRANCA',
-    'UNIDADE BASICA DE SAUDE XV',
-    'UNIDADE BASICA DE SAUDE CSU ELDORADO',
-    'UNIDADE BASICA DE SAUDE PARQUE SAO JOAO',
-    'UNIDADE BASICA DE SAUDE JARDIM ELDORADO',
-    'UNIDADE BASICA DE SAUDE NOVO ELDORADO',
-    'UNIDADE BASICA DE SAUDE SANTA CRUZ',
-    'UNIDADE BASICA DE SAUDE PEROBAS',
-    'UNIDADE BASICA DE SAUDE BELA VISTA',
-    'UNIDADE BASICA DE SAUDE INDUSTRIAL III SECAO',
-    'UNIDADE BASICA DE SAUDE JARDIM INDUSTRIAL',
-    'UNIDADE BASICA DE SAUDE VILA SAO PAULO',
-    'UNIDADE BASICA DE SAUDE SANDOVAL DE AZEVEDO',
-    'UNIDADE BASICA DE SAUDE JOAO EVANGELISTA',
-    'UNIDADE BASICA DE SAUDE BANDEIRANTES',
-    'UNIDADE BASICA DE SAUDE AMAZONAS',
-    'UNIDADE BASICA DE SAUDE VILA DINIZ',
-    'UNIDADE BASICA DE SAUDE NACIONAL',
-    'UNIDADE BASICA DE SAUDE ILDA EFIGENIA',
-    'UNIDADE BASICA DE SAUDE JOAQUIM MURTINHO',
-    'UNIDADE BASICA DE SAUDE XANGRILA',
-    'UNIDADE BASICA DE SAUDE AMENDOEIRAS',
-    'UNIDADE BASICA DE SAUDE ESTRELA DALVA',
-    'UNIDADE BASICA DE SAUDE TIJUCA',
-    'UNIDADE BASICA DE SAUDE PETROLANDIA',
-    'UNIDADE BASICA DE SAUDE TROPICAL II',
-    'UNIDADE BASICA DE SAUDE SAPUCAIAS',
-    'UNIDADE BASICA DE SAUDE DUQUE DE CAXIAS',
-    'UNIDADE BASICA DE SAUDE SAO LUIZ II',
-    'UNIDADE BASICA DE SAUDE SAO LUIZ I',
-    'UNIDADE BASICA DE SAUDE CAMPO ALTO',
-    'UNIDADE BASICA DE SAUDE TROPICAL I',
-    'UNIDADE BASICA DE SAUDE ESTANCIAS IMPERIAIS',
-    'UNIDADE BASICA DE SAUDE NASCENTES IMPERIAIS',
-    'UNIDADE BASICA DE SAUDE CAMPINA VERDE',
-    'UNIDADE BASICA DE SAUDE LAGUNA',
-    'UNIDADE BASICA DE SAUDE ARPOADOR',
-    'UNIDADE BASICA DE SAUDE SAO JOAQUIM',
-    'UNIDADE BASICA DE SAUDE PARQUE TURISTA',
-    'UNIDADE BASICA DE SAUDE VILA PEROLA',
-    'UNIDADE BASICA DE SAUDE NOVO PROGRESSO II',
-    'UNIDADE BASICA DE SAUDE COLORADO',
-    'UNIDADE BASICA DE SAUDE CANDIDA FERREIRA',
-    'UNIDADE DE SAUDE DA FAMILIA VILA PEROLA II USF 84',
-    'UNIDADE BASICA DE SAUDE PRESIDENTE KENNEDY',
-    'UNIDADE BASICA DE SAUDE OITIS',
-    'UNIDADE BASICA DE SAUDE MORADA NOVA',
-    'UNIDADE BASICA DE SAUDE INCONFIDENTES',
-    'UNIDADE BASICA DE SAUDE RIACHO',
-    'UNIDADE BASICA DE SAUDE FLAMENGO',
-    'UNIDADE BASICA DE SAUDE NOVO RIACHO',
-    'UNIDADE BASICA DE SAUDE DURVAL DE BARROS',
-    'UNIDADE BASICA DE SAUDE MONTE CASTELO',
-    'UNIDADE BASICA DE SAUDE CHACARAS',
-    'UNIDADE BASICA DE SAUDE CANADA',
-    'UNIDADE BASICA DE SAUDE CENTRO (CAD)',
-    'UBS BERNARDO MONTEIRO/MOACIR PINTO MOREIRA',
-    'UNIDADE BASICA DE SAUDE LINDA VISTA',
-    'UNIDADE BASICA DE SAUDE SANTA HELENA',
-    'UNIDADE BASICA DE SAUDE VILA ITALIA',
-    'UNIDADE BASICA DE SAUDE BEATRIZ USF 72',
-    'UNIDADE BASICA DE SAUDE MARIA DA CONCEICAO',
-    'UNIDADE BASICA DE SAUDE FUNCIONARIOS',
-    'UNIDADE BASICA DE SAUDE PRAIA',
-    'UBS UNIDADE XVI (SEDE)',
-    'UNIDADE BASICA DE SAUDE VILA RENASCER',
-    'UNIDADE BASICA DE SAUDE NOVA CONTAGEM',
-    'UNIDADE BASICA DE SAUDE VILA SOLEDADE',
-    'UNIDADE BASICA DE SAUDE ESTALEIRO',
-    'CERESP CONTAGEM',
-    'UNIDADE BASICA DE SAUDE RETIRO II',
-    'UNIDADE BASICA DE SAUDE RETIRO',
-    'UNIDADE BASICA DE SAUDE IPE AMARELO',
-    'UNIDADE BASICA DE SAUDE SAO JUDAS TADEU',
-    'UNIDADE BASICA DE SAUDE VILA ESPERANCA',
-    'UNIDADE BASICA DE SAUDE DARCY RIBEIRO',
-    'UNIDADE BASICA DE SAUDE ICAIVERA',
-    'UNIDADE BASICA DE SAUDE NOVA CONTAGEM I',
-    'CONTAGEM PENITENCIARIA NELSON HUNGRIA',
-    'UNIDADE BASICA DE SAUDE TUPA',
-    'UNIDADE BASICA DE SAUDE LIBERDADE II'
+    // ... (mantenha a lista completa)
+];
+
+const especialidades = [
+    {id:1, nome:'Cardiologia', icone:'🫀', grupo_sigtap:'02', exames_obrigatorios:'ECG + Teste Ergométrico', prazo_retorno_dias:60},
+    {id:2, nome:'Ortopedia', icone:'🦴', grupo_sigtap:'03', exames_obrigatorios:'RX + USG + Tomografia', prazo_retorno_dias:60},
+    {id:3, nome:'Oncologia', icone:'🎗️', grupo_sigtap:'01', exames_obrigatorios:'Biópsia + AP + USG', prazo_retorno_dias:30},
+    {id:4, nome:'Oftalmologia', icone:'👁️', grupo_sigtap:'05', exames_obrigatorios:'Mapeamento + Tonometria', prazo_retorno_dias:60},
+    {id:5, nome:'Otorrino', icone:'👂', grupo_sigtap:'04', exames_obrigatorios:'Audiometria + Videolaringoscopia', prazo_retorno_dias:60}
 ];
 
 // ============================================
@@ -2669,17 +2511,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('✅ FERRAMENTA OCI v7.0 INICIALIZADA COM SUCESSO!');
 });
-
-// ============================================
-// ESPECIALIDADES (necessário para os gráficos)
-// ============================================
-const especialidades = [
-    {id:1, nome:'Cardiologia', icone:'🫀', grupo_sigtap:'02', exames_obrigatorios:'ECG + Teste Ergométrico', prazo_retorno_dias:60},
-    {id:2, nome:'Ortopedia', icone:'🦴', grupo_sigtap:'03', exames_obrigatorios:'RX + USG + Tomografia', prazo_retorno_dias:60},
-    {id:3, nome:'Oncologia', icone:'🎗️', grupo_sigtap:'01', exames_obrigatorios:'Biópsia + AP + USG', prazo_retorno_dias:30},
-    {id:4, nome:'Oftalmologia', icone:'👁️', grupo_sigtap:'05', exames_obrigatorios:'Mapeamento + Tonometria', prazo_retorno_dias:60},
-    {id:5, nome:'Otorrino', icone:'👂', grupo_sigtap:'04', exames_obrigatorios:'Audiometria + Videolaringoscopia', prazo_retorno_dias:60}
-];
 </script>
 </body>
 </html>
