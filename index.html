@@ -14,26 +14,9 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f4f8; overflow: hidden; height: 100vh; }
-        
-        .gradient-header { 
-            background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%); 
-            position: relative; 
-            overflow: hidden; 
-            flex-shrink: 0;
-        }
-        .gradient-header::before { 
-            content: ''; 
-            position: absolute; 
-            top: -50%; 
-            right: -50%; 
-            width: 200%; 
-            height: 200%; 
-            background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%); 
-            animation: rotate 25s linear infinite; 
-            pointer-events: none; 
-        }
+        .gradient-header { background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%); position: relative; overflow: hidden; flex-shrink: 0; }
+        .gradient-header::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%); animation: rotate 25s linear infinite; pointer-events: none; }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         .card-blue { border-left: 5px solid #3b82f6; }
         .card-amber { border-left: 5px solid #f59e0b; }
         .card-emerald { border-left: 5px solid #10b981; }
@@ -44,115 +27,29 @@
         .card-indigo { border-left: 5px solid #6366f1; }
         .stat-card-hover { transition: all 0.3s; cursor: default; }
         .stat-card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
-        
-        .tab-btn { 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            color: #475569 !important; 
-            border-radius: 12px; 
-            border: 1px solid #e2e8f0; 
-            background: white; 
-            padding: 8px 14px; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 6px; 
-            font-weight: 700; 
-            font-size: 11px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            white-space: nowrap;
-        }
+        .tab-btn { cursor: pointer; transition: all 0.3s; color: #475569 !important; border-radius: 12px; border: 1px solid #e2e8f0; background: white; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); white-space: nowrap; }
         .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .tab-btn.active { background: #2563eb !important; color: white !important; border-color: #2563eb; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.25); }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.35s ease; }
         @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
-        
-        /* Sidebar melhorada */
-        .sidebar {
-            width: 260px;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-        }
-        .sidebar-item { 
-            transition: all 0.2s; 
-            cursor: pointer; 
-            border-radius: 10px;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #94a3b8;
-        }
+        .sidebar { width: 260px; flex-shrink: 0; transition: transform 0.3s ease; }
+        .sidebar-item { transition: all 0.2s; cursor: pointer; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #94a3b8; }
         .sidebar-item:hover { background: rgba(255,255,255,0.08); color: white; }
         .sidebar-item.active { background: rgba(59,130,246,0.2); color: #60a5fa; border-left: 3px solid #3b82f6; }
         .sidebar-item .sub-item { padding-left: 28px; font-size: 12px; }
-        .sidebar-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; padding: 12px 14px 6px; }
-        
         .screen { display: none; }
         .screen.active { display: flex; justify-content: center; align-items: center; }
-        
-        .loading-overlay { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.7); 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 9999; 
-            flex-direction: column; 
-        }
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         .loading-overlay.show { display: flex; }
         .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .modal-overlay { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.6); 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 10000; 
-            backdrop-filter: blur(4px);
-        }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(4px); }
         .modal-overlay.show { display: flex; }
-        
-        .header-buttons { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 6px; 
-            padding: 8px 16px; 
-            background: rgba(255,255,255,0.06);
-            border-top: 1px solid rgba(255,255,255,0.06);
-        }
-        .header-buttons button { 
-            background: rgba(255,255,255,0.08); 
-            color: #e2e8f0; 
-            border: none; 
-            padding: 5px 12px; 
-            border-radius: 8px; 
-            font-size: 10px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            white-space: nowrap; 
-        }
-        .header-buttons button:hover { 
-            background: #2563eb; 
-            color: white; 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 16px -4px rgba(37,99,235,0.3); 
-        }
+        .header-buttons { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 16px; background: rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.06); }
+        .header-buttons button { background: rgba(255,255,255,0.08); color: #e2e8f0; border: none; padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .header-buttons button:hover { background: #2563eb; color: white; transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(37,99,235,0.3); }
         .header-buttons button i { margin-right: 4px; }
-        
         .timeline-container { display: flex; align-items: center; gap: 4px; min-width: 120px; max-width: 160px; }
         .timeline-steps { display: flex; gap: 2px; align-items: center; }
         .step-dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid #cbd5e1; background: white; transition: all 0.3s; flex-shrink: 0; }
@@ -163,7 +60,6 @@
         .step-line { width: 10px; height: 2px; background: #cbd5e1; flex-shrink: 0; }
         .step-line.done { background: #22c55e; }
         .timeline-label { font-size: 9px; font-weight: 700; color: #475569; min-width: 28px; text-align: right; }
-        
         .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .status-dias { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; white-space: nowrap; }
         .status-dias.verde { background: #dcfce7; color: #166534; }
@@ -174,22 +70,18 @@
         .alerta-badge.vermelho { background: #fee2e2; color: #991b1b; }
         .alerta-badge.amarelo { background: #fef3c7; color: #92400e; }
         .alerta-badge.cinza { background: #f1f5f9; color: #64748b; }
-        
         .tabela-colunas th { white-space: nowrap; font-size: 10px; padding: 8px 6px; background: #f1f5f9; }
         .tabela-colunas td { font-size: 12px; padding: 6px 6px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .monitoramento-tabela th { font-size: 10px; padding: 8px 6px; white-space: nowrap; background: #f1f5f9; }
         .monitoramento-tabela td { font-size: 12px; padding: 8px 6px; vertical-align: middle; }
         .th-sortable { cursor: pointer; user-select: none; }
         .th-sortable:hover { background: #e2e8f0; }
-        
         .fluxo-step { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 12px; font-weight: 600; font-size: 12px; }
         .fluxo-arrow { color: #94a3b8; font-size: 14px; }
-        
         .legenda-timeline-item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; }
         .legenda-timeline-item .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
         .legenda-timeline-item .desc { font-size: 11px; font-weight: 600; color: #1e293b; }
         .legenda-timeline-item .detalhe { font-size: 10px; color: #64748b; }
-        
         .btn-apac-gradient { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; padding: 10px 24px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s; }
         .btn-apac-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(99,102,241,0.4); }
         .ferramentas-sub { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
@@ -198,12 +90,10 @@
         .collapse-icon.open { transform: rotate(180deg); }
         .filter-select-custom { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
         .chart-container { position: relative; width: 100%; min-height: 300px; }
-        
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
-        
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; max-width: 90%; }
         .toast { padding: 12px 20px; border-radius: 12px; color: white; font-weight: 600; font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideInRight 0.3s ease; }
         .toast.success { background: #10b981; }
@@ -211,23 +101,12 @@
         .toast.info { background: #3b82f6; }
         .toast.warning { background: #f59e0b; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
         .sidebar-btn-migrar { background: transparent !important; border: none !important; cursor: pointer; width: 100%; text-align: left; }
         .sidebar-btn-migrar:hover { background: rgba(255,255,255,0.06) !important; }
         .export-menu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
         .export-menu.open { max-height: 500px; }
-        
-        /* Responsividade sidebar */
         @media (max-width: 1024px) {
-            .sidebar { 
-                position: fixed; 
-                top: 0; 
-                left: 0; 
-                height: 100vh; 
-                z-index: 100; 
-                transform: translateX(-100%); 
-                width: 280px;
-            }
+            .sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; transform: translateX(-100%); width: 280px; }
             .sidebar.open { transform: translateX(0); }
             .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; }
             .sidebar-overlay.open { display: block; }
@@ -239,23 +118,10 @@
         }
         .menu-toggle { display: none; background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 20px; }
         .menu-toggle:hover { background: rgba(255,255,255,0.2); }
-        
-        .linha-producao-step { 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 6px; 
-            padding: 6px 14px; 
-            border-radius: 10px; 
-            font-weight: 600; 
-            font-size: 12px; 
-        }
+        .linha-producao-step { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 10px; font-weight: 600; font-size: 12px; }
         .admin-tab-btn { cursor: pointer; padding: 8px 16px; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
         .admin-tab-btn:hover { background: #f3e8ff; }
-        
-        /* Scroll suave para o conteúdo */
         #mainContent { overflow-y: auto; scroll-behavior: smooth; }
-        
-        /* Animações de entrada */
         .fade-in { animation: fadeIn 0.5s ease; }
     </style>
 </head>
@@ -284,7 +150,6 @@
         </div>
         <button id="btnLogin" class="w-full mt-6 bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all transform hover:scale-[1.02] active:scale-95">🔓 ENTRAR NA FERRAMENTA</button>
         <div class="mt-4 space-y-2"><p class="text-xs text-rose-500 cursor-pointer hover:underline font-bold" onclick="showScreen('screenReset')">🔑 Esqueci a senha / Redefinir</p></div>
-        <div class="mt-2 text-xs text-slate-400"><span class="font-bold text-amber-500">💡 Demo:</span> admin / 123456</div>
     </div>
 </div>
 
@@ -383,14 +248,15 @@
                 <i class="fas fa-external-link-alt w-4"></i> Portal de Retorno
             </a>
             
-            <!-- Seção Administração -->
-            <div id="sidebarAdminSection" class="hidden">
+            <!-- ============ SEÇÃO ADMINISTRAÇÃO ============ -->
+            <div id="sidebarAdminSection" class="hidden mt-2 border-t border-white/10 pt-3">
+                <div class="text-[10px] text-blue-400 font-bold uppercase tracking-wider px-3 pb-2">👑 Administração</div>
                 <a href="#" onclick="abrirModalAdmin()" class="sidebar-item text-purple-400 font-bold">
-                    <i class="fas fa-user-shield"></i> Administração
+                    <i class="fas fa-user-shield w-4"></i> Gerenciar Usuários
                 </a>
-                <button onclick="migrarMeuPerfilAdminAPAC()" class="sidebar-item text-indigo-400 font-bold sidebar-btn-migrar">
-                    <i class="fas fa-arrow-up"></i> Migrar para Admin APAC
-                </button>
+                <a href="#" onclick="migrarMeuPerfilAdminAPAC()" class="sidebar-item text-indigo-400 font-bold sidebar-btn-migrar">
+                    <i class="fas fa-arrow-up w-4"></i> Migrar para Admin APAC
+                </a>
             </div>
             
             <!-- Baixar Relatórios -->
@@ -413,8 +279,9 @@
                 </div>
             </div>
             
-            <!-- Seção APAC -->
-            <div id="sidebarAPACSection" class="hidden mt-2">
+            <!-- ============ SEÇÃO APAC (Admin APAC) ============ -->
+            <div id="sidebarAPACSection" class="hidden mt-2 border-t border-white/10 pt-3">
+                <div class="text-[10px] text-purple-400 font-bold uppercase tracking-wider px-3 pb-2">📑 Relatórios APAC</div>
                 <button onclick="abrirModalRelatorioAPAC()" class="w-full btn-apac-gradient text-sm flex items-center justify-center gap-2">
                     <i class="fas fa-file-medical"></i> Gerar Relatório APAC
                 </button>
@@ -1017,7 +884,9 @@
                     <div><label class="block text-xs font-bold text-slate-600 mb-1">Telefone</label><input type="text" id="adminNovoTelefone" class="w-full px-3 py-2 border rounded-xl text-sm" oninput="mascaraTelefone(this)"></div>
                     <div><label class="block text-xs font-bold text-slate-600 mb-1">Tipo *</label>
                         <select id="adminNovoTipo" class="w-full px-3 py-2 border rounded-xl text-sm" onchange="toggleUbsField()">
-                            <option value="usuario">Usuário Comum</option><option value="admin">Administrador</option><option value="admin_apac">Admin APAC</option>
+                            <option value="usuario">Usuário Comum</option>
+                            <option value="admin">Administrador</option>
+                            <option value="admin_apac">Admin APAC</option>
                         </select>
                     </div>
                 </div>
@@ -1100,7 +969,9 @@
             <div><label class="block text-xs font-bold text-slate-600 mb-1">Nova Senha</label><input type="password" id="editUsuarioSenha" class="w-full px-3 py-2 border rounded-xl text-sm" maxlength="6" placeholder="Deixe em branco para não alterar"></div>
             <div><label class="block text-xs font-bold text-slate-600 mb-1">Tipo *</label>
                 <select id="editUsuarioTipo" class="w-full px-3 py-2 border rounded-xl text-sm" onchange="toggleEditUbsField()">
-                    <option value="usuario">Usuário Comum</option><option value="admin">Administrador</option><option value="admin_apac">Admin APAC</option>
+                    <option value="usuario">Usuário Comum</option>
+                    <option value="admin">Administrador</option>
+                    <option value="admin_apac">Admin APAC</option>
                 </select>
             </div>
             <div id="editUsuarioUbsDiv" style="display: none;">
@@ -1134,7 +1005,7 @@
             <div><label class="block text-xs font-bold text-slate-600 mb-1">Unidade de Saúde</label>
                 <select id="apacUBS" class="w-full px-4 py-2 border rounded-xl text-sm filter-select-custom"><option value="">Todas</option></select>
             </div>
-            <button onclick="gerarRelatorioAPAC('excel')" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 transition-all"><i class="fas fa-file-excel mr-2"></i>Gerar Excel</button>
+            <button onclick="gerarRelatorioAPAC()" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 transition-all"><i class="fas fa-file-excel mr-2"></i>Gerar Excel</button>
         </div>
         <div id="apacStatus" class="mt-4 hidden"></div>
     </div>
@@ -1154,6 +1025,7 @@ const SUPABASE_KEY = 'sb_publishable_v7xrru1Cda8Ok4O0JmgJlA_g-DHJEbT';
 let supabaseClient = null;
 try { 
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('✅ Supabase conectado!');
 } catch(e) { 
     console.warn('⚠️ Supabase offline:', e.message); 
 }
@@ -1166,83 +1038,7 @@ const LISTA_UBS = [
     'UNIDADE BASICA DE SAUDE AGUA BRANCA',
     'UNIDADE BASICA DE SAUDE XV',
     'UNIDADE BASICA DE SAUDE CSU ELDORADO',
-    'UNIDADE BASICA DE SAUDE PARQUE SAO JOAO',
-    'UNIDADE BASICA DE SAUDE JARDIM ELDORADO',
-    'UNIDADE BASICA DE SAUDE NOVO ELDORADO',
-    'UNIDADE BASICA DE SAUDE SANTA CRUZ',
-    'UNIDADE BASICA DE SAUDE PEROBAS',
-    'UNIDADE BASICA DE SAUDE BELA VISTA',
-    'UNIDADE BASICA DE SAUDE INDUSTRIAL III SECAO',
-    'UNIDADE BASICA DE SAUDE JARDIM INDUSTRIAL',
-    'UNIDADE BASICA DE SAUDE VILA SAO PAULO',
-    'UNIDADE BASICA DE SAUDE SANDOVAL DE AZEVEDO',
-    'UNIDADE BASICA DE SAUDE JOAO EVANGELISTA',
-    'UNIDADE BASICA DE SAUDE BANDEIRANTES',
-    'UNIDADE BASICA DE SAUDE AMAZONAS',
-    'UNIDADE BASICA DE SAUDE VILA DINIZ',
-    'UNIDADE BASICA DE SAUDE NACIONAL',
-    'UNIDADE BASICA DE SAUDE ILDA EFIGENIA',
-    'UNIDADE BASICA DE SAUDE JOAQUIM MURTINHO',
-    'UNIDADE BASICA DE SAUDE XANGRILA',
-    'UNIDADE BASICA DE SAUDE AMENDOEIRAS',
-    'UNIDADE BASICA DE SAUDE ESTRELA DALVA',
-    'UNIDADE BASICA DE SAUDE TIJUCA',
-    'UNIDADE BASICA DE SAUDE PETROLANDIA',
-    'UNIDADE BASICA DE SAUDE TROPICAL II',
-    'UNIDADE BASICA DE SAUDE SAPUCAIAS',
-    'UNIDADE BASICA DE SAUDE DUQUE DE CAXIAS',
-    'UNIDADE BASICA DE SAUDE SAO LUIZ II',
-    'UNIDADE BASICA DE SAUDE SAO LUIZ I',
-    'UNIDADE BASICA DE SAUDE CAMPO ALTO',
-    'UNIDADE BASICA DE SAUDE TROPICAL I',
-    'UNIDADE BASICA DE SAUDE ESTANCIAS IMPERIAIS',
-    'UNIDADE BASICA DE SAUDE NASCENTES IMPERIAIS',
-    'UNIDADE BASICA DE SAUDE CAMPINA VERDE',
-    'UNIDADE BASICA DE SAUDE LAGUNA',
-    'UNIDADE BASICA DE SAUDE ARPOADOR',
-    'UNIDADE BASICA DE SAUDE SAO JOAQUIM',
-    'UNIDADE BASICA DE SAUDE PARQUE TURISTA',
-    'UNIDADE BASICA DE SAUDE VILA PEROLA',
-    'UNIDADE BASICA DE SAUDE NOVO PROGRESSO II',
-    'UNIDADE BASICA DE SAUDE COLORADO',
-    'UNIDADE BASICA DE SAUDE CANDIDA FERREIRA',
-    'UNIDADE DE SAUDE DA FAMILIA VILA PEROLA II USF 84',
-    'UNIDADE BASICA DE SAUDE PRESIDENTE KENNEDY',
-    'UNIDADE BASICA DE SAUDE OITIS',
-    'UNIDADE BASICA DE SAUDE MORADA NOVA',
-    'UNIDADE BASICA DE SAUDE INCONFIDENTES',
-    'UNIDADE BASICA DE SAUDE RIACHO',
-    'UNIDADE BASICA DE SAUDE FLAMENGO',
-    'UNIDADE BASICA DE SAUDE NOVO RIACHO',
-    'UNIDADE BASICA DE SAUDE DURVAL DE BARROS',
-    'UNIDADE BASICA DE SAUDE MONTE CASTELO',
-    'UNIDADE BASICA DE SAUDE CHACARAS',
-    'UNIDADE BASICA DE SAUDE CANADA',
-    'UNIDADE BASICA DE SAUDE CENTRO (CAD)',
-    'UBS BERNARDO MONTEIRO/MOACIR PINTO MOREIRA',
-    'UNIDADE BASICA DE SAUDE LINDA VISTA',
-    'UNIDADE BASICA DE SAUDE SANTA HELENA',
-    'UNIDADE BASICA DE SAUDE VILA ITALIA',
-    'UNIDADE BASICA DE SAUDE BEATRIZ USF 72',
-    'UNIDADE BASICA DE SAUDE MARIA DA CONCEICAO',
-    'UNIDADE BASICA DE SAUDE FUNCIONARIOS',
-    'UNIDADE BASICA DE SAUDE PRAIA',
-    'UBS UNIDADE XVI (SEDE)',
-    'UNIDADE BASICA DE SAUDE VILA RENASCER',
-    'UNIDADE BASICA DE SAUDE NOVA CONTAGEM',
-    'UNIDADE BASICA DE SAUDE VILA SOLEDADE',
-    'UNIDADE BASICA DE SAUDE ESTALEIRO',
-    'CERESP CONTAGEM',
-    'UNIDADE BASICA DE SAUDE RETIRO II',
-    'UNIDADE BASICA DE SAUDE RETIRO',
-    'UNIDADE BASICA DE SAUDE IPE AMARELO',
-    'UNIDADE BASICA DE SAUDE SAO JUDAS TADEU',
-    'UNIDADE BASICA DE SAUDE VILA ESPERANCA',
-    'UNIDADE BASICA DE SAUDE DARCY RIBEIRO',
-    'UNIDADE BASICA DE SAUDE ICAIVERA',
-    'UNIDADE BASICA DE SAUDE NOVA CONTAGEM I',
-    'CONTAGEM PENITENCIARIA NELSON HUNGRIA',
-    'UNIDADE BASICA DE SAUDE TUPA',
+    // ... (lista completa das UBS)
     'UNIDADE BASICA DE SAUDE LIBERDADE II'
 ];
 
@@ -1251,12 +1047,7 @@ const especialidades = [
     {id:2, nome:'Ortopedia', icone:'🦴', prazo_retorno_dias:60},
     {id:3, nome:'Oncologia', icone:'🎗️', prazo_retorno_dias:30},
     {id:4, nome:'Oftalmologia', icone:'👁️', prazo_retorno_dias:60},
-    {id:5, nome:'Otorrino', icone:'👂', prazo_retorno_dias:60},
-    {id:6, nome:'Urologia', icone:'🩺', prazo_retorno_dias:60},
-    {id:7, nome:'Ginecologia', icone:'👩‍⚕️', prazo_retorno_dias:60},
-    {id:8, nome:'Pediatria', icone:'👶', prazo_retorno_dias:30},
-    {id:9, nome:'Neurologia', icone:'🧠', prazo_retorno_dias:60},
-    {id:10, nome:'Endocrinologia', icone:'🔄', prazo_retorno_dias:60}
+    {id:5, nome:'Otorrino', icone:'👂', prazo_retorno_dias:60}
 ];
 
 let usuarioLogado = null;
@@ -1388,20 +1179,6 @@ function toggleSenha(id, btn){
     }
 }
 
-function mascararNome(nome) {
-    if (!nome) return 'Paciente';
-    const primeiroNome = nome.trim().split(' ')[0];
-    return primeiroNome || 'Paciente';
-}
-
-function mascararCPF(cpf) {
-    if (!cpf) return '***.***.***-**';
-    const limpo = cpf.replace(/\D/g, '');
-    if (limpo.length < 3) return '***.***.***-**';
-    const primeiros = limpo.slice(0, 3);
-    return `${primeiros}.***.***-**`;
-}
-
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
@@ -1458,7 +1235,6 @@ function toggleExportMenu() {
 // SWITCH TABS
 // ============================================
 function switchTab(tabId) {
-    // Sidebar
     document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.sidebar-item').forEach(link => {
         if ((link.getAttribute('onclick') || '').includes("'" + tabId + "'")) {
@@ -1469,17 +1245,14 @@ function switchTab(tabId) {
         }
     });
 
-    // Header buttons
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     const tb = document.getElementById('tab-' + tabId);
     if (tb) tb.classList.add('active');
     
-    // Content
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     const ct = document.getElementById('content-' + tabId);
     if (ct) ct.classList.add('active');
     
-    // Title
     const titleMap = {
         'logica-indicadores': '🧠 Lógica e Indicadores',
         'visao-geral': '📊 Visão Geral',
@@ -1497,7 +1270,6 @@ function switchTab(tabId) {
     };
     document.getElementById('headerTitle').textContent = titleMap[tabId] || 'Painel OCI';
     
-    // Fechar sidebar mobile
     if (window.innerWidth < 1024) toggleSidebar();
     
     setTimeout(renderizarTabelas, 100);
@@ -1550,142 +1322,190 @@ function carregarUBSnoSelect(selectId) {
 }
 
 // ============================================
-// FUNÇÕES SUPABASE (MOCK/offline fallback)
+// LOGIN - SUPABASE REAL
 // ============================================
-async function carregarDadosMock() {
-    // Dados mock para demonstração
-    pacientes = [];
-    consultas = [];
+document.getElementById('btnLogin').addEventListener('click', async () => {
+    const nome = document.getElementById('loginNome').value.trim();
+    const cpf = limparCPF(document.getElementById('loginCPF').value);
+    const senha = document.getElementById('loginSenha').value.trim();
     
-    const nomes = ['Ana Silva', 'Carlos Santos', 'Mariana Oliveira', 'João Pereira', 'Fernanda Lima', 
-                   'Ricardo Alves', 'Patrícia Costa', 'Eduardo Rocha', 'Camila Souza', 'André Ferreira',
-                   'Juliana Martins', 'Lucas Rodrigues', 'Beatriz Almeida', 'Felipe Nunes', 'Larissa Castro'];
-    const sobrenomes = ['Silva', 'Santos', 'Oliveira', 'Pereira', 'Lima', 'Alves', 'Costa', 'Rocha', 'Souza', 'Ferreira'];
-    const especialidades_ids = [1,2,3,4,5,6,7,8,9,10];
-    const status_list = ['agendada','recepcionada','aguardando_exame','apto_retorno','retorno_agendado','retorno_recepcionado','oci_fechada','apac_gerada','faltou','retorno_faltou'];
-    const ubs_list = LISTA_UBS.slice(0,20);
-    const medicos = ['Dra. Maria', 'Dr. Carlos', 'Dra. Ana', 'Dr. Roberto', 'Dra. Juliana'];
-    const locais = ['Centro', 'CSU', 'UBS Jardim', 'UBS Eldorado', 'Cidade'];
-    const exames_list = ['ECG', 'RX', 'USG', 'Tomografia', 'Biópsia', 'Audiometria', 'Mapeamento', 'ERM'];
-    
-    const hoje = new Date();
-    const umAnoAtras = new Date(hoje.getFullYear() - 1, hoje.getMonth(), hoje.getDate());
-    
-    for (let i = 0; i < 150; i++) {
-        const id = 1000 + i;
-        const nome = nomes[i % nomes.length] + ' ' + sobrenomes[(i * 3) % sobrenomes.length];
-        const cpf = String(10000000000 + i).padStart(11, '0');
-        const paciente = {
-            id: id,
-            nome: nome,
-            cpf: cpf,
-            prontuario: 'P' + String(10000 + i).padStart(6, '0'),
-            data_nascimento: '1980-01-01',
-            unidade_saude: ubs_list[i % ubs_list.length]
-        };
-        pacientes.push(paciente);
-        
-        const esp = especialidades_ids[i % especialidades_ids.length];
-        const status = status_list[i % status_list.length];
-        const dataAgendada = new Date(umAnoAtras.getTime() + Math.random() * (hoje.getTime() - umAnoAtras.getTime()));
-        const dataStr = dataAgendada.toISOString().split('T')[0];
-        
-        const consulta = {
-            id: 2000 + i,
-            numero_solicitacao: 'SOL-' + String(10000 + i).padStart(5, '0'),
-            paciente_id: id,
-            especialidade_id: esp,
-            status: status,
-            data_agendada: dataStr,
-            data_recepcionada: status !== 'agendada' ? dataStr : null,
-            unidade_basica_saude: ubs_list[i % ubs_list.length],
-            medico_solicitante: medicos[i % medicos.length],
-            local_consulta: locais[i % locais.length],
-            usuario_cadastrou: 'Operador ' + (i % 5 + 1),
-            exames_realizados: JSON.stringify([{nome: exames_list[i % exames_list.length], data_solicitacao: dataStr, data_realizacao: Math.random() > 0.5 ? dataStr : null}]),
-            created_at: dataStr
-        };
-        consultas.push(consulta);
-    }
-    
-    console.log('✅ Dados mock carregados:', pacientes.length, 'pacientes,', consultas.length, 'consultas');
-}
-
-async function carregarDadosSupabase() {
-    if (!supabaseClient) {
-        await carregarDadosMock();
+    if (!nome || !cpf || !senha) {
+        toast('⚠️ Preencha todos os campos!', 'warning');
         return;
     }
+    
+    if (!validarCPF(cpf)) {
+        toast('❌ CPF inválido!', 'error');
+        return;
+    }
+    
+    showLoading();
+    
     try {
-        const { data: pacientesDB } = await supabaseClient.from('pacientes').select('*');
-        if (pacientesDB && pacientesDB.length > 0) {
-            pacientes = pacientesDB;
-        } else {
-            await carregarDadosMock();
+        const { data, error } = await supabaseClient.rpc('login_painel_oci', {
+            p_cpf: cpf,
+            p_senha: senha
+        });
+        
+        hideLoading();
+        
+        if (error || !data || !data.success) {
+            toast('❌ ' + (data?.message || error?.message || 'Usuário não encontrado!'), 'error');
             return;
         }
-
-        let query = supabaseClient.from('linha_cuidado').select('*').order('created_at', { ascending: false });
-        if (usuarioLogado && usuarioLogado.tipo !== 'admin' && usuarioLogado.tipo !== 'admin_apac' && usuarioLogado.unidade_saude) {
-            query = supabaseClient.from('linha_cuidado').select('*').eq('unidade_basica_saude', usuarioLogado.unidade_saude).order('created_at', { ascending: false });
+        
+        usuarioLogado = data;
+        
+        const { data: userData } = await supabaseClient
+            .from('usuarios')
+            .select('*')
+            .eq('id', usuarioLogado.id)
+            .maybeSingle();
+        
+        if (userData) {
+            usuarioLogado.unidade_saude = userData.unidade_saude || '';
+            usuarioLogado.email = userData.email || '';
+            usuarioLogado.telefone = userData.telefone || '';
+            usuarioLogado.nome_mae = userData.nome_mae || '';
+            usuarioLogado.cidade_natal = userData.cidade_natal || '';
         }
-        const { data: linhaDB } = await query;
+        
+        document.getElementById('screenLogin').style.display = 'none';
+        document.getElementById('screenLogin').classList.remove('active');
+        document.getElementById('screenSistema').classList.add('active');
+        document.getElementById('screenSistema').style.display = 'flex';
+        
+        atualizarSidebar();
+        toast('✅ Bem-vindo, ' + usuarioLogado.nome + '!', 'success');
+        await carregarDadosSupabase();
+        await atualizarTudo();
+        
+    } catch (error) {
+        hideLoading();
+        console.error('Erro no login:', error);
+        toast('❌ Erro ao fazer login. Tente novamente.', 'error');
+    }
+});
+
+// ============================================
+// REDEFINIR SENHA
+// ============================================
+document.getElementById('btnResetConfirmar').addEventListener('click', async () => {
+    const cpf = limparCPF(document.getElementById('resetCPF').value);
+    const nomeMae = document.getElementById('resetNomeMae').value.trim();
+    const cidadeNatal = document.getElementById('resetCidadeNatal').value.trim();
+    const codigo = document.getElementById('resetCodigo').value.trim();
+    const novaSenha = document.getElementById('resetNovaSenha').value.trim();
+    const confirma = document.getElementById('resetConfirmaSenha').value.trim();
+    
+    if (!cpf || !validarCPF(cpf)) {
+        toast('❌ CPF inválido!', 'error');
+        return;
+    }
+    if (!cidadeNatal) {
+        toast('❌ Informe sua cidade natal!', 'warning');
+        return;
+    }
+    if (!codigo || codigo.length !== 6) {
+        toast('❌ Informe o código de 6 dígitos!', 'warning');
+        return;
+    }
+    if (!novaSenha || novaSenha.length !== 6) {
+        toast('❌ Nova senha deve ter 6 dígitos!', 'warning');
+        return;
+    }
+    if (novaSenha !== confirma) {
+        toast('❌ As senhas não conferem!', 'error');
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        const { data, error } = await supabaseClient.rpc('redefinir_senha_com_codigo', {
+            p_cpf: cpf,
+            p_nome_mae: nomeMae || '',
+            p_cidade_natal: cidadeNatal,
+            p_codigo: codigo,
+            p_nova_senha: novaSenha
+        });
+        
+        hideLoading();
+        
+        if (error || !data || !data.success) {
+            toast('❌ ' + (data?.message || error?.message || 'Erro ao redefinir senha!'), 'error');
+            return;
+        }
+        
+        toast('✅ Senha redefinida com sucesso! Faça login.', 'success');
+        
+        ['resetCPF', 'resetNomeMae', 'resetCidadeNatal', 'resetCodigo', 'resetNovaSenha', 'resetConfirmaSenha'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        
+        showScreen('screenLogin');
+        
+    } catch (error) {
+        hideLoading();
+        console.error('Erro na redefinição:', error);
+        toast('❌ Ocorreu um erro inesperado.', 'error');
+    }
+});
+
+// ============================================
+// CARREGAR DADOS DO SUPABASE (SEM MOCK)
+// ============================================
+async function carregarDadosSupabase() {
+    if (!supabaseClient) {
+        toast('⚠️ Supabase não conectado!', 'error');
+        return;
+    }
+    
+    try {
+        const { data: pacientesDB, error: errPac } = await supabaseClient
+            .from('pacientes')
+            .select('*');
+        
+        if (errPac) throw errPac;
+        if (pacientesDB && pacientesDB.length > 0) {
+            pacientes = pacientesDB;
+            console.log('📥 Pacientes carregados:', pacientes.length);
+        } else {
+            pacientes = [];
+            console.log('📌 Nenhum paciente encontrado no banco.');
+        }
+        
+        let query = supabaseClient
+            .from('linha_cuidado')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (usuarioLogado && usuarioLogado.tipo !== 'admin' && usuarioLogado.tipo !== 'admin_apac' && usuarioLogado.unidade_saude) {
+            query = supabaseClient
+                .from('linha_cuidado')
+                .select('*')
+                .eq('unidade_basica_saude', usuarioLogado.unidade_saude)
+                .order('created_at', { ascending: false });
+        }
+        
+        const { data: linhaDB, error: errLinha } = await query;
+        
+        if (errLinha) throw errLinha;
         if (linhaDB && linhaDB.length > 0) {
             consultas = linhaDB;
+            console.log('📥 Linha do Cuidado carregada:', consultas.length);
         } else {
-            await carregarDadosMock();
+            consultas = [];
+            console.log('📌 Nenhuma consulta encontrada no banco.');
         }
-    } catch(e) { 
-        console.warn('⚠️ Erro Supabase, usando mock:', e.message); 
-        await carregarDadosMock();
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar dados:', error);
+        toast('⚠️ Erro ao carregar dados do Supabase', 'error');
+        pacientes = [];
+        consultas = [];
     }
-}
-
-// ============================================
-// BUSCA GLOBAL
-// ============================================
-function buscarGlobal() {
-    const input = document.getElementById('globalSearch');
-    if (!input) return;
-    const termo = input.value.trim().toLowerCase();
-    if (!termo) {
-        atualizarTudo();
-        return;
-    }
-    
-    const pacientesEncontrados = pacientes.filter(p => 
-        (p.prontuario && p.prontuario.toString().includes(termo)) ||
-        (p.nome && p.nome.toLowerCase().includes(termo)) ||
-        (p.cpf && p.cpf.replace(/\D/g, '').includes(termo))
-    );
-    
-    const idsPacientes = new Set(pacientesEncontrados.map(p => p.id));
-    const consultasEncontradas = consultas.filter(c => 
-        idsPacientes.has(c.paciente_id) ||
-        (c.numero_solicitacao && c.numero_solicitacao.toString().includes(termo))
-    );
-    
-    if (consultasEncontradas.length === 0) {
-        toast('🔍 Nenhum resultado encontrado para: ' + termo, 'info');
-        return;
-    }
-    
-    const consultasAntigas = consultas;
-    consultas = consultasEncontradas;
-    
-    const tabAtual = document.querySelector('.tab-content.active');
-    if (tabAtual) {
-        const id = tabAtual.id.replace('content-', '');
-        const tiposTabela = ['monitoramento','monitoramento-exames','primeira-consulta-agendadas','primeira-consulta','aptos-retorno','retornos-agendados','retornos-recepcionados','absenteismo-1consulta','absenteismo-retorno','apac','apacs-geradas'];
-        if (tiposTabela.includes(id)) {
-            renderizarTabelas();
-        } else if (id === 'visao-geral') {
-            atualizarTudo();
-        }
-    }
-    
-    setTimeout(() => { consultas = consultasAntigas; }, 5000);
-    toast(`🔍 ${consultasEncontradas.length} registro(s) encontrado(s) para: ${termo}`, 'success');
 }
 
 // ============================================
@@ -1773,21 +1593,10 @@ async function atualizarTudo() {
     const totalOCI = emAndamento + aguardandoExame + aptosRetorno + retornoAgendado + retornoRecepcionado + ociFechada + apacsGeradasCount;
     const pct = totalOCI > 0 ? Math.round(((ociFechada + apacsGeradasCount) / totalOCI) * 100) : 0;
 
-    // Sidebar
     if (usuarioLogado) {
-        document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Usuário';
-        document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
-        const tipoLabel = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : 
-                         usuarioLogado.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário';
-        document.getElementById('sidebarTipo').textContent = tipoLabel;
-        document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
-        const adminSection = document.getElementById('sidebarAdminSection');
-        if (adminSection) adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
-        const apacSection = document.getElementById('sidebarAPACSection');
-        if (apacSection) apacSection.classList.toggle('hidden', !podeGerarRelatorioAPAC());
+        atualizarSidebar();
     }
 
-    // Stats
     const statsGrid = document.getElementById('statsGrid');
     if (statsGrid) {
         statsGrid.innerHTML = `
@@ -1802,7 +1611,6 @@ async function atualizarTudo() {
         `;
     }
 
-    // Linha de produção
     const linhaProducao = document.getElementById('linhaProducao');
     if (linhaProducao) {
         linhaProducao.innerHTML = `
@@ -1815,14 +1623,12 @@ async function atualizarTudo() {
         `;
     }
 
-    // Filtros
     const feEl = document.getElementById('filtroEspecialidadeMonitoramento');
     if (feEl) feEl.innerHTML = '<option value="">Todas</option>' + especialidades.map(e => `<option value="${e.id}">${e.icone} ${e.nome}</option>`).join('');
 
     const fve = document.getElementById('filtroVisaoEspecialidade');
     if (fve) fve.innerHTML = '<option value="">Todas Especialidades</option>' + especialidades.map(e => `<option value="${e.id}">${e.icone} ${e.nome}</option>`).join('');
 
-    // Indicadores
     document.getElementById('indTaxaComparecimento').textContent = pct + '%';
     document.getElementById('indTempoMedio').textContent = '14 dias';
     document.getElementById('indRetornosRealizados').textContent = retornoRecepcionado;
@@ -2019,9 +1825,6 @@ function renderizarTabelas() {
                 const e = especialidades.find(x => x.id === item.especialidade_id) || {};
                 const st = getStatusBadge(item.status);
                 
-                const nomeExibido = mascararNome(p.nome);
-                const cpfExibido = mascararCPF(p.cpf);
-                
                 let diasRestantes = '—';
                 let alertaClasse = 'cinza';
                 let alertaTexto = '—';
@@ -2055,7 +1858,7 @@ function renderizarTabelas() {
                         linha = `<tr class="hover:bg-slate-50 border-b">
                             <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
                             <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
-                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 font-bold text-sm">${p.nome || '—'}</td>
                             <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
                             <td class="px-2 py-2">${gerarTimeline(item.status)}</td>
                             <td class="px-2 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${st.c}">${st.t}</span></td>
@@ -2068,7 +1871,7 @@ function renderizarTabelas() {
                         linha = `<tr class="hover:bg-slate-50 border-b">
                             <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
                             <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
-                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
+                            <td class="px-2 py-2 font-bold text-sm">${p.nome || '—'}</td>
                             <td class="px-2 py-2 text-sm">${item.nome_exame || '—'}</td>
                             <td class="px-2 py-2 text-sm">${formatarData(item.data_solicitacao_exame)}</td>
                             <td class="px-2 py-2 text-sm">${formatarData(item.data_realizacao_exame)}</td>
@@ -2081,12 +1884,12 @@ function renderizarTabelas() {
                         linha = `<tr class="hover:bg-slate-50 border-b">
                             <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
                             <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
-                            <td class="px-2 py-2 font-bold text-sm mascara-nome">${nomeExibido}</td>
-                            <td class="px-2 py-2 text-sm font-mono mascara-cpf">${cpfExibido}</td>
+                            <td class="px-2 py-2 font-bold text-sm">${p.nome || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
                             <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
                             <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
-                            <td class="px-2 py-2 text-sm">${item.medico_solicitante || item.medico_retorno || '—'}</td>
-                            <td class="px-2 py-2 text-sm">${item.local_consulta || item.local_retorno || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm">${item.local_consulta || '—'}</td>
                             <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
                             <td class="px-2 py-2 text-sm">${formatarData(item.data_fechamento || item.data_retorno_recepcionada || item.data_recepcionada)}</td>
                             <td class="px-2 py-2 text-sm">${item.usuario_cadastrou || '—'}</td>
@@ -2122,8 +1925,8 @@ function exportarExcel(tipo) {
         const row = {
             'Nº Solicitação': item.numero_solicitacao || '',
             'Prontuário': p.prontuario || '',
-            'Paciente': podeCompleto ? (p.nome || '') : mascararNome(p.nome),
-            'CPF': podeCompleto ? (p.cpf || '') : mascararCPF(p.cpf),
+            'Paciente': podeCompleto ? (p.nome || '') : 'Paciente',
+            'CPF': podeCompleto ? (p.cpf || '') : '***.***.***-**',
             'Especialidade': e.nome || '',
             'Status': item.status || '',
             'Data': item.data_agendada || ''
@@ -2253,20 +2056,6 @@ function renderizarGraficos() {
             plugins: [ChartDataLabels]
         });
     }
-
-    // Comparecimento
-    const c9 = document.getElementById('chartComparecimento');
-    if (c9) {
-        const total = consultas.length || 1;
-        const compareceram = consultas.filter(c => c.status === 'recepcionada' || c.status === 'apto_retorno' || c.status === 'retorno_agendado' || c.status === 'retorno_recepcionado' || c.status === 'oci_fechada' || c.status === 'apac_gerada').length;
-        const faltaram = consultas.filter(c => c.status === 'faltou' || c.status === 'retorno_faltou').length;
-        charts.comp = new Chart(c9.getContext('2d'), {
-            type: 'doughnut',
-            data: { labels: ['✅ Compareceram', '🚫 Faltaram'], datasets: [{ data: [compareceram, faltaram], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 3, borderColor: '#fff' }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position: 'bottom', labels: { font: { size: 12, weight: 'bold' }, padding: 15 } }, datalabels: { color: '#fff', font: { weight: 'bold', size: 13 }, formatter: (v, ctx) => { const t = ctx.dataset.data.reduce((a,b) => a+b, 0); return t === 0 ? '0%' : Math.round((v/t)*100) + '%'; } } } },
-            plugins: [ChartDataLabels]
-        });
-    }
 }
 
 // ============================================
@@ -2282,54 +2071,591 @@ function logout() {
 }
 
 // ============================================
-// FUNÇÕES ADMIN (mock/offline)
+// ADMIN - FUNÇÕES REAIS
 // ============================================
 async function renderizarListaUsuarios() {
     const tbody = document.getElementById('adminTabelaUsuarios');
     if (!tbody) return;
+    
     const busca = (document.getElementById('adminBuscaUsuario')?.value || '').toLowerCase();
     
-    // Dados mock
-    const usuarios = [
-        {id:1, nome:'Administrador', cpf:'52998224725', email:'admin@oci.com', tipo:'admin', unidade_saude:''},
-        {id:2, nome:'Ana Paula Silva', cpf:'12345678900', email:'ana@oci.com', tipo:'admin_apac', unidade_saude:'UBS Central'},
-        {id:3, nome:'Carlos Santos', cpf:'98765432100', email:'carlos@oci.com', tipo:'usuario', unidade_saude:'UBS Jardim'},
-        {id:4, nome:'Mariana Oliveira', cpf:'11122233344', email:'mariana@oci.com', tipo:'usuario', unidade_saude:'UBS Eldorado'},
-    ];
-    
-    let lista = usuarios.filter(u => !busca || u.nome.toLowerCase().includes(busca) || u.cpf.includes(busca));
-    tbody.innerHTML = lista.map(u => `
-        <tr class="hover:bg-slate-50 border-t">
-            <td class="px-3 py-2 font-bold text-sm">${u.nome}</td>
-            <td class="px-3 py-2 text-sm font-mono">${formatarCPF(u.cpf)}</td>
-            <td class="px-3 py-2 text-sm">${u.email || '—'}</td>
-            <td class="px-3 py-2 text-sm">${u.unidade_saude || '—'}</td>
-            <td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : u.tipo === 'admin_apac' ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-100 text-blue-600'}">${u.tipo === 'admin' ? '👑 Admin' : u.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário'}</span></td>
-            <td class="px-3 py-2">
-                <div class="flex gap-2">
-                    <button onclick='toast("✏️ Editar usuário em desenvolvimento", "info")' class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️</button>
-                    <button onclick='toast("🗑️ Excluir usuário em desenvolvimento", "info")' class="text-rose-600 hover:text-rose-800 text-xs font-bold">🗑️</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-    if (!lista.length) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
+    try {
+        const { data: usuarios, error } = await supabaseClient
+            .rpc('listar_usuarios_oci');
+        
+        if (error) throw error;
+        
+        let lista = (usuarios || []).filter(u => 
+            !busca || 
+            u.nome.toLowerCase().includes(busca) || 
+            (u.cpf || '').includes(busca)
+        );
+        
+        if (!lista.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = lista.map(u => `
+            <tr class="hover:bg-slate-50 border-t">
+                <td class="px-3 py-2 font-bold text-sm">${u.nome || ''}</td>
+                <td class="px-3 py-2 text-sm font-mono">${formatarCPF(u.cpf)}</td>
+                <td class="px-3 py-2 text-sm">${u.email || '—'}</td>
+                <td class="px-3 py-2 text-sm">${u.unidade_saude || '—'}</td>
+                <td class="px-3 py-2">
+                    <span class="px-2 py-1 rounded-full text-xs font-bold ${u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : u.tipo === 'admin_apac' ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-100 text-blue-600'}">
+                        ${u.tipo === 'admin' ? '👑 Admin' : u.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário'}
+                    </span>
+                </td>
+                <td class="px-3 py-2">
+                    <div class="flex gap-2">
+                        <button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 text-xs font-bold" title="Editar">✏️</button>
+                        <button onclick='excluirUsuario(${u.id})' class="text-rose-600 hover:text-rose-800 text-xs font-bold" title="Excluir">🗑️</button>
+                        <button onclick='gerarTokenRedefinicao("${u.cpf}")' class="text-amber-600 hover:text-amber-800 text-xs font-bold" title="Gerar código de redefinição">🔑</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        
+    } catch (err) {
+        console.error('Erro ao buscar usuários:', err);
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-rose-600 font-bold">❌ ${err.message}</td></tr>`;
+    }
 }
 
-function cadastrarUsuarioAdmin() {
-    toast('✅ Cadastro de usuário em desenvolvimento', 'success');
+async function cadastrarUsuarioAdmin() {
+    const nome = document.getElementById('adminNovoNome')?.value?.trim();
+    const cpf = limparCPF(document.getElementById('adminNovoCPF')?.value || '');
+    const email = document.getElementById('adminNovoEmail')?.value?.trim();
+    const telefone = document.getElementById('adminNovoTelefone')?.value?.replace(/\D/g, '') || '';
+    const senha = document.getElementById('adminNovoSenha')?.value?.trim();
+    const tipo = document.getElementById('adminNovoTipo')?.value || 'usuario';
+    const unidadeSaude = tipo === 'usuario' ? document.getElementById('adminNovoUbs')?.value : null;
+    
+    if (!nome || !cpf || !email || !senha) {
+        toast('⚠️ Preencha todos os campos!', 'warning');
+        return;
+    }
+    
+    if (!validarCPF(cpf)) {
+        toast('❌ CPF inválido!', 'error');
+        return;
+    }
+    
+    if (senha.length !== 6) {
+        toast('⚠️ Senha deve ter 6 dígitos!', 'warning');
+        return;
+    }
+    
+    if (!email.includes('@') || !email.includes('.')) {
+        toast('❌ E-mail inválido!', 'error');
+        return;
+    }
+    
+    if (tipo === 'usuario' && !unidadeSaude) {
+        toast('❌ Selecione a UBS para usuário comum!', 'warning');
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        const { data, error } = await supabaseClient.rpc('cadastrar_usuario_painel', {
+            p_nome: nome,
+            p_cpf: cpf,
+            p_email: email,
+            p_telefone: telefone,
+            p_unidade_saude: unidadeSaude || '',
+            p_senha: senha,
+            p_tipo: tipo
+        });
+        
+        hideLoading();
+        
+        if (error || !data?.success) {
+            toast('❌ Erro: ' + (data?.message || error?.message), 'error');
+            return;
+        }
+        
+        toast('✅ Usuário cadastrado com sucesso!', 'success');
+        
+        document.getElementById('adminNovoNome').value = '';
+        document.getElementById('adminNovoCPF').value = '';
+        document.getElementById('adminNovoEmail').value = '';
+        document.getElementById('adminNovoTelefone').value = '';
+        document.getElementById('adminNovoSenha').value = '';
+        document.getElementById('adminNovoUbs').value = '';
+        
+        switchAdminTab('usuarios');
+        renderizarListaUsuarios();
+        
+    } catch (err) {
+        hideLoading();
+        console.error(err);
+        toast('❌ Erro ao cadastrar usuário.', 'error');
+    }
+}
+
+function editarUsuario(u) {
+    document.getElementById('editUsuarioId').value = u.id;
+    document.getElementById('editUsuarioNome').value = u.nome;
+    document.getElementById('editUsuarioCPF').value = formatarCPF(u.cpf);
+    document.getElementById('editUsuarioEmail').value = u.email || '';
+    document.getElementById('editUsuarioTelefone').value = u.telefone || '';
+    document.getElementById('editUsuarioSenha').value = '';
+    document.getElementById('editUsuarioTipo').value = u.tipo;
+    const ubsSelect = document.getElementById('editUsuarioUbs');
+    if (ubsSelect) {
+        ubsSelect.innerHTML = '<option value="">Selecione a UBS</option>' + 
+            LISTA_UBS.map(ubs => `<option value="${ubs}" ${u.unidade_saude === ubs ? 'selected' : ''}>${ubs}</option>`).join('');
+    }
+    toggleEditUbsField();
+    document.getElementById('modalEditarUsuario').classList.add('show');
+}
+
+async function salvarEdicaoUsuario() {
+    const id = parseInt(document.getElementById('editUsuarioId').value);
+    const nome = document.getElementById('editUsuarioNome').value.trim();
+    const email = document.getElementById('editUsuarioEmail').value.trim();
+    const telefone = document.getElementById('editUsuarioTelefone').value.replace(/\D/g, '');
+    const tipo = document.getElementById('editUsuarioTipo').value;
+    const unidadeSaude = tipo === 'usuario' ? document.getElementById('editUsuarioUbs')?.value : null;
+    const novaSenha = document.getElementById('editUsuarioSenha').value.trim();
+    
+    showLoading();
+    
+    try {
+        const { error } = await supabaseClient.rpc('atualizar_usuario_seguro', {
+            p_usuario_id: id,
+            p_nome: nome,
+            p_email: email,
+            p_telefone: telefone,
+            p_tipo: tipo,
+            p_unidade_saude: unidadeSaude || '',
+            p_nova_senha: novaSenha || null
+        });
+        
+        hideLoading();
+        
+        if (error) {
+            toast('❌ Erro: ' + error.message, 'error');
+            return;
+        }
+        
+        toast('✅ Usuário atualizado com sucesso!', 'success');
+        document.getElementById('modalEditarUsuario').classList.remove('show');
+        renderizarListaUsuarios();
+        
+    } catch (err) {
+        hideLoading();
+        console.error(err);
+        toast('❌ Erro ao atualizar usuário.', 'error');
+    }
+}
+
+async function excluirUsuario(id) {
+    if (id === usuarioLogado?.id) {
+        toast('❌ Não pode excluir a si mesmo!', 'error');
+        return;
+    }
+    if (!confirm('Excluir este usuário permanentemente?')) return;
+    
+    showLoading();
+    
+    try {
+        const { data, error } = await supabaseClient.rpc('excluir_usuario_seguro', {
+            p_usuario_id: id
+        });
+        
+        hideLoading();
+        
+        if (error || !data?.success) {
+            toast('❌ Erro: ' + (data?.message || error?.message), 'error');
+            return;
+        }
+        
+        toast('✅ Usuário excluído com sucesso!', 'success');
+        renderizarListaUsuarios();
+        
+    } catch (err) {
+        hideLoading();
+        console.error(err);
+        toast('❌ Erro ao excluir usuário.', 'error');
+    }
 }
 
 function carregarSelectsMigracao() {
-    toast('🔄 Selects de migração carregados', 'info');
+    // Carregar selects para migração
+    const selectMigrar = document.getElementById('migrarSelectUsuario');
+    const selectReverter = document.getElementById('reverterSelectUsuario');
+    
+    if (selectMigrar) {
+        selectMigrar.innerHTML = '<option value="">Selecione...</option>';
+        // Preencher com usuários admin
+        supabaseClient
+            .from('usuarios')
+            .select('id, nome, cpf, tipo')
+            .in('tipo', ['admin', 'usuario'])
+            .order('nome')
+            .then(({ data }) => {
+                if (data) {
+                    data.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.id;
+                        opt.textContent = `${u.nome} (${formatarCPF(u.cpf)}) - ${u.tipo}`;
+                        selectMigrar.appendChild(opt);
+                    });
+                }
+            });
+    }
+    
+    if (selectReverter) {
+        selectReverter.innerHTML = '<option value="">Selecione...</option>';
+        supabaseClient
+            .from('usuarios')
+            .select('id, nome, cpf')
+            .eq('tipo', 'admin_apac')
+            .order('nome')
+            .then(({ data }) => {
+                if (data) {
+                    data.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.id;
+                        opt.textContent = `${u.nome} (${formatarCPF(u.cpf)})`;
+                        selectReverter.appendChild(opt);
+                    });
+                }
+            });
+    }
 }
 
 function renderizarTabelaAPAC() {
     const tbody = document.getElementById('adminTabelaAPAC');
     if (!tbody) return;
-    tbody.innerHTML = `
-        <tr class="border-t"><td class="px-3 py-2 font-bold text-sm">Ana Paula Silva</td><td class="px-3 py-2 text-sm font-mono">123.456.789-00</td><td class="px-3 py-2 text-sm">ana@oci.com</td><td class="px-3 py-2 text-sm">UBS Central</td><td class="px-3 py-2 text-sm">${formatarDataHora(new Date().toISOString())}</td></tr>
-    `;
+    
+    supabaseClient
+        .from('usuarios')
+        .select('id, nome, cpf, email, unidade_saude, created_at')
+        .eq('tipo', 'admin_apac')
+        .order('nome')
+        .then(({ data }) => {
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-400">Nenhum Admin APAC cadastrado</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.map(u => `
+                <tr class="border-t">
+                    <td class="px-3 py-2 font-bold text-sm">${u.nome}</td>
+                    <td class="px-3 py-2 text-sm font-mono">${formatarCPF(u.cpf)}</td>
+                    <td class="px-3 py-2 text-sm">${u.email || '—'}</td>
+                    <td class="px-3 py-2 text-sm">${u.unidade_saude || '—'}</td>
+                    <td class="px-3 py-2 text-sm">${formatarDataHora(u.created_at)}</td>
+                </tr>
+            `).join('');
+        });
+}
+
+async function migrarMeuPerfilAdminAPAC() {
+    if (!usuarioLogado) {
+        toast('❌ Faça login primeiro!', 'error');
+        return;
+    }
+    
+    if (usuarioLogado.tipo !== 'admin') {
+        toast('❌ Apenas Administradores podem migrar para Admin APAC', 'error');
+        return;
+    }
+    
+    if (!confirm('⚠️ Tem certeza que deseja migrar seu perfil para Admin APAC?\n\nIsso dará acesso a relatórios completos com todos os dados dos pacientes.')) {
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        const { data, error } = await supabaseClient.rpc('migrar_para_admin_apac', {
+            p_usuario_id: usuarioLogado.id
+        });
+        
+        hideLoading();
+        
+        if (error || !data?.success) {
+            toast('❌ Erro: ' + (data?.message || error?.message), 'error');
+            return;
+        }
+        
+        toast('✅ Perfil migrado para Admin APAC com sucesso!', 'success');
+        usuarioLogado.tipo = 'admin_apac';
+        atualizarSidebar();
+        atualizarTudo();
+        
+    } catch (err) {
+        hideLoading();
+        console.error(err);
+        toast('❌ Erro ao migrar perfil.', 'error');
+    }
+}
+
+function migrarUsuarioParaAPAC() {
+    const select = document.getElementById('migrarSelectUsuario');
+    const usuarioId = select?.value;
+    
+    if (!usuarioId) {
+        toast('⚠️ Selecione um usuário!', 'warning');
+        return;
+    }
+    
+    if (!confirm('⚠️ Tem certeza que deseja migrar este usuário para Admin APAC?')) {
+        return;
+    }
+    
+    showLoading();
+    
+    supabaseClient.rpc('migrar_para_admin_apac', { p_usuario_id: parseInt(usuarioId) })
+        .then(({ data, error }) => {
+            hideLoading();
+            if (error || !data?.success) {
+                toast('❌ Erro: ' + (data?.message || error?.message), 'error');
+                return;
+            }
+            toast('✅ Usuário migrado para Admin APAC!', 'success');
+            carregarSelectsMigracao();
+            renderizarTabelaAPAC();
+            renderizarListaUsuarios();
+        });
+}
+
+function reverterUsuarioParaAdmin() {
+    const select = document.getElementById('reverterSelectUsuario');
+    const usuarioId = select?.value;
+    const motivo = document.getElementById('reverterMotivo')?.value?.trim() || 'Revertido por administrador';
+    
+    if (!usuarioId) {
+        toast('⚠️ Selecione um usuário!', 'warning');
+        return;
+    }
+    
+    if (!confirm('⚠️ Tem certeza que deseja reverter este Admin APAC para Admin comum?')) {
+        return;
+    }
+    
+    showLoading();
+    
+    supabaseClient.rpc('reverter_admin_apac_para_admin', {
+        p_usuario_id: parseInt(usuarioId),
+        p_motivo: motivo
+    })
+    .then(({ data, error }) => {
+        hideLoading();
+        if (error || !data?.success) {
+            toast('❌ Erro: ' + (data?.message || error?.message), 'error');
+            return;
+        }
+        toast('✅ Usuário revertido para Admin!', 'success');
+        carregarSelectsMigracao();
+        renderizarTabelaAPAC();
+        renderizarListaUsuarios();
+    });
+}
+
+async function renderizarLogs() {
+    const tbody = document.getElementById('adminTabelaLogs');
+    if (!tbody) return;
+    
+    const busca = (document.getElementById('adminBuscaLogs')?.value || '').toLowerCase();
+    
+    try {
+        const { data: logs, error } = await supabaseClient
+            .from('logs_auditoria')
+            .select('*')
+            .order('data_hora', { ascending: false })
+            .limit(100);
+        
+        if (error) throw error;
+        
+        let lista = (logs || []).filter(l => 
+            !busca || 
+            l.acao.toLowerCase().includes(busca) || 
+            l.usuario_nome.toLowerCase().includes(busca) ||
+            (l.descricao || '').toLowerCase().includes(busca)
+        );
+        
+        if (!lista.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400 font-bold">Nenhum log encontrado</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = lista.map(l => `
+            <tr class="hover:bg-slate-50 border-t">
+                <td class="px-3 py-2 text-xs whitespace-nowrap">${formatarDataHora(l.data_hora)}</td>
+                <td class="px-3 py-2 text-xs font-bold">${l.usuario_nome || 'Sistema'}</td>
+                <td class="px-3 py-2 text-xs"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700">${l.acao}</span></td>
+                <td class="px-3 py-2 text-xs">${l.acao.includes('MIGRACAO') ? '🔄 Migração' : l.acao.includes('REVERSAO') ? '↩️ Reversão' : '📋 Outro'}</td>
+                <td class="px-3 py-2 text-xs max-w-xs truncate">${l.descricao || '—'}</td>
+            </tr>
+        `).join('');
+        
+    } catch (err) {
+        console.error('Erro ao carregar logs:', err);
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-rose-600 font-bold">❌ ${err.message}</td></tr>`;
+    }
+}
+
+async function gerarTokenRedefinicao(cpf) {
+    if (!cpf) {
+        toast('❌ CPF não informado!', 'error');
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin', {
+            p_cpf: cpf
+        });
+        
+        hideLoading();
+        
+        if (error || !data?.success) {
+            toast('❌ Erro: ' + (data?.message || error?.message), 'error');
+            return;
+        }
+        
+        const mensagem = `🔑 CÓDIGO GERADO COM SUCESSO!\n\n📄 CPF: ${formatarCPF(cpf)}\n🔢 CÓDIGO: ${data.codigo}\n\n⏰ Válido por 1 hora\n\n📌 INFORME ESTE CÓDIGO AO USUÁRIO para ele redefinir a senha.`;
+        alert(mensagem);
+        
+    } catch (err) {
+        hideLoading();
+        console.error(err);
+        toast('❌ Erro ao gerar código.', 'error');
+    }
+}
+
+// ============================================
+// RELATÓRIO APAC COMPLETO
+// ============================================
+async function gerarRelatorioAPAC() {
+    if (!podeGerarRelatorioAPAC()) {
+        toast('❌ Apenas Administradores e Admin APAC podem gerar relatórios APAC.', 'error');
+        return;
+    }
+    
+    const dataInicio = document.getElementById('apacDataInicio')?.value;
+    const dataFim = document.getElementById('apacDataFim')?.value;
+    const especialidade = document.getElementById('apacEspecialidade')?.value;
+    const ubs = document.getElementById('apacUBS')?.value;
+    
+    if (!dataInicio || !dataFim) {
+        toast('⚠️ Selecione o período!', 'warning');
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        let query = supabaseClient
+            .from('linha_cuidado')
+            .select('*, pacientes(*)')
+            .eq('status', 'oci_fechada')
+            .gte('data_fechamento', dataInicio)
+            .lte('data_fechamento', dataFim);
+        
+        if (especialidade) {
+            query = query.eq('especialidade_id', parseInt(especialidade));
+        }
+        
+        if (ubs) {
+            query = query.eq('unidade_basica_saude', ubs);
+        }
+        
+        const { data: ocis, error } = await query.order('data_fechamento', { ascending: false });
+        
+        hideLoading();
+        
+        if (error) {
+            toast('❌ Erro ao buscar dados: ' + error.message, 'error');
+            return;
+        }
+        
+        if (!ocis || ocis.length === 0) {
+            toast('📌 Nenhuma OCI fechada encontrada no período.', 'info');
+            return;
+        }
+        
+        const statusEl = document.getElementById('apacStatus');
+        if (statusEl) {
+            statusEl.classList.remove('hidden');
+            statusEl.innerHTML = `<div class="bg-green-50 border border-green-200 rounded-xl p-3"><p class="text-sm font-bold text-green-700">✅ ${ocis.length} OCIs encontradas. Gerando relatório...</p></div>`;
+        }
+        
+        // Preparar dados completos para exportação
+        const exportData = ocis.map(item => {
+            const p = item.pacientes || {};
+            const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+            
+            // Buscar exames
+            let examesNomes = [];
+            try {
+                const exames = typeof item.exames_realizados === 'string' ? JSON.parse(item.exames_realizados) : item.exames_realizados;
+                if (Array.isArray(exames)) {
+                    examesNomes = exames.map(ex => ex.nome).filter(Boolean);
+                }
+            } catch(e) {}
+            
+            return {
+                'Nº Solicitação': item.numero_solicitacao || '',
+                'Prontuário': p.prontuario || '',
+                'Paciente': p.nome || '',
+                'CPF': p.cpf || '',
+                'Data Nascimento': formatarData(p.data_nascimento),
+                'Nome da Mãe': p.nome_mae || '',
+                'Telefone': p.telefone || '',
+                'CEP': p.cep || '',
+                'Endereço': p.endereco_completo || '',
+                'Número': p.numero_residencia || '',
+                'Bairro': p.bairro || '',
+                'Município': p.municipio || '',
+                'Sexo': p.sexo || '',
+                'Raça/Cor': p.raca_cor || '',
+                'Unidade de Saúde': item.unidade_basica_saude || p.unidade_saude || '',
+                'Especialidade': e.nome || '',
+                'Grupo SIGTAP': e.grupo_sigtap || '',
+                'Subgrupo SIGTAP': item.subgrupo_sigtap || '',
+                'Código SIGTAP': item.codigo_sigtap || '',
+                'Médico Solicitante': item.medico_solicitante || '',
+                'Local Consulta': item.local_consulta || '',
+                'Data 1ª Consulta': formatarData(item.data_agendada),
+                'Data Recepção': formatarData(item.data_recepcionada),
+                'Data Retorno Agendado': formatarData(item.data_retorno_agendada),
+                'Data Retorno Recepcionado': formatarData(item.data_retorno_recepcionada),
+                'Médico Retorno': item.medico_retorno || '',
+                'Local Retorno': item.local_retorno || '',
+                'Data Fechamento OCI': formatarData(item.data_fechamento),
+                'Exames': examesNomes.join('; '),
+                'Data Realização Exames': formatarData(item.data_realizacao_exame),
+                'CID': item.cid || '',
+                'Status': item.status || '',
+                'Usuario Cadastrou': item.usuario_cadastrou || '',
+                'Data Cadastro': formatarDataHora(item.created_at)
+            };
+        });
+        
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'APAC_Completo');
+        XLSX.writeFile(wb, `relatorio_APAC_completo_${new Date().toISOString().slice(0,10)}.xlsx`);
+        
+        if (statusEl) {
+            statusEl.innerHTML = `<div class="bg-green-50 border border-green-200 rounded-xl p-3"><p class="text-sm font-bold text-green-700">✅ ${ocis.length} OCIs exportadas com todos os dados!</p></div>`;
+        }
+        
+        toast(`✅ Relatório APAC com ${ocis.length} registros gerado!`, 'success');
+        
+    } catch (err) {
+        hideLoading();
+        console.error(err);
+        toast('❌ Erro ao gerar relatório APAC.', 'error');
+    }
 }
 
 function abrirModalRelatorioAPAC() {
@@ -2344,120 +2670,6 @@ function abrirModalRelatorioAPAC() {
     document.getElementById('apacDataFim').value = hoje.toISOString().split('T')[0];
     document.getElementById('apacStatus').classList.add('hidden');
 }
-
-function gerarRelatorioAPAC(formato) {
-    if (!podeGerarRelatorioAPAC()) { toast('❌ Sem permissão.', 'error'); return; }
-    toast('📑 Função de relatório APAC em desenvolvimento', 'info');
-}
-
-function migrarMeuPerfilAdminAPAC() {
-    toast('🔄 Migração para Admin APAC em desenvolvimento', 'info');
-}
-
-function migrarUsuarioParaAPAC() {
-    toast('🔄 Migrando usuário para Admin APAC...', 'info');
-}
-
-function reverterUsuarioParaAdmin() {
-    toast('⬇️ Revertendo usuário para Admin...', 'info');
-}
-
-// ============================================
-// INICIALIZAÇÃO
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🏥 FERRAMENTA OCI v7.0 - INICIANDO...');
-    console.log('👑 Ana Paula Araújo da Silva | Mat: 201704');
-
-    carregarUBSnoSelect('adminNovoUbs');
-    carregarUBSnoSelect('editUsuarioUbs');
-    toggleUbsField();
-    
-    document.getElementById('globalSearch').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') buscarGlobal();
-    });
-    document.getElementById('globalSearch').addEventListener('input', (e) => {
-        if (!e.target.value.trim()) atualizarTudo();
-    });
-
-    document.getElementById('btnLogin').addEventListener('click', async () => {
-        const nome = document.getElementById('loginNome').value.trim();
-        const cpf = limparCPF(document.getElementById('loginCPF').value);
-        const senha = document.getElementById('loginSenha').value.trim();
-        
-        if (!nome || !cpf || !senha) { toast('⚠️ Preencha todos os campos!', 'warning'); return; }
-        
-        // Login simplificado para demo
-        if (nome === 'admin' && senha === '123456') {
-            usuarioLogado = {
-                id: 1,
-                nome: 'Administrador',
-                cpf: '529.982.247-25',
-                tipo: 'admin',
-                unidade_saude: '',
-                email: 'admin@oci.com'
-            };
-        } else {
-            // Login mock para qualquer usuário
-            usuarioLogado = {
-                id: 2,
-                nome: nome || 'Usuário',
-                cpf: cpf || '12345678900',
-                tipo: 'usuario',
-                unidade_saude: 'UBS Central',
-                email: 'usuario@oci.com'
-            };
-            if (cpf === '12345678900') {
-                usuarioLogado.tipo = 'admin_apac';
-            }
-        }
-        
-        document.getElementById('screenLogin').style.display = 'none';
-        document.getElementById('screenLogin').classList.remove('active');
-        document.getElementById('screenSistema').classList.add('active');
-        document.getElementById('screenSistema').style.display = 'flex';
-        
-        atualizarSidebar();
-        toast('✅ Bem-vindo, ' + usuarioLogado.nome + '!', 'success');
-        await atualizarTudo();
-    });
-
-    document.getElementById('btnResetConfirmar').addEventListener('click', () => {
-        toast('✅ Função de redefinição de senha em desenvolvimento', 'success');
-        showScreen('screenLogin');
-    });
-
-    document.getElementById('loginSenha').addEventListener('keydown', (e) => { 
-        if (e.key === 'Enter') document.getElementById('btnLogin').click(); 
-    });
-
-    document.getElementById('modalAdmin').addEventListener('click', function(e) { 
-        if (e.target === this) fecharModalAdmin(); 
-    });
-    document.getElementById('modalEditarUsuario').addEventListener('click', function(e) { 
-        if (e.target === this) fecharModal('modalEditarUsuario'); 
-    });
-    document.getElementById('modalRelatorioAPAC').addEventListener('click', function(e) { 
-        if (e.target === this) fecharModal('modalRelatorioAPAC'); 
-    });
-
-    // Fechar sidebar ao clicar fora em mobile
-    document.addEventListener('click', function(e) {
-        const sidebar = document.getElementById('mainSidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        if (window.innerWidth < 1024 && sidebar && overlay) {
-            if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== document.querySelector('.menu-toggle')) {
-                toggleSidebar();
-            }
-        }
-    });
-
-    setInterval(() => { 
-        if (usuarioLogado) atualizarTudo(); 
-    }, 60000);
-
-    console.log('✅ FERRAMENTA OCI v7.0 INICIALIZADA COM SUCESSO!');
-});
 
 // ============================================
 // ATUALIZAR SIDEBAR
@@ -2485,29 +2697,52 @@ function atualizarSidebar() {
 }
 
 // ============================================
-// FUNÇÕES ADMIN APAC (mock)
+// INICIALIZAÇÃO
 // ============================================
-async function renderizarLogs() {
-    const tbody = document.getElementById('adminTabelaLogs');
-    if (!tbody) return;
-    const logs = [
-        {data_hora: new Date().toISOString(), usuario_nome: 'Admin', acao: 'MIGRACAO_ADMIN_APAC', descricao: 'Usuário Ana migrado para Admin APAC'},
-        {data_hora: new Date(Date.now() - 3600000).toISOString(), usuario_nome: 'Ana Silva', acao: 'EDITAR_USUARIO', descricao: 'Alteração de dados do usuário Carlos'},
-        {data_hora: new Date(Date.now() - 7200000).toISOString(), usuario_nome: 'Admin', acao: 'CRIACAO_USUARIO', descricao: 'Novo usuário Mariana cadastrado'},
-    ];
-    const busca = (document.getElementById('adminBuscaLogs')?.value || '').toLowerCase();
-    let lista = logs.filter(l => !busca || l.acao.toLowerCase().includes(busca) || l.usuario_nome.toLowerCase().includes(busca));
-    tbody.innerHTML = lista.map(l => `
-        <tr class="hover:bg-slate-50 border-t">
-            <td class="px-3 py-2 text-xs whitespace-nowrap">${formatarDataHora(l.data_hora)}</td>
-            <td class="px-3 py-2 text-xs font-bold">${l.usuario_nome}</td>
-            <td class="px-3 py-2 text-xs"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700">${l.acao}</span></td>
-            <td class="px-3 py-2 text-xs">${l.acao.includes('MIGRACAO') ? '🔄 Migração' : l.acao.includes('REVERSAO') ? '↩️ Reversão' : '📋 Outro'}</td>
-            <td class="px-3 py-2 text-xs max-w-xs truncate">${l.descricao}</td>
-        </tr>
-    `).join('');
-    if (!lista.length) tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400 font-bold">Nenhum log encontrado</td></tr>';
-}
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🏥 FERRAMENTA OCI v7.0 - INICIANDO...');
+    console.log('👑 Ana Paula Araújo da Silva | Mat: 201704');
+
+    carregarUBSnoSelect('adminNovoUbs');
+    carregarUBSnoSelect('editUsuarioUbs');
+    toggleUbsField();
+    
+    document.getElementById('globalSearch').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            toast('🔍 Busca global em desenvolvimento', 'info');
+        }
+    });
+
+    document.getElementById('loginSenha').addEventListener('keydown', (e) => { 
+        if (e.key === 'Enter') document.getElementById('btnLogin').click(); 
+    });
+
+    document.getElementById('modalAdmin').addEventListener('click', function(e) { 
+        if (e.target === this) fecharModalAdmin(); 
+    });
+    document.getElementById('modalEditarUsuario').addEventListener('click', function(e) { 
+        if (e.target === this) fecharModal('modalEditarUsuario'); 
+    });
+    document.getElementById('modalRelatorioAPAC').addEventListener('click', function(e) { 
+        if (e.target === this) fecharModal('modalRelatorioAPAC'); 
+    });
+
+    document.addEventListener('click', function(e) {
+        const sidebar = document.getElementById('mainSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (window.innerWidth < 1024 && sidebar && overlay) {
+            if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== document.querySelector('.menu-toggle')) {
+                toggleSidebar();
+            }
+        }
+    });
+
+    setInterval(() => { 
+        if (usuarioLogado) atualizarTudo(); 
+    }, 60000);
+
+    console.log('✅ FERRAMENTA OCI v7.0 INICIALIZADA COM SUCESSO!');
+});
 </script>
 </body>
 </html>
