@@ -123,6 +123,43 @@
         .admin-tab-btn:hover { background: #f3e8ff; }
         #mainContent { overflow-y: auto; scroll-behavior: smooth; }
         .fade-in { animation: fadeIn 0.5s ease; }
+        
+        /* Admin Section na Sidebar */
+        .sidebar-admin-section {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .sidebar-admin-section .section-title {
+            font-size: 10px;
+            color: #a78bfa;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 14px 6px 14px;
+        }
+        .sidebar-admin-section .sidebar-item {
+            color: #c4b5fd;
+        }
+        .sidebar-admin-section .sidebar-item:hover {
+            color: white;
+            background: rgba(167, 139, 250, 0.15);
+        }
+        
+        /* APAC Section na Sidebar */
+        .sidebar-apac-section {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .sidebar-apac-section .section-title {
+            font-size: 10px;
+            color: #a78bfa;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 14px 6px 14px;
+        }
     </style>
 </head>
 <body>
@@ -247,18 +284,7 @@
             <a href="https://paineldousuario.regulacaoconsolidados.workers.dev/#" target="_blank" class="sidebar-item text-emerald-400 font-bold hover:bg-white/10">
                 <i class="fas fa-external-link-alt w-4"></i> Portal de Retorno
             </a>
-            
-            <!-- ============ SEÇÃO ADMINISTRAÇÃO ============ -->
-            <div id="sidebarAdminSection" class="hidden mt-2 border-t border-white/10 pt-3">
-                <div class="text-[10px] text-blue-400 font-bold uppercase tracking-wider px-3 pb-2">👑 Administração</div>
-                <a href="#" onclick="abrirModalAdmin()" class="sidebar-item text-purple-400 font-bold">
-                    <i class="fas fa-user-shield w-4"></i> Gerenciar Usuários
-                </a>
-                <a href="#" onclick="migrarMeuPerfilAdminAPAC()" class="sidebar-item text-indigo-400 font-bold sidebar-btn-migrar">
-                    <i class="fas fa-arrow-up w-4"></i> Migrar para Admin APAC
-                </a>
-            </div>
-            
+
             <!-- Baixar Relatórios -->
             <div>
                 <button onclick="toggleExportMenu()" class="sidebar-item text-white font-bold hover:bg-white/10 w-full">
@@ -279,13 +305,25 @@
                 </div>
             </div>
             
-            <!-- ============ SEÇÃO APAC (Admin APAC) ============ -->
-            <div id="sidebarAPACSection" class="hidden mt-2 border-t border-white/10 pt-3">
-                <div class="text-[10px] text-purple-400 font-bold uppercase tracking-wider px-3 pb-2">📑 Relatórios APAC</div>
-                <button onclick="abrirModalRelatorioAPAC()" class="w-full btn-apac-gradient text-sm flex items-center justify-center gap-2">
+            <!-- ============ SEÇÃO ADMINISTRAÇÃO (APENAS ADMIN) ============ -->
+            <div id="sidebarAdminSection" class="sidebar-admin-section hidden">
+                <div class="section-title">👑 Administração</div>
+                <a href="#" onclick="abrirModalAdmin()" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm font-semibold">
+                    <i class="fas fa-user-cog w-5 text-purple-400"></i> Gerenciar Usuários
+                </a>
+                <a href="#" onclick="migrarMeuPerfilAdminAPAC()" class="sidebar-item flex items-center gap-3 p-3 rounded-xl text-sm font-semibold">
+                    <i class="fas fa-arrow-up w-5 text-indigo-400"></i> Migrar para Admin APAC
+                </a>
+            </div>
+            
+            <!-- ============ SEÇÃO APAC (ADMIN E ADMIN_APAC) ============ -->
+            <div id="sidebarAPACSection" class="sidebar-apac-section hidden">
+                <div class="section-title">📑 Relatórios APAC</div>
+                <button onclick="abrirModalRelatorioAPAC()" class="w-full btn-apac-gradient text-sm flex items-center justify-center gap-2 py-3 rounded-xl">
                     <i class="fas fa-file-medical"></i> Gerar Relatório APAC
                 </button>
             </div>
+            
         </nav>
         
         <div class="p-4 border-t border-white/10 flex-shrink-0">
@@ -853,6 +891,7 @@
             <button onclick="switchAdminTab('migracao')" id="adminTab-migracao" class="admin-tab-btn text-slate-400">🔄 Migração</button>
         </div>
         
+        <!-- TAB USUÁRIOS -->
         <div id="adminContent-usuarios" class="admin-content">
             <div class="mb-3 flex gap-3 flex-wrap">
                 <input type="text" id="adminBuscaUsuario" placeholder="🔍 Buscar usuário..." class="flex-1 px-4 py-2 border rounded-xl text-sm min-w-[150px]" oninput="renderizarListaUsuarios()">
@@ -870,6 +909,7 @@
             </div>
         </div>
         
+        <!-- TAB NOVO USUÁRIO -->
         <div id="adminContent-novo" class="admin-content hidden">
             <form class="space-y-3" onsubmit="return false;">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -898,6 +938,7 @@
             </form>
         </div>
         
+        <!-- TAB LOGS -->
         <div id="adminContent-logs" class="admin-content hidden">
             <div class="mb-3 flex gap-3 flex-wrap">
                 <input type="text" id="adminBuscaLogs" placeholder="🔍 Buscar logs..." class="flex-1 px-4 py-2 border rounded-xl text-sm min-w-[150px]" oninput="renderizarLogs()">
@@ -915,6 +956,7 @@
             </div>
         </div>
         
+        <!-- TAB MIGRAÇÃO -->
         <div id="adminContent-migracao" class="admin-content hidden">
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
                 <p class="text-sm text-amber-700 font-bold">🔄 Gerenciar Migração para Admin APAC</p>
@@ -1038,7 +1080,83 @@ const LISTA_UBS = [
     'UNIDADE BASICA DE SAUDE AGUA BRANCA',
     'UNIDADE BASICA DE SAUDE XV',
     'UNIDADE BASICA DE SAUDE CSU ELDORADO',
-    // ... (lista completa das UBS)
+    'UNIDADE BASICA DE SAUDE PARQUE SAO JOAO',
+    'UNIDADE BASICA DE SAUDE JARDIM ELDORADO',
+    'UNIDADE BASICA DE SAUDE NOVO ELDORADO',
+    'UNIDADE BASICA DE SAUDE SANTA CRUZ',
+    'UNIDADE BASICA DE SAUDE PEROBAS',
+    'UNIDADE BASICA DE SAUDE BELA VISTA',
+    'UNIDADE BASICA DE SAUDE INDUSTRIAL III SECAO',
+    'UNIDADE BASICA DE SAUDE JARDIM INDUSTRIAL',
+    'UNIDADE BASICA DE SAUDE VILA SAO PAULO',
+    'UNIDADE BASICA DE SAUDE SANDOVAL DE AZEVEDO',
+    'UNIDADE BASICA DE SAUDE JOAO EVANGELISTA',
+    'UNIDADE BASICA DE SAUDE BANDEIRANTES',
+    'UNIDADE BASICA DE SAUDE AMAZONAS',
+    'UNIDADE BASICA DE SAUDE VILA DINIZ',
+    'UNIDADE BASICA DE SAUDE NACIONAL',
+    'UNIDADE BASICA DE SAUDE ILDA EFIGENIA',
+    'UNIDADE BASICA DE SAUDE JOAQUIM MURTINHO',
+    'UNIDADE BASICA DE SAUDE XANGRILA',
+    'UNIDADE BASICA DE SAUDE AMENDOEIRAS',
+    'UNIDADE BASICA DE SAUDE ESTRELA DALVA',
+    'UNIDADE BASICA DE SAUDE TIJUCA',
+    'UNIDADE BASICA DE SAUDE PETROLANDIA',
+    'UNIDADE BASICA DE SAUDE TROPICAL II',
+    'UNIDADE BASICA DE SAUDE SAPUCAIAS',
+    'UNIDADE BASICA DE SAUDE DUQUE DE CAXIAS',
+    'UNIDADE BASICA DE SAUDE SAO LUIZ II',
+    'UNIDADE BASICA DE SAUDE SAO LUIZ I',
+    'UNIDADE BASICA DE SAUDE CAMPO ALTO',
+    'UNIDADE BASICA DE SAUDE TROPICAL I',
+    'UNIDADE BASICA DE SAUDE ESTANCIAS IMPERIAIS',
+    'UNIDADE BASICA DE SAUDE NASCENTES IMPERIAIS',
+    'UNIDADE BASICA DE SAUDE CAMPINA VERDE',
+    'UNIDADE BASICA DE SAUDE LAGUNA',
+    'UNIDADE BASICA DE SAUDE ARPOADOR',
+    'UNIDADE BASICA DE SAUDE SAO JOAQUIM',
+    'UNIDADE BASICA DE SAUDE PARQUE TURISTA',
+    'UNIDADE BASICA DE SAUDE VILA PEROLA',
+    'UNIDADE BASICA DE SAUDE NOVO PROGRESSO II',
+    'UNIDADE BASICA DE SAUDE COLORADO',
+    'UNIDADE BASICA DE SAUDE CANDIDA FERREIRA',
+    'UNIDADE DE SAUDE DA FAMILIA VILA PEROLA II USF 84',
+    'UNIDADE BASICA DE SAUDE PRESIDENTE KENNEDY',
+    'UNIDADE BASICA DE SAUDE OITIS',
+    'UNIDADE BASICA DE SAUDE MORADA NOVA',
+    'UNIDADE BASICA DE SAUDE INCONFIDENTES',
+    'UNIDADE BASICA DE SAUDE RIACHO',
+    'UNIDADE BASICA DE SAUDE FLAMENGO',
+    'UNIDADE BASICA DE SAUDE NOVO RIACHO',
+    'UNIDADE BASICA DE SAUDE DURVAL DE BARROS',
+    'UNIDADE BASICA DE SAUDE MONTE CASTELO',
+    'UNIDADE BASICA DE SAUDE CHACARAS',
+    'UNIDADE BASICA DE SAUDE CANADA',
+    'UNIDADE BASICA DE SAUDE CENTRO (CAD)',
+    'UBS BERNARDO MONTEIRO/MOACIR PINTO MOREIRA',
+    'UNIDADE BASICA DE SAUDE LINDA VISTA',
+    'UNIDADE BASICA DE SAUDE SANTA HELENA',
+    'UNIDADE BASICA DE SAUDE VILA ITALIA',
+    'UNIDADE BASICA DE SAUDE BEATRIZ USF 72',
+    'UNIDADE BASICA DE SAUDE MARIA DA CONCEICAO',
+    'UNIDADE BASICA DE SAUDE FUNCIONARIOS',
+    'UNIDADE BASICA DE SAUDE PRAIA',
+    'UBS UNIDADE XVI (SEDE)',
+    'UNIDADE BASICA DE SAUDE VILA RENASCER',
+    'UNIDADE BASICA DE SAUDE NOVA CONTAGEM',
+    'UNIDADE BASICA DE SAUDE VILA SOLEDADE',
+    'UNIDADE BASICA DE SAUDE ESTALEIRO',
+    'CERESP CONTAGEM',
+    'UNIDADE BASICA DE SAUDE RETIRO II',
+    'UNIDADE BASICA DE SAUDE RETIRO',
+    'UNIDADE BASICA DE SAUDE IPE AMARELO',
+    'UNIDADE BASICA DE SAUDE SAO JUDAS TADEU',
+    'UNIDADE BASICA DE SAUDE VILA ESPERANCA',
+    'UNIDADE BASICA DE SAUDE DARCY RIBEIRO',
+    'UNIDADE BASICA DE SAUDE ICAIVERA',
+    'UNIDADE BASICA DE SAUDE NOVA CONTAGEM I',
+    'CONTAGEM PENITENCIARIA NELSON HUNGRIA',
+    'UNIDADE BASICA DE SAUDE TUPA',
     'UNIDADE BASICA DE SAUDE LIBERDADE II'
 ];
 
@@ -1280,8 +1398,17 @@ function switchTab(tabId) {
 // FUNÇÕES ADMIN
 // ============================================
 function abrirModalAdmin() {
-    if (!usuarioLogado) { toast('❌ Faça login primeiro!', 'error'); return; }
-    if (usuarioLogado.tipo !== 'admin') { toast('❌ Apenas Administradores podem acessar esta área', 'error'); return; }
+    if (!usuarioLogado) {
+        toast('❌ Faça login primeiro!', 'error');
+        return;
+    }
+    
+    if (usuarioLogado.tipo !== 'admin') {
+        toast('❌ Apenas Administradores podem acessar esta área', 'error');
+        return;
+    }
+    
+    console.log('🔓 Abrindo modal de administração para:', usuarioLogado.nome);
     document.getElementById('modalAdmin').classList.add('show');
     switchAdminTab('usuarios');
     renderizarListaUsuarios();
@@ -1422,7 +1549,7 @@ document.getElementById('btnResetConfirmar').addEventListener('click', async () 
     showLoading();
     
     try {
-        const { data, error } = await supabaseClient.rpc('redefinir_senha_com_codigo', {
+        const { data, error } = await supabaseClient.rpc('redefinir_senha_admin_com_codigo', {
             p_cpf: cpf,
             p_nome_mae: nomeMae || '',
             p_cidade_natal: cidadeNatal,
@@ -1454,7 +1581,7 @@ document.getElementById('btnResetConfirmar').addEventListener('click', async () 
 });
 
 // ============================================
-// CARREGAR DADOS DO SUPABASE (SEM MOCK)
+// CARREGAR DADOS DO SUPABASE
 // ============================================
 async function carregarDadosSupabase() {
     if (!supabaseClient) {
@@ -1505,6 +1632,46 @@ async function carregarDadosSupabase() {
         toast('⚠️ Erro ao carregar dados do Supabase', 'error');
         pacientes = [];
         consultas = [];
+    }
+}
+
+// ============================================
+// ATUALIZAR SIDEBAR
+// ============================================
+function atualizarSidebar() {
+    if (!usuarioLogado) return;
+    
+    document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Usuário';
+    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
+    
+    const tipoLabel = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : 
+                     usuarioLogado.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário';
+    document.getElementById('sidebarTipo').textContent = tipoLabel;
+    document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
+    
+    // ============ SEÇÃO ADMINISTRAÇÃO (APENAS ADMIN) ============
+    const adminSection = document.getElementById('sidebarAdminSection');
+    if (adminSection) {
+        if (usuarioLogado.tipo === 'admin') {
+            adminSection.classList.remove('hidden');
+            adminSection.style.display = 'block';
+            console.log('✅ Seção Administração visível para admin');
+        } else {
+            adminSection.classList.add('hidden');
+            adminSection.style.display = 'none';
+        }
+    }
+    
+    // ============ SEÇÃO APAC (ADMIN E ADMIN_APAC) ============
+    const apacSection = document.getElementById('sidebarAPACSection');
+    if (apacSection) {
+        if (podeGerarRelatorioAPAC()) {
+            apacSection.classList.remove('hidden');
+            apacSection.style.display = 'block';
+        } else {
+            apacSection.classList.add('hidden');
+            apacSection.style.display = 'none';
+        }
     }
 }
 
@@ -2080,11 +2247,10 @@ async function renderizarListaUsuarios() {
     const busca = (document.getElementById('adminBuscaUsuario')?.value || '').toLowerCase();
     
     try {
-        // Usar SELECT direto com RLS (já configurada)
-      const { data: usuarios, error } = await supabaseClient
-    .from('usuarios')
-    .select('id, nome, cpf, email, telefone, unidade_saude, tipo')
-    .order('nome');
+        const { data: usuarios, error } = await supabaseClient
+            .from('usuarios')
+            .select('id, nome, cpf, email, telefone, unidade_saude, tipo')
+            .order('nome');
         
         if (error) throw error;
         
@@ -2228,7 +2394,7 @@ async function salvarEdicaoUsuario() {
     showLoading();
     
     try {
-        const { error } = await supabaseClient.rpc('atualizar_usuario_seguro', {
+        const { data, error } = await supabaseClient.rpc('atualizar_usuario_seguro', {
             p_usuario_id: id,
             p_nome: nome,
             p_email: email,
@@ -2288,13 +2454,11 @@ async function excluirUsuario(id) {
 }
 
 function carregarSelectsMigracao() {
-    // Carregar selects para migração
     const selectMigrar = document.getElementById('migrarSelectUsuario');
     const selectReverter = document.getElementById('reverterSelectUsuario');
     
     if (selectMigrar) {
         selectMigrar.innerHTML = '<option value="">Selecione...</option>';
-        // Preencher com usuários admin
         supabaseClient
             .from('usuarios')
             .select('id, nome, cpf, tipo')
@@ -2513,7 +2677,7 @@ async function gerarTokenRedefinicao(cpf) {
     showLoading();
     
     try {
-        const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin', {
+        const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin_oci', {
             p_cpf: cpf
         });
         
@@ -2591,12 +2755,10 @@ async function gerarRelatorioAPAC() {
             statusEl.innerHTML = `<div class="bg-green-50 border border-green-200 rounded-xl p-3"><p class="text-sm font-bold text-green-700">✅ ${ocis.length} OCIs encontradas. Gerando relatório...</p></div>`;
         }
         
-        // Preparar dados completos para exportação
         const exportData = ocis.map(item => {
             const p = item.pacientes || {};
             const e = especialidades.find(x => x.id === item.especialidade_id) || {};
             
-            // Buscar exames
             let examesNomes = [];
             try {
                 const exames = typeof item.exames_realizados === 'string' ? JSON.parse(item.exames_realizados) : item.exames_realizados;
@@ -2672,31 +2834,6 @@ function abrirModalRelatorioAPAC() {
     document.getElementById('apacDataInicio').value = inicio.toISOString().split('T')[0];
     document.getElementById('apacDataFim').value = hoje.toISOString().split('T')[0];
     document.getElementById('apacStatus').classList.add('hidden');
-}
-
-// ============================================
-// ATUALIZAR SIDEBAR
-// ============================================
-function atualizarSidebar() {
-    if (!usuarioLogado) return;
-    
-    document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Usuário';
-    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
-    
-    const tipoLabel = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : 
-                     usuarioLogado.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário';
-    document.getElementById('sidebarTipo').textContent = tipoLabel;
-    document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
-    
-    const adminSection = document.getElementById('sidebarAdminSection');
-    if (adminSection) {
-        adminSection.classList.toggle('hidden', usuarioLogado.tipo !== 'admin');
-    }
-    
-    const apacSection = document.getElementById('sidebarAPACSection');
-    if (apacSection) {
-        apacSection.classList.toggle('hidden', !podeGerarRelatorioAPAC());
-    }
 }
 
 // ============================================
