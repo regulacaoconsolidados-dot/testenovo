@@ -1342,7 +1342,7 @@ document.getElementById('btnLogin').addEventListener('click', async () => {
     showLoading();
     
     try {
-        const { data, error } = await supabaseClient.rpc('login_painel_oci', {
+        const { data, error } = await supabaseClient.rpc('login_painel_admin', {
             p_cpf: cpf,
             p_senha: senha
         });
@@ -2080,8 +2080,11 @@ async function renderizarListaUsuarios() {
     const busca = (document.getElementById('adminBuscaUsuario')?.value || '').toLowerCase();
     
     try {
-        const { data: usuarios, error } = await supabaseClient
-            .rpc('listar_usuarios_oci');
+        // Usar SELECT direto com RLS (já configurada)
+      const { data: usuarios, error } = await supabaseClient
+    .from('usuarios')
+    .select('id, nome, cpf, email, telefone, unidade_saude, tipo')
+    .order('nome');
         
         if (error) throw error;
         
