@@ -17,6 +17,7 @@
         .gradient-header { background: linear-gradient(135deg, #0a1929 0%, #0f2b3d 50%, #1a3a4a 100%); position: relative; overflow: hidden; flex-shrink: 0; }
         .gradient-header::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%); animation: rotate 25s linear infinite; pointer-events: none; }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .card-blue { border-left: 5px solid #3b82f6; }
         .card-amber { border-left: 5px solid #f59e0b; }
         .card-emerald { border-left: 5px solid #10b981; }
@@ -27,29 +28,38 @@
         .card-indigo { border-left: 5px solid #6366f1; }
         .stat-card-hover { transition: all 0.3s; cursor: default; }
         .stat-card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
-        .tab-btn { cursor: pointer; transition: all 0.3s; color: #475569 !important; border-radius: 12px; border: 1px solid #e2e8f0; background: white; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); white-space: nowrap; }
-        .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .tab-btn.active { background: #2563eb !important; color: white !important; border-color: #2563eb; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.25); }
+        
+        .tab-btn { cursor: pointer; transition: all 0.3s; color: #ffffff !important; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.12); padding: 8px 16px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .tab-btn:hover { background: #2563eb; color: white !important; transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(37,99,235,0.4); border-color: #2563eb; }
+        .tab-btn.active { background: #2563eb !important; color: white !important; border-color: #2563eb; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.35); }
+        .tab-btn i { margin-right: 6px; font-size: 12px; }
+        
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.35s ease; }
         @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+        
         .sidebar { width: 260px; flex-shrink: 0; transition: transform 0.3s ease; }
         .sidebar-item { transition: all 0.2s; cursor: pointer; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #94a3b8; }
         .sidebar-item:hover { background: rgba(255,255,255,0.08); color: white; }
         .sidebar-item.active { background: rgba(59,130,246,0.2); color: #60a5fa; border-left: 3px solid #3b82f6; }
         .sidebar-item .sub-item { padding-left: 28px; font-size: 12px; }
+        
         .screen { display: none; }
         .screen.active { display: flex; justify-content: center; align-items: center; }
+        
         .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         .loading-overlay.show { display: flex; }
         .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(4px); }
         .modal-overlay.show { display: flex; }
-        .header-buttons { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 16px; background: rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.06); }
-        .header-buttons button { background: rgba(255,255,255,0.08); color: #e2e8f0; border: none; padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .header-buttons button:hover { background: #2563eb; color: white; transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(37,99,235,0.3); }
+        
+        .header-buttons { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 16px; background: rgba(255,255,255,0.05); border-top: 1px solid rgba(255,255,255,0.06); }
+        .header-buttons button { background: rgba(255,255,255,0.12); color: #ffffff !important; border: 1px solid rgba(255,255,255,0.1); padding: 5px 14px; border-radius: 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .header-buttons button:hover { background: #2563eb; color: white !important; transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(37,99,235,0.4); border-color: #2563eb; }
         .header-buttons button i { margin-right: 4px; }
+        
         .timeline-container { display: flex; align-items: center; gap: 4px; min-width: 120px; max-width: 160px; }
         .timeline-steps { display: flex; gap: 2px; align-items: center; }
         .step-dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid #cbd5e1; background: white; transition: all 0.3s; flex-shrink: 0; }
@@ -60,40 +70,54 @@
         .step-line { width: 10px; height: 2px; background: #cbd5e1; flex-shrink: 0; }
         .step-line.done { background: #22c55e; }
         .timeline-label { font-size: 9px; font-weight: 700; color: #475569; min-width: 28px; text-align: right; }
+        
         .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .status-dias { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; white-space: nowrap; }
+        .status-dias { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 12px; white-space: nowrap; }
         .status-dias.verde { background: #dcfce7; color: #166534; }
         .status-dias.vermelho { background: #fee2e2; color: #991b1b; }
         .status-dias.amarelo { background: #fef3c7; color: #92400e; }
-        .alerta-badge { font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 12px; white-space: nowrap; }
+        .alerta-badge { font-size: 10px; font-weight: 700; padding: 2px 12px; border-radius: 12px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
         .alerta-badge.verde { background: #dcfce7; color: #166534; }
         .alerta-badge.vermelho { background: #fee2e2; color: #991b1b; }
         .alerta-badge.amarelo { background: #fef3c7; color: #92400e; }
         .alerta-badge.cinza { background: #f1f5f9; color: #64748b; }
-        .tabela-colunas th { white-space: nowrap; font-size: 10px; padding: 8px 6px; background: #f1f5f9; }
-        .tabela-colunas td { font-size: 12px; padding: 6px 6px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .monitoramento-tabela th { font-size: 10px; padding: 8px 6px; white-space: nowrap; background: #f1f5f9; }
-        .monitoramento-tabela td { font-size: 12px; padding: 8px 6px; vertical-align: middle; }
+        
+        .tabela-colunas th { white-space: nowrap; font-size: 10px; padding: 8px 8px; background: #f1f5f9; text-align: left; }
+        .tabela-colunas td { font-size: 12px; padding: 6px 8px; vertical-align: middle; }
+        .monitoramento-tabela th { font-size: 10px; padding: 8px 8px; white-space: nowrap; background: #f1f5f9; text-align: left; }
+        .monitoramento-tabela td { font-size: 12px; padding: 8px 8px; vertical-align: middle; }
         .th-sortable { cursor: pointer; user-select: none; }
         .th-sortable:hover { background: #e2e8f0; }
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        
         .fluxo-step { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 12px; font-weight: 600; font-size: 12px; }
         .fluxo-arrow { color: #94a3b8; font-size: 14px; }
+        
         .legenda-timeline-item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; }
         .legenda-timeline-item .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
         .legenda-timeline-item .desc { font-size: 11px; font-weight: 600; color: #1e293b; }
         .legenda-timeline-item .detalhe { font-size: 10px; color: #64748b; }
+        
         .btn-apac-gradient { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; padding: 10px 24px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s; }
         .btn-apac-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(99,102,241,0.4); }
+        
         .ferramentas-sub { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
         .ferramentas-sub.open { max-height: 600px; }
         .collapse-icon { transition: transform 0.3s ease; }
         .collapse-icon.open { transform: rotate(180deg); }
+        .export-menu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .export-menu.open { max-height: 500px; }
+        
         .filter-select-custom { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+        
         .chart-container { position: relative; width: 100%; min-height: 300px; }
+        
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; max-width: 90%; }
         .toast { padding: 12px 20px; border-radius: 12px; color: white; font-weight: 600; font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideInRight 0.3s ease; }
         .toast.success { background: #10b981; }
@@ -101,10 +125,10 @@
         .toast.info { background: #3b82f6; }
         .toast.warning { background: #f59e0b; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
         .sidebar-btn-migrar { background: transparent !important; border: none !important; cursor: pointer; width: 100%; text-align: left; }
         .sidebar-btn-migrar:hover { background: rgba(255,255,255,0.06) !important; }
-        .export-menu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-        .export-menu.open { max-height: 500px; }
+        
         @media (max-width: 1024px) {
             .sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; transform: translateX(-100%); width: 280px; }
             .sidebar.open { transform: translateX(0); }
@@ -118,48 +142,24 @@
         }
         .menu-toggle { display: none; background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 20px; }
         .menu-toggle:hover { background: rgba(255,255,255,0.2); }
+        
         .linha-producao-step { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 10px; font-weight: 600; font-size: 12px; }
         .admin-tab-btn { cursor: pointer; padding: 8px 16px; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
         .admin-tab-btn:hover { background: #f3e8ff; }
+        
         #mainContent { overflow-y: auto; scroll-behavior: smooth; }
         .fade-in { animation: fadeIn 0.5s ease; }
         
-        /* Admin Section na Sidebar */
-        .sidebar-admin-section {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 8px;
-            margin-top: 8px;
-        }
-        .sidebar-admin-section .section-title {
-            font-size: 10px;
-            color: #a78bfa;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0 14px 6px 14px;
-        }
-        .sidebar-admin-section .sidebar-item {
-            color: #c4b5fd;
-        }
-        .sidebar-admin-section .sidebar-item:hover {
-            color: white;
-            background: rgba(167, 139, 250, 0.15);
-        }
+        .sidebar-admin-section { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px; }
+        .sidebar-admin-section .section-title { font-size: 10px; color: #a78bfa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 14px 6px 14px; }
+        .sidebar-admin-section .sidebar-item { color: #c4b5fd; }
+        .sidebar-admin-section .sidebar-item:hover { color: white; background: rgba(167, 139, 250, 0.15); }
         
-        /* APAC Section na Sidebar */
-        .sidebar-apac-section {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 8px;
-            margin-top: 8px;
-        }
-        .sidebar-apac-section .section-title {
-            font-size: 10px;
-            color: #a78bfa;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0 14px 6px 14px;
-        }
+        .sidebar-apac-section { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px; }
+        .sidebar-apac-section .section-title { font-size: 10px; color: #a78bfa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 14px 6px 14px; }
+        
+        .badge-cancelado { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        .badge-transferido { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
     </style>
 </head>
 <body>
@@ -370,7 +370,7 @@
                 </div>
             </div>
             
-            <!-- BOTÕES DO CABEÇALHO -->
+            <!-- BOTÕES DO CABEÇALHO (MAIS VISÍVEIS) -->
             <div class="header-buttons" id="headerButtons">
                 <button class="tab-btn active" id="tab-logica-indicadores" onclick="switchTab('logica-indicadores')"><i class="fas fa-brain"></i> Lógica</button>
                 <button class="tab-btn" id="tab-visao-geral" onclick="switchTab('visao-geral')"><i class="fas fa-th-large"></i> Visão</button>
@@ -387,6 +387,7 @@
                 <button class="tab-btn" id="tab-apacs-geradas" onclick="switchTab('apacs-geradas')"><i class="fas fa-file-medical"></i> APAC</button>
             </div>
         </header>
+
 
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="flex-1 overflow-y-auto p-3 md:p-5 lg:p-6" id="mainContent">
@@ -423,6 +424,8 @@
                     <div class="flex flex-wrap gap-2 mt-3">
                         <span class="fluxo-step bg-orange-100 text-orange-700"><i class="fas fa-user-times mr-1"></i> Absenteísmo 1ª</span>
                         <span class="fluxo-step bg-red-100 text-red-700"><i class="fas fa-user-slash mr-1"></i> Absenteísmo Retorno</span>
+                        <span class="fluxo-step bg-rose-100 text-rose-700"><i class="fas fa-ban mr-1"></i> Cancelado</span>
+                        <span class="fluxo-step bg-amber-100 text-amber-700"><i class="fas fa-exchange-alt mr-1"></i> Transferido</span>
                     </div>
                     
                     <!-- LEGENDA -->
@@ -447,7 +450,7 @@
                     </div>
                 </div>
 
-                <!-- CARDS DE INDICADORES -->
+                <!-- CARDS DE INDICADORES COM NOVAS ESPECIALIDADES -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div class="bg-white rounded-2xl shadow-sm border p-5 card-blue">
                         <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i class="fas fa-stethoscope text-blue-500"></i> Regras por Especialidade</h3>
@@ -457,6 +460,8 @@
                             <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">🎗️ Oncologia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">BIO; AP; USG</span></div>
                             <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">👁️ Oftalmologia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">Mapeamento</span></div>
                             <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">👂 Otorrino</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">Audiometria</span></div>
+                            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">👩 Saúde da Mulher</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">USG; Colposcopia</span></div>
+                            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg"><span class="text-sm font-bold text-slate-700">🔪 Cirurgia</span><span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">Avaliação Pré-op</span></div>
                         </div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border p-5 card-emerald">
@@ -519,7 +524,7 @@
                 </div>
             </div>
 
-            <!-- ============ MONITORAMENTO ============ -->
+            <!-- ============ MONITORAMENTO (CORRIGIDO) ============ -->
             <div id="content-monitoramento" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 items-center justify-between">
@@ -527,12 +532,20 @@
                         <div class="flex flex-wrap gap-2">
                             <input type="text" id="buscaMonitoramento" placeholder="Buscar..." class="px-3 py-2 border rounded-xl text-sm w-48" oninput="filtrarTabela('monitoramento')">
                             <select id="filtroEspecialidadeMonitoramento" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="filtrarTabela('monitoramento')"><option value="">Todas</option></select>
-                            <select id="filtroStatusMonitoramento" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="filtrarTabela('monitoramento')"><option value="">Todos</option>
-                                <option value="agendada">Agendada</option><option value="recepcionada">Recepcionada</option>
-                                <option value="aguardando_exame">Ag. Exame</option><option value="apto_retorno">Apto Retorno</option>
-                                <option value="retorno_agendado">Ret. Agendado</option><option value="retorno_recepcionado">Ret. Recepcionado</option>
-                                <option value="oci_fechada">OCI Fechada</option><option value="apac_gerada">APAC Gerada</option>
-                                <option value="faltou">Faltou 1ª</option><option value="retorno_faltou">Faltou Retorno</option>
+                            <select id="filtroStatusMonitoramento" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="filtrarTabela('monitoramento')">
+                                <option value="">Todos</option>
+                                <option value="agendada">Agendada</option>
+                                <option value="recepcionada">Recepcionada</option>
+                                <option value="aguardando_exame">Ag. Exame</option>
+                                <option value="apto_retorno">Apto Retorno</option>
+                                <option value="retorno_agendado">Ret. Agendado</option>
+                                <option value="retorno_recepcionado">Ret. Recepcionado</option>
+                                <option value="oci_fechada">OCI Fechada</option>
+                                <option value="apac_gerada">APAC Gerada</option>
+                                <option value="faltou">Faltou 1ª</option>
+                                <option value="retorno_faltou">Faltou Retorno</option>
+                                <option value="cancelada">❌ Cancelado</option>
+                                <option value="transferida">🔄 Transferido</option>
                             </select>
                             <select id="paginaMonitoramento" class="px-3 py-2 border rounded-xl text-sm filter-select-custom" onchange="mudarPagina('monitoramento')">
                                 <option value="15">15</option><option value="30">30</option><option value="50">50</option><option value="100" selected>100</option>
@@ -541,16 +554,17 @@
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full monitoramento-tabela text-sm">
+                        <table class="w-full monitoramento-tabela text-sm" id="tabelaMonitoramentoContainer">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','numero_solicitacao')">Nº Solic</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','prontuario')">Pront</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','nome')">Paciente</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','especialidade')">Especialidade</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase" style="min-width:150px;">Linha do Cuidado</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase th-sortable" onclick="ordenarTabela('monitoramento','status')">Status</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Dias Rest.</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Alerta</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left th-sortable" onclick="ordenarTabela('monitoramento','numero_solicitacao')">Nº Solic</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left th-sortable" onclick="ordenarTabela('monitoramento','prontuario')">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left th-sortable" onclick="ordenarTabela('monitoramento','nome')">Paciente</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left th-sortable" onclick="ordenarTabela('monitoramento','especialidade')">Especialidade</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left" style="min-width:150px;">Timeline</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left th-sortable" onclick="ordenarTabela('monitoramento','status')">Status</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Subgrupo</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-center">Dias Rest.</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-center">Alerta</th>
                             </tr></thead>
                             <tbody class="divide-y" id="tabelaMonitoramento"></tbody>
                         </table>
@@ -575,14 +589,14 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solic</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Pront</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Exame</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data Solic</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data Real</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Dias até Real</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Status</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Exame</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Solic</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Real</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Dias até Real</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Status</th>
                             </tr></thead>
                             <tbody class="divide-y" id="tabelaMonitoramentoExames"></tbody>
                         </table>
@@ -607,11 +621,11 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase">Pront</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase">CPF</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Especialidade</th><th class="px-2 py-2 text-xs font-bold uppercase">Médico</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Local</th><th class="px-2 py-2 text-xs font-bold uppercase">Data Agenda</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Operador</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">CPF</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Especialidade</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Médico</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Agenda</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Operador</th>
                             </tr></thead>
                             <tbody id="tabelaPrimeiraConsultaAgendadas"></tbody>
                         </table>
@@ -636,11 +650,11 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase">Pront</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase">CPF</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase">Especialidade</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase">Local</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data 1ª Cons</th><th class="px-2 py-2 text-xs font-bold uppercase">Operador</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">CPF</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Especialidade</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data 1ª Cons</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Operador</th>
                             </tr></thead>
                             <tbody id="tabelaPrimeiraConsulta"></tbody>
                         </table>
@@ -665,12 +679,12 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase">Pront</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase">CPF</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase">Especialidade</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase">Local</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data 1ª Cons</th><th class="px-2 py-2 text-xs font-bold uppercase">Exames</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data Real</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">CPF</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Especialidade</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data 1ª Cons</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Exames</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Real</th>
                             </tr></thead>
                             <tbody id="tabelaAptosRetorno"></tbody>
                         </table>
@@ -695,12 +709,12 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solic 1ª</th><th class="px-2 py-2 text-xs font-bold uppercase">Nº Ret</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Pront</th><th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">CPF</th><th class="px-2 py-2 text-xs font-bold uppercase">UBS</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Especialidade</th><th class="px-2 py-2 text-xs font-bold uppercase">Médico</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Local</th><th class="px-2 py-2 text-xs font-bold uppercase">Data 1ª Cons</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data Retorno</th><th class="px-2 py-2 text-xs font-bold uppercase">Exames</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic 1ª</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Ret</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">CPF</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">UBS</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Especialidade</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Médico</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Data 1ª Cons</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Retorno</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Exames</th>
                             </tr></thead>
                             <tbody id="tabelaRetornosAgendados"></tbody>
                         </table>
@@ -709,7 +723,7 @@
                 </div>
             </div>
 
-            <!-- ============ RETORNOS RECEPCIONADOS ============ -->
+            <!-- ============ RETORNOS RECEPCIONADOS (CORRIGIDO) ============ -->
             <div id="content-retornos-recepcionados" class="tab-content space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b flex flex-wrap gap-3 justify-between items-center">
@@ -725,12 +739,18 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solic 1ª</th><th class="px-2 py-2 text-xs font-bold uppercase">Nº Ret</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Pront</th><th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">CPF</th><th class="px-2 py-2 text-xs font-bold uppercase">UBS</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Especialidade</th><th class="px-2 py-2 text-xs font-bold uppercase">Médico</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Local</th><th class="px-2 py-2 text-xs font-bold uppercase">Data 1ª Cons</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data Recep</th><th class="px-2 py-2 text-xs font-bold uppercase">Exames</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic 1ª</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic Retorno</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">CPF</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">UBS</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Especialidade</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Médico</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data 1ª Cons</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Recep Retorno</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Exames</th>
                             </tr></thead>
                             <tbody id="tabelaRetornosRecepcionados"></tbody>
                         </table>
@@ -755,10 +775,10 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase">Pront</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase">CPF</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase">Médico</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Local</th><th class="px-2 py-2 text-xs font-bold uppercase">Data Agendamento</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">CPF</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Médico</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Agendamento</th>
                             </tr></thead>
                             <tbody id="tabelaAbsenteismo1Consulta"></tbody>
                         </table>
@@ -783,11 +803,11 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Retorno</th><th class="px-2 py-2 text-xs font-bold uppercase">Pront</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase">CPF</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase">Especialidade</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase">Local</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data Agendamento</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Retorno</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">CPF</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Especialidade</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Agendamento</th>
                             </tr></thead>
                             <tbody id="tabelaAbsenteismoRetorno"></tbody>
                         </table>
@@ -821,11 +841,11 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase">Pront</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase">CPF</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase">Especialidade</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase">Local</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data 1ª Cons</th><th class="px-2 py-2 text-xs font-bold uppercase">Data Fechamento</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">CPF</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Especialidade</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data 1ª Cons</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Fechamento</th>
                             </tr></thead>
                             <tbody id="tabelaAPAC"></tbody>
                         </table>
@@ -859,12 +879,12 @@
                     <div class="overflow-x-auto">
                         <table class="w-full tabela-colunas text-sm">
                             <thead><tr class="bg-slate-50">
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase">Pront</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase">CPF</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase">Especialidade</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase">Local</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase">Data 1ª Cons</th><th class="px-2 py-2 text-xs font-bold uppercase">Data Fechamento</th>
-                                <th class="px-2 py-2 text-xs font-bold uppercase bg-indigo-50">Nº APAC</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Nº Solic</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Pront</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Paciente</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">CPF</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">UBS</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Especialidade</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Médico</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data 1ª Cons</th><th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Fechamento</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left bg-indigo-50">Nº APAC</th>
                             </tr></thead>
                             <tbody id="tabelaAPACSGeradas"></tbody>
                         </table>
@@ -873,7 +893,7 @@
                 </div>
             </div>
             
-        </div><!-- Fim do conteúdo principal -->
+        </div>
     </main>
 </div>
 
@@ -1165,7 +1185,10 @@ const especialidades = [
     {id:2, nome:'Ortopedia', icone:'🦴', prazo_retorno_dias:60},
     {id:3, nome:'Oncologia', icone:'🎗️', prazo_retorno_dias:30},
     {id:4, nome:'Oftalmologia', icone:'👁️', prazo_retorno_dias:60},
-    {id:5, nome:'Otorrino', icone:'👂', prazo_retorno_dias:60}
+    {id:5, nome:'Otorrino', icone:'👂', prazo_retorno_dias:60},
+    {id:6, nome:'Saúde da Mulher', icone:'👩', prazo_retorno_dias:60},
+    {id:7, nome:'Cirurgia', icone:'🔪', prazo_retorno_dias:60},
+    {id:8, nome:'Alto Custo', icone:'💰', prazo_retorno_dias:60}
 ];
 
 let usuarioLogado = null;
@@ -1243,8 +1266,8 @@ function getStatusBadge(status) {
         'apac_gerada': {t:'APAC Gerada', c:'text-pink-600 bg-pink-50'},
         'faltou': {t:'Faltou 1ª', c:'text-orange-600 bg-orange-50'},
         'retorno_faltou': {t:'Faltou Ret.', c:'text-red-600 bg-red-50'},
-        'cancelada': {t:'Cancelada', c:'text-slate-600 bg-slate-100'},
-        'transferida': {t:'Transferida', c:'text-slate-600 bg-slate-100'}
+        'cancelada': {t:'❌ Cancelada', c:'text-rose-600 bg-rose-50'},
+        'transferida': {t:'🔄 Transferida', c:'text-amber-600 bg-amber-50'}
     };
     return map[status] || {t:status, c:'text-slate-600 bg-slate-50'};
 }
@@ -1636,46 +1659,6 @@ async function carregarDadosSupabase() {
 }
 
 // ============================================
-// ATUALIZAR SIDEBAR
-// ============================================
-function atualizarSidebar() {
-    if (!usuarioLogado) return;
-    
-    document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Usuário';
-    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
-    
-    const tipoLabel = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : 
-                     usuarioLogado.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário';
-    document.getElementById('sidebarTipo').textContent = tipoLabel;
-    document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
-    
-    // ============ SEÇÃO ADMINISTRAÇÃO (APENAS ADMIN) ============
-    const adminSection = document.getElementById('sidebarAdminSection');
-    if (adminSection) {
-        if (usuarioLogado.tipo === 'admin') {
-            adminSection.classList.remove('hidden');
-            adminSection.style.display = 'block';
-            console.log('✅ Seção Administração visível para admin');
-        } else {
-            adminSection.classList.add('hidden');
-            adminSection.style.display = 'none';
-        }
-    }
-    
-    // ============ SEÇÃO APAC (ADMIN E ADMIN_APAC) ============
-    const apacSection = document.getElementById('sidebarAPACSection');
-    if (apacSection) {
-        if (podeGerarRelatorioAPAC()) {
-            apacSection.classList.remove('hidden');
-            apacSection.style.display = 'block';
-        } else {
-            apacSection.classList.add('hidden');
-            apacSection.style.display = 'none';
-        }
-    }
-}
-
-// ============================================
 // GERAR TIMELINE
 // ============================================
 function gerarTimeline(status) {
@@ -1732,6 +1715,43 @@ function gerarTimeline(status) {
 }
 
 // ============================================
+// ATUALIZAR SIDEBAR
+// ============================================
+function atualizarSidebar() {
+    if (!usuarioLogado) return;
+    
+    document.getElementById('sidebarNome').textContent = usuarioLogado.nome || 'Usuário';
+    document.getElementById('sidebarAvatar').textContent = (usuarioLogado.nome || 'U')[0].toUpperCase();
+    
+    const tipoLabel = usuarioLogado.tipo === 'admin' ? '👑 Administrador' : 
+                     usuarioLogado.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário';
+    document.getElementById('sidebarTipo').textContent = tipoLabel;
+    document.getElementById('sidebarUBS').textContent = usuarioLogado.unidade_saude || '';
+    
+    const adminSection = document.getElementById('sidebarAdminSection');
+    if (adminSection) {
+        if (usuarioLogado.tipo === 'admin') {
+            adminSection.classList.remove('hidden');
+            adminSection.style.display = 'block';
+        } else {
+            adminSection.classList.add('hidden');
+            adminSection.style.display = 'none';
+        }
+    }
+    
+    const apacSection = document.getElementById('sidebarAPACSection');
+    if (apacSection) {
+        if (podeGerarRelatorioAPAC()) {
+            apacSection.classList.remove('hidden');
+            apacSection.style.display = 'block';
+        } else {
+            apacSection.classList.add('hidden');
+            apacSection.style.display = 'none';
+        }
+    }
+}
+
+// ============================================
 // ATUALIZAR TUDO
 // ============================================
 async function atualizarTudo() {
@@ -1767,14 +1787,43 @@ async function atualizarTudo() {
     const statsGrid = document.getElementById('statsGrid');
     if (statsGrid) {
         statsGrid.innerHTML = `
-            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-blue text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">OCI Aberta</p><h3 class="text-2xl font-extrabold mt-1">${emAndamento + aguardandoExame}</h3></div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-cyan text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">Aptos Retorno</p><h3 class="text-2xl font-extrabold mt-1">${aptosRetorno}</h3></div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-teal text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">Ret. Recep.</p><h3 class="text-2xl font-extrabold mt-1">${retornoRecepcionado}</h3></div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-emerald text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">OCIs Fechadas</p><h3 class="text-2xl font-extrabold mt-1">${pct}%</h3></div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-purple text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">APAC´s</p><h3 class="text-2xl font-extrabold mt-1">${apacsGeradasCount}</h3></div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-rose text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">Abs. 1ª</p><h3 class="text-2xl font-extrabold mt-1">${faltou1}</h3></div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover" style="border-left:5px solid #dc2626; text-align:center;"><p class="text-slate-500 text-[10px] font-bold uppercase">Abs. Ret.</p><h3 class="text-2xl font-extrabold mt-1">${faltouRetorno}</h3></div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover" style="border-left:5px solid #64748b; text-align:center;"><p class="text-slate-500 text-[10px] font-bold uppercase">Cancel./Transf.</p><h3 class="text-2xl font-extrabold mt-1">${canceladas + transferidas}</h3></div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-blue text-center">
+                <p class="text-slate-500 text-[10px] font-bold uppercase">OCI Aberta</p>
+                <h3 class="text-2xl font-extrabold mt-1">${emAndamento + aguardandoExame}</h3>
+                <p class="text-[10px] text-slate-400">${totalOCI > 0 ? Math.round(((emAndamento + aguardandoExame) / totalOCI) * 100) : 0}%</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-cyan text-center">
+                <p class="text-slate-500 text-[10px] font-bold uppercase">Aptos Retorno</p>
+                <h3 class="text-2xl font-extrabold mt-1">${aptosRetorno}</h3>
+                <p class="text-[10px] text-slate-400">${totalOCI > 0 ? Math.round((aptosRetorno / totalOCI) * 100) : 0}%</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-teal text-center">
+                <p class="text-slate-500 text-[10px] font-bold uppercase">Ret. Recep.</p>
+                <h3 class="text-2xl font-extrabold mt-1">${retornoRecepcionado}</h3>
+                <p class="text-[10px] text-slate-400">${totalOCI > 0 ? Math.round((retornoRecepcionado / totalOCI) * 100) : 0}%</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-emerald text-center">
+                <p class="text-slate-500 text-[10px] font-bold uppercase">OCIs Fechadas</p>
+                <h3 class="text-2xl font-extrabold mt-1">${pct}%</h3>
+                <p class="text-[10px] text-slate-400">${ociFechada} fechadas</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-purple text-center">
+                <p class="text-slate-500 text-[10px] font-bold uppercase">APAC´s</p>
+                <h3 class="text-2xl font-extrabold mt-1">${apacsGeradasCount}</h3>
+                <p class="text-[10px] text-slate-400">${totalOCI > 0 ? Math.round((apacsGeradasCount / totalOCI) * 100) : 0}%</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover card-rose text-center">
+                <p class="text-slate-500 text-[10px] font-bold uppercase">Abs. 1ª</p>
+                <h3 class="text-2xl font-extrabold mt-1">${faltou1}</h3>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover" style="border-left:5px solid #dc2626; text-align:center;">
+                <p class="text-slate-500 text-[10px] font-bold uppercase">Abs. Ret.</p>
+                <h3 class="text-2xl font-extrabold mt-1">${faltouRetorno}</h3>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm stat-card-hover" style="border-left:5px solid #64748b; text-align:center;">
+                <p class="text-slate-500 text-[10px] font-bold uppercase">Cancel./Transf.</p>
+                <h3 class="text-2xl font-extrabold mt-1">${canceladas + transferidas}</h3>
+            </div>
         `;
     }
 
@@ -1995,7 +2044,11 @@ function renderizarTabelas() {
                 let diasRestantes = '—';
                 let alertaClasse = 'cinza';
                 let alertaTexto = '—';
-                if (item.status !== 'oci_fechada' && item.status !== 'apac_gerada' && item.status !== 'faltou' && item.status !== 'retorno_faltou' && item.status !== 'cancelada' && item.status !== 'transferida') {
+                let subgrupo = item.subgrupo_sigtap || '—';
+                
+                if (item.status !== 'oci_fechada' && item.status !== 'apac_gerada' && 
+                    item.status !== 'faltou' && item.status !== 'retorno_faltou' && 
+                    item.status !== 'cancelada' && item.status !== 'transferida') {
                     if (item.data_agendada) {
                         const prazo = e.prazo_retorno_dias || 60;
                         const dataRef = new Date(item.data_agendada + 'T12:00:00');
@@ -2005,17 +2058,23 @@ function renderizarTabelas() {
                         if (diasRest < 0) {
                             diasRestantes = `Vencido ${Math.abs(diasRest)}d`;
                             alertaClasse = 'vermelho';
-                            alertaTexto = 'OCI Pendente';
+                            alertaTexto = '⚠️ Pendente!';
                         } else if (diasRest <= 15) {
                             diasRestantes = `${diasRest} dias`;
                             alertaClasse = 'amarelo';
-                            alertaTexto = 'Próximo do prazo';
+                            alertaTexto = '⏳ Próximo do prazo';
                         } else {
                             diasRestantes = `${diasRest} dias`;
                             alertaClasse = 'verde';
-                            alertaTexto = 'Dentro do Prazo';
+                            alertaTexto = '✅ Dentro do Prazo';
                         }
                     }
+                } else if (item.status === 'cancelada') {
+                    alertaTexto = '❌ Cancelado';
+                    alertaClasse = 'cinza';
+                } else if (item.status === 'transferida') {
+                    alertaTexto = '🔄 Transferido';
+                    alertaClasse = 'cinza';
                 }
                 
                 let linha = '';
@@ -2023,43 +2082,44 @@ function renderizarTabelas() {
                 switch(tipo) {
                     case 'monitoramento':
                         linha = `<tr class="hover:bg-slate-50 border-b">
-                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
-                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
-                            <td class="px-2 py-2 font-bold text-sm">${p.nome || '—'}</td>
-                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
-                            <td class="px-2 py-2">${gerarTimeline(item.status)}</td>
-                            <td class="px-2 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${st.c}">${st.t}</span></td>
-                            <td class="px-2 py-2"><span class="status-dias ${alertaClasse}">${diasRestantes}</span></td>
-                            <td class="px-2 py-2"><span class="alerta-badge ${alertaClasse}">${alertaTexto}</span></td>
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm text-left">${p.nome || '—'}</td>
+                            <td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-left">${gerarTimeline(item.status)}</td>
+                            <td class="px-2 py-2 text-left"><span class="px-2 py-1 rounded-full text-xs font-bold ${st.c}">${st.t}</span></td>
+                            <td class="px-2 py-2 text-left text-xs">${subgrupo}</td>
+                            <td class="px-2 py-2 text-center"><span class="status-dias ${alertaClasse}">${diasRestantes}</span></td>
+                            <td class="px-2 py-2 text-center"><span class="alerta-badge ${alertaClasse}">${alertaTexto}</span></td>
                         </tr>`;
                         break;
                         
                     case 'monitoramento-exames':
                         linha = `<tr class="hover:bg-slate-50 border-b">
-                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
-                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
-                            <td class="px-2 py-2 font-bold text-sm">${p.nome || '—'}</td>
-                            <td class="px-2 py-2 text-sm">${item.nome_exame || '—'}</td>
-                            <td class="px-2 py-2 text-sm">${formatarData(item.data_solicitacao_exame)}</td>
-                            <td class="px-2 py-2 text-sm">${formatarData(item.data_realizacao_exame)}</td>
-                            <td class="px-2 py-2 text-sm font-bold">${item.dias_ate_realizacao || '—'}</td>
-                            <td class="px-2 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${item.status_exame === '✅ Realizado' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${item.status_exame || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm text-left">${p.nome || '—'}</td>
+                            <td class="px-2 py-2 text-sm text-left">${item.nome_exame || '—'}</td>
+                            <td class="px-2 py-2 text-sm text-left">${formatarData(item.data_solicitacao_exame)}</td>
+                            <td class="px-2 py-2 text-sm text-left">${formatarData(item.data_realizacao_exame)}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-left">${item.dias_ate_realizacao || '—'}</td>
+                            <td class="px-2 py-2 text-left"><span class="px-2 py-1 rounded-full text-xs font-bold ${item.status_exame === '✅ Realizado' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${item.status_exame || '—'}</span></td>
                         </tr>`;
                         break;
                         
                     default:
                         linha = `<tr class="hover:bg-slate-50 border-b">
-                            <td class="px-2 py-2 text-sm font-bold text-blue-600">${item.numero_solicitacao || '—'}</td>
-                            <td class="px-2 py-2 text-sm font-bold text-purple-600">${p.prontuario || '—'}</td>
-                            <td class="px-2 py-2 font-bold text-sm">${p.nome || '—'}</td>
-                            <td class="px-2 py-2 text-sm font-mono">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
-                            <td class="px-2 py-2 text-sm">${item.unidade_basica_saude || '—'}</td>
-                            <td class="px-2 py-2"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
-                            <td class="px-2 py-2 text-sm">${item.medico_solicitante || '—'}</td>
-                            <td class="px-2 py-2 text-sm">${item.local_consulta || '—'}</td>
-                            <td class="px-2 py-2 text-sm">${formatarData(item.data_agendada)}</td>
-                            <td class="px-2 py-2 text-sm">${formatarData(item.data_fechamento || item.data_retorno_recepcionada || item.data_recepcionada)}</td>
-                            <td class="px-2 py-2 text-sm">${item.usuario_cadastrou || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">${item.numero_solicitacao || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">${p.prontuario || '—'}</td>
+                            <td class="px-2 py-2 font-bold text-sm text-left">${p.nome || '—'}</td>
+                            <td class="px-2 py-2 text-sm font-mono text-left">${p.cpf ? formatarCPF(p.cpf) : '—'}</td>
+                            <td class="px-2 py-2 text-sm text-left">${item.unidade_basica_saude || '—'}</td>
+                            <td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">${e.icone || ''} ${e.nome || '—'}</span></td>
+                            <td class="px-2 py-2 text-sm text-left">${item.medico_solicitante || '—'}</td>
+                            <td class="px-2 py-2 text-sm text-left">${item.local_consulta || '—'}</td>
+                            <td class="px-2 py-2 text-sm text-left">${formatarData(item.data_agendada)}</td>
+                            <td class="px-2 py-2 text-sm text-left">${formatarData(item.data_fechamento || item.data_retorno_recepcionada || item.data_recepcionada)}</td>
+                            <td class="px-2 py-2 text-sm text-left">${item.usuario_cadastrou || '—'}</td>
                         </tr>`;
                 }
                 
@@ -2075,43 +2135,6 @@ function renderizarTabelas() {
         }
         pagEl.innerHTML = `<span class="text-xs text-slate-500">${dados.length} registros | Pág ${paginaAtual[tipo]} de ${totalPag}</span><div class="flex gap-1 flex-wrap">${pagHTML}</div>`;
     });
-}
-
-// ============================================
-// EXPORTAÇÃO EXCEL
-// ============================================
-function exportarExcel(tipo) {
-    const dados = getDadosFiltrados(tipo);
-    if (dados.length === 0) { toast('⚠️ Nenhum dado para exportar!', 'warning'); return; }
-
-    const podeCompleto = podeVerDadosCompletos();
-
-    const exportData = dados.map(item => {
-        const p = pacientes.find(x => x.id === item.paciente_id) || {};
-        const e = especialidades.find(x => x.id === item.especialidade_id) || {};
-        const row = {
-            'Nº Solicitação': item.numero_solicitacao || '',
-            'Prontuário': p.prontuario || '',
-            'Paciente': podeCompleto ? (p.nome || '') : 'Paciente',
-            'CPF': podeCompleto ? (p.cpf || '') : '***.***.***-**',
-            'Especialidade': e.nome || '',
-            'Status': item.status || '',
-            'Data': item.data_agendada || ''
-        };
-        if (tipo === 'monitoramento-exames') {
-            row['Exame'] = item.nome_exame || '';
-            row['Data Solicitação'] = item.data_solicitacao_exame || '';
-            row['Data Realização'] = item.data_realizacao_exame || '';
-            row['Status Exame'] = item.status_exame || '';
-        }
-        return row;
-    });
-
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, tipo.replace(/-/g, '_'));
-    XLSX.writeFile(wb, `relatorio_${tipo.replace(/-/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`);
-    toast('✅ Exportado: ' + exportData.length + ' registros', 'success');
 }
 
 // ============================================
@@ -2223,6 +2246,129 @@ function renderizarGraficos() {
             plugins: [ChartDataLabels]
         });
     }
+}
+
+// ============================================
+// BUSCA GLOBAL
+// ============================================
+function buscarGlobal() {
+    const termo = document.getElementById('globalSearch').value.trim().toLowerCase();
+    if (!termo) {
+        atualizarTudo();
+        return;
+    }
+    
+    const pacientesEncontrados = pacientes.filter(p => 
+        (p.prontuario && p.prontuario.toString().includes(termo)) ||
+        (p.nome && p.nome.toLowerCase().includes(termo)) ||
+        (p.cpf && p.cpf.replace(/\D/g, '').includes(termo))
+    );
+    
+    const idsPacientes = new Set(pacientesEncontrados.map(p => p.id));
+    const consultasEncontradas = consultas.filter(c => 
+        idsPacientes.has(c.paciente_id) ||
+        (c.numero_solicitacao && c.numero_solicitacao.toString().includes(termo))
+    );
+    
+    if (consultasEncontradas.length === 0) {
+        toast('🔍 Nenhum resultado encontrado para: ' + termo, 'info');
+        return;
+    }
+    
+    const consultasAntigas = consultas;
+    consultas = consultasEncontradas;
+    
+    const tabAtual = document.querySelector('.tab-content.active');
+    if (tabAtual) {
+        const id = tabAtual.id.replace('content-', '');
+        const tiposTabela = ['monitoramento','monitoramento-exames','primeira-consulta-agendadas','primeira-consulta','aptos-retorno','retornos-agendados','retornos-recepcionados','absenteismo-1consulta','absenteismo-retorno','apac','apacs-geradas'];
+        if (tiposTabela.includes(id)) {
+            renderizarTabelas();
+        } else if (id === 'visao-geral') {
+            atualizarTudo();
+        }
+    }
+    
+    setTimeout(() => { consultas = consultasAntigas; }, 5000);
+    toast(`🔍 ${consultasEncontradas.length} registro(s) encontrado(s) para: ${termo}`, 'success');
+}
+
+// ============================================
+// EXPORTAÇÃO EXCEL (TODAS AS COLUNAS)
+// ============================================
+function exportarExcel(tipo) {
+    const dados = getDadosFiltrados(tipo);
+    if (dados.length === 0) { toast('⚠️ Nenhum dado para exportar!', 'warning'); return; }
+
+    const podeCompleto = podeVerDadosCompletos();
+
+    const exportData = dados.map(item => {
+        const p = pacientes.find(x => x.id === item.paciente_id) || {};
+        const e = especialidades.find(x => x.id === item.especialidade_id) || {};
+        
+        let diasRestantes = '—';
+        let alertaTexto = '—';
+        if (item.status !== 'oci_fechada' && item.status !== 'apac_gerada' && 
+            item.status !== 'faltou' && item.status !== 'retorno_faltou' && 
+            item.status !== 'cancelada' && item.status !== 'transferida') {
+            if (item.data_agendada) {
+                const prazo = e.prazo_retorno_dias || 60;
+                const dataRef = new Date(item.data_agendada + 'T12:00:00');
+                const hoje = new Date();
+                const diasDecorridos = Math.floor((hoje - dataRef) / 86400000);
+                const diasRest = prazo - diasDecorridos;
+                if (diasRest < 0) {
+                    diasRestantes = `Vencido ${Math.abs(diasRest)}d`;
+                    alertaTexto = '⚠️ Pendente!';
+                } else if (diasRest <= 15) {
+                    diasRestantes = `${diasRest} dias`;
+                    alertaTexto = '⏳ Próximo do prazo';
+                } else {
+                    diasRestantes = `${diasRest} dias`;
+                    alertaTexto = '✅ Dentro do Prazo';
+                }
+            }
+        } else if (item.status === 'cancelada') {
+            alertaTexto = '❌ Cancelado';
+        } else if (item.status === 'transferida') {
+            alertaTexto = '🔄 Transferido';
+        }
+        
+        const row = {
+            'Nº Solicitação': item.numero_solicitacao || '',
+            'Prontuário': p.prontuario || '',
+            'Paciente': podeCompleto ? (p.nome || '') : 'Paciente',
+            'CPF': podeCompleto ? (p.cpf || '') : '***.***.***-**',
+            'Especialidade': e.nome || '',
+            'Subgrupo': item.subgrupo_sigtap || '',
+            'Status': item.status || '',
+            'Data Agendada': item.data_agendada || '',
+            'Data Recepção': item.data_recepcionada || '',
+            'Data Retorno Agendado': item.data_retorno_agendada || '',
+            'Data Retorno Recepcionado': item.data_retorno_recepcionada || '',
+            'Data Fechamento': item.data_fechamento || '',
+            'Dias Restantes': diasRestantes,
+            'Alerta': alertaTexto,
+            'Médico': item.medico_solicitante || '',
+            'Local': item.local_consulta || '',
+            'UBS': item.unidade_basica_saude || '',
+            'Usuário Cadastrou': item.usuario_cadastrou || '',
+            'Data Cadastro': formatarDataHora(item.created_at)
+        };
+        if (tipo === 'monitoramento-exames') {
+            row['Exame'] = item.nome_exame || '';
+            row['Data Solicitação'] = item.data_solicitacao_exame || '';
+            row['Data Realização'] = item.data_realizacao_exame || '';
+            row['Status Exame'] = item.status_exame || '';
+        }
+        return row;
+    });
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, tipo.replace(/-/g, '_'));
+    XLSX.writeFile(wb, `relatorio_${tipo.replace(/-/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`);
+    toast('✅ Exportado: ' + exportData.length + ' registros', 'success');
 }
 
 // ============================================
@@ -2849,7 +2995,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('globalSearch').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            toast('🔍 Busca global em desenvolvimento', 'info');
+            buscarGlobal();
+        }
+    });
+    document.getElementById('globalSearch').addEventListener('input', (e) => {
+        if (!e.target.value.trim()) {
+            atualizarTudo();
         }
     });
 
@@ -2886,3 +3037,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
